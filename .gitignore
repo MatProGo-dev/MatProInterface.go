@@ -19,3 +19,7 @@
 
 # Setup Files
 extras/*.txt
+
+# Testing files
+testing/*.txt
+testing/*.log

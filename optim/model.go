@@ -3,7 +3,6 @@ package optim
 import (
 	"errors"
 	"fmt"
-	"github.com/kwesiRutledge/gurobi.go/gurobi"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -54,7 +53,7 @@ Description:
 	Adds a Real variable to the model and returns said variable.
 */
 func (m *Model) AddRealVariable() Variable {
-	return m.AddVariableClassic(-gurobi.INFINITY, gurobi.INFINITY, Continuous)
+	return m.AddVariableClassic(-INFINITY, INFINITY, Continuous)
 }
 
 // AddVariable adds a variable of a given variable type to the model given the lower

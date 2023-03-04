@@ -5,6 +5,11 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
+// Constants
+// =========
+
+const INFINITY = 1e100
+
 // SumVars returns the sum of the given variables. It creates a new empty
 // expression and adds to it the given variables.
 func SumVars(vs ...Variable) ScalarExpression {
