@@ -39,8 +39,8 @@ func GetDefaultSetupInfo() (SetupInfo, error) {
 	}
 
 	sf0 := SetupInfo{
-		InitialDirectory:  fmt.Sprintf("%v/go/pkg/mod/github.com/kwesi!rutledge/", homeDir),
-		GurobiGoDirectory: fmt.Sprintf("%v/go/pkg/mod/github.com/kwesi!rutledge/", homeDir),
+		InitialDirectory:  fmt.Sprintf("%v/go/pkg/mod/github.com/MatProGo-dev/", homeDir),
+		GurobiGoDirectory: fmt.Sprintf("%v/go/pkg/mod/github.com/MatProGo-dev/", homeDir),
 	}
 
 	// Get current working directory
@@ -76,7 +76,7 @@ Description:
 	Run the safe go get which is necessary for this library which uses cgo.
 */
 func SafeGetGurobiGo() error {
-	err := exec.Command("go", "get", "-d", "github.com/kwesiRutledge/gurobi.go/gurobi").Run()
+	err := exec.Command("go", "get", "-d", "github.com/MatProGo-dev/Gurobi.go/gurobi").Run()
 	if err != nil {
 		return fmt.Errorf("There was an issue running go get: %v", err)
 	}
