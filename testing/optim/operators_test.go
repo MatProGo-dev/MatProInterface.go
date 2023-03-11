@@ -15,7 +15,7 @@ func TestOperators_LessEq1(t *testing.T) {
 	// Constants
 	desLength := 5
 
-	m := optim.NewModel()
+	m := optim.NewModel("LessEq1")
 	var vec1 = m.AddVariableVector(desLength)
 	var vec2 = optim.OnesVector(desLength)
 

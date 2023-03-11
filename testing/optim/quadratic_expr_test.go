@@ -122,7 +122,7 @@ Description:
 */
 func TestQuadraticExpr_NumVars1(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("NumVars1")
 
 	v1 := m.AddVariableClassic(-10, 10, optim.Continuous)
 	v2 := m.AddVariableClassic(-10, 10, optim.Continuous)
@@ -156,7 +156,7 @@ Description:
 */
 func TestQuadraticExpr_NumVars2(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("NumVars2")
 
 	v1 := m.AddVariableClassic(-10, 10, optim.Continuous)
 	v2 := m.AddVariableClassic(-10, 10, optim.Continuous)
@@ -197,7 +197,7 @@ Description:
 */
 func TestQuadraticExpr_NumVars3(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("NumVars3")
 
 	v1 := m.AddVariableClassic(-10, 10, optim.Continuous)
 
@@ -233,7 +233,7 @@ Description:
 */
 func TestQuadraticExpr_Vars1(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("Vars1")
 
 	v1 := m.AddVariableClassic(-10, 10, optim.Continuous)
 	v2 := m.AddVariableClassic(-10, 10, optim.Continuous)
@@ -281,7 +281,7 @@ Description:
 */
 func TestQuadraticExpr_Plus1(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("Plus1")
 
 	v1 := m.AddVariableClassic(-10, 10, optim.Continuous)
 	v2 := m.AddVariableClassic(-10, 10, optim.Continuous)
@@ -359,7 +359,7 @@ Description:
 */
 func TestQuadraticExpr_Plus2(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("Plus2")
 
 	v1 := m.AddVariableClassic(-10, 10, optim.Continuous)
 	v2 := m.AddVariableClassic(-10, 10, optim.Continuous)
@@ -432,7 +432,7 @@ Description:
 */
 func TestQuadraticExpr_Plus3(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("Plus3")
 
 	v1 := m.AddVariableClassic(-10, 10, optim.Continuous)
 	v2 := m.AddVariableClassic(-10, 10, optim.Continuous)
@@ -512,7 +512,7 @@ Description:
 */
 func TestQuadraticExpr_Plus4(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("Plus4")
 
 	v1 := m.AddVariableClassic(-10, 10, optim.Continuous)
 	v2 := m.AddVariableClassic(-10, 10, optim.Continuous)
@@ -598,7 +598,7 @@ Description:
 */
 func TestQuadraticExpr_Plus5(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("Plus5")
 
 	v1 := m.AddVariableClassic(-10, 10, optim.Continuous)
 	v2 := m.AddVariableClassic(-10, 10, optim.Continuous)
@@ -668,7 +668,7 @@ Description:
 */
 func TestQuadraticExpr_Plus6(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("Plus6")
 
 	v1 := m.AddVariableClassic(-10, 10, optim.Continuous)
 	v2 := m.AddVariableClassic(-10, 10, optim.Continuous)
@@ -784,7 +784,7 @@ Description:
 */
 func TestQuadraticExpr_RewriteInTermsOfIndices1(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("RewriteInTermsOfIndices1")
 
 	v1 := m.AddVariableClassic(-10, 10, optim.Continuous)
 	v2 := m.AddVariableClassic(-10, 10, optim.Continuous)

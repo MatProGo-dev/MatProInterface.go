@@ -19,7 +19,7 @@ Description:
 */
 func TestConstraint_IsConstraint1(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("IsConstraint1")
 
 	// Create a scalar constraint.
 
@@ -44,7 +44,7 @@ Description:
 */
 func TestConstraint_IsConstraint2(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("IsConstraint2")
 
 	// Create a scalar constraint.
 

@@ -16,7 +16,7 @@ Description:
 	In this case, the VectorLinearExpression is valid.
 */
 func TestVectorLinearExpression_Check1(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("Check1")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
@@ -48,7 +48,7 @@ Description:
 	In this case, the VectorLinearExpression is NOT valid. L is too big in rows.
 */
 func TestVectorLinearExpression_Check2(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("Check2")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
@@ -85,7 +85,7 @@ Description:
 	In this case, the VectorLinearExpression is NOT valid. L is too big in columns.
 */
 func TestVectorLinearExpression_Check3(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("Check3")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
@@ -121,7 +121,7 @@ Description:
 	This test the VariableIDs() method when a variable vector with 2 unique vectors.
 */
 func TestVectorLinearExpression_VariableIDs1(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("VariableIDs1")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
@@ -162,7 +162,7 @@ Description:
 	This test the VariableIDs() method works for a variable vector with 1 unique vectors.
 */
 func TestVectorLinearExpression_VariableIDs2(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("VariableIDs2")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
@@ -207,7 +207,7 @@ Description:
 	This test the Coeffs() method which should return the matrix's elements in a prescribed order.
 */
 func TestVectorLinearExpression_Coeffs1(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("Coeffs1")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
@@ -256,7 +256,7 @@ Description:
 	This test the Coeffs() method which should return the matrix's elements in a prescribed order.
 */
 func TestVectorLinearExpression_Coeffs2(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("Coeffs2")
 	x := m.AddBinaryVariable()
 
 	// Create Vector Variables
@@ -348,7 +348,7 @@ Description:
 */
 func TestVectorLinearExpression_Eq1(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("Eq1")
 
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
@@ -399,7 +399,7 @@ Description:
 */
 func TestVectorLinearExpression_Eq2(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("Eq2")
 
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
@@ -441,7 +441,7 @@ Description:
 */
 func TestVectorLinearExpression_Eq3(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("Eq3")
 
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
@@ -488,7 +488,7 @@ Description:
 	- VarVector
 */
 func TestVectorLinearExpression_Eq4(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("Eq4")
 	dimX := 2
 	x := m.AddVariableVector(dimX)
 
@@ -524,7 +524,7 @@ Description:
 	- Vector Linear Expression
 */
 func TestVectorLinearExpression_Eq5(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("Eq5")
 	dimX := 2
 	x := m.AddVariableVector(dimX)
 
@@ -557,7 +557,7 @@ Description:
 	A constraint between two vectors of length 2
 */
 func TestVectorLinearExpression_Len1(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("Len1")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
@@ -593,7 +593,7 @@ Description:
 	A constraint between two vectors of length 10
 */
 func TestVectorLinearExpression_Len2(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("Len2")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
@@ -632,7 +632,7 @@ Description:
 func TestVectorLinearExpr_Plus1(t *testing.T) {
 	// Constants
 	n := 5
-	m := optim.NewModel()
+	m := optim.NewModel("Plus1")
 
 	kv1 := optim.KVector(
 		optim.OnesVector(n),
@@ -700,7 +700,7 @@ Description:
 func TestVectorLinearExpr_Plus2(t *testing.T) {
 	// Constants
 	n := 5
-	m := optim.NewModel()
+	m := optim.NewModel("Plus2")
 
 	kv1 := optim.KVector(
 		optim.OnesVector(n + 1),
@@ -733,7 +733,7 @@ Description:
 func TestVectorLinearExpr_Plus3(t *testing.T) {
 	// Constants
 	n := 5
-	m := optim.NewModel()
+	m := optim.NewModel("Plus3")
 
 	kv1 := optim.KVector(
 		optim.OnesVector(n),
@@ -801,7 +801,7 @@ Description:
 func TestVectorLinearExpr_Plus4(t *testing.T) {
 	// Constants
 	n := 5
-	m := optim.NewModel()
+	m := optim.NewModel("Plus4")
 
 	vv1 := m.AddVariableVector(n)
 	vle2 := optim.VectorLinearExpr{
@@ -880,7 +880,7 @@ Description:
 func TestVectorLinearExpr_Plus5(t *testing.T) {
 	// Constants
 	n := 5
-	m := optim.NewModel()
+	m := optim.NewModel("Plus5")
 
 	vv1 := m.AddVariableVector(n)
 	vle1 := optim.VectorLinearExpr{
@@ -956,7 +956,7 @@ Description:
 func TestVectorLinearExpr_Plus6(t *testing.T) {
 	// Constants
 	n := 5
-	m := optim.NewModel()
+	m := optim.NewModel("Plus6")
 
 	vv1 := m.AddVariableVector(n)
 	vle1 := optim.VectorLinearExpr{

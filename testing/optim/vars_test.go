@@ -19,7 +19,7 @@ Description:
 */
 func TestVar_Plus1(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("Plus1")
 	x := m.AddVariable()
 
 	k1 := optim.K(1.0)
@@ -60,7 +60,7 @@ Description:
 */
 func TestVar_Plus2(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("Plus2")
 	x := m.AddVariable()
 	y := m.AddVariable()
 
@@ -108,7 +108,7 @@ Description:
 */
 func TestVar_Plus3(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("Plus3")
 	x := m.AddVariable()
 	y := m.AddVariable()
 	z := m.AddVariable()
@@ -199,7 +199,7 @@ Description:
 */
 func TestVar_Plus4(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("Plus4")
 	x := m.AddVariable()
 	y := m.AddVariable()
 	z := m.AddVariable()

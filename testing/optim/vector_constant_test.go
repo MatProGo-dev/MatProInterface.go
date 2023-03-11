@@ -123,7 +123,7 @@ Description:
 func TestKVector_Comparison2(t *testing.T) {
 	// Constants
 	desLength := 10
-	m := optim.NewModel()
+	m := optim.NewModel("Comparison2")
 	var vec1 = optim.KVector(optim.OnesVector(desLength))
 	var vec2 = m.AddVariableVector(desLength)
 
@@ -155,7 +155,7 @@ Description:
 func TestKVector_Comparison3(t *testing.T) {
 	// Constants
 	desLength := 10
-	m := optim.NewModel()
+	m := optim.NewModel("Comparison3")
 	var vec1 = optim.KVector(optim.OnesVector(desLength))
 	var vec2 = m.AddVariableVector(desLength)
 
@@ -196,7 +196,7 @@ Description:
 func TestKVector_Comparison4(t *testing.T) {
 	// Constants
 	desLength := 10
-	m := optim.NewModel()
+	m := optim.NewModel("Comparison4")
 	var vec1 = optim.KVector(optim.OnesVector(desLength))
 	var vec2 = m.AddVariableVector(desLength - 1)
 

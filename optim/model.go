@@ -13,27 +13,28 @@ import (
 // problem, constraints, objective, and parameters. New variables can only be
 // created using an instantiated Model.
 type Model struct {
-	Variables []Variable
-	constrs   []ScalarConstraint
-	obj       *Objective
-	showLog   bool
-	timeLimit time.Duration
+	Name        string
+	Variables   []Variable
+	Constraints []Constraint
+	Obj         *Objective
+	ShowLog     bool
+	TimeLimit   time.Duration
 }
 
 // NewModel returns a new model with some default arguments such as not to show
 // the log and no time limit.
-func NewModel() *Model {
-	return &Model{showLog: false}
+func NewModel(name string) *Model {
+	return &Model{Name: name, ShowLog: false}
 }
 
-// ShowLog instructs the solver to show the log or not.
-func (m *Model) ShowLog(shouldShow bool) {
-	m.showLog = shouldShow
-}
+//// ShowLog instructs the solver to show the log or not.
+//func (m *Model) ShowLog(shouldShow bool) {
+//	m.ShowLog = shouldShow
+//}
 
 // SetTimeLimit sets the solver time limit for the model.
 func (m *Model) SetTimeLimit(dur time.Duration) {
-	m.timeLimit = dur
+	m.TimeLimit = dur
 }
 
 /*
@@ -70,11 +71,10 @@ func (m *Model) AddBinaryVariable() Variable {
 	return m.AddVariableClassic(0, 1, Binary)
 }
 
-// AddVariableVector adds a vector of variables of a given variable type to the
-// model. It then returns the resulting slice.
 /*
 AddVariableVector
 Description:
+
 	Creates a VarVector object using a constructor that assumes you want an "unbounded" vector of real optimization
 	variables.
 */
@@ -167,13 +167,13 @@ func (m *Model) AddConstr(constr ScalarConstraint, extras ...interface{}) {
 	}
 
 	// Algorithm
-	m.constrs = append(m.constrs, constr)
+	m.Constraints = append(m.Constraints, constr)
 }
 
 // SetObjective sets the objective of the model given an expression and
 // objective sense.
 func (m *Model) SetObjective(e ScalarExpression, sense ObjSense) {
-	m.obj = NewObjective(e, sense)
+	m.Obj = NewObjective(e, sense)
 }
 
 // Optimize optimizes the model using the given solver type and returns the
@@ -196,23 +196,23 @@ func (m *Model) Optimize(solver Solver) (*Solution, error) {
 	// 	types.WriteByte(byte(v.Vtype))
 	// }
 
-	solver.ShowLog(m.showLog)
+	solver.ShowLog(m.ShowLog)
 
-	if m.timeLimit > 0 {
-		solver.SetTimeLimit(m.timeLimit.Seconds())
+	if m.TimeLimit > 0 {
+		solver.SetTimeLimit(m.TimeLimit.Seconds())
 	}
 
 	solver.AddVariables(m.Variables)
 
-	for _, constr := range m.constrs {
+	for _, constr := range m.Constraints {
 		solver.AddConstraint(constr)
 	}
 
-	if m.obj != nil {
+	if m.Obj != nil {
 		logrus.WithField(
-			"num_vars", m.obj.NumVars(),
+			"num_vars", m.Obj.NumVars(),
 		).Info("Number of variables in objective")
-		err = solver.SetObjective(*m.obj)
+		err = solver.SetObjective(*m.Obj)
 		if err != nil {
 			return nil, fmt.Errorf("There was an error setting the objective: %v", err)
 		}

@@ -8,7 +8,7 @@ import (
 )
 
 func TestVarVector_Length1(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("Length1")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
@@ -30,7 +30,7 @@ Description:
 	Tests that a larger vector variable (contains 5 elements) properly returns the right length.
 */
 func TestVarVector_Length2(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("Length2")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
@@ -52,7 +52,7 @@ Description:
 	Tests whether or not we can properly retrieve an element from a given vector.
 */
 func TestVarVector_At1(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("At1")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
@@ -75,7 +75,7 @@ Description:
 	Makes sure that if we change the extracted vector, it does not effect the element saved in the slice.
 */
 func TestVarVector_At2(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("At2")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
@@ -100,7 +100,7 @@ Description:
 	the VariableIDs method is called.
 */
 func TestVarVector_VariableIDs1(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("VariableIDs1")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
@@ -128,7 +128,7 @@ Description:
 	the VariableIDs method is called.
 */
 func TestVarVector_VariableIDs2(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("VariableIDs2")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
@@ -159,7 +159,7 @@ Description:
 	This test verifies that the constant method returns an all zero vector for any varvector object.
 */
 func TestVarVector_Constant1(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("Constant1")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
@@ -187,7 +187,7 @@ Description:
 	This one will be extremely long.
 */
 func TestVarVector_Constant2(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("Constant2")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
@@ -214,7 +214,7 @@ Description:
 	This test verifies that the Eq method works between a varvector and another object.
 */
 func TestVarVector_Eq1(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("Eq1")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
@@ -241,7 +241,7 @@ Description:
 	Comparison should be between var vector and an unsupported type.
 */
 func TestVarVector_Eq2(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("Eq2")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
@@ -267,7 +267,7 @@ Description:
 	This test verifies that the Eq method works between a varvector and another var vector.
 */
 func TestVarVector_Eq3(t *testing.T) {
-	m := optim.NewModel()
+	m := optim.NewModel("Eq3")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
@@ -296,7 +296,7 @@ Description:
 func TestVarVector_Comparison1(t *testing.T) {
 	// Constants
 	desLength := 10
-	m := optim.NewModel()
+	m := optim.NewModel("Comparison1")
 	var vec1 = m.AddVariableVector(desLength)
 	var vec2 = m.AddVariableVector(desLength - 1)
 
@@ -325,7 +325,7 @@ Description:
 func TestVarVector_Comparison2(t *testing.T) {
 	// Constants
 	desLength := 10
-	m := optim.NewModel()
+	m := optim.NewModel("Comparison2")
 	var vec1 = m.AddVariableVector(desLength)
 	var vec2 = m.AddVariableVector(desLength)
 
@@ -353,7 +353,7 @@ Description:
 func TestVarVector_Plus1(t *testing.T) {
 	// Constants
 	desLength := 10
-	m := optim.NewModel()
+	m := optim.NewModel("Plus1")
 	vec1 := m.AddVariableVector(desLength)
 	k2 := optim.KVector(optim.OnesVector(desLength))
 
@@ -409,7 +409,7 @@ Description:
 func TestVarVector_Plus2(t *testing.T) {
 	// Constants
 	desLength := 10
-	m := optim.NewModel()
+	m := optim.NewModel("Plus2")
 	vec1 := m.AddVariableVector(desLength)
 	k2 := optim.KVector(optim.OnesVector(desLength - 1))
 
@@ -434,7 +434,7 @@ Description:
 func TestVarVector_Plus3(t *testing.T) {
 	// Constants
 	desLength := 10
-	m := optim.NewModel()
+	m := optim.NewModel("Plus3")
 	vec1 := m.AddVariableVector(desLength)
 	k2 := optim.OnesVector(desLength)
 
@@ -490,7 +490,7 @@ Description:
 func TestVarVector_Plus4(t *testing.T) {
 	// Constants
 	desLength := 10
-	m := optim.NewModel()
+	m := optim.NewModel("Plus4")
 	vec1 := m.AddVariableVector(desLength)
 	vec2 := m.AddVariableVector(desLength - 2)
 	vec3 := optim.VarVector{
@@ -613,7 +613,7 @@ Description:
 func TestVarVector_Plus5(t *testing.T) {
 	// Constants
 	desLength := 10
-	m := optim.NewModel()
+	m := optim.NewModel("Plus5")
 	vec1 := m.AddVariableVector(desLength)
 	vec3 := m.AddVariableVector(desLength)
 
@@ -732,7 +732,7 @@ Description:
 func TestVarVector_AtVec1(t *testing.T) {
 	// Constants
 	desLength := 10
-	m := optim.NewModel()
+	m := optim.NewModel("AtVec1")
 	vec1 := m.AddVariableVector(desLength)
 	idx1 := 2
 

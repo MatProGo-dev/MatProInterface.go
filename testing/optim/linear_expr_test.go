@@ -6,8 +6,8 @@ import (
 	"testing"
 )
 
-func TestLinearExprCoeffsAndConstant(t *testing.T) {
-	m := optim.NewModel()
+func TestLinearExpr_CoeffsAndConstant1(t *testing.T) {
+	m := optim.NewModel("CoeffsAndConstant")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
@@ -77,7 +77,7 @@ func TestScalarLinearExpr_Plus1(t *testing.T) {
 	L2.ScaleVec(3.0, &L2)
 	c2 := 5.0
 
-	m := optim.NewModel()
+	m := optim.NewModel("Plus1")
 	vv1 := m.AddVariableVector(2)
 
 	// Create sle's
@@ -129,7 +129,7 @@ func TestScalarLinearExpr_Plus2(t *testing.T) {
 	L2.ScaleVec(3.0, &L2)
 	c2 := 5.0
 
-	m := optim.NewModel()
+	m := optim.NewModel("Plus2")
 	vv1 := m.AddVariableVector(3)
 
 	vv2 := optim.VarVector{
@@ -213,7 +213,7 @@ func TestScalarLinearExpr_Plus3(t *testing.T) {
 
 	K1 := optim.K(5)
 
-	m := optim.NewModel()
+	m := optim.NewModel("Plus3")
 	vv1 := m.AddVariableVector(2)
 
 	// Create sle's
@@ -263,7 +263,7 @@ Description:
 */
 func TestScalarLinearExpression_Plus3(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("Plus3")
 
 	v1 := m.AddVariableClassic(-10, 10, optim.Continuous)
 	v2 := m.AddVariableClassic(-10, 10, optim.Continuous)
@@ -350,7 +350,7 @@ Description:
 */
 func TestScalarLinearExpression_Plus4(t *testing.T) {
 	// Constants
-	m := optim.NewModel()
+	m := optim.NewModel("Plus4")
 
 	v1 := m.AddVariableClassic(-10, 10, optim.Continuous)
 	v2 := m.AddVariableClassic(-10, 10, optim.Continuous)
