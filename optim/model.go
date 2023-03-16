@@ -134,40 +134,41 @@ func (m *Model) AddBinaryVariableMatrix(rows, cols int) [][]Variable {
 	return m.AddVariableMatrix(rows, cols, 0, 1, Binary)
 }
 
-// AddConstr adds a the given constraint to the model.
-func (m *Model) AddConstr(constr ScalarConstraint, extras ...interface{}) {
+// AddConstr adds the given constraint to the model.
+func (m *Model) AddConstr(constr ScalarConstraint, extras ...interface{}) error {
 	// Constants
 	nExtraArguments := len(extras)
 
 	// Input Processing
-	if nExtraArguments > 1 {
-		// Do nothing, but report an error.
-		logrus.Error(
-			fmt.Sprintf("The optimizer tried to add a constraint using a bad call to AddConstr! Skipping this constraint: %v , because of extra inputs %v", constr, extras),
+	switch {
+	case nExtraArguments > 1:
+		// Do nothing, but report an error
+		return fmt.Errorf(
+			"The optimizer tried to add a constraint using a bad call to AddConstr! Skipping this constraint: %v , because of extra inputs %v",
+			constr,
+			extras,
 		)
-		return
-	}
-
-	optionalErrorArgument := extras[0]
-	switch optionalErrorArgument.(type) {
-	case error:
-		// Cast argument
-		err, _ := optionalErrorArgument.(error)
-		if err != nil {
-			logrus.Error(
-				fmt.Sprintf("There was an error computing constraint %v: %v", constr, err),
+	case nExtraArguments == 1:
+		e0AsError, tf := extras[0].(error)
+		if !tf {
+			return fmt.Errorf(
+				"The second argument to AddConstraint must be of type error; received type \"%T\".",
+				extras[0],
 			)
-			return
 		}
-	default:
-		logrus.Info(
-			fmt.Sprintf("Unexpected input to AddConstr %v of type %T.", optionalErrorArgument, optionalErrorArgument),
-		)
-		return
+
+		if e0AsError != nil {
+			return fmt.Errorf(
+				"There was an error computing constraint %v: %v",
+				constr, e0AsError,
+			)
+		}
 	}
+	// If no extras are given, then move on to last part.
 
 	// Algorithm
 	m.Constraints = append(m.Constraints, constr)
+	return nil
 }
 
 // SetObjective sets the objective of the model given an expression and
