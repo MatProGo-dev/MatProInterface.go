@@ -65,3 +65,73 @@ func TestModel_AddConstr1(t *testing.T) {
 	}
 
 }
+
+/*
+TestModel_AddConstr2
+Description:
+
+	Tests that a simple constraint (VectorConstraint) can be given to the model.
+*/
+func TestModel_AddConstr2(t *testing.T) {
+	// Constants
+	m := optim.NewModel("AddConstr1")
+
+	// Create Constraint
+	n := 3
+	vv1 := m.AddVariableVector(n)
+	kv1 := optim.OnesVector(n)
+	slc1, err := vv1.LessEq(kv1)
+	if err != nil {
+		t.Errorf("There was an issue creating the desired scalar constraint: %v", err)
+	}
+
+	// Add Constraint to Model
+	err = m.AddConstr(slc1)
+	if err != nil {
+		t.Errorf("There was an issue adding the constraint to the model: %v", err)
+	}
+
+	if len(m.Constraints) != 1 {
+		t.Errorf("Expected for the updated model to contain 1 constraint; received %v", len(m.Constraints))
+	}
+
+}
+
+/*
+TestModel_AddConstr3
+Description:
+
+	Tests that a simple constraint (VectorConstraint) can be given to the model.
+*/
+func TestModel_AddConstr3(t *testing.T) {
+	// Constants
+	m := optim.NewModel("AddConstr1")
+
+	// Create Constraint
+	n := 3
+	vv1 := m.AddVariableVector(n)
+	kv1 := optim.OnesVector(n)
+	L1 := optim.Identity(n)
+	L1.Scale(2.0, &L1)
+	vle1 := optim.VectorLinearExpr{
+		L: L1,
+		X: vv1,
+		C: kv1,
+	}
+
+	slc1, err := vle1.LessEq(optim.ZerosVector(n))
+	if err != nil {
+		t.Errorf("There was an issue creating the desired scalar constraint: %v", err)
+	}
+
+	// Add Constraint to Model
+	err = m.AddConstr(slc1)
+	if err != nil {
+		t.Errorf("There was an issue adding the constraint to the model: %v", err)
+	}
+
+	if len(m.Constraints) != 1 {
+		t.Errorf("Expected for the updated model to contain 1 constraint; received %v", len(m.Constraints))
+	}
+
+}
