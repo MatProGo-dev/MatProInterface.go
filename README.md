@@ -3,7 +3,7 @@ A common interface used for modeling Mathematical Programs in the language Go.
 
 ## To-Dos
 
-* [ ] Create New AddConstr methods which work for vector constraints
+* [X] Create New AddConstr methods which work for vector constraints
 * [ ] Mult
   * [ ] General Function (in operators.go)
     * [ ] Methods for
@@ -33,5 +33,6 @@ A common interface used for modeling Mathematical Programs in the language Go.
 * [ ] Create function for:
     * [ ] IsScalar()
     * [ ] IsVector()
-* [ ] VectorConstraint
-    * [ ] AtVec()
+* [X] VectorConstraint
+    * [X] AtVec()
+* [ ] Write changes to all AtVec() methods to output both elements AND errors (so we can detect out of length calls)
