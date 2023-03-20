@@ -36,3 +36,4 @@ A common interface used for modeling Mathematical Programs in the language Go.
 * [X] VectorConstraint
     * [X] AtVec()
 * [ ] Write changes to all AtVec() methods to output both elements AND errors (so we can detect out of length calls)
+* [ ] Investigate where logrus was used and plan around it.

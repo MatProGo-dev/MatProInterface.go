@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
 // Model represents the overall constrained linear optimization model to be
@@ -209,15 +207,15 @@ func (m *Model) Optimize(solver Solver) (*Solution, error) {
 		solver.AddConstraint(constr)
 	}
 
-	if m.Obj != nil {
-		logrus.WithField(
-			"num_vars", m.Obj.NumVars(),
-		).Info("Number of variables in objective")
-		err = solver.SetObjective(*m.Obj)
-		if err != nil {
-			return nil, fmt.Errorf("There was an error setting the objective: %v", err)
-		}
-	}
+	//if m.Obj != nil {
+	//	logrus.WithField(
+	//		"num_vars", m.Obj.NumVars(),
+	//	).Info("Number of variables in objective")
+	//	err = solver.SetObjective(*m.Obj)
+	//	if err != nil {
+	//		return nil, fmt.Errorf("There was an error setting the objective: %v", err)
+	//	}
+	//}
 
 	mipSol, err := solver.Optimize()
 	defer solver.DeleteSolver()

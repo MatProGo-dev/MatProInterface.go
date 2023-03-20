@@ -3,8 +3,6 @@ package optim
 import (
 	"fmt"
 	"gonum.org/v1/gonum/mat"
-
-	log "github.com/sirupsen/logrus"
 )
 
 /*
@@ -120,12 +118,12 @@ func Multiply(term1, term2 interface{}) (Expression, error) {
 
 // Dot returns the dot product of a vector of variables and slice of floats.
 func Dot(vs []Variable, coeffs []float64) ScalarExpression {
-	if len(vs) != len(coeffs) {
-		log.WithFields(log.Fields{
-			"num_vars":   len(vs),
-			"num_coeffs": len(coeffs),
-		}).Panic("Number of vars and coeffs mismatch")
-	}
+	//if len(vs) != len(coeffs) {
+	//	log.WithFields(log.Fields{
+	//		"num_vars":   len(vs),
+	//		"num_coeffs": len(coeffs),
+	//	}).Panic("Number of vars and coeffs mismatch")
+	//}
 
 	newExpr := NewExpr(0)
 	for i := range vs {
