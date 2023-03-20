@@ -54,12 +54,12 @@ func TestConstraint_IsConstraint2(t *testing.T) {
 		Elements: []optim.Variable{x, x, x, x},
 	}
 
-	scalarConstr0, err := optim.Eq(lhs0, vv1)
+	vectorConstr0, err := optim.Eq(lhs0, vv1)
 	if err != nil {
 		t.Errorf("An error occurred constructing the equality constraint: %v", err)
 	}
 
-	if !optim.IsConstraint(scalarConstr0) {
+	if !optim.IsConstraint(vectorConstr0) {
 		t.Errorf("The scalar constraint is not implementing a Constraint() interface!")
 	}
 }
