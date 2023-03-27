@@ -13,9 +13,13 @@ const INFINITY = 1e100
 // SumVars returns the sum of the given variables. It creates a new empty
 // expression and adds to it the given variables.
 func SumVars(vs ...Variable) ScalarExpression {
+	var err error
 	newExpr := NewExpr(0)
 	for _, v := range vs {
-		newExpr.Plus(v)
+		newExpr, err = newExpr.Plus(v)
+		if err != nil {
+			panic("Unexpected error!")
+		}
 	}
 	return newExpr
 }

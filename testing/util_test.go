@@ -7,7 +7,7 @@ import (
 
 func TestDot(t *testing.T) {
 	N := 10
-	m := optim.NewModel()
+	m := optim.NewModel("testDot")
 	xs := m.AddBinaryVariableVector(N)
 	coeffs := make([]float64, N)
 
@@ -15,7 +15,7 @@ func TestDot(t *testing.T) {
 		coeffs[i] = float64(i + 1)
 	}
 
-	expr := optim.Dot(xs, coeffs)
+	expr := optim.Dot(xs.Elements, coeffs)
 
 	for i, coeff := range expr.Coeffs() {
 		if coeffs[i] != coeff {
@@ -30,8 +30,8 @@ func TestDot(t *testing.T) {
 
 func TestDotPanic(t *testing.T) {
 	N := 10
-	m := optim.NewModel()
-	xs := m.AddBinaryVarVector(N)
+	m := optim.NewModel("TestDotPanic")
+	xs := m.AddBinaryVariableVector(N)
 	coeffs := make([]float64, N-1)
 
 	for i := 0; i < N-1; i++ {
@@ -44,16 +44,18 @@ func TestDotPanic(t *testing.T) {
 		}
 	}()
 
-	optim.Dot(xs, coeffs)
+	optim.Dot(xs.Elements, coeffs)
 }
 
 func TestSumVars(t *testing.T) {
 	numVars := 3
-	m := optim.NewModel()
-	x := m.AddBinaryVar()
-	y := m.AddBinaryVar()
-	z := m.AddBinaryVar()
+	m := optim.NewModel("TestSumVars")
+	x := m.AddBinaryVariable()
+	y := m.AddBinaryVariable()
+	z := m.AddBinaryVariable()
 	expr := optim.SumVars(x, y, z)
+
+	// t.Errorf("%v", expr.(optim.ScalarLinearExpr))
 
 	for _, coeff := range expr.Coeffs() {
 		if coeff != 1 {
