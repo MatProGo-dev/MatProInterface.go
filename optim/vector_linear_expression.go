@@ -53,7 +53,7 @@ func (vle VectorLinearExpr) Check() error {
 IDs
 Description:
 
-	Returns the goop2 ID of each variable in the current vector linear expression.
+	Returns the MatProInterface ID of each variable in the current vector linear expression.
 */
 func (vle VectorLinearExpr) IDs() []uint64 {
 	return vle.X.IDs()

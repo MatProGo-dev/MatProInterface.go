@@ -3,7 +3,7 @@ package optim_test
 /*
 util_test.go
 Description:
-	This file tests some of the utilities added in goop2's util.go file.
+	This file tests some of the utilities added in MatProInterface.go's util.go file.
 */
 
 import (
