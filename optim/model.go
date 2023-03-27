@@ -220,6 +220,10 @@ func (m *Model) Optimize(solver Solver) (*Solution, error) {
 	mipSol, err := solver.Optimize()
 	defer solver.DeleteSolver()
 
+	if err != nil {
+		return nil, fmt.Errorf("There was an issue while trying to optimize the model: %v", err)
+	}
+
 	if mipSol.Status != OptimizationStatus_OPTIMAL {
 		errorMessage, err := mipSol.Status.ToMessage()
 		if err != nil {
