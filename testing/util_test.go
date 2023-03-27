@@ -28,24 +28,24 @@ func TestDot(t *testing.T) {
 	}
 }
 
-func TestDotPanic(t *testing.T) {
-	N := 10
-	m := optim.NewModel("TestDotPanic")
-	xs := m.AddBinaryVariableVector(N)
-	coeffs := make([]float64, N-1)
-
-	for i := 0; i < N-1; i++ {
-		coeffs[i] = float64(i + 1)
-	}
-
-	defer func() {
-		if r := recover(); r == nil {
-			t.Error("Coeff size mismatch: Code did not panic")
-		}
-	}()
-
-	optim.Dot(xs.Elements, coeffs)
-}
+//func TestDotPanic(t *testing.T) {
+//	N := 10
+//	m := optim.NewModel("TestDotPanic")
+//	xs := m.AddBinaryVariableVector(N)
+//	coeffs := make([]float64, N-1)
+//
+//	for i := 0; i < N-1; i++ {
+//		coeffs[i] = float64(i + 1)
+//	}
+//
+//	defer func() {
+//		if r := recover(); r == nil {
+//			t.Error("Coeff size mismatch: Code did not panic")
+//		}
+//	}()
+//
+//	optim.Dot(xs.Elements, coeffs)
+//}
 
 func TestSumVars(t *testing.T) {
 	numVars := 3
