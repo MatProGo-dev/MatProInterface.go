@@ -36,7 +36,7 @@ jobs:
         uses: tj-actions/coverage-badge-go@v1
         if: ${{ runner.os == 'Linux' && matrix.go == '1.17' }} # Runs this on only one of the ci builds.
         with:
-          green: 80
+          green: 50
           filename: coverage.out
 
       - uses: stefanzweifel/git-auto-commit-action@v4
