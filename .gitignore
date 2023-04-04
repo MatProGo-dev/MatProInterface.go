@@ -23,3 +23,6 @@ extras/*.txt
 # Testing files
 testing/*.txt
 testing/*.log
+
+# Mac Extra files
+*.DS_Store
