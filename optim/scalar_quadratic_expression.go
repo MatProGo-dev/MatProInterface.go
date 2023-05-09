@@ -200,7 +200,7 @@ Description:
 	- A Linear Expression, or
 	- A Constant
 */
-func (qe ScalarQuadraticExpression) Plus(e interface{}, extras ...interface{}) (ScalarExpression, error) {
+func (qe ScalarQuadraticExpression) Plus(e interface{}, errors ...error) (ScalarExpression, error) {
 	// Constants
 
 	// Algorithm depends

@@ -50,7 +50,7 @@ func (v Variable) Constant() float64 {
 
 // Plus adds the current expression to another and returns the resulting
 // expression.
-func (v Variable) Plus(e interface{}, extras ...interface{}) (ScalarExpression, error) {
+func (v Variable) Plus(e interface{}, errors ...error) (ScalarExpression, error) {
 	// Input Processing??
 
 	// Algorithm

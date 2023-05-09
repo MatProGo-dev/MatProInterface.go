@@ -22,7 +22,7 @@ type ScalarExpression interface {
 
 	// Plus adds the current expression to another and returns the resulting
 	// expression
-	Plus(e interface{}, extras ...interface{}) (ScalarExpression, error)
+	Plus(e interface{}, errors ...error) (ScalarExpression, error)
 
 	// Mult multiplies the current expression to another and returns the
 	// resulting expression

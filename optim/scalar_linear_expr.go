@@ -59,7 +59,7 @@ func (sle ScalarLinearExpr) Constant() float64 {
 
 // Plus adds the current expression to another and returns the resulting
 // expression
-func (sle ScalarLinearExpr) Plus(e interface{}, extras ...interface{}) (ScalarExpression, error) {
+func (sle ScalarLinearExpr) Plus(e interface{}, errors ...error) (ScalarExpression, error) {
 	// Algorithm depends on the type of eIn.
 	switch e.(type) {
 	case K:
