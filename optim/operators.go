@@ -127,7 +127,7 @@ func Dot(vs []Variable, coeffs []float64) ScalarExpression {
 
 	newExpr := NewExpr(0)
 	for i := range vs {
-		newExpr.Plus(vs[i].Mult(coeffs[i]))
+		newExpr.Plus(vs[i].Multiply(coeffs[i]))
 	}
 
 	return newExpr

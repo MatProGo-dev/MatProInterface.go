@@ -128,14 +128,14 @@ func (sle ScalarLinearExpr) Plus(e interface{}, errors ...error) (ScalarExpressi
 	}
 }
 
-// Mult multiplies the current expression to another and returns the
-// resulting expression
-func (sle ScalarLinearExpr) Mult(c float64) (ScalarExpression, error) {
-	sle.L.ScaleVec(c, &sle.L)
-	sle.C *= c
-
-	return sle, nil
-}
+//// Mult multiplies the current expression to another and returns the
+//// resulting expression
+//func (sle ScalarLinearExpr) Mult(c float64) (ScalarExpression, error) {
+//	sle.L.ScaleVec(c, &sle.L)
+//	sle.C *= c
+//
+//	return sle, nil
+//}
 
 // LessEq returns a less than or equal to (<=) constraint between the
 // current expression and another
@@ -220,4 +220,28 @@ func (sle ScalarLinearExpr) RewriteInTermsOf(newX VarVector) (ScalarLinearExpr, 
 
 	return newLE, nil
 
+}
+
+/*
+Multiply
+Description:
+
+	multiplies the current expression to another and returns the resulting expression
+*/
+func (sle ScalarLinearExpr) Multiply(val interface{}, errors ...error) (Expression, error) {
+
+	switch val.(type) {
+	case float64:
+		// Cast
+		cAsFloat := val.(float64)
+
+		// Compute
+		sleOut := sle
+		sleOut.L.ScaleVec(cAsFloat, &sle.L)
+		sleOut.C *= cAsFloat
+		return sleOut, nil
+
+	default:
+		return sle, fmt.Errorf("Unexpected type of val: %T", val)
+	}
 }

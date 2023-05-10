@@ -26,7 +26,7 @@ type ScalarExpression interface {
 
 	// Mult multiplies the current expression to another and returns the
 	// resulting expression
-	Mult(c float64) (ScalarExpression, error)
+	//Mult(c float64, errors ...error) (Expression, error)
 
 	// LessEq returns a less than or equal to (<=) constraint between the
 	// current expression and another
@@ -46,7 +46,7 @@ type ScalarExpression interface {
 
 	//Multiply
 	// Multiplies the given scalar expression with another expression
-	//Multiply(term1 interface{}, extras...) (Expression, error)
+	Multiply(term1 interface{}, errors ...error) (Expression, error)
 }
 
 // NewExpr returns a new expression with a single additive constant value, c,

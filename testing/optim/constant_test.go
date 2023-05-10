@@ -369,3 +369,158 @@ func TestK_Plus6(t *testing.T) {
 	}
 
 }
+
+/*
+TestK_LessEq1
+Description:
+
+	Tests the ability to create constraints using a constant and a variable.
+*/
+func TestK_LessEq1(t *testing.T) {
+	// Constants
+	c1 := optim.K(3.14)
+	v1 := optim.Variable{
+		ID: 4, Lower: -optim.INFINITY, Upper: optim.INFINITY, Vtype: optim.Continuous,
+	}
+
+	// Test Function
+	constr1, err := c1.LessEq(v1)
+	if err != nil {
+		t.Errorf("There was an issue comparing c1 and v1: %v", err)
+	}
+
+	_, ok1 := constr1.LeftHandSide.(optim.K)
+	if !ok1 {
+		t.Errorf("LHS is expected to be of type optim.K; received %T", constr1.LeftHandSide)
+	}
+
+	_, ok2 := constr1.RightHandSide.(optim.Variable)
+	if !ok2 {
+		t.Errorf("RHS is expected to be of type optim.Variable; received %T", constr1.RightHandSide)
+	}
+}
+
+/*
+TestK_GreaterEq1
+Description:
+
+	Tests the ability to create constraints using a constant and a scalar linear expression.
+*/
+func TestK_GreaterEq1(t *testing.T) {
+	// Constants
+	c1 := optim.K(3.14)
+	v1 := optim.Variable{
+		ID: 4, Lower: -optim.INFINITY, Upper: optim.INFINITY, Vtype: optim.Continuous,
+	}
+	sle1 := optim.ScalarLinearExpr{
+		L: *mat.NewVecDense(1, []float64{0.7}),
+		X: optim.VarVector{
+			Elements: []optim.Variable{v1},
+		},
+		C: 12.1,
+	}
+
+	// Test Function
+	constr1, err := c1.GreaterEq(sle1)
+	if err != nil {
+		t.Errorf("There was an issue comparing c1 and v1: %v", err)
+	}
+
+	_, ok1 := constr1.LeftHandSide.(optim.K)
+	if !ok1 {
+		t.Errorf("LHS is expected to be of type optim.K; received %T", constr1.LeftHandSide)
+	}
+
+	_, ok2 := constr1.RightHandSide.(optim.ScalarLinearExpr)
+	if !ok2 {
+		t.Errorf(
+			"RHS is expected to be of type optim.ScalarLinearExpr; received %T",
+			constr1.RightHandSide,
+		)
+	}
+
+	if constr1.Sense != optim.SenseGreaterThanEqual {
+		t.Errorf(
+			"Comparison sense is expected to be optim.SenseGreaterThanEqual; received %v",
+			constr1.Sense,
+		)
+	}
+}
+
+/*
+TestK_Eq1
+Description:
+
+	Tests the ability to create constraints using a constant and a scalar linear expression.
+*/
+func TestK_Eq1(t *testing.T) {
+	// Constants
+	c1 := optim.K(3.14)
+	v1 := optim.Variable{
+		ID: 4, Lower: -optim.INFINITY, Upper: optim.INFINITY, Vtype: optim.Continuous,
+	}
+	sle1 := optim.ScalarLinearExpr{
+		L: *mat.NewVecDense(1, []float64{0.7}),
+		X: optim.VarVector{
+			Elements: []optim.Variable{v1},
+		},
+		C: 12.1,
+	}
+
+	// Test Function
+	constr1, err := c1.Eq(sle1)
+	if err != nil {
+		t.Errorf("There was an issue comparing c1 and v1: %v", err)
+	}
+
+	_, ok1 := constr1.LeftHandSide.(optim.K)
+	if !ok1 {
+		t.Errorf("LHS is expected to be of type optim.K; received %T", constr1.LeftHandSide)
+	}
+
+	_, ok2 := constr1.RightHandSide.(optim.ScalarLinearExpr)
+	if !ok2 {
+		t.Errorf(
+			"RHS is expected to be of type optim.ScalarLinearExpr; received %T",
+			constr1.RightHandSide,
+		)
+	}
+
+	if constr1.Sense != optim.SenseEqual {
+		t.Errorf(
+			"Comparison sense is expected to be optim.SenseEqual; received %v",
+			constr1.Sense,
+		)
+	}
+}
+
+/*
+TestK_Multiply1
+Description:
+
+	Tests the ability to multiply a constant with another constant.
+*/
+func TestK_Multiply1(t *testing.T) {
+	// Constants
+	c1 := optim.K(3.14)
+	c2 := optim.K(6.86)
+
+	// Algorithm
+	expr1, err := c1.Multiply(c2)
+	if err != nil {
+		t.Errorf("There was an issue multiplying two constants: %v", err)
+	}
+
+	expr1AsK, ok := expr1.(optim.K)
+	if !ok {
+		t.Errorf("There was an issue converting the product to a constant!")
+	}
+
+	if expr1AsK != 3.14*6.86 {
+		t.Errorf(
+			"Expected product to have value %v; received %v",
+			3.14*6.86,
+			expr1AsK,
+		)
+	}
+}

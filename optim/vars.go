@@ -126,27 +126,27 @@ func (v Variable) Plus(e interface{}, errors ...error) (ScalarExpression, error)
 	}
 }
 
-// Mult multiplies the current expression to another and returns the
-// resulting expression
-func (v Variable) Mult(m float64) (ScalarExpression, error) {
-	// Constants
-	// switch m.(type) {
-	// case float64:
-
-	vars := []Variable{v}
-	coeffs := []float64{m * v.Coeffs()[0]}
-
-	// Algorithm
-	newExpr := ScalarLinearExpr{
-		X: VarVector{vars},
-		L: *mat.NewVecDense(1, coeffs),
-		C: 0,
-	}
-	return newExpr, nil
-	// case *Variable:
-	// 	return nil
-	// }
-}
+//// Mult multiplies the current expression to another and returns the
+//// resulting expression
+//func (v Variable) Mult(m float64) (ScalarExpression, error) {
+//	// Constants
+//	// switch m.(type) {
+//	// case float64:
+//
+//	vars := []Variable{v}
+//	coeffs := []float64{m * v.Coeffs()[0]}
+//
+//	// Algorithm
+//	newExpr := ScalarLinearExpr{
+//		X: VarVector{vars},
+//		L: *mat.NewVecDense(1, coeffs),
+//		C: 0,
+//	}
+//	return newExpr, nil
+//	// case *Variable:
+//	// 	return nil
+//	// }
+//}
 
 // LessEq returns a less than or equal to (<=) constraint between the
 // current expression and another
@@ -237,4 +237,36 @@ func UniqueVars(varsIn []Variable) []Variable {
 
 	return varsOut
 
+}
+
+/*
+Multiply
+Description:
+
+	multiplies the current expression to another and returns the resulting expression
+*/
+func (v Variable) Multiply(val interface{}, errors ...error) (Expression, error) {
+	// Input Processing
+	// TODO: Finish input processing!
+
+	// Constants
+	switch val.(type) {
+	case float64:
+		// Cast
+		valAsFloat := val.(float64)
+
+		// Algorithm
+		vars := []Variable{v}
+		coeffs := []float64{valAsFloat * v.Coeffs()[0]}
+
+		// Algorithm
+		newExpr := ScalarLinearExpr{
+			X: VarVector{vars},
+			L: *mat.NewVecDense(1, coeffs),
+			C: 0,
+		}
+		return newExpr, nil
+	default:
+		return v, fmt.Errorf("Unexpected input to v.Multiply(): %T", val)
+	}
 }

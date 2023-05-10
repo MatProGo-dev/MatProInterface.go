@@ -14,11 +14,11 @@ func TestLinearExpr_CoeffsAndConstant1(t *testing.T) {
 	// 2 * x + 4 * y - 5
 	coeffs := []float64{2, 4}
 	constant := -5.0
-	expr1, err := x.Mult(coeffs[0])
+	expr1, err := x.Multiply(coeffs[0])
 	if err != nil {
 		t.Errorf("There was an error computing the first multiplication: %v", err)
 	}
-	expr2, err := y.Mult(coeffs[1])
+	expr2, err := y.Multiply(coeffs[1])
 	if err != nil {
 		t.Errorf("There was an error computing the second multiplication: %v", err)
 	}

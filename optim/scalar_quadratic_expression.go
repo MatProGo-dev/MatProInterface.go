@@ -278,29 +278,29 @@ func (qe ScalarQuadraticExpression) Plus(e interface{}, errors ...error) (Scalar
 
 // // Mult multiplies the current expression to another and returns the
 // // resulting expression
-/*
-Mult
-Description:
-	Mult multiplies the current expression to another and returns the
-	resulting expression
-*/
-func (qe ScalarQuadraticExpression) Mult(c float64) (ScalarExpression, error) {
-	// Create Output
-	var newQE ScalarQuadraticExpression = ScalarQuadraticExpression{
-		X: (qe).X,
-	}
-
-	// Iterate through all of the rows and columns of Q
-	newQE.Q.Scale(c, &qe.Q)
-
-	// Iterate through the linear coefficients
-	newQE.L.ScaleVec(c, &qe.L)
-
-	// Update through the constant
-	qe.C *= c
-
-	return qe, nil
-}
+///*
+//Mult
+//Description:
+//	Mult multiplies the current expression to another and returns the
+//	resulting expression
+//*/
+//func (qe ScalarQuadraticExpression) Mult(c float64) (ScalarExpression, error) {
+//	// Create Output
+//	var newQE ScalarQuadraticExpression = ScalarQuadraticExpression{
+//		X: (qe).X,
+//	}
+//
+//	// Iterate through all of the rows and columns of Q
+//	newQE.Q.Scale(c, &qe.Q)
+//
+//	// Iterate through the linear coefficients
+//	newQE.L.ScaleVec(c, &qe.L)
+//
+//	// Update through the constant
+//	qe.C *= c
+//
+//	return qe, nil
+//}
 
 /*
 LessEq
@@ -429,4 +429,41 @@ func (qe ScalarQuadraticExpression) RewriteInTermsOf(newX VarVector) (ScalarQuad
 
 	return newQE, nil
 
+}
+
+/*
+Multiply
+Description:
+
+	Multiply() multiplies the current expression to another and returns the
+	resulting expression
+*/
+func (qe ScalarQuadraticExpression) Multiply(val interface{}, errors ...error) (Expression, error) {
+	// Input Processing
+	// TODO: Finish input processing!
+
+	// Create Output
+	switch val.(type) {
+	case float64:
+		// Cast variable
+		valAsFloat := val.(float64)
+
+		// Algorithm
+		var newQE ScalarQuadraticExpression = ScalarQuadraticExpression{
+			X: (qe).X,
+		}
+
+		// Iterate through all of the rows and columns of Q
+		newQE.Q.Scale(valAsFloat, &qe.Q)
+
+		// Iterate through the linear coefficients
+		newQE.L.ScaleVec(valAsFloat, &qe.L)
+
+		// Update through the constant
+		qe.C *= valAsFloat
+
+		return qe, nil
+	default:
+		return qe, fmt.Errorf("Unexpected type of input to Multiply(): %T", val)
+	}
 }

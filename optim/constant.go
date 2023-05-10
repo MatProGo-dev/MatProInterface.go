@@ -87,12 +87,6 @@ func (c K) Plus(e interface{}, errors ...error) (ScalarExpression, error) {
 	}
 }
 
-// Mult multiplies the current expression to another and returns the
-// resulting expression
-func (c K) Mult(val float64) (ScalarExpression, error) {
-	return K(float64(c) * val), nil
-}
-
 // LessEq returns a less than or equal to (<=) constraint between the
 // current expression and another
 func (c K) LessEq(other ScalarExpression) (ScalarConstraint, error) {
@@ -130,7 +124,7 @@ Description:
 
 	This method multiplies the input constant by another expression.
 */
-func (c K) Multiply(term1 interface{}) (Expression, error) {
+func (c K) Multiply(term1 interface{}, errors ...error) (Expression, error) {
 	// Constants
 
 	// Algorithm
