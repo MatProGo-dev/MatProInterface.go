@@ -524,3 +524,157 @@ func TestK_Multiply1(t *testing.T) {
 		)
 	}
 }
+
+/*
+TestK_Multiply2
+Description:
+
+	Tests the ability to multiply a constant with a variable.
+*/
+func TestK_Multiply2(t *testing.T) {
+	// Constants
+	c1 := optim.K(3.14)
+	v1 := optim.Variable{
+		ID: 4, Lower: -optim.INFINITY, Upper: optim.INFINITY, Vtype: optim.Continuous,
+	}
+
+	// Algorithm
+	expr1, err := c1.Multiply(v1)
+	if err != nil {
+		t.Errorf("There was an issue multiplying two constants: %v", err)
+	}
+
+	expr1AsSLE, ok := expr1.(optim.ScalarLinearExpr)
+	if !ok {
+		t.Errorf("There was an issue converting the product to a constant!")
+	}
+
+	if expr1AsSLE.C != 0.0 {
+		t.Errorf(
+			"Expected product's constant to have value %v; received %v",
+			0.0,
+			expr1AsSLE.C,
+		)
+	}
+
+	if expr1AsSLE.L.AtVec(0) != float64(c1) {
+		t.Errorf(
+			"Expected product to have coefficient %v; received %v",
+			c1,
+			expr1AsSLE.L.AtVec(0),
+		)
+	}
+}
+
+/*
+TestK_Multiply3
+Description:
+
+	Tests the ability to multiply a constant with a scalar linear expression.
+*/
+func TestK_Multiply3(t *testing.T) {
+	// Constants
+	c1 := optim.K(3.14)
+	v1 := optim.Variable{
+		ID: 4, Lower: -optim.INFINITY, Upper: optim.INFINITY, Vtype: optim.Continuous,
+	}
+	sle1 := optim.ScalarLinearExpr{
+		L: *mat.NewVecDense(1, []float64{0.7}),
+		X: optim.VarVector{
+			Elements: []optim.Variable{v1},
+		},
+		C: 12.1,
+	}
+
+	// Algorithm
+	expr1, err := c1.Multiply(sle1)
+	if err != nil {
+		t.Errorf("There was an issue multiplying two constants: %v", err)
+	}
+
+	expr1AsSLE, ok := expr1.(optim.ScalarLinearExpr)
+	if !ok {
+		t.Errorf("There was an issue converting the product to a constant!")
+	}
+
+	if expr1AsSLE.C != 3.14*12.1 {
+		t.Errorf(
+			"Expected product's constant to have value %v; received %v",
+			float64(c1)*sle1.C,
+			expr1AsSLE.C,
+		)
+	}
+
+	if expr1AsSLE.L.AtVec(0) != float64(c1)*sle1.L.AtVec(0) {
+		t.Errorf(
+			"Expected product to have coefficient %v; received %v",
+			float64(c1)*sle1.L.AtVec(0),
+			expr1AsSLE.L.AtVec(0),
+		)
+	}
+}
+
+/*
+TestK_Multiply4
+Description:
+
+	Tests the ability to multiply a constant with a scalar linear expression.
+*/
+func TestK_Multiply4(t *testing.T) {
+	// Constants
+	c1 := optim.K(3.14)
+	v1 := optim.Variable{
+		ID: 4, Lower: -optim.INFINITY, Upper: optim.INFINITY, Vtype: optim.Continuous,
+	}
+	v2 := optim.Variable{
+		ID: 5, Lower: -optim.INFINITY, Upper: optim.INFINITY, Vtype: optim.Continuous,
+	}
+	sqe1 := optim.ScalarQuadraticExpression{
+		Q: optim.Identity(2),
+		L: *mat.NewVecDense(2, []float64{0.7, 1.7}),
+		X: optim.VarVector{
+			Elements: []optim.Variable{v1, v2},
+		},
+		C: 12.3,
+	}
+
+	// Algorithm
+	expr1, err := c1.Multiply(sqe1)
+	if err != nil {
+		t.Errorf("There was an issue multiplying two constants: %v", err)
+	}
+
+	expr1AsSQE, ok := expr1.(optim.ScalarQuadraticExpression)
+	if !ok {
+		t.Errorf("There was an issue converting the product to a constant!")
+	}
+
+	if expr1AsSQE.C != float64(c1)*sqe1.C {
+		t.Errorf(
+			"Expected product's constant to have value %v; received %v",
+			float64(c1)*sqe1.C,
+			expr1AsSQE.C,
+		)
+	}
+
+	if expr1AsSQE.L.AtVec(0) != float64(c1)*sqe1.L.AtVec(0) {
+		t.Errorf(
+			"Expected product to have coefficient %v; received %v",
+			float64(c1)*sqe1.L.AtVec(0),
+			expr1AsSQE.L.AtVec(0),
+		)
+	}
+
+	for rowIndex := 0; rowIndex < 2; rowIndex++ {
+		for colIndex := 0; colIndex < 2; colIndex++ {
+			if expr1AsSQE.Q.At(rowIndex, colIndex) != float64(c1)*sqe1.Q.At(rowIndex, colIndex) {
+				t.Errorf(
+					"Expected product term to have matrix with Q.At(%v,%v) = %v; received %v",
+					rowIndex, colIndex,
+					float64(c1)*sqe1.Q.At(rowIndex, colIndex),
+					expr1AsSQE.Q.At(rowIndex, colIndex),
+				)
+			}
+		}
+	}
+}

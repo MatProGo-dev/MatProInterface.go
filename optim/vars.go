@@ -270,3 +270,24 @@ func (v Variable) Multiply(val interface{}, errors ...error) (Expression, error)
 		return v, fmt.Errorf("Unexpected input to v.Multiply(): %T", val)
 	}
 }
+
+/*
+ToScalarLinearExpression
+Description:
+
+	Converting the variable into a scalar linear Expression.
+*/
+func (v Variable) ToScalarLinearExpression() ScalarLinearExpr {
+	// Constants
+
+	// Create components
+	vars := []Variable{v}
+	coeffs := []float64{v.Coeffs()[0]}
+
+	// Create sle
+	return ScalarLinearExpr{
+		X: VarVector{vars},
+		L: *mat.NewVecDense(1, coeffs),
+		C: 0,
+	}
+}

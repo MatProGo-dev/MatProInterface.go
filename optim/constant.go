@@ -135,11 +135,35 @@ func (c K) Multiply(term1 interface{}, errors ...error) (Expression, error) {
 	case K:
 		term1AsK, _ := term1.(K)
 		return c * term1AsK, nil
-	//case ScalarLinearExpr:
-	//	term1AsSLE, _ := term1.(ScalarLinearExpr)
-	//	product := QuadraticExpr{
-	//		Q: float64[][]{}, // TODO: Finish this. Maybe switch quadratic expression to use gonum.Matrix objects instead of the current system.
-	//	}
+	case Variable:
+		// Cast
+		term1AsV, _ := term1.(Variable)
+
+		// Algorithm
+		term1AsSLE := term1AsV.ToScalarLinearExpression()
+
+		return c.Multiply(term1AsSLE)
+	case ScalarLinearExpr:
+		// Cast
+		term1AsSLE, _ := term1.(ScalarLinearExpr)
+
+		// Scale all vectors and constants
+		var sleOut ScalarLinearExpr
+		sleOut.L.ScaleVec(float64(c), &term1AsSLE.L)
+		sleOut.C = term1AsSLE.C * float64(c)
+
+		return sleOut, nil
+	case ScalarQuadraticExpression:
+		// Cast
+		term1AsSQE, _ := term1.(ScalarQuadraticExpression)
+
+		// Scale all matrices and constants
+		var sqeOut ScalarQuadraticExpression
+		sqeOut.Q.Scale(float64(c), &term1AsSQE.Q)
+		sqeOut.L.ScaleVec(float64(c), &term1AsSQE.L)
+		sqeOut.C = float64(c) * term1AsSQE.C
+
+		return sqeOut, nil
 	default:
 		return K(0), fmt.Errorf("Unexpected type of term1 in the Multiply() method: %T (%v)", term1, term1)
 

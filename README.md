@@ -12,7 +12,7 @@ A common interface used for modeling Mathematical Programs in the language Go.
   * [ ] General Function (in operators.go)
     * [ ] Methods for
         * [ ] Scalars
-            * [ ] Constant
+            * [X] Constant
             * [ ] Var
             * [ ] ScalarLinearExpression
             * [ ] QuadraticExpression
