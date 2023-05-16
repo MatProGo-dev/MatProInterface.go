@@ -245,3 +245,22 @@ func (sle ScalarLinearExpr) Multiply(val interface{}, errors ...error) (Expressi
 		return sle, fmt.Errorf("Unexpected type of val: %T", val)
 	}
 }
+
+/*
+Copy
+Description:
+*/
+func (sle ScalarLinearExpr) Copy() ScalarLinearExpr {
+	// Constants
+
+	// Algorithm
+	sleOut := ScalarLinearExpr{
+		X: sle.X.Copy(),
+		C: sle.C,
+	}
+	// Create zeros vector and then fill with copied terms.
+	sleOut.L = ZerosVector(sle.X.Len())
+	sleOut.L.CopyVec(&sle.L)
+
+	return sleOut
+}

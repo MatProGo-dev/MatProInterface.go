@@ -152,7 +152,7 @@ func Sum(exprs ...interface{}) (Expression, error) {
 
 	// Check whether or not the second argument is an error or not.
 	var (
-		e1        interface{}
+		e1        Expression
 		exprIndex int
 		tf        bool
 	)
@@ -171,6 +171,8 @@ func Sum(exprs ...interface{}) (Expression, error) {
 			return ScalarLinearExpr{}, fmt.Errorf("Expected third expression in sum to be an Expression; received %T (%v)", exprs[2], exprs[2])
 		}
 
+		e1 = exprs[2].(Expression)
+
 		exprIndex = 3
 	case Expression:
 		e1, _ = exprs[1].(Expression)
@@ -184,7 +186,7 @@ func Sum(exprs ...interface{}) (Expression, error) {
 		if !tf {
 			return ScalarLinearExpr{}, fmt.Errorf("Expected third expression in sum to be an Expression; received %T (%v)", exprs[2], exprs[2])
 		}
-		e1 = exprs[2]
+		e1 = exprs[2].(Expression)
 		exprIndex = 3
 	default:
 		e1 = ScalarLinearExpr{}
@@ -198,7 +200,7 @@ func Sum(exprs ...interface{}) (Expression, error) {
 			return e0, fmt.Errorf("Error computing sum between %v and %v: %v", e0, e1, err)
 		}
 
-		var tempInter []interface{} = []interface{}{tempSum, err}
+		var tempInter []interface{} = []interface{}{tempSum}
 		tempInter = append(tempInter, exprs[exprIndex:]...)
 		return Sum(tempInter...)
 	}

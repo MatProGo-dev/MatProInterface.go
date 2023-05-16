@@ -286,3 +286,17 @@ func (vv VarVector) Comparison(rhs interface{}, sense ConstrSense) (VectorConstr
 		return VectorConstraint{}, fmt.Errorf("The Eq() method for VarVector is not implemented yet for type %T!", rhs)
 	}
 }
+
+func (vv VarVector) Copy() VarVector {
+	// Constants
+
+	// Algorithm
+	newVarSlice := []Variable{}
+	for varIndex := 0; varIndex < vv.Len(); varIndex++ {
+		// Append to newVar Slice
+		newVarSlice = append(newVarSlice, vv.Elements[varIndex])
+	}
+
+	return VarVector{newVarSlice}
+
+}

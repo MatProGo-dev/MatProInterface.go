@@ -148,8 +148,8 @@ func (c K) Multiply(term1 interface{}, errors ...error) (Expression, error) {
 		term1AsSLE, _ := term1.(ScalarLinearExpr)
 
 		// Scale all vectors and constants
-		var sleOut ScalarLinearExpr
-		sleOut.L.ScaleVec(float64(c), &term1AsSLE.L)
+		sleOut := term1AsSLE.Copy()
+		sleOut.L.ScaleVec(float64(c), &sleOut.L)
 		sleOut.C = term1AsSLE.C * float64(c)
 
 		return sleOut, nil
