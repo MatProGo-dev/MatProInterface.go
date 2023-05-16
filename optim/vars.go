@@ -256,16 +256,35 @@ func (v Variable) Multiply(val interface{}, errors ...error) (Expression, error)
 		valAsFloat := val.(float64)
 
 		// Algorithm
-		vars := []Variable{v}
-		coeffs := []float64{valAsFloat * v.Coeffs()[0]}
+		return v.Multiply(
+			K(valAsFloat),
+		)
+	case K:
+		// Cast
+		valAsK := val.(K)
 
 		// Algorithm
-		newExpr := ScalarLinearExpr{
-			X: VarVector{vars},
-			L: *mat.NewVecDense(1, coeffs),
-			C: 0,
+		return valAsK.Multiply(v)
+	case Variable:
+		// Cast
+		valAsVar := val.(Variable)
+
+		// Algorithm
+		sqeOut := ScalarQuadraticExpression{
+			X: VarVector{
+				UniqueVars([]Variable{valAsVar, v}),
+			},
+			C: 0.0,
 		}
-		return newExpr, nil
+		sqeOut.L = ZerosVector(sqeOut.X.Len())
+		if valAsVar.ID == v.ID {
+			sqeOut.Q = *mat.NewDense(1, 1, []float64{1.0})
+		} else {
+			sqeOut.Q = ZerosMatrix(2, 2)
+			sqeOut.Q.Set(0, 1, 0.5)
+			sqeOut.Q.Set(1, 0, 0.5)
+		}
+		return sqeOut, nil
 	default:
 		return v, fmt.Errorf("Unexpected input to v.Multiply(): %T", val)
 	}
