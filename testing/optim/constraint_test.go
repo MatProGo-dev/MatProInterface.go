@@ -63,3 +63,19 @@ func TestConstraint_IsConstraint2(t *testing.T) {
 		t.Errorf("The scalar constraint is not implementing a Constraint() interface!")
 	}
 }
+
+/*
+TestConstraint_IsConstraint3
+Description:
+
+	This verifies that a float is not a constraint.
+*/
+func TestConstraint_IsConstraint3(t *testing.T) {
+	// Constants
+	f1 := 7.5
+
+	// Algorithm
+	if optim.IsConstraint(f1) {
+		t.Errorf("The float was not properly detected as NOT BEING a constant.")
+	}
+}
