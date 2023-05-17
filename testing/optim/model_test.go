@@ -9,6 +9,7 @@ Description:
 import (
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"testing"
+	"time"
 )
 
 /*
@@ -28,6 +29,63 @@ func TestModel_NewModel1(t *testing.T) {
 
 	if m.Name != "test" {
 		t.Errorf("Expected model's name to be %v; received %v", "test", m.Name)
+	}
+}
+
+/*
+TestModel_SetTimeLimit1
+Description:
+
+	Tests the ability of this function to set the time limit for the model solution.
+*/
+func TestModel_SetTimeLimit1(t *testing.T) {
+	// Constants
+	t1 := time.Now()
+	dur1 := time.Since(t1)
+
+	m := optim.NewModel("test-settimelimit1")
+
+	// Algorithm
+	m.SetTimeLimit(dur1)
+
+	if m.TimeLimit != dur1 {
+		t.Errorf(
+			"Expected time limit to be %v; received %v",
+			m.TimeLimit,
+			dur1,
+		)
+	}
+
+}
+
+/*
+TestModel_AddVariable1
+Description:
+*/
+func TestModel_AddVariable1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-addvariable1")
+
+	// Algorithm
+	if len(m.Variables) != 0 {
+		t.Errorf(
+			"The uninitialized model has %v variables; expected 0!",
+			len(m.Variables),
+		)
+	}
+
+	v := m.AddVariable()
+	if len(m.Variables) != 1 {
+		t.Errorf(
+			"After adding one variable to the model expected for slice to have one element; received %v",
+			len(m.Variables),
+		)
+	}
+	if v.ID != 0 {
+		t.Errorf(
+			"The ID of the new variable was %v; expected %v",
+			v.ID, 0,
+		)
 	}
 }
 
