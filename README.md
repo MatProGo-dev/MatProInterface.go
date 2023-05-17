@@ -5,6 +5,19 @@
 # MatProInterface.go
 A common interface used for modeling Mathematical Programs in the language Go.
 
+## FAQs
+
+> Why are the solvers not bundled into the interface?
+
+The solvers are separated into separate repositories to avoid compilation issues.
+A compilation issue would arise, for example, if Gurobi bindings were built into this interace,
+but your computer did not have Gurobi installed on it. The same can be said for a number of other
+solvers as well. To avoid such issues, ALL SOLVERS should be included in separate pacakages
+that implement the `solver` interface in this package.
+
+With this in mind, you should be able to use any solver by installing its associated
+MatProGo.dev pacakage and then calling its "Solver" object.
+
 ## To-Dos
 
 * [X] Create New AddConstr methods which work for vector constraints
