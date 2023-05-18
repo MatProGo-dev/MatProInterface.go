@@ -90,6 +90,228 @@ func TestModel_AddVariable1(t *testing.T) {
 }
 
 /*
+TestModel_AddBinaryVariable1
+Description:
+*/
+func TestModel_AddBinaryVariable1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-addbinaryvariable1")
+
+	// Algorithm
+	if len(m.Variables) != 0 {
+		t.Errorf(
+			"The uninitialized model has %v variables; expected 0!",
+			len(m.Variables),
+		)
+	}
+
+	v := m.AddBinaryVariable()
+	if len(m.Variables) != 1 {
+		t.Errorf(
+			"After adding one variable to the model expected for slice to have one element; received %v",
+			len(m.Variables),
+		)
+	}
+	if v.ID != 0 {
+		t.Errorf(
+			"The ID of the new variable was %v; expected %v",
+			v.ID, 0,
+		)
+	}
+
+	if v.Vtype != optim.Binary {
+		t.Errorf(
+			"Unexpected variable type. Expected Binary, received %v",
+			v.Vtype,
+		)
+	}
+}
+
+/*
+TestModel_AddVariableVector1
+Description:
+
+	This test verifies that the AddVariableVector function correctly adds
+	a vector of variables.
+*/
+func TestModel_AddVariableVector1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-addbinaryvariable1")
+	nVars := 4
+
+	// Algorithm
+	if len(m.Variables) != 0 {
+		t.Errorf(
+			"The uninitialized model has %v variables; expected 0!",
+			len(m.Variables),
+		)
+	}
+
+	m.AddVariableVector(nVars)
+	if len(m.Variables) != nVars {
+		t.Errorf(
+			"After adding one variable to the model expected for slice to have one element; received %v",
+			len(m.Variables),
+		)
+	}
+	for _, tempVar := range m.Variables {
+		if tempVar.ID < 0 {
+			t.Errorf(
+				"The ID of the new variable was %v; expected > 0",
+				tempVar.ID,
+			)
+		}
+		if tempVar.Vtype != optim.Continuous {
+			t.Errorf(
+				"Unexpected variable type. Expected Continuous, received %v",
+				tempVar.Vtype,
+			)
+		}
+	}
+}
+
+/*
+TestModel_AddVariableMatrix1
+Description:
+
+	This test will verify that the appropriate number of variables are created by
+	AddVariableMatrix.
+*/
+func TestModel_AddVariableMatrix1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-addvariablematrix1")
+	nVars := 4
+
+	// Algorithm
+	if len(m.Variables) != 0 {
+		t.Errorf(
+			"The uninitialized model has %v variables; expected 0!",
+			len(m.Variables),
+		)
+	}
+
+	m.AddVariableMatrix(nVars, nVars, -optim.INFINITY, optim.INFINITY, optim.Continuous)
+	if len(m.Variables) != nVars*nVars {
+		t.Errorf(
+			"After adding one variable to the model expected for slice to have one element; received %v",
+			len(m.Variables),
+		)
+	}
+	for _, tempVar := range m.Variables {
+		if tempVar.ID < 0 {
+			t.Errorf(
+				"The ID of the new variable was %v; expected > 0",
+				tempVar.ID,
+			)
+		}
+		if tempVar.ID > uint64(nVars*nVars) {
+			t.Errorf(
+				"The ID of the new variable was %v; expected < %v",
+				tempVar.ID,
+				nVars*nVars,
+			)
+		}
+		if tempVar.Vtype != optim.Continuous {
+			t.Errorf(
+				"Unexpected variable type. Expected Continuous, received %v",
+				tempVar.Vtype,
+			)
+		}
+	}
+}
+
+/*
+TestModel_AddBinaryVariableMatrix1
+Description:
+
+	This test will verify that the appropriate number of variables are created by
+	AddVariableMatrix.
+*/
+func TestModel_AddBinaryVariableMatrix1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-addbinaryvariablematrix1")
+	nVars := 4
+
+	// Algorithm
+	if len(m.Variables) != 0 {
+		t.Errorf(
+			"The uninitialized model has %v variables; expected 0!",
+			len(m.Variables),
+		)
+	}
+
+	m.AddBinaryVariableMatrix(nVars, nVars)
+	if len(m.Variables) != nVars*nVars {
+		t.Errorf(
+			"After adding one variable to the model expected for slice to have one element; received %v",
+			len(m.Variables),
+		)
+	}
+	for _, tempVar := range m.Variables {
+		if tempVar.ID < 0 {
+			t.Errorf(
+				"The ID of the new variable was %v; expected > 0",
+				tempVar.ID,
+			)
+		}
+		if tempVar.ID > uint64(nVars*nVars) {
+			t.Errorf(
+				"The ID of the new variable was %v; expected < %v",
+				tempVar.ID,
+				nVars*nVars,
+			)
+		}
+		if tempVar.Vtype != optim.Binary {
+			t.Errorf(
+				"Unexpected variable type. Expected Continuous, received %v",
+				tempVar.Vtype,
+			)
+		}
+	}
+}
+
+/*
+TestModel_SetObjective1
+Description:
+
+	This test verifies that the AddVariableVector function and some other functions
+	can be used to set the objective properly.
+*/
+func TestModel_SetObjective1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-setobjective1")
+	nVars := 4
+
+	// Algorithm
+	if len(m.Variables) != 0 {
+		t.Errorf(
+			"The uninitialized model has %v variables; expected 0!",
+			len(m.Variables),
+		)
+	}
+
+	vv := m.AddVariableVector(nVars)
+	sle1 := optim.ScalarLinearExpr{
+		X: vv,
+		L: optim.OnesVector(nVars),
+		C: 3.14,
+	}
+
+	m.SetObjective(sle1, optim.SenseMinimize)
+
+	if m.Obj.Sense != optim.SenseMinimize {
+		t.Errorf("The sense of the objective should be minimize; received %v", m.Obj.Sense)
+	}
+
+	if _, ok := m.Obj.ScalarExpression.(optim.ScalarLinearExpr); !ok {
+		t.Errorf(
+			"Expected for objective to be a ScalarLinearExpression; received %T",
+			m.Obj.ScalarExpression,
+		)
+	}
+}
+
+/*
 TestModel_AddConstr1
 Description:
 
