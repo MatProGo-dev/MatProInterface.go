@@ -14,79 +14,68 @@ A common interface used for modeling Mathematical Programs in the language Go.
 For example, to model the program above one would write the following code:
 ```
 // Constants
-	modelName := "mpg-qp1"
-	m := optim.NewModel(modelName)
-	x := m.AddVariableVector(2)
+modelName := "mpg-qp1"
+m := optim.NewModel(modelName)
+x := m.AddVariableVector(2)
 
-	gs := mpgSolver.NewGurobiSolver(
-		fmt.Sprintf("solvertest-%v", modelName),
-	)
+gs := mpgSolver.NewGurobiSolver(
+    fmt.Sprintf("solvertest-%v", modelName),
+)
 
-	// Add Variables to Gurobi's Model
-	err := gs.AddVariable(x.AtVec(0).(optim.Variable))
-	if err != nil {
-		t.Errorf("There was an issue adding x[0] to gs: %v", err)
-	}
+// Create Vector Constants
+c1 := optim.KVector(
+    *mat.NewVecDense(2, []float64{0.0, 1.0}),
+)
 
-	err = gs.AddVariable(x.AtVec(1).(optim.Variable))
-	if err != nil {
-		t.Errorf("There was an issue adding x[1] to gs: %v", err)
-	}
+c2 := optim.KVector(
+    *mat.NewVecDense(2, []float64{2.0, 3.0}),
+)
 
-	// Create Vector Variables
-	c1 := optim.KVector(
-		*mat.NewVecDense(2, []float64{0.0, 1.0}),
-	)
+// Use these to create constraints.
 
-	c2 := optim.KVector(
-		*mat.NewVecDense(2, []float64{2.0, 3.0}),
-	)
+vc1, err := x.LessEq(c2)
+if err != nil {
+    t.Errorf("There was an issue creating the proper vector constraint: %v", err)
+}
 
-	// Use these to create constraints.
+vc2, err := x.GreaterEq(c1)
+if err != nil {
+    t.Errorf("There was an issue creating the proper vector constraint: %v", err)
+}
 
-	vc1, err := x.LessEq(c2)
-	if err != nil {
-		t.Errorf("There was an issue creating the proper vector constraint: %v", err)
-	}
+// Create objective
+Q1 := optim.Identity(x.Len())
+Q1.Set(0, 1, 0.25)
+Q1.Set(1, 0, 0.25)
+Q1.Set(1, 1, 0.25)
 
-	vc2, err := x.GreaterEq(c1)
-	if err != nil {
-		t.Errorf("There was an issue creating the proper vector constraint: %v", err)
-	}
+obj := optim.ScalarQuadraticExpression{
+    Q: Q1,
+    X: x,
+    L: *mat.NewVecDense(x.Len(), []float64{0, -0.97}),
+    C: 2.0,
+}
 
-	// Create objective
-	Q1 := optim.Identity(x.Len())
-	Q1.Set(0, 1, 0.25)
-	Q1.Set(1, 0, 0.25)
-	Q1.Set(1, 1, 0.25)
+// Add Constraints
+constraints := []optim.Constraint{vc1, vc2}
+for _, constr := range constraints {
+    err = gs.AddConstraint(constr)
+    if err != nil {
+        t.Errorf("There was an issue adding the vector constraint to the model: %v", err)
+    }
+}
 
-	obj := optim.ScalarQuadraticExpression{
-		Q: Q1,
-		X: x,
-		L: *mat.NewVecDense(x.Len(), []float64{0, -0.97}),
-		C: 2.0,
-	}
+// Add objective
+err = m.SetObjective(optim.Objective{obj, optim.SenseMinimize})
+if err != nil {
+    t.Errorf("There was an issue setting the objective of the Gurobi solver model: %v", err)
+}
 
-	// Add Constraints
-	constraints := []optim.Constraint{vc1, vc2}
-	for _, constr := range constraints {
-		err = gs.AddConstraint(constr)
-		if err != nil {
-			t.Errorf("There was an issue adding the vector constraint to the model: %v", err)
-		}
-	}
-
-	// Add objective
-	err = gs.SetObjective(optim.Objective{obj, optim.SenseMinimize})
-	if err != nil {
-		t.Errorf("There was an issue setting the objective of the Gurobi solver model: %v", err)
-	}
-
-	// Solve!
-	sol, err := gs.Optimize()
-	if err != nil {
-		t.Errorf("There was an issue optimizing the QP: %v", err)
-	}
+// Solve!
+sol, err := m.Optimize()
+if err != nil {
+    t.Errorf("There was an issue optimizing the QP: %v", err)
+}
 ```
 
 ## How to Install

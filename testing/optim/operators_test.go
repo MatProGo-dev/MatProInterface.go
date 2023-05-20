@@ -6,6 +6,35 @@ import (
 )
 
 /*
+TestOperators_Eq1
+Description:
+
+	Tests whether or not Eq works for two valid expressions.
+*/
+func TestOperators_Eq1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-eq1")
+	vec1 := m.AddVariable()
+	vec2 := m.AddVariable()
+
+	// Algorithms
+	constr0, err := optim.Eq(vec1, vec2)
+	if err != nil {
+		t.Errorf("The Eq() comparison appears to be equal to the two vectors: %v", err)
+	}
+
+	sc0, _ := constr0.(optim.ScalarConstraint)
+	if _, ok1 := sc0.LeftHandSide.(optim.Variable); !ok1 {
+		t.Errorf("The left hand side of the equality is not a variable!")
+	}
+
+	if _, ok2 := sc0.RightHandSide.(optim.Variable); !ok2 {
+		t.Errorf("The right hand side of the equality is not a variable!")
+	}
+
+}
+
+/*
 TestOperators_LessEq1
 Description:
 
@@ -47,6 +76,40 @@ func TestOperators_LessEq1(t *testing.T) {
 			)
 		}
 
+	}
+
+}
+
+/*
+TestOperators_GreaterEq1
+Description:
+
+	Tests whether or not GreaterEq works for two valid expressions.
+*/
+func TestOperators_GreaterEq1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-eq1")
+	vec1 := m.AddVariable()
+	vec2 := m.AddVariable()
+	c1 := optim.K(1.2)
+	e2, err := c1.Plus(vec2)
+	if err != nil {
+		t.Errorf("There was an issue adding vec2 to c1: %v", err)
+	}
+
+	// Algorithms
+	constr0, err := optim.GreaterEq(vec1, e2)
+	if err != nil {
+		t.Errorf("The Eq() comparison appears to be equal to the two vectors: %v", err)
+	}
+
+	sc0, _ := constr0.(optim.ScalarConstraint)
+	if _, ok1 := sc0.LeftHandSide.(optim.Variable); !ok1 {
+		t.Errorf("The left hand side of the equality is not a variable!")
+	}
+
+	if _, ok2 := sc0.RightHandSide.(optim.ScalarLinearExpr); !ok2 {
+		t.Errorf("The right hand side of the equality is not a variable!")
 	}
 
 }
