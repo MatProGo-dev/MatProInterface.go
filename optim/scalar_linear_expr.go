@@ -229,17 +229,26 @@ Description:
 	multiplies the current expression to another and returns the resulting expression
 */
 func (sle ScalarLinearExpr) Multiply(val interface{}, errors ...error) (Expression, error) {
+	// Constants
 
+	// TODO[Kwesi]: Build input processing logic here
+
+	// Algorithm
 	switch val.(type) {
 	case float64:
 		// Cast
 		cAsFloat := val.(float64)
 
+		cAsK := K(cAsFloat)
 		// Compute
-		sleOut := sle
-		sleOut.L.ScaleVec(cAsFloat, &sle.L)
-		sleOut.C *= cAsFloat
-		return sleOut, nil
+		return cAsK.Multiply(sle)
+
+	case K:
+		// Cast variable
+		cAsK := val.(K)
+
+		// Compute
+		return cAsK.Multiply(sle)
 
 	default:
 		return sle, fmt.Errorf("Unexpected type of val: %T", val)

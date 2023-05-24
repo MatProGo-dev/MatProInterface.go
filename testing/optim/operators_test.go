@@ -88,7 +88,7 @@ Description:
 */
 func TestOperators_GreaterEq1(t *testing.T) {
 	// Constants
-	m := optim.NewModel("test-operators-eq1")
+	m := optim.NewModel("test-operators-greatereq1")
 	vec1 := m.AddVariable()
 	vec2 := m.AddVariable()
 	c1 := optim.K(1.2)
@@ -112,4 +112,113 @@ func TestOperators_GreaterEq1(t *testing.T) {
 		t.Errorf("The right hand side of the equality is not a variable!")
 	}
 
+}
+
+/*
+TestOperators_Multiply1
+Description:
+*/
+func TestOperators_Multiply1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-multiply1")
+	v1 := m.AddVariable()
+	f1 := 6.4
+
+	// Algorithm
+	prod1, err := optim.Multiply(v1, f1)
+	if err != nil {
+		t.Errorf("There was an issue using Multiply(): %v", err)
+	}
+
+	prod1AsSLE, ok1 := prod1.(optim.ScalarLinearExpr)
+	if !ok1 {
+		t.Errorf("There was an issue converting this product to an SLE! Type %T", prod1)
+	}
+
+	if prod1AsSLE.X.Len() != 1 {
+		t.Errorf("Expected X to have length 1; received %v", prod1AsSLE.X.Len())
+	}
+
+}
+
+/*
+TestOperators_Multiply2
+Description:
+
+	Tests multiply of scalar float with ScalarLinearExpression
+*/
+func TestOperators_Multiply2(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-multiply1")
+	vv1 := m.AddVariableVector(2)
+	sle1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(2),
+		X: vv1,
+		C: 2.14,
+	}
+	f1 := 6.4
+
+	// Algorithm
+	prod1, err := optim.Multiply(sle1, f1)
+	if err != nil {
+		t.Errorf("There was an issue using Multiply(): %v", err)
+	}
+
+	prod1AsSLE, ok1 := prod1.(optim.ScalarLinearExpr)
+	if !ok1 {
+		t.Errorf("There was an issue converting this product to an SLE! Type %T", prod1)
+	}
+
+	if prod1AsSLE.X.Len() != vv1.Len() {
+		t.Errorf("Expected X to have length 2; received %v", vv1.Len())
+	}
+
+	for vecIndex := 0; vecIndex < 2; vecIndex++ {
+		// Check each element of vector coefficient
+		if prod1AsSLE.L.AtVec(vecIndex) != 1.0*f1 {
+			t.Errorf(
+				"Product coefficient L[%v] = %v. Expected %v",
+				vecIndex,
+				prod1AsSLE.L.AtVec(vecIndex),
+				1.0*f1,
+			)
+		}
+
+	}
+
+}
+
+/*
+TestOperators_Sum1
+Description:
+
+	Sums two expressions together.
+*/
+func TestOperators_Sum1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-sum1")
+
+	f1 := 3.1
+	v1 := m.AddVariable()
+
+	// Test
+	sum1, err := optim.Sum(v1, f1)
+	if err != nil {
+		t.Errorf("Sum of variable and float failed! %v", err)
+	}
+
+	sum1AsSLE, ok1 := sum1.(optim.ScalarLinearExpr)
+	if !ok1 {
+		t.Errorf(
+			"Did not successuflly cast sum to ScalarLinearExpr; received %T",
+			sum1,
+		)
+	}
+
+	if sum1AsSLE.X.Len() != 1 {
+		t.Errorf(
+			"Expected sum to be an SLE with 1 variable; received %v variables!",
+			sum1AsSLE.X.Len(),
+		)
+	}
 }

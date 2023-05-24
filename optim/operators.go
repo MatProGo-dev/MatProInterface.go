@@ -102,36 +102,38 @@ func Multiply(term1, term2 interface{}) (Expression, error) {
 
 		// Create constraint
 		return term1AsKVector.Multiply(term2)
-	//case ScalarExpression:
-	//	term1AsScalarExpression, _ := term1.(ScalarExpression)
-	//
-	//	// Create Constraint
-	//	return term1AsScalarExpression.Multiply(term2)
-	//
+	case ScalarExpression:
+		term1AsScalarExpression, _ := term1.(ScalarExpression)
+
+		// Create Constraint
+		return term1AsScalarExpression.Multiply(term2)
+
 	//case VectorExpression:
 	//	lhsAsVecExpr, _ := lhs.(VectorExpression)
-	//	return lhsAsVecExpr.Comparison(rhs, sense)
+	//	return lhsAsVecExpr.Multiply(term2)
 	default:
 		return nil, fmt.Errorf("Multiply of %T term with %T term is not yet defined!", term1, term2)
 	}
 }
 
+// TODO[Kwesi]: Define dot product logic for vectors.
+
 // Dot returns the dot product of a vector of variables and slice of floats.
-func Dot(vs []Variable, coeffs []float64) ScalarExpression {
-	//if len(vs) != len(coeffs) {
-	//	log.WithFields(log.Fields{
-	//		"num_vars":   len(vs),
-	//		"num_coeffs": len(coeffs),
-	//	}).Panic("Number of vars and coeffs mismatch")
-	//}
-
-	newExpr := NewExpr(0)
-	for i := range vs {
-		newExpr.Plus(vs[i].Multiply(coeffs[i]))
-	}
-
-	return newExpr
-}
+//func Dot(vs []Variable, coeffs []float64) ScalarExpression {
+//	//if len(vs) != len(coeffs) {
+//	//	log.WithFields(log.Fields{
+//	//		"num_vars":   len(vs),
+//	//		"num_coeffs": len(coeffs),
+//	//	}).Panic("Number of vars and coeffs mismatch")
+//	//}
+//
+//	newExpr := NewExpr(0)
+//	for i := range vs {
+//		newExpr.Plus(vs[i].Multiply(coeffs[i]))
+//	}
+//
+//	return newExpr
+//}
 
 // Sum returns the sum of the given expressions. It creates a new empty
 // expression and adds to it the given expressions.
@@ -188,6 +190,14 @@ func Sum(exprs ...interface{}) (Expression, error) {
 		}
 		e1 = exprs[2].(Expression)
 		exprIndex = 3
+	case float64:
+		// Cast variable value
+		e1AsFloat, _ := exprs[1].(float64)
+
+		e1 = K(e1AsFloat)
+
+		// Set next variable to check here.
+		exprIndex = 2
 	default:
 		e1 = ScalarLinearExpr{}
 		return ScalarLinearExpr{}, fmt.Errorf("Unexpected input to Sum %v of type %T", exprs[1], exprs[1])

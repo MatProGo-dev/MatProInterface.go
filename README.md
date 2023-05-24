@@ -9,6 +9,19 @@ A common interface used for modeling Mathematical Programs in the language Go.
 |:------------------------------------------:|
 |  Effectively Model Mathematical Programs   |
 
+## How to Install
+
+```
+go get github.com/The-Velo-Network/MatProInterface.go
+```
+
+The interface is very useful on its own, but typically you won't want to install it alone.
+You should use it with a solver that can address the problems specified
+by your model.
+
+## Available Solvers
+
+- [Gurobi](https://github.com/MatProGo-dev/Gurobi.go)
 
 ## Modeling the Mathematical Program Above
 For example, to model the program above one would write the following code:
@@ -78,20 +91,6 @@ if err != nil {
 }
 ```
 
-## How to Install
-
-```
-go get github.com/The-Velo-Network/MatProInterface.go
-```
-
-The interface is very useful on its own, but typically you won't want to install it alone.
-You should use it with a solver that can address the problems specified
-by your model.
-
-## Available Solvers
-
-- [Gurobi](https://github.com/MatProGo-dev/Gurobi.go)
-
 ## FAQs
 
 > Why are the solvers not bundled into the interface?
@@ -104,6 +103,19 @@ that implement the `solver` interface in this package.
 
 With this in mind, you should be able to use any solver by installing its associated
 MatProGo.dev pacakage and then calling its "Solver" object.
+
+> I feel like things can be done more efficiently in this library.
+> Why did you avoid using things like pointer receivers?
+
+This project was written to make it easier for first-time Go contributors/users
+to easily understand. For this reason, I've avoided making some optimizations
+that might improve speed but might confuse a less experienced Go programmer.
+
+Still, there might be behaviors that occur that confuse you.
+For example, you might realize that when
+you manipulate certain variables with this library, the
+objects are passed by reference and not by value. Feel free to
+ask if this is intentional by creating an issue.
 
 ## To-Dos
 
