@@ -285,6 +285,48 @@ func (v Variable) Multiply(val interface{}, errors ...error) (Expression, error)
 			sqeOut.Q.Set(1, 0, 0.5)
 		}
 		return sqeOut, nil
+
+	case ScalarLinearExpr:
+		// Cast
+		valAsSLE := val.(ScalarLinearExpr)
+
+		// Algorithm
+		sqeOut := ScalarQuadraticExpression{
+			X: VarVector{
+				UniqueVars(append(valAsSLE.X.Elements, v)),
+			},
+			C: 0.0,
+		}
+		sqeOut.Q = ZerosMatrix(sqeOut.X.Len(), sqeOut.X.Len())
+		sqeOut.L = ZerosVector(sqeOut.X.Len())
+
+		vIndex, _ := FindInSlice(v, valAsSLE.X.Elements)    // err should be nil
+		vIndexInSQE, _ := FindInSlice(v, sqeOut.X.Elements) // err should be nil
+		for xIndex := 0; xIndex < valAsSLE.L.Len(); xIndex++ {
+			// Check to make sure index is not the vIndex
+			if vIndex == xIndex {
+				// If v is in the original slice (i.e., we now need to represent v^2)
+
+				sqeOut.Q.Set(vIndexInSQE, vIndexInSQE, valAsSLE.L.AtVec(vIndex))
+			} else {
+				// If xIndex is not for v, then create off-diagonal elements
+				xIndexInSQE, _ := FindInSlice(valAsSLE.X.AtVec(xIndex), sqeOut.X.Elements)
+
+				// Create a pair of off-diagonal elements
+				sqeOut.Q.Set(vIndexInSQE, xIndexInSQE, valAsSLE.L.AtVec(xIndex)*0.5)
+				sqeOut.Q.Set(xIndexInSQE, vIndexInSQE, valAsSLE.L.AtVec(xIndex)*0.5)
+
+			}
+		}
+		return sqeOut, nil
+
+	case ScalarQuadraticExpression:
+		// Cast
+		//valAsSQE := val.(ScalarQuadraticExpression)
+
+		// Return error
+		return ScalarQuadraticExpression{}, fmt.Errorf("Can not multiply Variable with ScalarQuadraticExpression. MatProInterface can not represent polynomials higher than degree 2.")
+
 	default:
 		return v, fmt.Errorf("Unexpected input to v.Multiply(): %T", val)
 	}

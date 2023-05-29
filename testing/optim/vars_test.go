@@ -2,6 +2,7 @@ package optim_test
 
 import (
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
+	"strings"
 	"testing"
 )
 
@@ -282,4 +283,400 @@ func TestVar_Plus4(t *testing.T) {
 	if sumAsSLE.C != qe1.C {
 		t.Errorf("Expected sum's constant to be %v; received %v.", qe1.C, sumAsSLE.C)
 	}
+}
+
+/*
+TestVariable_Multiply1
+Description:
+
+	Tests how well the Multiply() function works between a variable and a float.
+*/
+func TestVariable_Multiply1(t *testing.T) {
+	//Constants
+	m := optim.NewModel("Test-Variable-Multiply1")
+	v1 := m.AddVariable()
+	f1 := 3.14
+
+	// Algorithm
+	prod, err := v1.Multiply(f1)
+	if err != nil {
+		t.Errorf("Error multiplying variable with float: %v", err)
+	}
+
+	prodAsSLE, ok := prod.(optim.ScalarLinearExpr)
+	if !ok {
+		t.Errorf(
+			"Expected product to be ScalarLinearExpr; received %T",
+			prod,
+		)
+	}
+
+	if prodAsSLE.X.Len() != 1 {
+		t.Errorf(
+			"Expected product to contain a single variable; received %v.",
+			prodAsSLE.X.Len(),
+		)
+	}
+
+	if prodAsSLE.X.AtVec(0).IDs()[0] != v1.ID {
+		t.Errorf(
+			"Expected the variable in X be %v; received %v",
+			v1, prodAsSLE.X.AtVec(0),
+		)
+	}
+
+	if prodAsSLE.L.AtVec(0) != f1 {
+		t.Errorf(
+			"Expected linear coefficient to be %v; received %v.",
+			f1,
+			prodAsSLE.L.AtVec(0),
+		)
+	}
+}
+
+/*
+TestVariable_Multiply2
+Description:
+
+	Tests how well the Multiply() function works between a variable and a K.
+*/
+func TestVariable_Multiply2(t *testing.T) {
+	//Constants
+	m := optim.NewModel("Test-Variable-Multiply2")
+	v1 := m.AddVariable()
+	k1 := optim.K(3.14)
+
+	// Algorithm
+	prod, err := v1.Multiply(k1)
+	if err != nil {
+		t.Errorf("Error multiplying variable with constant K: %v", err)
+	}
+
+	prodAsSLE, ok := prod.(optim.ScalarLinearExpr)
+	if !ok {
+		t.Errorf(
+			"Expected product to be ScalarLinearExpr; received %T",
+			prod,
+		)
+	}
+
+	if prodAsSLE.X.Len() != 1 {
+		t.Errorf(
+			"Expected product to contain a single variable; received %v.",
+			prodAsSLE.X.Len(),
+		)
+	}
+
+	if prodAsSLE.X.AtVec(0).IDs()[0] != v1.ID {
+		t.Errorf(
+			"Expected the variable in X be %v; received %v",
+			v1, prodAsSLE.X.AtVec(0),
+		)
+	}
+
+	if prodAsSLE.L.AtVec(0) != float64(k1) {
+		t.Errorf(
+			"Expected linear coefficient to be %v; received %v.",
+			k1,
+			prodAsSLE.L.AtVec(0),
+		)
+	}
+}
+
+/*
+TestVariable_Multiply3
+Description:
+
+	Tests how well the Multiply() function works between a variable and a variable (different).
+*/
+func TestVariable_Multiply3(t *testing.T) {
+	//Constants
+	m := optim.NewModel("Test-Variable-Multiply1")
+	v1 := m.AddVariable()
+	v2 := m.AddVariable()
+
+	// Algorithm
+	prod, err := v1.Multiply(v2)
+	if err != nil {
+		t.Errorf("Error multiplying variable with variable: %v", err)
+	}
+
+	prodAsSQE, ok := prod.(optim.ScalarQuadraticExpression)
+	if !ok {
+		t.Errorf(
+			"Expected product to be ScalarQuadraticExpression; received %T",
+			prod,
+		)
+	}
+
+	if prodAsSQE.X.Len() != 2 {
+		t.Errorf(
+			"Expected product to contain a single variable; received %v.",
+			prodAsSQE.X.Len(),
+		)
+	}
+
+	// Verify that v1 and v2 are in the X
+	if v1Index, _ := optim.FindInSlice(v1, prodAsSQE.X.Elements); v1Index == -1 {
+		t.Errorf(
+			"Expected for %v to be in X; it was not!",
+			v1,
+		)
+	}
+
+	if v2Index, _ := optim.FindInSlice(v2, prodAsSQE.X.Elements); v2Index == -1 {
+		t.Errorf(
+			"Expected for %v to be in X; it was not!",
+			v2,
+		)
+	}
+
+	for xIndex := 0; xIndex < prodAsSQE.X.Len(); xIndex++ {
+		if prodAsSQE.L.AtVec(xIndex) != 0.0 {
+			t.Errorf(
+				"Expected linear coefficient to be %v; received %v.",
+				0.0,
+				prodAsSQE.L.AtVec(xIndex),
+			)
+		}
+	}
+
+}
+
+/*
+TestVariable_Multiply4
+Description:
+
+	Tests how well the Multiply() function works between a variable and a variable (same as original).
+*/
+func TestVariable_Multiply4(t *testing.T) {
+	//Constants
+	m := optim.NewModel("Test-Variable-Multiply1")
+	v1 := m.AddVariable()
+
+	// Algorithm
+	prod, err := v1.Multiply(v1)
+	if err != nil {
+		t.Errorf("Error multiplying vector with float: %v", err)
+	}
+
+	prodAsSQE, ok := prod.(optim.ScalarQuadraticExpression)
+	if !ok {
+		t.Errorf(
+			"Expected product to be ScalarQuadraticExpression; received %T",
+			prod,
+		)
+	}
+
+	if prodAsSQE.X.Len() != 1 {
+		t.Errorf(
+			"Expected product to contain a single variable; received %v.",
+			prodAsSQE.X.Len(),
+		)
+	}
+
+	// Verify that v1 and v2 are in the X
+	if v1Index, _ := optim.FindInSlice(v1, prodAsSQE.X.Elements); v1Index == -1 {
+		t.Errorf(
+			"Expected for %v to be in X; it was not!",
+			v1,
+		)
+	}
+
+	// Check constants
+	if prodAsSQE.Q.At(0, 0) != 1.0 {
+		t.Errorf(
+			"Expected quadratic coefficient to be %v; received %v.",
+			3.14,
+			prodAsSQE.Q.At(0, 0),
+		)
+	}
+
+	if prodAsSQE.L.AtVec(0) != 0.0 {
+		t.Errorf(
+			"Expected linear coefficient to be %v; received %v.",
+			0.0,
+			prodAsSQE.L.AtVec(0),
+		)
+	}
+
+}
+
+/*
+TestVariable_Multiply5
+Description:
+
+	Tests how well the Multiply() function works between a variable and a scalar linear expression.
+*/
+func TestVariable_Multiply5(t *testing.T) {
+	//Constants
+	m := optim.NewModel("Test-Variable-Multiply1")
+	v1 := m.AddVariable()
+
+	// Algorithm
+	prod, err := v1.Multiply(v1.Multiply(3.14))
+	if err != nil {
+		t.Errorf("Error multiplying variable with sle: %v", err)
+	}
+
+	prodAsSQE, ok := prod.(optim.ScalarQuadraticExpression)
+	if !ok {
+		t.Errorf(
+			"Expected product to be ScalarQuadraticExpression; received %T",
+			prod,
+		)
+	}
+
+	if prodAsSQE.X.Len() != 1 {
+		t.Errorf(
+			"Expected product to contain a single variable; received %v.",
+			prodAsSQE.X.Len(),
+		)
+	}
+
+	// Verify that v1 and v2 are in the X
+	if v1Index, _ := optim.FindInSlice(v1, prodAsSQE.X.Elements); v1Index == -1 {
+		t.Errorf(
+			"Expected for %v to be in X; it was not!",
+			v1,
+		)
+	}
+
+	// Check constants
+	if prodAsSQE.Q.At(0, 0) != 3.14 {
+		t.Errorf(
+			"Expected quadratic coefficient to be %v; received %v.",
+			3.14,
+			prodAsSQE.Q.At(0, 0),
+		)
+	}
+
+	if prodAsSQE.L.AtVec(0) != 0.0 {
+		t.Errorf(
+			"Expected linear coefficient to be %v; received %v.",
+			0.0,
+			prodAsSQE.L.AtVec(0),
+		)
+	}
+
+}
+
+/*
+TestVariable_Multiply6
+Description:
+
+	Tests how well the Multiply() function works between a variable and a scalar linear expression.
+*/
+func TestVariable_Multiply6(t *testing.T) {
+	//Constants
+	m := optim.NewModel("Test-Variable-Multiply1")
+	v1 := m.AddVariable()
+	v2 := m.AddVariable()
+
+	// Algorithm
+	prod, err := v1.Multiply(v2.Multiply(3.14))
+	if err != nil {
+		t.Errorf("Error multiplying variable with sle: %v", err)
+	}
+
+	prodAsSQE, ok := prod.(optim.ScalarQuadraticExpression)
+	if !ok {
+		t.Errorf(
+			"Expected product to be ScalarQuadraticExpression; received %T",
+			prod,
+		)
+	}
+
+	if prodAsSQE.X.Len() != 2 {
+		t.Errorf(
+			"Expected product to contain a single variable; received %v.",
+			prodAsSQE.X.Len(),
+		)
+	}
+
+	// Verify that v1 and v2 are in the X
+	if v1Index, _ := optim.FindInSlice(v1, prodAsSQE.X.Elements); v1Index == -1 {
+		t.Errorf(
+			"Expected for %v to be in X; it was not!",
+			v1,
+		)
+	}
+
+	if v2Index, _ := optim.FindInSlice(v2, prodAsSQE.X.Elements); v2Index == -1 {
+		t.Errorf(
+			"Expected for %v to be in X; it was not!",
+			v2,
+		)
+	}
+
+	// Check constants
+	if prodAsSQE.Q.At(0, 0) != 0.0 {
+		t.Errorf(
+			"Expected quadratic coefficient to be %v; received %v.",
+			0.0,
+			prodAsSQE.Q.At(0, 0),
+		)
+	}
+
+	if prodAsSQE.Q.At(1, 1) != 0.0 {
+		t.Errorf(
+			"Expected quadratic coefficient to be %v; received %v.",
+			0.0,
+			prodAsSQE.Q.At(1, 1),
+		)
+	}
+
+	if prodAsSQE.Q.At(0, 1) != 3.14*0.5 {
+		t.Errorf(
+			"Expected quadratic coefficient to be %v; received %v",
+			3.14*0.5,
+			prodAsSQE.Q.At(0, 1),
+		)
+	}
+
+	if prodAsSQE.Q.At(1, 0) != 3.14*0.5 {
+		t.Errorf(
+			"Expected quadratic coefficient to be %v; received %v",
+			3.14*0.5,
+			prodAsSQE.Q.At(1, 0),
+		)
+	}
+
+	if prodAsSQE.L.AtVec(0) != 0.0 {
+		t.Errorf(
+			"Expected linear coefficient to be %v; received %v.",
+			0.0,
+			prodAsSQE.L.AtVec(0),
+		)
+	}
+
+}
+
+/*
+TestVariable_Multiply7
+Description:
+
+	Tests how well the Multiply() function works between a variable and
+	a scalar quadratic expression. Should produce an error
+*/
+func TestVariable_Multiply7(t *testing.T) {
+	//Constants
+	m := optim.NewModel("Test-Variable-Multiply1")
+	v1 := m.AddVariable()
+	v2 := m.AddVariable()
+
+	// Algorithm
+	_, err := v1.Multiply(v1.Multiply(v2.Multiply(3.14)))
+	if err == nil {
+		t.Errorf("Error should occur multiplying variable with sqe, but none did!")
+	}
+
+	if strings.Compare(
+		err.Error(),
+		"Can not multiply Variable with ScalarQuadraticExpression. MatProInterface can not represent polynomials higher than degree 2.",
+	) != 0 {
+		t.Errorf(
+			"Expected for specific error to occur, but received %v", err)
+	}
+
 }
