@@ -106,9 +106,9 @@ func (s *Solution) Value(v Variable) float64 {
 	return s.Values[v.ID]
 }
 
-// IsOne returns true if the value assigned to the variable is an integer,
-// and assigned to one. This is a convenience method which should not be
-// super trusted...
-func (s *Solution) IsOne(v Variable) bool {
-	return (v.Vtype == Integer || v.Vtype == Binary) && s.Value(v) > tinyNum
-}
+//// IsOne returns true if the value assigned to the variable is an integer,
+//// and assigned to one. This is a convenience method which should not be
+//// super trusted...
+//func (s *Solution) IsOne(v Variable) bool {
+//	return (v.Vtype == Integer || v.Vtype == Binary) && s.Value(v) > tinyNum
+//}
