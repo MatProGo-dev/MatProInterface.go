@@ -125,8 +125,8 @@ ask if this is intentional by creating an issue.
     * [ ] Methods for
         * [ ] Scalars
             * [X] Constant
-            * [ ] Var
-            * [ ] ScalarLinearExpression
+            * [X] Var
+            * [X] ScalarLinearExpression
             * [ ] QuadraticExpression
         * [ ] Vectors
             * [ ] Vector Constant
@@ -152,4 +152,4 @@ ask if this is intentional by creating an issue.
 * [X] VectorConstraint
     * [X] AtVec()
 * [ ] Write changes to all AtVec() methods to output both elements AND errors (so we can detect out of length calls)
-* [ ] Investigate where logrus was used and plan around it.
+* [ ] Determine whether or not to keep the Solution and Solver() interfaces in this module. It seems like they can be solver-specific.
