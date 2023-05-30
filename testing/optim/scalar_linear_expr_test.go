@@ -3,6 +3,7 @@ package optim_test
 import (
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"gonum.org/v1/gonum/mat"
+	"strings"
 	"testing"
 )
 
@@ -400,6 +401,441 @@ func TestScalarLinearExpression_Plus4(t *testing.T) {
 
 	if sle3.C != le2.C {
 		t.Errorf("Expected for constant of final quadratic expression to be %v; received %v", le2.C+le2.C, sle3.C)
+	}
+
+}
+
+/*
+TestScalarLinearExpr_Multiply1
+Description:
+
+	Tests the Multiply() function for an input of a float.
+*/
+func TestScalarLinearExpr_Multiply1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Test-sle-Multiply1")
+	v1 := m.AddVariable()
+	f1 := 3.14
+
+	sle, _ := v1.Multiply(f1)
+	sle1 := sle.(optim.ScalarLinearExpr)
+
+	// Test Multiply
+	prod, err := sle1.Multiply(f1)
+	if err != nil {
+		t.Errorf("There was an issue using Multiply: %v", err)
+
+	}
+
+	prodAsSLE, ok1 := prod.(optim.ScalarLinearExpr)
+	if !ok1 {
+		t.Errorf(
+			"Expected product to be a ScalarLinearExpr; received %T",
+			prod,
+		)
+	}
+
+	if prodAsSLE.X.Len() != 1 {
+		t.Errorf(
+			"Expected product to contain only one variable; received %v",
+			prodAsSLE.X.Len(),
+		)
+	}
+
+	if prodAsSLE.L.AtVec(0) != f1*f1 {
+		t.Errorf(
+			"Expected the single coefficient to be %v; received %v",
+			f1*f1,
+			prodAsSLE.L.AtVec(0),
+		)
+	}
+
+	if prodAsSLE.C != 0.0 {
+		t.Errorf(
+			"Expected constant offset to be 0.0; received %v",
+			prodAsSLE.C,
+		)
+	}
+}
+
+/*
+TestScalarLinearExpr_Multiply2
+Description:
+
+	Tests the Multiply() function for an input of a constant K.
+*/
+func TestScalarLinearExpr_Multiply2(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Test-sle-Multiply2")
+	v1 := m.AddVariable()
+	k1 := optim.K(3.14)
+
+	sle, _ := v1.Multiply(k1)
+	sle1 := sle.(optim.ScalarLinearExpr)
+
+	// Test Multiply
+	prod, err := sle1.Multiply(k1)
+	if err != nil {
+		t.Errorf("There was an issue using Multiply: %v", err)
+
+	}
+
+	prodAsSLE, ok1 := prod.(optim.ScalarLinearExpr)
+	if !ok1 {
+		t.Errorf(
+			"Expected product to be a ScalarLinearExpr; received %T",
+			prod,
+		)
+	}
+
+	if prodAsSLE.X.Len() != 1 {
+		t.Errorf(
+			"Expected product to contain only one variable; received %v",
+			prodAsSLE.X.Len(),
+		)
+	}
+
+	if prodAsSLE.L.AtVec(0) != float64(k1)*float64(k1) {
+		t.Errorf(
+			"Expected the single coefficient to be %v; received %v",
+			float64(k1)*float64(k1),
+			prodAsSLE.L.AtVec(0),
+		)
+	}
+
+	if prodAsSLE.C != 0.0 {
+		t.Errorf(
+			"Expected constant offset to be 0.0; received %v",
+			prodAsSLE.C,
+		)
+	}
+}
+
+/*
+TestScalarLinearExpr_Multiply3
+Description:
+
+	Tests the Multiply() function for an input of a variable v.
+*/
+func TestScalarLinearExpr_Multiply3(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Test-sle-Multiply3")
+	v1 := m.AddVariable()
+
+	sle, _ := v1.Multiply(3.14)
+	sle1 := sle.(optim.ScalarLinearExpr)
+
+	// Test Multiply
+	prod, err := sle1.Multiply(v1)
+	if err != nil {
+		t.Errorf("There was an issue using Multiply: %v", err)
+
+	}
+
+	prodAsSQE, ok1 := prod.(optim.ScalarQuadraticExpression)
+	if !ok1 {
+		t.Errorf(
+			"Expected product to be a ScalarLinearExpr; received %T",
+			prod,
+		)
+	}
+
+	if prodAsSQE.X.Len() != 1 {
+		t.Errorf(
+			"Expected product to contain only one variable; received %v",
+			prodAsSQE.X.Len(),
+		)
+	}
+
+	// Check constants
+	if prodAsSQE.Q.At(0, 0) != 3.14 {
+		t.Errorf(
+			"Expected Q.At(0,0) to be %v; received %v",
+			3.14,
+			prodAsSQE.Q.At(0, 0),
+		)
+	}
+	if prodAsSQE.L.AtVec(0) != 0.0 {
+		t.Errorf(
+			"Expected the single coefficient to be %v; received %v",
+			3.14,
+			prodAsSQE.L.AtVec(0),
+		)
+	}
+
+	if prodAsSQE.C != 0.0 {
+		t.Errorf(
+			"Expected constant offset to be 0.0; received %v",
+			prodAsSQE.C,
+		)
+	}
+}
+
+/*
+TestScalarLinearExpr_Multiply4
+Description:
+
+	Tests the Multiply() function for an input of a variable v.
+	Input sle has offset.
+*/
+func TestScalarLinearExpr_Multiply4(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Test-sle-Multiply4")
+	v1 := m.AddVariable()
+
+	sle, _ := v1.Multiply(3.14)
+	sle1 := sle.(optim.ScalarLinearExpr)
+	sle2, err := sle1.Plus(2.71)
+	if err != nil {
+		t.Errorf(
+			"Failed to add sle1 with 2.71: %v", err,
+		)
+	}
+	sle3 := sle2.(optim.ScalarLinearExpr)
+
+	// Test Multiply
+	prod, err := sle3.Multiply(v1)
+	if err != nil {
+		t.Errorf("There was an issue using Multiply: %v", err)
+
+	}
+
+	prodAsSQE, ok1 := prod.(optim.ScalarQuadraticExpression)
+	if !ok1 {
+		t.Errorf(
+			"Expected product to be a ScalarLinearExpr; received %T",
+			prod,
+		)
+	}
+
+	if prodAsSQE.X.Len() != 1 {
+		t.Errorf(
+			"Expected product to contain only one variable; received %v",
+			prodAsSQE.X.Len(),
+		)
+	}
+
+	// Check constants
+	if prodAsSQE.Q.At(0, 0) != 3.14 {
+		t.Errorf(
+			"Expected Q.At(0,0) to be %v; received %v",
+			3.14,
+			prodAsSQE.Q.At(0, 0),
+		)
+	}
+	if prodAsSQE.L.AtVec(0) != sle3.C {
+		t.Errorf(
+			"Expected the single coefficient to be %v; received %v",
+			3.14,
+			prodAsSQE.L.AtVec(0),
+		)
+	}
+
+	if prodAsSQE.C != 0.0 {
+		t.Errorf(
+			"Expected constant offset to be %v; received %v",
+			0.0,
+			prodAsSQE.C,
+		)
+	}
+}
+
+/*
+TestScalarLinearExpr_Multiply5
+Description:
+
+	Tests the Multiply() function for an input of a variable (different from original).
+*/
+func TestScalarLinearExpr_Multiply5(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Test-sle-Multiply5")
+	v1 := m.AddVariable()
+	v2 := m.AddVariable()
+
+	sle, _ := v1.Multiply(3.14)
+	sle1 := sle.(optim.ScalarLinearExpr)
+	sle2, err := sle1.Plus(2.71)
+	if err != nil {
+		t.Errorf(
+			"Failed to add sle1 with 2.71: %v", err,
+		)
+	}
+	sle3 := sle2.(optim.ScalarLinearExpr)
+
+	// Test Multiply
+	prod, err := sle3.Multiply(v2)
+	if err != nil {
+		t.Errorf("There was an issue using Multiply: %v", err)
+
+	}
+
+	prodAsSQE, ok1 := prod.(optim.ScalarQuadraticExpression)
+	if !ok1 {
+		t.Errorf(
+			"Expected product to be a ScalarLinearExpr; received %T",
+			prod,
+		)
+	}
+
+	if prodAsSQE.X.Len() != 2 {
+		t.Errorf(
+			"Expected product to contain only one variable; received %v",
+			prodAsSQE.X.Len(),
+		)
+	}
+
+	// Check constants
+	if prodAsSQE.Q.At(0, 1) != 3.14*0.5 {
+		t.Errorf(
+			"Expected Q.At(0,1) to be %v; received %v",
+			3.14*0.5,
+			prodAsSQE.Q.At(0, 1),
+		)
+	}
+	if prodAsSQE.Q.At(1, 0) != 3.14*0.5 {
+		t.Errorf(
+			"Expected Q.At(1,0) to be %v; received %v",
+			3.14*0.5,
+			prodAsSQE.Q.At(1, 0),
+		)
+	}
+
+	if prodAsSQE.Q.At(0, 0) != 0.0 {
+		t.Errorf(
+			"Expected Q.At(0,0) to be %v; received %v",
+			0.0,
+			prodAsSQE.Q.At(0, 0),
+		)
+	}
+	if prodAsSQE.Q.At(1, 1) != 0.0 {
+		t.Errorf(
+			"Expected Q.At(1,1) to be %v; received %v",
+			0.0,
+			prodAsSQE.Q.At(1, 1),
+		)
+	}
+
+	if prodAsSQE.L.AtVec(1) != sle3.C {
+		t.Errorf(
+			"Expected the single coefficient to be %v; received %v",
+			3.14,
+			prodAsSQE.L.AtVec(0),
+		)
+	}
+
+	if prodAsSQE.C != 0.0 {
+		t.Errorf(
+			"Expected constant offset to be %v; received %v",
+			0.0,
+			prodAsSQE.C,
+		)
+	}
+}
+
+/*
+TestScalarLinearExpr_Multiply6
+Description:
+
+	Tests the Multiply() function for an input of a scalar linear expression.
+*/
+func TestScalarLinearExpr_Multiply6(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Test-sle-Multiply5")
+	v1 := m.AddVariable()
+
+	sle, _ := v1.Multiply(3.14)
+	sle1 := sle.(optim.ScalarLinearExpr)
+	sle2, err := sle1.Plus(2.71)
+	if err != nil {
+		t.Errorf(
+			"Failed to add sle1 with 2.71: %v", err,
+		)
+	}
+	sle3 := sle2.(optim.ScalarLinearExpr)
+
+	// Test Multiply
+	prod, err := sle3.Multiply(sle3)
+	if err != nil {
+		t.Errorf("There was an issue using Multiply: %v", err)
+
+	}
+
+	prodAsSQE, ok1 := prod.(optim.ScalarQuadraticExpression)
+	if !ok1 {
+		t.Errorf(
+			"Expected product to be a ScalarLinearExpr; received %T",
+			prod,
+		)
+	}
+
+	if prodAsSQE.X.Len() != 1 {
+		t.Errorf(
+			"Expected product to contain only one variable; received %v",
+			prodAsSQE.X.Len(),
+		)
+	}
+
+	// Check constants
+	if prodAsSQE.Q.At(0, 0) != 3.14*3.14 {
+		t.Errorf(
+			"Expected Q.At(0,0) to be %v; received %v",
+			0.0,
+			prodAsSQE.Q.At(0, 0),
+		)
+	}
+
+	if prodAsSQE.L.AtVec(0) != sle3.C*3.14*2.0 {
+		t.Errorf(
+			"Expected the single coefficient to be %v; received %v",
+			3.14,
+			prodAsSQE.L.AtVec(0),
+		)
+	}
+
+	if prodAsSQE.C != sle3.C*sle3.C {
+		t.Errorf(
+			"Expected constant offset to be %v; received %v",
+			sle3.C*sle3.C,
+			prodAsSQE.C,
+		)
+	}
+}
+
+/*
+TestScalarLinearExpr_Multiply7
+Description:
+
+	Tests the Multiply() function for an input of a scalar linear expression.
+*/
+func TestScalarLinearExpr_Multiply7(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Test-sle-Multiply7")
+	v1 := m.AddVariable()
+	v2 := m.AddVariable()
+
+	sle, _ := v1.Multiply(3.14)
+	sle1 := sle.(optim.ScalarLinearExpr)
+	sle2, err := sle1.Multiply(v2)
+	if err != nil {
+		t.Errorf(
+			"Failed to add sle1 with 2.71: %v", err,
+		)
+	}
+	sle3 := sle2.(optim.ScalarQuadraticExpression)
+
+	// Test Multiply
+	_, err = sle1.Multiply(sle3)
+	if err == nil {
+		t.Errorf("There should be an an issue using Multiply; received none")
+
+	}
+
+	if strings.Compare(
+		err.Error(),
+		"Can not multiply ScalarLinearExpr with ScalarQuadraticExpression. MatProInterface can not represent polynomials higher than degree 2.",
+	) != 0 {
+		t.Errorf(
+			"Expected for specific error to occur, but received %v", err)
 	}
 
 }

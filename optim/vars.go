@@ -300,6 +300,7 @@ func (v Variable) Multiply(val interface{}, errors ...error) (Expression, error)
 		sqeOut.Q = ZerosMatrix(sqeOut.X.Len(), sqeOut.X.Len())
 		sqeOut.L = ZerosVector(sqeOut.X.Len())
 
+		// Update Q
 		vIndex, _ := FindInSlice(v, valAsSLE.X.Elements)    // err should be nil
 		vIndexInSQE, _ := FindInSlice(v, sqeOut.X.Elements) // err should be nil
 		for xIndex := 0; xIndex < valAsSLE.L.Len(); xIndex++ {
@@ -318,6 +319,10 @@ func (v Variable) Multiply(val interface{}, errors ...error) (Expression, error)
 
 			}
 		}
+
+		// Update L
+		sqeOut.L.SetVec(vIndexInSQE, valAsSLE.C)
+
 		return sqeOut, nil
 
 	case ScalarQuadraticExpression:

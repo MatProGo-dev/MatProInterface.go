@@ -62,12 +62,19 @@ func (sle ScalarLinearExpr) Constant() float64 {
 func (sle ScalarLinearExpr) Plus(e interface{}, errors ...error) (ScalarExpression, error) {
 	// Algorithm depends on the type of eIn.
 	switch e.(type) {
+	case float64:
+		// Cast
+		eAsFloat64 := e.(float64)
+
+		// Use the version of Plus defined for K
+		return sle.Plus(K(eAsFloat64))
+
 	case K:
 		// Collect Expression
 		KIn := e.(K)
 
 		// Create new expression and add to its constant term
-		sleOut := sle
+		sleOut := sle.Copy()
 		sleOut.C += float64(KIn)
 
 		return sleOut, nil
@@ -249,6 +256,89 @@ func (sle ScalarLinearExpr) Multiply(val interface{}, errors ...error) (Expressi
 
 		// Compute
 		return cAsK.Multiply(sle)
+
+	case Variable:
+		// Cast
+		valAsVar := val.(Variable)
+
+		// Compute
+		return valAsVar.Multiply(sle)
+
+	case ScalarLinearExpr:
+		// Cast
+		valAsSLE := val.(ScalarLinearExpr)
+
+		// Algorithm
+		sqeOut := ScalarQuadraticExpression{
+			X: VarVector{
+				UniqueVars(append(valAsSLE.X.Elements, sle.X.Elements...)),
+			},
+			C: valAsSLE.C * sle.C,
+		}
+		sqeOut.Q = ZerosMatrix(sqeOut.X.Len(), sqeOut.X.Len())
+		sqeOut.L = ZerosVector(sqeOut.X.Len())
+
+		// Update Q
+		for xIndex1 := 0; xIndex1 < sle.X.Len(); xIndex1++ {
+			for xIndex2 := 0; xIndex2 < valAsSLE.X.Len(); xIndex2++ {
+				// Get x1 and x2
+				x1 := sle.X.AtVec(xIndex1)
+				x2 := valAsSLE.X.AtVec(xIndex2)
+
+				// Find coefficients associated with x1 and x2 in
+				coeff1 := sle.L.AtVec(xIndex1)
+				coeff2 := valAsSLE.L.AtVec(xIndex2)
+
+				// Place product into Q matrix
+				x1LocInSQEOut, _ := FindInSlice(x1, sqeOut.X.Elements)
+				x2LocInSQEOut, _ := FindInSlice(x2, sqeOut.X.Elements)
+				if x1LocInSQEOut != x2LocInSQEOut {
+					sqeOut.Q.Set(
+						x1LocInSQEOut, x2LocInSQEOut,
+						sqeOut.Q.At(x1LocInSQEOut, x2LocInSQEOut)+0.5*coeff1*coeff2,
+					)
+					sqeOut.Q.Set(
+						x2LocInSQEOut, x1LocInSQEOut,
+						sqeOut.Q.At(x1LocInSQEOut, x2LocInSQEOut)+0.5*coeff1*coeff2,
+					)
+				} else {
+					sqeOut.Q.Set(
+						x1LocInSQEOut, x2LocInSQEOut,
+						sqeOut.Q.At(x1LocInSQEOut, x2LocInSQEOut)+coeff1*coeff2,
+					)
+				}
+
+			}
+		}
+
+		// Update L
+		// First update according to sle.L multiplied by valAsSLE.C
+		for xIndex1 := 0; xIndex1 < sle.X.Len(); xIndex1++ {
+			x1 := sle.X.AtVec(xIndex1)
+			x1LocInSQEOut, _ := FindInSlice(x1, sqeOut.X.Elements)
+			sqeOut.L.SetVec(
+				x1LocInSQEOut,
+				sqeOut.L.AtVec(x1LocInSQEOut)+sle.L.AtVec(xIndex1)*valAsSLE.C,
+			)
+		}
+		// Second, update according to valAsSLE.L multiplied by val.C
+		for xIndex2 := 0; xIndex2 < valAsSLE.X.Len(); xIndex2++ {
+			x2 := sle.X.AtVec(xIndex2)
+			x2LocInSQEOut, _ := FindInSlice(x2, sqeOut.X.Elements)
+			sqeOut.L.SetVec(
+				x2LocInSQEOut,
+				sqeOut.L.AtVec(x2LocInSQEOut)+valAsSLE.L.AtVec(xIndex2)*sle.C,
+			)
+		}
+
+		return sqeOut, nil
+
+	case ScalarQuadraticExpression:
+		// Cast
+		//valAsSQE := val.(ScalarQuadraticExpression)
+
+		// Return error
+		return ScalarQuadraticExpression{}, fmt.Errorf("Can not multiply ScalarLinearExpr with ScalarQuadraticExpression. MatProInterface can not represent polynomials higher than degree 2.")
 
 	default:
 		return sle, fmt.Errorf("Unexpected type of val: %T", val)
