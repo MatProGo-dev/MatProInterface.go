@@ -839,3 +839,100 @@ func TestScalarLinearExpr_Multiply7(t *testing.T) {
 	}
 
 }
+
+/*
+TestScalarLinearExpr_NewLinearExpr1
+Description:
+
+	Tests that the scalar linear expression is properly created by NewLinearExpr.
+*/
+func TestScalarLinearExpr_NewLinearExpr1(t *testing.T) {
+	// Constants
+	se := optim.NewLinearExpr(2.1)
+
+	seAsSLE, ok1 := se.(optim.ScalarLinearExpr)
+	if !ok1 {
+		t.Errorf("se was not optim.ScalarLinearExpr, but instead %T", se)
+	}
+
+	if seAsSLE.C != 2.1 {
+		t.Errorf(
+			"Expected offset to be 2.1; received %v",
+			seAsSLE.C,
+		)
+	}
+}
+
+/*
+TestScalarLinearExpr_Variables1
+Description:
+
+	Verifies that this function works well for SLE's of one variable.
+*/
+func TestScalarLinearExpr_Variables1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("testSLE-variables1")
+	vv1 := m.AddVariableVector(1)
+	sle1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(1),
+		X: vv1,
+		C: 0.1,
+	}
+
+	// Algorithm
+	varsOut := sle1.Variables()
+	if len(varsOut) != 1 {
+		t.Errorf(
+			"Expected for a variablevector of length 1; received length %v",
+			len(varsOut),
+		)
+	}
+
+	if varsOut[0].ID != vv1.Elements[0].ID {
+		t.Errorf(
+			"Expected first element of varsOut (%v) to be the same as the first element of vv1 (%v). They were not!",
+			varsOut[0],
+			vv1.Elements[0],
+		)
+	}
+}
+
+/*
+TestScalarLinearExpr_Variables2
+Description:
+
+	Verifies that this function works well for SLE's of ten variable.
+*/
+func TestScalarLinearExpr_Variables2(t *testing.T) {
+	// Constants
+	m := optim.NewModel("testSLE-variables1")
+	n := 11
+	vv1 := m.AddVariableVector(n)
+	sle1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(n),
+		X: vv1,
+		C: 0.1,
+	}
+
+	// Algorithm
+	varsOut := sle1.Variables()
+	if len(varsOut) != n {
+		t.Errorf(
+			"Expected for a variablevector of length %v; received length %v",
+			n, len(varsOut),
+		)
+	}
+
+	for vv1Index := 0; vv1Index < vv1.Len(); vv1Index++ {
+		// check each element
+		if vv1.Elements[vv1Index] != varsOut[vv1Index] {
+			t.Errorf(
+				"Expected %v-th element of varsOut (%v) to be the same as vv1[%v]. IT wasn't!",
+				vv1Index,
+				varsOut[vv1Index],
+				vv1.Elements[vv1Index],
+			)
+		}
+	}
+
+}
