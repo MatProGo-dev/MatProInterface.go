@@ -133,7 +133,7 @@ func (m *Model) AddBinaryVariableMatrix(rows, cols int) [][]Variable {
 }
 
 // AddConstr adds the given constraint to the model.
-func (m *Model) AddConstr(constr Constraint, extras ...interface{}) error {
+func (m *Model) AddConstraint(constr Constraint, extras ...interface{}) error {
 	// Constants
 	nExtraArguments := len(extras)
 

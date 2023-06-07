@@ -90,6 +90,43 @@ func TestModel_AddVariable1(t *testing.T) {
 }
 
 /*
+TestModel_AddRealVariable1
+Description:
+*/
+func TestModel_AddRealVariable1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-addvariable1")
+
+	// Algorithm
+	if len(m.Variables) != 0 {
+		t.Errorf(
+			"The uninitialized model has %v variables; expected 0!",
+			len(m.Variables),
+		)
+	}
+
+	v := m.AddRealVariable()
+	if len(m.Variables) != 1 {
+		t.Errorf(
+			"After adding one variable to the model expected for slice to have one element; received %v",
+			len(m.Variables),
+		)
+	}
+	if v.ID != 0 {
+		t.Errorf(
+			"The ID of the new variable was %v; expected %v",
+			v.ID, 0,
+		)
+	}
+	if v.Vtype != optim.Continuous {
+		t.Errorf(
+			"The type of the created variable was %v; not optim.Continuous",
+			v.Vtype,
+		)
+	}
+}
+
+/*
 TestModel_AddBinaryVariable1
 Description:
 */
@@ -118,11 +155,70 @@ func TestModel_AddBinaryVariable1(t *testing.T) {
 			v.ID, 0,
 		)
 	}
+	if v.Lower != 0.0 {
+		t.Errorf(
+			"The lower bound for the binary variable was %v; not 0.0",
+			v.Lower,
+		)
+	}
+	if v.Upper != 1.0 {
+		t.Errorf(
+			"The upper bound for the binary variable was %v; not 1.0",
+			v.Upper,
+		)
+	}
 
 	if v.Vtype != optim.Binary {
 		t.Errorf(
 			"Unexpected variable type. Expected Binary, received %v",
 			v.Vtype,
+		)
+	}
+}
+
+/*
+TestModel_AddVariableClassic1
+Description:
+*/
+func TestModel_AddVariableClassic1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-addvariable-classic1")
+
+	// Algorithm
+	if len(m.Variables) != 0 {
+		t.Errorf(
+			"The uninitialized model has %v variables; expected 0!",
+			len(m.Variables),
+		)
+	}
+
+	lower0 := -10.0
+	upper0 := 100.0
+	v := m.AddVariableClassic(lower0, upper0, optim.Continuous)
+	if len(m.Variables) != 1 {
+		t.Errorf(
+			"After adding one variable to the model expected for slice to have one element; received %v",
+			len(m.Variables),
+		)
+	}
+	if v.Lower != lower0 {
+		t.Errorf(
+			"Expected lower bound to be %v; received %v",
+			lower0,
+			v.Lower,
+		)
+	}
+	if v.Upper != upper0 {
+		t.Errorf(
+			"Expected upper bound to be %v; received %v",
+			upper0,
+			v.Upper,
+		)
+	}
+	if v.ID != 0 {
+		t.Errorf(
+			"The ID of the new variable was %v; expected %v",
+			v.ID, 0,
 		)
 	}
 }
@@ -335,7 +431,7 @@ func TestModel_AddConstr1(t *testing.T) {
 	}
 
 	// Add Constraint to Model
-	err = m.AddConstr(slc1)
+	err = m.AddConstraint(slc1)
 	if err != nil {
 		t.Errorf("There was an issue adding the constraint to the model: %v", err)
 	}
@@ -347,14 +443,14 @@ func TestModel_AddConstr1(t *testing.T) {
 }
 
 /*
-TestModel_AddConstr2
+TestModel_AddConstraint2
 Description:
 
 	Tests that a simple constraint (VectorConstraint) can be given to the model.
 */
-func TestModel_AddConstr2(t *testing.T) {
+func TestModel_AddConstraint2(t *testing.T) {
 	// Constants
-	m := optim.NewModel("AddConstr1")
+	m := optim.NewModel("AddConstraint1")
 
 	// Create Constraint
 	n := 3
@@ -366,7 +462,7 @@ func TestModel_AddConstr2(t *testing.T) {
 	}
 
 	// Add Constraint to Model
-	err = m.AddConstr(slc1)
+	err = m.AddConstraint(slc1)
 	if err != nil {
 		t.Errorf("There was an issue adding the constraint to the model: %v", err)
 	}
@@ -378,14 +474,14 @@ func TestModel_AddConstr2(t *testing.T) {
 }
 
 /*
-TestModel_AddConstr3
+TestModel_AddConstraint3
 Description:
 
 	Tests that a simple constraint (VectorConstraint) can be given to the model.
 */
-func TestModel_AddConstr3(t *testing.T) {
+func TestModel_AddConstraint3(t *testing.T) {
 	// Constants
-	m := optim.NewModel("AddConstr1")
+	m := optim.NewModel("AddConstraint1")
 
 	// Create Constraint
 	n := 3
@@ -405,7 +501,7 @@ func TestModel_AddConstr3(t *testing.T) {
 	}
 
 	// Add Constraint to Model
-	err = m.AddConstr(slc1)
+	err = m.AddConstraint(slc1)
 	if err != nil {
 		t.Errorf("There was an issue adding the constraint to the model: %v", err)
 	}
