@@ -31,10 +31,6 @@ modelName := "mpg-qp1"
 m := optim.NewModel(modelName)
 x := m.AddVariableVector(2)
 
-gs := mpgSolver.NewGurobiSolver(
-    fmt.Sprintf("solvertest-%v", modelName),
-)
-
 // Create Vector Constants
 c1 := optim.KVector(
     *mat.NewVecDense(2, []float64{0.0, 1.0}),
@@ -72,7 +68,7 @@ obj := optim.ScalarQuadraticExpression{
 // Add Constraints
 constraints := []optim.Constraint{vc1, vc2}
 for _, constr := range constraints {
-    err = gs.AddConstraint(constr)
+    err = m.AddConstraint(constr)
     if err != nil {
         t.Errorf("There was an issue adding the vector constraint to the model: %v", err)
     }
@@ -84,11 +80,7 @@ if err != nil {
     t.Errorf("There was an issue setting the objective of the Gurobi solver model: %v", err)
 }
 
-// Solve!
-sol, err := m.Optimize()
-if err != nil {
-    t.Errorf("There was an issue optimizing the QP: %v", err)
-}
+// Solve using the solver of your choice!
 ```
 
 ## FAQs
