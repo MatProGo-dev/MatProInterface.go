@@ -1,5 +1,5 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/MatProGo-dev/MatProInterface.go.svg)](https://pkg.go.dev/github.com/MatProGo-dev/MatProInterface.go)
-![Coverage](https://img.shields.io/badge/Coverage-73.0%25-yellow)
+[![codecov](https://codecov.io/gh/MatProGo-dev/MatProInterface.go/branch/main/graph/badge.svg?token=RCIN5S1AK7)](https://codecov.io/gh/MatProGo-dev/MatProInterface.go)
 [![Go Report Card](https://goreportcard.com/badge/github.com/MatProGo-dev/MatProInterface.go)](https://goreportcard.com/report/github.com/MatProGo-dev/MatProInterface.go)
 
 # MatProInterface.go
