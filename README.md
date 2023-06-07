@@ -145,3 +145,4 @@ ask if this is intentional by creating an issue.
     * [X] AtVec()
 * [ ] Write changes to all AtVec() methods to output both elements AND errors (so we can detect out of length calls)
 * [ ] Determine whether or not to keep the Solution and Solver() interfaces in this module. It seems like they can be solver-specific.
+* [ ] Introduce MatrixVar object
