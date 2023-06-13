@@ -12,6 +12,51 @@ Description:
 */
 
 /*
+TestExpression_NumVars1()
+Description:
+
+	Tests that the expression's NumVars() expression works.
+*/
+func TestExpression_NumVars1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-expression-numvars1")
+	vv1 := m.AddVariableVector(3)
+	sle1, err := optim.Sum(vv1, optim.OnesVector(vv1.Len()))
+	if err != nil {
+		t.Errorf("Unexpected issue in Sum(): %v", err)
+	}
+
+	// Tests
+	if sle1.NumVars() != vv1.Len() {
+		t.Errorf(
+			"Expected sle to have %v variables, but found %v",
+			vv1.Len(),
+			sle1.NumVars(),
+		)
+	}
+
+	id0 := sle1.IDs()
+	if len(id0) != vv1.Len() {
+		t.Errorf(
+			"%v IDs found when we expected %v.",
+			len(id0),
+			vv1.Len(),
+		)
+	}
+
+	for idIndex := 0; idIndex < vv1.Len(); idIndex++ {
+		// Compare
+		if existentIndex, _ := optim.FindInSlice(vv1.Elements[idIndex].ID, sle1.IDs()); existentIndex == -1 {
+			t.Errorf(
+				"ID %v was not found in variable vector IDs.",
+				vv1.Elements[idIndex].ID,
+			)
+		}
+	}
+
+}
+
+/*
 TestExpression_ToExpression1
 Description:
 

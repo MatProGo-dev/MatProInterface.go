@@ -54,9 +54,8 @@ Description:
 */
 func FindInSlice(xIn interface{}, sliceIn interface{}) (int, error) {
 
-	switch xIn.(type) {
+	switch x := xIn.(type) {
 	case string:
-		x := xIn.(string)
 		slice := sliceIn.([]string)
 
 		// Perform Search
@@ -71,7 +70,6 @@ func FindInSlice(xIn interface{}, sliceIn interface{}) (int, error) {
 		return xLocationInSliceIn, nil
 
 	case int:
-		x := xIn.(int)
 		slice := sliceIn.([]int)
 
 		// Perform Search
@@ -86,7 +84,6 @@ func FindInSlice(xIn interface{}, sliceIn interface{}) (int, error) {
 		return xLocationInSliceIn, nil
 
 	case uint64:
-		x := xIn.(uint64)
 		slice := sliceIn.([]uint64)
 
 		// Perform Search
@@ -101,7 +98,6 @@ func FindInSlice(xIn interface{}, sliceIn interface{}) (int, error) {
 		return xLocationInSliceIn, nil
 
 	case Variable:
-		x := xIn.(Variable)
 		slice, ok := sliceIn.([]Variable)
 		if !ok {
 			return -1, fmt.Errorf("The input slice was not of type %T; expected type %T", x, slice)

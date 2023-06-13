@@ -158,15 +158,14 @@ func Sum(exprs ...interface{}) (Expression, error) {
 		exprIndex int
 		tf        bool
 	)
-	switch exprs[1].(type) {
+	switch secondElt := exprs[1].(type) {
 	case error:
 		if len(exprs) < 3 {
 			return e0, nil
 		}
 
-		e1AsErr, _ := exprs[1].(error)
-		if e1AsErr != nil {
-			return ScalarLinearExpr{}, fmt.Errorf("An error occurred in the sum: %v", e1AsErr)
+		if secondElt != nil {
+			return ScalarLinearExpr{}, fmt.Errorf("An error occurred in the sum: %v", secondElt)
 		}
 		tf = IsExpression(exprs[2])
 		if !tf {
@@ -177,7 +176,7 @@ func Sum(exprs ...interface{}) (Expression, error) {
 
 		exprIndex = 3
 	case Expression:
-		e1, _ = exprs[1].(Expression)
+		e1 = secondElt
 		exprIndex = 2
 	case nil:
 		if len(exprs) < 3 {
@@ -192,11 +191,12 @@ func Sum(exprs ...interface{}) (Expression, error) {
 		exprIndex = 3
 	case float64:
 		// Cast variable value
-		e1AsFloat, _ := exprs[1].(float64)
-
-		e1 = K(e1AsFloat)
+		e1 = K(secondElt)
 
 		// Set next variable to check here.
+		exprIndex = 2
+	case mat.VecDense:
+		e1 = KVector(secondElt)
 		exprIndex = 2
 	default:
 		e1 = ScalarLinearExpr{}
@@ -218,13 +218,11 @@ func Sum(exprs ...interface{}) (Expression, error) {
 	// Collect Expression
 	// ==================
 
-	switch e0.(type) {
+	switch first := e0.(type) {
 	case ScalarExpression:
-		exprAsSE, _ := e0.(ScalarExpression)
-		return exprAsSE.Plus(e1)
+		return first.Plus(e1)
 	case VectorExpression:
-		exprAsVE, _ := e0.(VectorExpression)
-		return exprAsVE.Plus(e1)
+		return first.Plus(e1)
 	default:
 		return e0, fmt.Errorf("Unexpected type input to Sum: %T", e0)
 	}

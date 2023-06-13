@@ -101,56 +101,46 @@ Description:
 
 	Adds the current expression to another and returns the resulting expression
 */
-func (kv KVector) Plus(e interface{}, extras ...interface{}) (VectorExpression, error) {
+func (kv KVector) Plus(eIn interface{}, extras ...interface{}) (VectorExpression, error) {
 	// Constants
 	kvLen := kv.Len()
 
 	// Extras Management
 
 	// Management
-	switch e.(type) {
+	switch e := eIn.(type) {
 	case float64:
-		// Cast type
-		eAsFloat, _ := e.(float64)
-
 		// Create vector
 		tempOnes := OnesVector(kvLen)
 		var eAsVec mat.VecDense
-		eAsVec.ScaleVec(eAsFloat, &tempOnes)
+		eAsVec.ScaleVec(e, &tempOnes)
 
 		// Add the values
 		return kv.Plus(KVector(eAsVec))
 	case K:
-		// Cast type
-		eAsK, _ := e.(K)
-
 		// Return Addition
-		return kv.Plus(float64(eAsK))
-	case KVector:
-		// Cast type
-		eAsKVector, _ := e.(KVector)
+		return kv.Plus(float64(e))
+	case mat.VecDense:
+		// Return Sum
+		var result mat.VecDense
+		kv2 := mat.VecDense(kv)
+		result.AddVec(&kv2, &e)
 
+		return KVector(result), nil
+	case KVector:
 		// Compute Addition
 		var result mat.VecDense
 		kvAsVec := mat.VecDense(kv)
-		eAsVec := mat.VecDense(eAsKVector)
+		eAsVec := mat.VecDense(e)
 		result.AddVec(&kvAsVec, &eAsVec)
 
 		return KVector(result), nil
 
 	case VarVector:
-		// Cast type
-		eAsVV, _ := e.(VarVector)
-
-		// Return addition
-		return eAsVV.Plus(kv)
+		return e.Plus(kv)
 
 	case VectorLinearExpr:
-		// Cast Type
-		eAsVLE, _ := e.(VectorLinearExpr)
-
-		// Return result
-		return eAsVLE.Plus(kv)
+		return e.Plus(kv)
 
 	default:
 		errString := fmt.Sprintf("Unrecognized expression type %T for addition of KVector kv.Plus(%v)!", e, e)

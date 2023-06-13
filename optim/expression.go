@@ -52,46 +52,25 @@ func ToExpression(eIn interface{}) (Expression, error) {
 	// Algorithm
 
 	// Attempt conversion to float64
-	if eAsFloat, tf := eIn.(float64); tf {
-		return K(eAsFloat), nil
-	}
-
-	if eAsK, tf := eIn.(K); tf {
-		return eAsK, nil
-	}
-
-	if eAsVariable, tf := eIn.(Variable); tf {
-		return eAsVariable, nil
-	}
-
-	switch eIn.(type) {
+	switch e := eIn.(type) {
 	case float64:
-		eAsFloat, _ := eIn.(float64)
-		return K(eAsFloat), nil
+		return K(e), nil
 	case K:
-		eAsK, _ := eIn.(K)
-		return eAsK, nil
+		return e, nil
 	case Variable:
-		eAsVar, _ := eIn.(Variable)
-		return eAsVar, nil
+		return e, nil
 	case ScalarLinearExpr:
-		eAsSLE, _ := eIn.(ScalarLinearExpr)
-		return eAsSLE, nil
+		return e, nil
 	case ScalarQuadraticExpression:
-		eAsSQE, _ := eIn.(ScalarQuadraticExpression)
-		return eAsSQE, nil
+		return e, nil
 	case mat.VecDense:
-		eAsVD, _ := eIn.(mat.VecDense)
-		return ToExpression(KVector(eAsVD))
+		return ToExpression(KVector(e))
 	case KVector:
-		eAsKV, _ := eIn.(KVector)
-		return eAsKV, nil
+		return e, nil
 	case VarVector:
-		eAsVV, _ := eIn.(VarVector)
-		return eAsVV, nil
+		return e, nil
 	case VectorLinearExpr:
-		eAsVLE, _ := eIn.(VectorLinearExpr)
-		return eAsVLE, nil
+		return e, nil
 	default:
 		return K(-1.0), fmt.Errorf("Unexpected type input to ToExpression(): %T", eIn)
 	}
