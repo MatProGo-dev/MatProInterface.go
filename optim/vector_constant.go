@@ -30,20 +30,20 @@ func (kv KVector) Len() int {
 	return kvAsVector.Len()
 }
 
-/*
-At
-Description:
-
-	This function returns the value at the k index.
-	(Legacy)
-*/
-func (kv KVector) At(i int) float64 {
-	// Constants
-	kvI := kv.AtVec(i)
-	kvIAsK := kvI.(K)
-
-	return float64(kvIAsK)
-}
+///*
+//At
+//Description:
+//
+//	This function returns the value at the k index.
+//	(Legacy)
+//*/
+//func (kv KVector) At(i int) float64 {
+//	// Constants
+//	kvI := kv.AtVec(i)
+//	kvIAsK := kvI.(K)
+//
+//	return float64(kvIAsK)
+//}
 
 /*
 AtVec

@@ -21,14 +21,14 @@ Description:
 	This test verifies whether or not a 1 is retrieved when we create a KVector
 	using OnesVector().
 */
-func TestKVector_At1(t *testing.T) {
+func TestKVector_AtVec1(t *testing.T) {
 	// Create a KVector
 	desLength := 4
 	var vec1 = optim.KVector(optim.OnesVector(desLength))
 	targetIndex := 2
 
-	if vec1.At(targetIndex) != 1.0 {
-		t.Errorf("vec1[%v] = %v; expected %v.", targetIndex, vec1.At(targetIndex), 1.0)
+	if vec1.AtVec(targetIndex).(optim.K) != 1.0 {
+		t.Errorf("vec1[%v] = %v; expected %v.", targetIndex, vec1.AtVec(targetIndex), 1.0)
 	}
 }
 
@@ -39,14 +39,14 @@ Description:
 	This test verifies whether or not an arbitrary number is retrieved when we create a KVector
 	using NewVecDense().
 */
-func TestKVector_At2(t *testing.T) {
+func TestKVector_AtVec2(t *testing.T) {
 	// Create a KVector
 	vec1Elts := []float64{1.0, 3.0, 5.0, 7.0, 9.0}
 	var vec1 = optim.KVector(*mat.NewVecDense(5, vec1Elts))
 	targetIndex := 3
 
-	if vec1.At(targetIndex) != vec1Elts[targetIndex] {
-		t.Errorf("vec1[%v] = %v; expected %v.", targetIndex, vec1.At(targetIndex), vec1Elts[targetIndex])
+	if vec1.AtVec(targetIndex).(optim.K) != optim.K(vec1Elts[targetIndex]) {
+		t.Errorf("vec1[%v] = %v; expected %v.", targetIndex, vec1.AtVec(targetIndex), vec1Elts[targetIndex])
 	}
 }
 

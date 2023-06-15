@@ -1,7 +1,9 @@
 package optim
 
 import (
+	"fmt"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
+	"strings"
 	"testing"
 )
 
@@ -99,6 +101,40 @@ func TestOperators_GreaterEq1(t *testing.T) {
 
 	// Algorithms
 	constr0, err := optim.GreaterEq(vec1, e2)
+	if err != nil {
+		t.Errorf("The Eq() comparison appears to be equal to the two vectors: %v", err)
+	}
+
+	sc0, _ := constr0.(optim.ScalarConstraint)
+	if _, ok1 := sc0.LeftHandSide.(optim.Variable); !ok1 {
+		t.Errorf("The left hand side of the equality is not a variable!")
+	}
+
+	if _, ok2 := sc0.RightHandSide.(optim.ScalarLinearExpr); !ok2 {
+		t.Errorf("The right hand side of the equality is not a variable!")
+	}
+
+}
+
+/*
+TestOperators_Comparison1
+Description:
+
+	Tests whether or not Comparison works for two valid expressions.
+*/
+func TestOperators_Comparison1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-comparison1")
+	vec1 := m.AddVariable()
+	vec2 := m.AddVariable()
+	c1 := optim.K(1.2)
+	e2, err := c1.Plus(vec2)
+	if err != nil {
+		t.Errorf("There was an issue adding vec2 to c1: %v", err)
+	}
+
+	// Algorithms
+	constr0, err := optim.Comparison(vec1, e2, optim.SenseGreaterThanEqual)
 	if err != nil {
 		t.Errorf("The Eq() comparison appears to be equal to the two vectors: %v", err)
 	}
@@ -263,4 +299,184 @@ func TestOperators_Sum1(t *testing.T) {
 			sum1AsSLE.X.Len(),
 		)
 	}
+}
+
+/*
+TestOperators_Sum2
+Description:
+
+	Sums two expressions together. Tests whether or not error handling works when
+	first argument is not an expression.
+*/
+func TestOperators_Sum2(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-sum1")
+
+	f1 := 3.1
+	v1 := m.AddVariable()
+	tf1 := true
+
+	// Test
+	_, err := optim.Sum(tf1, v1, f1)
+	if err == nil {
+		t.Errorf("Expected there to be an error when parsing, but there was none!")
+	}
+
+	if !strings.Contains(err.Error(), "The first input to Sum must be an expression! Received type") {
+		t.Errorf(
+			"Wrong error detected in Sum: %v", err,
+		)
+	}
+}
+
+/*
+TestOperators_Sum3
+Description:
+
+	Sums two expressions together. Tests whether or not Sum of single expression is
+	properly returned.
+*/
+func TestOperators_Sum3(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-sum3")
+
+	f1 := 3.1
+	v1 := m.AddVariableVector(10)
+	se1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(v1.Len()),
+		X: v1,
+		C: f1,
+	}
+
+	// Test
+	sumOut, err := optim.Sum(se1)
+	if err != nil {
+		t.Errorf(
+			"There was an issue computing the sum: %v",
+			err,
+		)
+	}
+
+	sumAsSLE, ok1 := sumOut.(optim.ScalarLinearExpr)
+	if !ok1 {
+		t.Errorf("There was an issue converting sum to SLE!")
+	}
+
+	// Check that sum is the same as SLE
+	for Lindex := 0; Lindex < v1.Len(); Lindex++ {
+		if sumAsSLE.L.AtVec(Lindex) != se1.L.AtVec(Lindex) {
+			t.Errorf(
+				"Expected L[%v] = %v; received %v",
+				Lindex, se1.L.AtVec(Lindex),
+				sumAsSLE.L.AtVec(Lindex),
+			)
+		}
+		if sumAsSLE.X.AtVec(Lindex).IDs()[0] != se1.X.AtVec(Lindex).IDs()[0] {
+			t.Errorf(
+				"One of the variable's ids in the sle %v is not the same as what is in the sum %v!",
+				se1.X.AtVec(Lindex).IDs()[0],
+				sumAsSLE.X.AtVec(Lindex).IDs()[0],
+			)
+		}
+	}
+
+	if sumAsSLE.C != se1.C {
+		t.Errorf(
+			"Expected offset to be %v; received %v.",
+			se1.C,
+			sumAsSLE.C,
+		)
+	}
+}
+
+/*
+TestOperators_Sum4
+Description:
+
+	Sums two expressions together. Tests whether or not single expression input
+	with error input is properly returned (when error is nil).
+*/
+func TestOperators_Sum4(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-sum4")
+
+	f1 := 3.1
+	v1 := m.AddVariableVector(10)
+	se1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(v1.Len()),
+		X: v1,
+		C: f1,
+	}
+
+	// Test
+	var err error = nil
+	sumOut, err := optim.Sum(se1, err)
+	if err != nil {
+		t.Errorf(
+			"There was an issue computing the sum: %v",
+			err,
+		)
+	}
+
+	sumAsSLE, ok1 := sumOut.(optim.ScalarLinearExpr)
+	if !ok1 {
+		t.Errorf("There was an issue converting sum to SLE!")
+	}
+
+	// Check that sum is the same as SLE
+	for Lindex := 0; Lindex < v1.Len(); Lindex++ {
+		if sumAsSLE.L.AtVec(Lindex) != se1.L.AtVec(Lindex) {
+			t.Errorf(
+				"Expected L[%v] = %v; received %v",
+				Lindex, se1.L.AtVec(Lindex),
+				sumAsSLE.L.AtVec(Lindex),
+			)
+		}
+		if sumAsSLE.X.AtVec(Lindex).IDs()[0] != se1.X.AtVec(Lindex).IDs()[0] {
+			t.Errorf(
+				"One of the variable's ids in the sle %v is not the same as what is in the sum %v!",
+				se1.X.AtVec(Lindex).IDs()[0],
+				sumAsSLE.X.AtVec(Lindex).IDs()[0],
+			)
+		}
+	}
+
+	if sumAsSLE.C != se1.C {
+		t.Errorf(
+			"Expected offset to be %v; received %v.",
+			se1.C,
+			sumAsSLE.C,
+		)
+	}
+}
+
+/*
+TestOperators_Sum5
+Description:
+
+	Sums two expressions together. Tests whether or not single expression input
+	with error input is properly errored (when error is NOT nil).
+*/
+func TestOperators_Sum5(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-sum4")
+
+	f1 := 3.1
+	v1 := m.AddVariableVector(10)
+	se1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(v1.Len()),
+		X: v1,
+		C: f1,
+	}
+
+	// Test
+	err0 := fmt.Errorf("My custom error!")
+	_, err := optim.Sum(se1, err0)
+	if !strings.Contains(err.Error(), err0.Error()) {
+		t.Errorf(
+			"Expected error \"%v\"; received %v",
+			err0, err,
+		)
+	}
+
 }

@@ -161,7 +161,7 @@ func Sum(exprs ...interface{}) (Expression, error) {
 	switch secondElt := exprs[1].(type) {
 	case error:
 		if len(exprs) < 3 {
-			return e0, nil
+			return e0, secondElt
 		}
 
 		if secondElt != nil {
