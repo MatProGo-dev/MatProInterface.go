@@ -156,7 +156,7 @@ func Sum(exprs ...interface{}) (Expression, error) {
 	var (
 		e1        Expression
 		exprIndex int
-		tf        bool
+		err       error
 	)
 	switch secondElt := exprs[1].(type) {
 	case error:
@@ -167,12 +167,10 @@ func Sum(exprs ...interface{}) (Expression, error) {
 		if secondElt != nil {
 			return ScalarLinearExpr{}, fmt.Errorf("An error occurred in the sum: %v", secondElt)
 		}
-		tf = IsExpression(exprs[2])
-		if !tf {
+		e1, err = ToExpression(exprs[2])
+		if err != nil {
 			return ScalarLinearExpr{}, fmt.Errorf("Expected third expression in sum to be an Expression; received %T (%v)", exprs[2], exprs[2])
 		}
-
-		e1 = exprs[2].(Expression)
 
 		exprIndex = 3
 	case Expression:
@@ -183,11 +181,11 @@ func Sum(exprs ...interface{}) (Expression, error) {
 			return e0, nil
 		}
 
-		tf = IsExpression(exprs[2])
-		if !tf {
+		e1, err = ToExpression(exprs[2])
+		if err != nil {
 			return ScalarLinearExpr{}, fmt.Errorf("Expected third expression in sum to be an Expression; received %T (%v)", exprs[2], exprs[2])
 		}
-		e1 = exprs[2].(Expression)
+
 		exprIndex = 3
 	case float64:
 		// Cast variable value

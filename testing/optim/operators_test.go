@@ -480,3 +480,241 @@ func TestOperators_Sum5(t *testing.T) {
 	}
 
 }
+
+/*
+TestOperators_Sum6
+Description:
+
+	Sums two expressions together. Tests whether or not two expression input
+	with error input is properly returned (when error between is nil).
+*/
+func TestOperators_Sum6(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-sum4")
+
+	f1 := 3.1
+	v1 := m.AddVariableVector(10)
+	se1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(v1.Len()),
+		X: v1,
+		C: f1,
+	}
+
+	// Test
+	var err error = nil
+	sumOut, err := optim.Sum(se1, err, f1)
+	if err != nil {
+		t.Errorf(
+			"There was an issue computing the sum: %v",
+			err,
+		)
+	}
+
+	sumAsSLE, ok1 := sumOut.(optim.ScalarLinearExpr)
+	if !ok1 {
+		t.Errorf("There was an issue converting sum to SLE!")
+	}
+
+	// Check that sum is the same as SLE
+	for Lindex := 0; Lindex < v1.Len(); Lindex++ {
+		if sumAsSLE.L.AtVec(Lindex) != se1.L.AtVec(Lindex) {
+			t.Errorf(
+				"Expected L[%v] = %v; received %v",
+				Lindex, se1.L.AtVec(Lindex),
+				sumAsSLE.L.AtVec(Lindex),
+			)
+		}
+		if sumAsSLE.X.AtVec(Lindex).IDs()[0] != se1.X.AtVec(Lindex).IDs()[0] {
+			t.Errorf(
+				"One of the variable's ids in the sle %v is not the same as what is in the sum %v!",
+				se1.X.AtVec(Lindex).IDs()[0],
+				sumAsSLE.X.AtVec(Lindex).IDs()[0],
+			)
+		}
+	}
+
+	if sumAsSLE.C != se1.C+f1 {
+		t.Errorf(
+			"Expected offset to be %v; received %v.",
+			se1.C,
+			sumAsSLE.C,
+		)
+	}
+}
+
+/*
+TestOperators_Sum7
+Description:
+
+	Sums two expressions together. Tests whether or not two expression input
+	with error input is properly returned (when no error between).
+*/
+func TestOperators_Sum7(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-sum7")
+
+	f1 := 3.1
+	v1 := m.AddVariableVector(10)
+	se1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(v1.Len()),
+		X: v1,
+		C: f1,
+	}
+
+	// Test
+	var err error = nil
+	sumOut, err := optim.Sum(se1, f1)
+	if err != nil {
+		t.Errorf(
+			"There was an issue computing the sum: %v",
+			err,
+		)
+	}
+
+	sumAsSLE, ok1 := sumOut.(optim.ScalarLinearExpr)
+	if !ok1 {
+		t.Errorf("There was an issue converting sum to SLE!")
+	}
+
+	// Check that sum is the same as SLE
+	for Lindex := 0; Lindex < v1.Len(); Lindex++ {
+		if sumAsSLE.L.AtVec(Lindex) != se1.L.AtVec(Lindex) {
+			t.Errorf(
+				"Expected L[%v] = %v; received %v",
+				Lindex, se1.L.AtVec(Lindex),
+				sumAsSLE.L.AtVec(Lindex),
+			)
+		}
+		if sumAsSLE.X.AtVec(Lindex).IDs()[0] != se1.X.AtVec(Lindex).IDs()[0] {
+			t.Errorf(
+				"One of the variable's ids in the sle %v is not the same as what is in the sum %v!",
+				se1.X.AtVec(Lindex).IDs()[0],
+				sumAsSLE.X.AtVec(Lindex).IDs()[0],
+			)
+		}
+	}
+
+	if sumAsSLE.C != se1.C+f1 {
+		t.Errorf(
+			"Expected offset to be %v; received %v.",
+			se1.C,
+			sumAsSLE.C,
+		)
+	}
+}
+
+/*
+TestOperators_Sum8
+Description:
+
+	Sums two expressions together. Tests whether or not two vector expression input
+	with error input is properly returned (when no error between).
+*/
+func TestOperators_Sum8(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-sum8")
+
+	//f1 := 3.1
+	v1 := m.AddVariableVector(10)
+	vc1 := optim.OnesVector(v1.Len())
+
+	// Test
+	var err error = nil
+	sumOut, err := optim.Sum(v1, vc1)
+	if err != nil {
+		t.Errorf(
+			"There was an issue computing the sum: %v",
+			err,
+		)
+	}
+
+	sumAsVLE, ok1 := sumOut.(optim.VectorLinearExpr)
+	if !ok1 {
+		t.Errorf("There was an issue converting sum to SLE!")
+	}
+
+	// Check that sum is the same as SLE
+	for Lindex := 0; Lindex < v1.Len(); Lindex++ {
+		//if sumAsVLE.L.AtVec(Lindex) != se1.L.AtVec(Lindex) {
+		//	t.Errorf(
+		//		"Expected L[%v] = %v; received %v",
+		//		Lindex, se1.L.AtVec(Lindex),
+		//		sumAsVLE.L.AtVec(Lindex),
+		//	)
+		//}
+		if sumAsVLE.X.AtVec(Lindex).IDs()[0] != v1.AtVec(Lindex).IDs()[0] {
+			t.Errorf(
+				"One of the variable's ids in the sle %v is not the same as what is in the sum %v!",
+				v1.AtVec(Lindex).IDs()[0],
+				sumAsVLE.X.AtVec(Lindex).IDs()[0],
+			)
+		}
+		if sumAsVLE.C.AtVec(Lindex) != vc1.AtVec(Lindex) {
+			t.Errorf(
+				"One of the expression's constants (%v) did not match the constant vector at %v (%v).",
+				sumAsVLE.C.AtVec(Lindex),
+				Lindex, vc1.AtVec(Lindex),
+			)
+		}
+	}
+}
+
+/*
+TestOperators_Sum9
+Description:
+
+	Sums two expressions together. Tests whether or not sum of expression
+	and bool throws error (as expected).
+*/
+func TestOperators_Sum9(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-sum9")
+
+	b1 := false
+	v1 := m.AddVariableVector(10)
+	se1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(v1.Len()),
+		X: v1,
+	}
+
+	// Test
+	var err error = nil
+	_, err = optim.Sum(se1, b1)
+	if !strings.Contains(err.Error(), "Unexpected input to Sum ") {
+		t.Errorf("Did not receive expected error!")
+	}
+}
+
+/*
+TestOperators_Sum10
+Description:
+
+	Sums two expressions together. Tests whether or not sum of three expressions
+	is correct.
+*/
+func TestOperators_Sum10(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-sum10")
+
+	v1 := m.AddVariable()
+	f1 := 1.2
+	f2 := 3.8
+
+	// Test
+	var err error = nil
+	sumOut, err := optim.Sum(v1, f1, f2)
+	if err != nil {
+		t.Errorf(
+			"Unexpected error in sum: %v", err,
+		)
+	}
+
+	sumOutAsSLE, tf1 := sumOut.(optim.ScalarLinearExpr)
+	if !tf1 {
+		t.Errorf("Unexpected type of sum output! %T", sumOutAsSLE)
+	}
+
+	if sumOutAsSLE.C != f1+f2 {
+		t.Errorf("Expected offset of sum to be %v; recieved %v.", f1+f2, sumOutAsSLE.C)
+	}
+}
