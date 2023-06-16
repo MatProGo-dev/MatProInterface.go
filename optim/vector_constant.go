@@ -30,21 +30,6 @@ func (kv KVector) Len() int {
 	return kvAsVector.Len()
 }
 
-///*
-//At
-//Description:
-//
-//	This function returns the value at the k index.
-//	(Legacy)
-//*/
-//func (kv KVector) At(i int) float64 {
-//	// Constants
-//	kvI := kv.AtVec(i)
-//	kvIAsK := kvI.(K)
-//
-//	return float64(kvIAsK)
-//}
-
 /*
 AtVec
 Description:
@@ -77,13 +62,13 @@ func (kv KVector) IDs() []uint64 {
 }
 
 /*
-Coeffs
+LinearCoeff
 Description:
 
 	This function returns a slice of the coefficients in the expression. For constants, this is always nil.
 */
 func (kv KVector) LinearCoeff() mat.Dense {
-	return Identity(kv.Len())
+	return ZerosMatrix(kv.Len(), kv.Len())
 }
 
 /*

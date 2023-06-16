@@ -84,6 +84,81 @@ func TestKVector_Len2(t *testing.T) {
 }
 
 /*
+TestKVector_NumVars1
+Description:
+
+	Verify that the number of variables associated with the constant vector is zero.
+*/
+func TestKVector_NumVars1(t *testing.T) {
+	// Constant
+	kv1 := optim.KVector(optim.OnesVector(10))
+
+	// Test
+	if kv1.NumVars() != 0 {
+		t.Errorf(
+			"Expected for there to be zero variables in KVector; receive %v",
+			kv1.NumVars(),
+		)
+	}
+
+}
+
+/*
+TestKVector_IDs1()
+Description:
+
+	Verify that the number of variables associated with the constant vector is zero.
+*/
+func TestKVector_IDs1(t *testing.T) {
+	// Constant
+	kv1 := optim.KVector(optim.OnesVector(10))
+
+	// Test
+	if len(kv1.IDs()) != 0 {
+		t.Errorf(
+			"Expected for there to be zero variables in KVector; receive %v",
+			len(kv1.IDs()),
+		)
+	}
+
+}
+
+/*
+TestKVector_LinearCoeff1
+Description:
+
+	Verify that the number of variables associated with the constant vector is zero.
+*/
+func TestKVector_LinearCoeff1(t *testing.T) {
+	// Constant
+	kv1 := optim.KVector(optim.OnesVector(10))
+
+	// Test
+	coeff := kv1.LinearCoeff()
+	nx, ny := coeff.Dims()
+	for rowIndex := 0; rowIndex < nx; rowIndex++ {
+		for colIndex := 0; colIndex < ny; colIndex++ {
+			if coeff.At(rowIndex, colIndex) != 0.0 {
+				t.Errorf(
+					"Expected coeff[%v,%v] = %v; expected %v",
+					rowIndex, colIndex, coeff.At(rowIndex, colIndex),
+					0.0,
+				)
+			}
+
+		}
+
+	}
+	if kv1.NumVars() != 0 {
+		t.Errorf(
+			"Expected for there to be zero variables in KVector; receive %v",
+			kv1.NumVars(),
+		)
+	}
+
+}
+
+/*
 TestKVector_Comparison1
 Description:
 
