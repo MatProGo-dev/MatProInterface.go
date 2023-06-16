@@ -208,7 +208,7 @@ func Sum(exprs ...interface{}) (Expression, error) {
 			return e0, fmt.Errorf("Error computing sum between %v and %v: %v", e0, e1, err)
 		}
 
-		var tempInter []interface{} = []interface{}{tempSum}
+		var tempInter = []interface{}{tempSum}
 		tempInter = append(tempInter, exprs[exprIndex:]...)
 		return Sum(tempInter...)
 	}

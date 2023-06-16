@@ -151,6 +151,65 @@ func TestOperators_Comparison1(t *testing.T) {
 }
 
 /*
+TestOperators_Comparison2
+Description:
+
+	Tests whether or not Comparison works for a valid expression and
+	a boolean.
+*/
+func TestOperators_Comparison2(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-comparison2")
+	vec1 := m.AddVariable()
+	vec2 := m.AddVariable()
+	c1 := optim.K(1.2)
+	err0 := fmt.Errorf("Comparison err 2")
+	e2, err := c1.Plus(vec1.Plus(vec2))
+	if err != nil {
+		t.Errorf("There was an issue adding vec2 to c1: %v", err)
+	}
+
+	// Algorithms
+	_, err = optim.Comparison(err0, e2, optim.SenseGreaterThanEqual)
+	if strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Comparison in sense '%v' is not defined for lhs type %T and rhs type %T!",
+			optim.SenseGreaterThanEqual, e2, err0,
+		),
+	) {
+		t.Errorf("The Eq() comparison appears to be equal to the two vectors: %v", err)
+	}
+}
+
+/*
+TestOperators_Comparison3
+Description:
+
+	Tests whether or not Comparison works for a valid expression and
+	a boolean.
+*/
+func TestOperators_Comparison3(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-comparison3")
+	vv1 := m.AddVariableVector(10)
+	kv1 := optim.OnesVector(vv1.Len())
+
+	// Algorithms
+	constr, err := optim.Comparison(vv1, kv1, optim.SenseLessThanEqual)
+	if err != nil {
+		t.Errorf("There was an error computing Comparison(): %v", err)
+	}
+
+	if constr.(optim.VectorConstraint).Sense != optim.SenseLessThanEqual {
+		t.Errorf(
+			"Expected sense of constraint to be %v; received %v",
+			optim.SenseLessThanEqual, constr.(optim.ScalarConstraint).Sense,
+		)
+	}
+}
+
+/*
 TestOperators_Multiply1
 Description:
 */
