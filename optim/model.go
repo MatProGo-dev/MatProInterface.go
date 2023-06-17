@@ -147,18 +147,20 @@ func (m *Model) AddConstraint(constr Constraint, extras ...interface{}) error {
 			extras,
 		)
 	case nExtraArguments == 1:
-		e0AsError, tf := extras[0].(error)
-		if !tf {
+		switch extra0 := extras[0].(type) {
+		case error:
+			if extra0 != nil {
+				return fmt.Errorf(
+					"There was an error computing constraint %v: %v",
+					constr, extra0,
+				)
+			}
+		case nil:
+			// Do nothing
+		default:
 			return fmt.Errorf(
-				"The second argument to AddConstraint must be of type error; received type \"%T\".",
-				extras[0],
-			)
-		}
-
-		if e0AsError != nil {
-			return fmt.Errorf(
-				"There was an error computing constraint %v: %v",
-				constr, e0AsError,
+				"There was an unexpected type input to AddConstraint(): %T (%v)",
+				extra0, extra0,
 			)
 		}
 	}
@@ -186,15 +188,6 @@ func (m *Model) Optimize(solver Solver) (*Solution, error) {
 		return nil, errors.New("no variables in model")
 	}
 
-	// lbs := make([]float64, len(m.Variables))
-	// ubs := make([]float64, len(m.Variables))
-	// types := new(bytes.Buffer)
-	// for i, v := range m.Variables {
-	// 	lbs[i] = v.Lower
-	// 	ubs[i] = v.Upper
-	// 	types.WriteByte(byte(v.Vtype))
-	// }
-
 	solver.ShowLog(m.ShowLog)
 
 	if m.TimeLimit > 0 {
@@ -206,16 +199,6 @@ func (m *Model) Optimize(solver Solver) (*Solution, error) {
 	for _, constr := range m.Constraints {
 		solver.AddConstraint(constr)
 	}
-
-	//if m.Obj != nil {
-	//	logrus.WithField(
-	//		"num_vars", m.Obj.NumVars(),
-	//	).Info("Number of variables in objective")
-	//	err = solver.SetObjective(*m.Obj)
-	//	if err != nil {
-	//		return nil, fmt.Errorf("There was an error setting the objective: %v", err)
-	//	}
-	//}
 
 	mipSol, err := solver.Optimize()
 	defer solver.DeleteSolver()

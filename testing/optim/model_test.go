@@ -7,7 +7,9 @@ Description:
 */
 
 import (
+	"fmt"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
+	"strings"
 	"testing"
 	"time"
 )
@@ -267,6 +269,92 @@ func TestModel_AddVariableVector1(t *testing.T) {
 }
 
 /*
+TestModel_AddVariableVectorClassic1
+Description:
+
+	This test verifies that the AddVariableVectorClassic function correctly adds
+	a vector of variables.
+*/
+func TestModel_AddVariableVectorClassic1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-model-addvariablevectorclassic1")
+	nVars := 4
+
+	// Algorithm
+	if len(m.Variables) != 0 {
+		t.Errorf(
+			"The uninitialized model has %v variables; expected 0!",
+			len(m.Variables),
+		)
+	}
+
+	m.AddVariableVectorClassic(nVars, 0, optim.INFINITY, optim.Continuous)
+	if len(m.Variables) != nVars {
+		t.Errorf(
+			"After adding one variable to the model expected for slice to have one element; received %v",
+			len(m.Variables),
+		)
+	}
+	for _, tempVar := range m.Variables {
+		if tempVar.ID < 0 {
+			t.Errorf(
+				"The ID of the new variable was %v; expected > 0",
+				tempVar.ID,
+			)
+		}
+		if tempVar.Vtype != optim.Continuous {
+			t.Errorf(
+				"Unexpected variable type. Expected Continuous, received %v",
+				tempVar.Vtype,
+			)
+		}
+	}
+}
+
+/*
+TestModel_AddBinaryVariableVector1
+Description:
+
+	This test verifies that the AddBinaryVariableVector function correctly adds
+	a vector of variables.
+*/
+func TestModel_AddBinaryVariableVector1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-model-addvariablevectorclassic1")
+	nVars := 4
+
+	// Algorithm
+	if len(m.Variables) != 0 {
+		t.Errorf(
+			"The uninitialized model has %v variables; expected 0!",
+			len(m.Variables),
+		)
+	}
+
+	m.AddBinaryVariableVector(nVars)
+	if len(m.Variables) != nVars {
+		t.Errorf(
+			"After adding one variable to the model expected for slice to have one element; received %v",
+			len(m.Variables),
+		)
+	}
+	for _, tempVar := range m.Variables {
+		if tempVar.ID < 0 {
+			t.Errorf(
+				"The ID of the new variable was %v; expected > 0",
+				tempVar.ID,
+			)
+		}
+		if tempVar.Vtype != optim.Binary {
+			t.Errorf(
+				"Unexpected variable type. Expected Continuous, received %v",
+				tempVar.Vtype,
+			)
+		}
+	}
+}
+
+/*
 TestModel_AddVariableMatrix1
 Description:
 
@@ -508,6 +596,135 @@ func TestModel_AddConstraint3(t *testing.T) {
 
 	if len(m.Constraints) != 1 {
 		t.Errorf("Expected for the updated model to contain 1 constraint; received %v", len(m.Constraints))
+	}
+
+}
+
+/*
+TestModel_AddConstraint
+Description:
+
+	Tests that a simple constraint (VectorConstraint) can be given to the model
+	along with a nil error.
+*/
+func TestModel_AddConstraint4(t *testing.T) {
+	// Constants
+	m := optim.NewModel("AddConstraint1")
+
+	// Create Constraint
+	n := 3
+	vv1 := m.AddVariableVector(n)
+	kv1 := optim.OnesVector(n)
+	L1 := optim.Identity(n)
+	L1.Scale(2.0, &L1)
+	vle1 := optim.VectorLinearExpr{
+		L: L1,
+		X: vv1,
+		C: kv1,
+	}
+
+	slc1, err := vle1.LessEq(optim.ZerosVector(n))
+	if err != nil {
+		t.Errorf("There was an issue creating the desired scalar constraint: %v", err)
+	}
+
+	// Add Constraint to Model
+	var err0 error = nil
+	err = m.AddConstraint(slc1, err0)
+	if err != nil {
+		t.Errorf("There was an issue adding the constraint to the model: %v", err)
+	}
+
+	if len(m.Constraints) != 1 {
+		t.Errorf("Expected for the updated model to contain 1 constraint; received %v", len(m.Constraints))
+	}
+
+}
+
+/*
+TestModel_AddConstraint5
+Description:
+
+	Tests that a simple constraint (VectorConstraint) can be given to the model
+	along with a bool.
+*/
+func TestModel_AddConstraint5(t *testing.T) {
+	// Constants
+	m := optim.NewModel("AddConstraint5")
+
+	// Create Constraint
+	n := 3
+	vv1 := m.AddVariableVector(n)
+	kv1 := optim.OnesVector(n)
+	L1 := optim.Identity(n)
+	L1.Scale(2.0, &L1)
+	vle1 := optim.VectorLinearExpr{
+		L: L1,
+		X: vv1,
+		C: kv1,
+	}
+
+	slc1, err := vle1.LessEq(optim.ZerosVector(n))
+	if err != nil {
+		t.Errorf("There was an issue creating the desired scalar constraint: %v", err)
+	}
+
+	// Add Constraint to Model
+	b1 := false
+	err = m.AddConstraint(slc1, b1)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"There was an unexpected type input to AddConstraint(): %T (%v)",
+			b1, b1,
+		),
+	) {
+		t.Errorf("There was an issue adding the constraint to the model: %v", err)
+	}
+
+}
+
+/*
+TestModel_AddConstraint6
+Description:
+
+	Tests that a simple constraint (VectorConstraint) can be given to the model
+	along with a couple of bools.
+*/
+func TestModel_AddConstraint6(t *testing.T) {
+	// Constants
+	m := optim.NewModel("AddConstraint6")
+
+	// Create Constraint
+	n := 3
+	vv1 := m.AddVariableVector(n)
+	kv1 := optim.OnesVector(n)
+	L1 := optim.Identity(n)
+	L1.Scale(2.0, &L1)
+	vle1 := optim.VectorLinearExpr{
+		L: L1,
+		X: vv1,
+		C: kv1,
+	}
+
+	slc1, err := vle1.LessEq(optim.ZerosVector(n))
+	if err != nil {
+		t.Errorf("There was an issue creating the desired scalar constraint: %v", err)
+	}
+
+	// Add Constraint to Model
+	b1 := false
+	b2 := true
+	err = m.AddConstraint(slc1, b1, b2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"The optimizer tried to add a constraint using a bad call to AddConstr! Skipping this constraint: %v , because of extra inputs %v",
+			slc1,
+			[]interface{}{b1, b2},
+		),
+	) {
+		t.Errorf("There was an issue adding the constraint to the model: %v", err)
 	}
 
 }
