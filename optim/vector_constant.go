@@ -106,6 +106,13 @@ func (kv KVector) Plus(eIn interface{}, extras ...interface{}) (VectorExpression
 		// Return Addition
 		return kv.Plus(float64(e))
 	case mat.VecDense:
+		// Input Checking
+		if kvLen != e.Len() {
+			return kv, fmt.Errorf(
+				"Length of vectors in sum do not match! Vectors have lengths %v and %v!",
+				kv.Len(), e.Len(),
+			)
+		}
 		// Return Sum
 		var result mat.VecDense
 		kv2 := mat.VecDense(kv)
@@ -113,6 +120,14 @@ func (kv KVector) Plus(eIn interface{}, extras ...interface{}) (VectorExpression
 
 		return KVector(result), nil
 	case KVector:
+		// Input Checking
+		if kvLen != e.Len() {
+			return kv, fmt.Errorf(
+				"Length of vectors in sum do not match! Vectors have lengths %v and %v!",
+				kv.Len(), e.Len(),
+			)
+		}
+
 		// Compute Addition
 		var result mat.VecDense
 		kvAsVec := mat.VecDense(kv)

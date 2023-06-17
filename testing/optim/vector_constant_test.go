@@ -159,6 +159,37 @@ func TestKVector_LinearCoeff1(t *testing.T) {
 }
 
 /*
+TestKVector_Constant1
+Description:
+
+	Tests that the constant function correctly retrieves a matrix.
+*/
+func TestKVector_Constant1(t *testing.T) {
+	// Constant
+	kv1 := optim.KVector(optim.OnesVector(10))
+
+	// Test
+	mat1 := kv1.Constant()
+
+	if mat1.Len() != kv1.Len() {
+		t.Errorf(
+			"Expected the constant to have length %v; received %v.",
+			kv1.Len(), mat1.Len(),
+		)
+	}
+
+	for i := 0; i < kv1.Len(); i++ {
+		if float64(kv1.AtVec(i).(optim.K)) != mat1.AtVec(i) {
+			t.Errorf(
+				"Expected vector at index %v to be %v; received %v",
+				i, kv1.AtVec(i),
+				mat1.AtVec(i),
+			)
+		}
+	}
+}
+
+/*
 TestKVector_Comparison1
 Description:
 
@@ -395,5 +426,234 @@ func TestKVector_Plus3(t *testing.T) {
 				vec1.AtVec(dimIndex).(optim.K)+f1,
 			)
 		}
+	}
+}
+
+/*
+TestKVector_Plus4
+Description:
+
+	Tests the addition of KVector with a mat.VecDense vector
+*/
+func TestKVector_Plus4(t *testing.T) {
+	// Constants
+	desLength := 10
+	//m := optim.NewModel()
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	var vec2 = optim.ZerosVector(desLength)
+
+	// Algorithm
+	eOut, err := vec1.Plus(vec2)
+	if err != nil {
+		t.Errorf("There was an issue adding the two expression.")
+	}
+
+	vec3, ok := eOut.(optim.KVector)
+	if !ok {
+		t.Errorf("Expected vec3 to be of type optim.KVector; received %T", eOut)
+	}
+
+	for dimIndex := 0; dimIndex < desLength; dimIndex++ {
+		if float64(vec3.AtVec(dimIndex).(optim.K)) != float64(vec1.AtVec(dimIndex).(optim.K))+vec2.AtVec(dimIndex) {
+			t.Errorf(
+				"Expected v3.AtVec(%v) = %v; received %v",
+				dimIndex,
+				vec3.AtVec(dimIndex),
+				float64(vec1.AtVec(dimIndex).(optim.K))+vec2.AtVec(dimIndex),
+			)
+		}
+	}
+}
+
+/*
+TestKVector_Plus5
+Description:
+
+	Tests the addition of KVector with a mat.VecDense of improper length
+*/
+func TestKVector_Plus5(t *testing.T) {
+	// Constants
+	desLength := 10
+	//m := optim.NewModel()
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	var vec2 = optim.ZerosVector(desLength - 1)
+
+	// Algorithm
+	_, err := vec1.Plus(vec2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Length of vectors in sum do not match! Vectors have lengths %v and %v!",
+			vec1.Len(), vec2.Len(),
+		)) {
+		t.Errorf("The wrong error was detected! %v", err)
+	}
+}
+
+/*
+TestKVector_Plus6
+Description:
+
+	Tests the addition of KVector with another KVector. Length mismatch.
+*/
+func TestKVector_Plus6(t *testing.T) {
+	// Constants
+	desLength := 10
+	//m := optim.NewModel()
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	var vec2 = optim.KVector(optim.ZerosVector(desLength - 1))
+
+	// Algorithm
+	_, err := vec1.Plus(vec2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Length of vectors in sum do not match! Vectors have lengths %v and %v!",
+			vec1.Len(), vec2.Len(),
+		)) {
+		t.Errorf("The wrong error was detected! %v", err)
+	}
+
+}
+
+/*
+TestKVector_Plus7
+Description:
+
+	Tests the addition of KVector with a VarVector
+*/
+func TestKVector_Plus7(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("test-kvector-plus7")
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	vec2 := m.AddVariableVector(desLength)
+
+	// Algorithm
+	eOut, err := vec1.Plus(vec2)
+	if err != nil {
+		t.Errorf("There was an issue adding the two expression: %v", err)
+	}
+
+	vec3, ok := eOut.(optim.VectorLinearExpr)
+	if !ok {
+		t.Errorf("Expected vec3 to be of type optim.KVector; received %T", eOut)
+	}
+
+	for dimIndex := 0; dimIndex < desLength; dimIndex++ {
+		if vec3.C.AtVec(dimIndex) != vec1.AtVec(dimIndex).Constant() {
+			t.Errorf(
+				"Expected v3.AtVec(%v) = %v; received %v",
+				dimIndex,
+				vec3.AtVec(dimIndex),
+				vec1.AtVec(dimIndex).(optim.K),
+			)
+		}
+	}
+
+	for dimIndex := 0; dimIndex < vec3.Len(); dimIndex++ {
+		if vec3.X.AtVec(dimIndex).IDs()[0] != vec2.AtVec(dimIndex).IDs()[0] {
+			t.Errorf(
+				"Expected variable at %v to have ID %v; received %v.",
+				dimIndex, vec2.AtVec(dimIndex).IDs()[0],
+				vec3.X.AtVec(dimIndex).IDs()[0],
+			)
+		}
+	}
+
+	tempIdentity := optim.Identity(vec2.Len())
+	for rowIndex := 0; rowIndex < vec2.Len(); rowIndex++ {
+		for colIndex := 0; colIndex < vec2.Len(); colIndex++ {
+			// Make sure L is identity
+			if vec3.L.At(rowIndex, colIndex) != (&tempIdentity).At(rowIndex, colIndex) {
+				t.Errorf(
+					"Expected L to be identity matrix, but entry at (%v,%v) (%v) does not match identity.",
+					rowIndex, colIndex, vec3.L.At(rowIndex, colIndex),
+				)
+			}
+		}
+	}
+}
+
+/*
+TestKVector_Plus8
+Description:
+
+	Tests the addition of KVector with a VectorLinearExpr
+*/
+func TestKVector_Plus8(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("test-kvector-plus7")
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	vec2 := m.AddVariableVector(desLength)
+
+	// Algorithm
+	eOut, err := vec2.Plus(vec1.Plus(vec2))
+	if err != nil {
+		t.Errorf("There was an issue adding the two expression: %v", err)
+	}
+
+	vec3, ok := eOut.(optim.VectorLinearExpr)
+	if !ok {
+		t.Errorf("Expected vec3 to be of type optim.KVector; received %T", eOut)
+	}
+
+	for dimIndex := 0; dimIndex < desLength; dimIndex++ {
+		if vec3.C.AtVec(dimIndex) != vec1.AtVec(dimIndex).Constant() {
+			t.Errorf(
+				"Expected v3.AtVec(%v) = %v; received %v",
+				dimIndex,
+				vec3.AtVec(dimIndex),
+				vec1.AtVec(dimIndex).(optim.K),
+			)
+		}
+	}
+
+	for dimIndex := 0; dimIndex < vec3.Len(); dimIndex++ {
+		if vec3.X.AtVec(dimIndex).IDs()[0] != vec2.AtVec(dimIndex).IDs()[0] {
+			t.Errorf(
+				"Expected variable at %v to have ID %v; received %v.",
+				dimIndex, vec2.AtVec(dimIndex).IDs()[0],
+				vec3.X.AtVec(dimIndex).IDs()[0],
+			)
+		}
+	}
+
+	tempIdentity := optim.Identity(vec2.Len())
+
+	for rowIndex := 0; rowIndex < vec2.Len(); rowIndex++ {
+		for colIndex := 0; colIndex < vec2.Len(); colIndex++ {
+			// Make sure L is identity
+			if vec3.L.At(rowIndex, colIndex) != 2.0*(&tempIdentity).At(rowIndex, colIndex) {
+				t.Errorf(
+					"Expected L to be identity matrix, but entry at (%v,%v) (%v) does not match identity.",
+					rowIndex, colIndex, vec3.L.At(rowIndex, colIndex),
+				)
+			}
+		}
+	}
+}
+
+/*
+TestKVector_Plus9
+Description:
+
+	Tests the addition of KVector with a bool
+*/
+func TestKVector_Plus9(t *testing.T) {
+	// Constants
+	desLength := 10
+	//m := optim.NewModel("test-kvector-plus7")
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	b1 := false
+
+	// Algorithm
+	_, err := vec1.Plus(b1)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf("Unrecognized expression type %T for addition of KVector kv.Plus(%v)!", b1, b1),
+	) {
+		t.Errorf("Unexpected error when adding kvector with bool! %v", err)
 	}
 }
