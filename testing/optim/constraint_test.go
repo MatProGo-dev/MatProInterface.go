@@ -48,13 +48,13 @@ func TestConstraint_IsConstraint2(t *testing.T) {
 
 	// Create a scalar constraint.
 
-	lhs0 := optim.OnesVector(4)
+	rhs0 := optim.OnesVector(4)
 	x := m.AddVariableClassic(0, 3.0, optim.Continuous)
 	vv1 := optim.VarVector{
 		Elements: []optim.Variable{x, x, x, x},
 	}
 
-	vectorConstr0, err := optim.Eq(lhs0, vv1)
+	vectorConstr0, err := vv1.Eq(rhs0)
 	if err != nil {
 		t.Errorf("An error occurred constructing the equality constraint: %v", err)
 	}
@@ -77,5 +77,58 @@ func TestConstraint_IsConstraint3(t *testing.T) {
 	// Algorithm
 	if optim.IsConstraint(f1) {
 		t.Errorf("The float was not properly detected as NOT BEING a constant.")
+	}
+}
+
+/*
+TestConstraint_IsConstraint4
+Description:
+
+	This test verifies if a pointer to a scalar constraint is properly detected by IsConstraint.
+*/
+func TestConstraint_IsConstraint4(t *testing.T) {
+	// Constants
+	m := optim.NewModel("IsConstraint4")
+
+	// Create a scalar constraint.
+
+	lhs0 := optim.One
+	x := m.AddBinaryVariable()
+
+	scalarConstr0, err := lhs0.Eq(x)
+	if err != nil {
+		t.Errorf("An error occurred constructing the equality constraint: %v", err)
+	}
+
+	if !optim.IsConstraint(scalarConstr0) {
+		t.Errorf("The scalar constraint is not implementing a Constraint() interface!")
+	}
+}
+
+/*
+TestConstraint_IsConstraint2
+Description:
+
+	This test verifies if a pointer to vector constraint is properly detected by IsConstraint.
+*/
+func TestConstraint_IsConstraint5(t *testing.T) {
+	// Constants
+	m := optim.NewModel("IsConstraint5")
+
+	// Create a scalar constraint.
+
+	rhs0 := optim.OnesVector(4)
+	x := m.AddVariableClassic(0, 3.0, optim.Continuous)
+	vv1 := optim.VarVector{
+		Elements: []optim.Variable{x, x, x, x},
+	}
+
+	vectorConstr0, err := vv1.Eq(rhs0)
+	if err != nil {
+		t.Errorf("An error occurred constructing the equality constraint: %v", err)
+	}
+
+	if !optim.IsConstraint(&vectorConstr0) {
+		t.Errorf("The scalar constraint is not implementing a Constraint() interface!")
 	}
 }
