@@ -210,6 +210,93 @@ func TestOperators_Comparison3(t *testing.T) {
 }
 
 /*
+TestOperators_Comparison4
+Description:
+
+	Tests whether or not Comparison works for two valid expressions.
+*/
+func TestOperators_Comparison4(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-comparison4")
+	v1 := m.AddVariable()
+	f1 := 2.3
+
+	// Algorithms
+	constr0, err := optim.Comparison(f1, v1, optim.SenseGreaterThanEqual)
+	if err != nil {
+		t.Errorf("The Eq() comparison appears to be equal to the two vectors: %v", err)
+	}
+
+	sc0, _ := constr0.(optim.ScalarConstraint)
+	if _, ok1 := sc0.LeftHandSide.(optim.K); !ok1 {
+		t.Errorf("The left hand side of the equality is not a variable!")
+	}
+
+	if _, ok2 := sc0.RightHandSide.(optim.Variable); !ok2 {
+		t.Errorf("The right hand side of the equality is not a variable!")
+	}
+
+}
+
+/*
+TestOperators_Comparison5
+Description:
+
+	Tests whether or not Comparison works for a valid expression and
+	a boolean.
+*/
+func TestOperators_Comparison5(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-comparison3")
+	vv1 := m.AddVariableVector(10)
+	kv1 := optim.OnesVector(vv1.Len())
+
+	// Algorithms
+	constr, err := optim.Comparison(kv1, vv1, optim.SenseLessThanEqual)
+	if err != nil {
+		t.Errorf("There was an error computing Comparison(): %v", err)
+	}
+
+	if constr.(optim.VectorConstraint).Sense != optim.SenseLessThanEqual {
+		t.Errorf(
+			"Expected sense of constraint to be %v; received %v",
+			optim.SenseLessThanEqual, constr.(optim.ScalarConstraint).Sense,
+		)
+	}
+}
+
+/*
+TestOperators_Comparison6
+Description:
+
+	Tests whether or not Comparison works for a valid expression and
+	a boolean.
+*/
+func TestOperators_Comparison6(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-comparison2")
+	vec1 := m.AddVariable()
+	vec2 := m.AddVariable()
+	c1 := optim.K(1.2)
+	e2, err := c1.Plus(vec1.Plus(vec2))
+	if err != nil {
+		t.Errorf("There was an issue adding vec2 to c1: %v", err)
+	}
+
+	// Algorithms
+	constr0, err := optim.Comparison(e2, c1, optim.SenseGreaterThanEqual)
+	if err != nil {
+		t.Errorf("Unexpected error computing comparison: %v", err)
+	}
+
+	scalarConstr0 := constr0.(optim.ScalarConstraint)
+	_, ok1 := scalarConstr0.LeftHandSide.(optim.ScalarLinearExpr)
+	if !ok1 {
+		t.Errorf("Expected LHS to be a ScalarLinearExpr but received %T.", scalarConstr0.LeftHandSide)
+	}
+}
+
+/*
 TestOperators_Multiply1
 Description:
 */
@@ -279,6 +366,56 @@ func TestOperators_Multiply2(t *testing.T) {
 			)
 		}
 
+	}
+
+}
+
+/*
+TestOperators_Multiply3
+Description:
+*/
+func TestOperators_Multiply3(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-multiply3")
+	v1 := m.AddVariable()
+	f1 := 6.4
+
+	// Algorithm
+	prod1, err := optim.Multiply(f1, v1)
+	if err != nil {
+		t.Errorf("There was an issue using Multiply(): %v", err)
+	}
+
+	prod1AsSLE, ok1 := prod1.(optim.ScalarLinearExpr)
+	if !ok1 {
+		t.Errorf("There was an issue converting this product to an SLE! Type %T", prod1)
+	}
+
+	if prod1AsSLE.X.Len() != 1 {
+		t.Errorf("Expected X to have length 1; received %v", prod1AsSLE.X.Len())
+	}
+
+}
+
+/*
+TestOperators_Multiply4
+Description:
+
+	Multiply a vecdense with a VarVector. Idk if this will work at all?
+*/
+func TestOperators_Multiply4(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-multiply3")
+	v1 := m.AddVariableVector(3)
+	kv1 := optim.OnesVector(v1.Len())
+
+	// Algorithm
+	_, err := optim.Multiply(kv1, v1)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf("The Multiply() method for KVector has not been implemented yet!"),
+	) {
+		t.Errorf("Unexpected error value for multiply: %v", err)
 	}
 
 }

@@ -45,32 +45,28 @@ func Comparison(lhs, rhs interface{}, sense ConstrSense) (Constraint, error) {
 	// Constants
 
 	// Algorithm
-	switch lhs.(type) {
+	switch lhs0 := lhs.(type) {
 	case float64:
 		// Convert lhs to K
-		lhsAsFloat64, _ := lhs.(float64)
-		lhsAsK := K(lhsAsFloat64)
+		lhsAsK := K(lhs0)
 
 		// Create constraint
 		return Comparison(lhsAsK, rhs, sense)
 	case mat.VecDense:
 		// Convert lhs to KVector.
-		lhsAsVecDense, _ := lhs.(mat.VecDense)
-		lhsAsKVector := KVector(lhsAsVecDense)
+		lhsAsKVector := KVector(lhs0)
 
 		// Create constraint
 		return lhsAsKVector.Comparison(rhs, sense)
 	case ScalarExpression:
-		lhsAsScalarExpression, _ := lhs.(ScalarExpression)
 		rhsAsScalarExpression, _ := rhs.(ScalarExpression)
 		return ScalarConstraint{
-			lhsAsScalarExpression,
+			lhs0,
 			rhsAsScalarExpression,
 			sense,
 		}, nil
 	case VectorExpression:
-		lhsAsVecExpr, _ := lhs.(VectorExpression)
-		return lhsAsVecExpr.Comparison(rhs, sense)
+		return lhs0.Comparison(rhs, sense)
 	default:
 		return nil, fmt.Errorf("Comparison in sense '%v' is not defined for lhs type %T and rhs type %T!", sense, lhs, rhs)
 	}
@@ -87,26 +83,22 @@ func Multiply(term1, term2 interface{}) (Expression, error) {
 	// Constants
 
 	// Algorithm
-	switch term1.(type) {
+	switch t1 := term1.(type) {
 	case float64:
 		// Convert lhs to K
-		term1AsFloat64, _ := term1.(float64)
-		term1AsK := K(term1AsFloat64)
+		term1AsK := K(t1)
 
 		// Create constraint
 		return Multiply(term1AsK, term2)
 	case mat.VecDense:
 		// Convert lhs to KVector.
-		term1AsVecDense, _ := term1.(mat.VecDense)
-		term1AsKVector := KVector(term1AsVecDense)
+		term1AsKVector := KVector(t1)
 
 		// Create constraint
 		return term1AsKVector.Multiply(term2)
 	case ScalarExpression:
-		term1AsScalarExpression, _ := term1.(ScalarExpression)
-
 		// Create Constraint
-		return term1AsScalarExpression.Multiply(term2)
+		return t1.Multiply(term2)
 
 	//case VectorExpression:
 	//	lhsAsVecExpr, _ := lhs.(VectorExpression)
