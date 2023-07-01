@@ -203,6 +203,13 @@ Description:
 func (qe ScalarQuadraticExpression) Plus(e interface{}, errors ...error) (ScalarExpression, error) {
 	// Constants
 
+	// Input Processing
+	if len(errors) > 0 {
+		if errors[0] != nil {
+			return qe, errors[0]
+		}
+	}
+
 	// Algorithm depends
 	switch e.(type) {
 	//case float64:
@@ -440,29 +447,48 @@ Description:
 */
 func (qe ScalarQuadraticExpression) Multiply(val interface{}, errors ...error) (Expression, error) {
 	// Input Processing
-	// TODO: Finish input processing!
+	if len(errors) > 0 {
+		if errors[0] != nil {
+			return qe, errors[0]
+		}
+	}
 
 	// Create Output
-	switch val.(type) {
+	switch valAsType := val.(type) {
 	case float64:
-		// Cast variable
-		valAsFloat := val.(float64)
-
 		// Algorithm
 		var newQE ScalarQuadraticExpression = ScalarQuadraticExpression{
 			X: (qe).X,
+			C: qe.C,
 		}
 
 		// Iterate through all of the rows and columns of Q
-		newQE.Q.Scale(valAsFloat, &qe.Q)
+		newQE.Q.Scale(valAsType, &qe.Q)
 
 		// Iterate through the linear coefficients
-		newQE.L.ScaleVec(valAsFloat, &qe.L)
+		newQE.L.ScaleVec(valAsType, &qe.L)
 
 		// Update through the constant
-		qe.C *= valAsFloat
+		newQE.C *= valAsType
 
-		return qe, nil
+		return newQE, nil
+	case K:
+		// Algorithm
+		valAsFloat := float64(valAsType)
+		return qe.Multiply(valAsFloat)
+
+	case Variable:
+		// Return error
+		return qe, fmt.Errorf("Attempted to multiply Variable with ScalarQuadraticExpression which would result in degree 3 expression! MatProInterface can not currently handle such a high degree polynomial!")
+
+	case ScalarLinearExpr:
+		// Return error
+		return qe, fmt.Errorf("Attempted to multiply ScalarLinearExpr with ScalarQuadraticExpression which would result in degree 3 expression! MatProInterface can not currently handle such a high degree polynomial!")
+
+	case ScalarQuadraticExpression:
+		// Return error
+		return qe, fmt.Errorf("Attempted to multiply ScalarQuadraticExpression with ScalarQuadraticExpression which would result in degree 4 expression! MatProInterface can not currently handle such a high degree polynomial!")
+
 	default:
 		return qe, fmt.Errorf("Unexpected type of input to Multiply(): %T", val)
 	}
