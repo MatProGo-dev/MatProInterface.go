@@ -1,6 +1,7 @@
 package optim_test
 
 import (
+	"fmt"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"gonum.org/v1/gonum/mat"
 	"strings"
@@ -1130,6 +1131,96 @@ func TestQuadraticExpr_Multiply5(t *testing.T) {
 	if !strings.Contains(
 		err.Error(),
 		"Attempted to multiply ScalarQuadraticExpression with ScalarQuadraticExpression which would result in degree 4 expression! MatProInterface can not currently handle such a high degree polynomial!",
+	) {
+		t.Errorf("There was an unexpected error in multiply: %v", err)
+	}
+
+}
+
+/*
+TestQuadraticExpr_Multiply6
+Description:
+
+	Tests whether or not the Multiply() function works for a quadratic expression
+	and a ScalarQuadraticExpression AND an error is also passed.
+*/
+func TestQuadraticExpr_Multiply6(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Multiply4")
+
+	vv1 := m.AddVariableVector(2)
+
+	Q1_aoa := [][]float64{
+		[]float64{1.0, 2.0},
+		[]float64{3.0, 4.0},
+	}
+
+	L1_a := []float64{1.0, 7.0}
+
+	C1 := 3.14
+
+	// Preparing constants for NewQuadraticExpr
+	Q1_vals := append(Q1_aoa[0], Q1_aoa[1]...)
+	Q1 := *mat.NewDense(2, 2, Q1_vals)
+
+	L1 := *mat.NewVecDense(2, L1_a)
+
+	// Algorithm
+	err1 := fmt.Errorf("Dummy error!")
+	qe1, err := optim.NewQuadraticExpr(Q1, L1, C1, vv1)
+	if err != nil {
+		t.Errorf("There was an issue creating a basic quadratic expression: %v", err)
+	}
+
+	_, err = qe1.Multiply(qe1, err1)
+	if !strings.Contains(
+		err.Error(),
+		err1.Error(),
+	) {
+		t.Errorf("There was an unexpected error in multiply: %v", err)
+	}
+
+}
+
+/*
+TestQuadraticExpr_Multiply7
+Description:
+
+	Tests whether or not the Multiply() function works for a quadratic expression
+	and a ScalarQuadraticExpression AND an error is also passed.
+*/
+func TestQuadraticExpr_Multiply7(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Multiply7")
+
+	vv1 := m.AddVariableVector(2)
+
+	Q1_aoa := [][]float64{
+		[]float64{1.0, 2.0},
+		[]float64{3.0, 4.0},
+	}
+
+	L1_a := []float64{1.0, 7.0}
+
+	C1 := 3.14
+
+	// Preparing constants for NewQuadraticExpr
+	Q1_vals := append(Q1_aoa[0], Q1_aoa[1]...)
+	Q1 := *mat.NewDense(2, 2, Q1_vals)
+
+	L1 := *mat.NewVecDense(2, L1_a)
+
+	// Algorithm
+	b1 := false
+	qe1, err := optim.NewQuadraticExpr(Q1, L1, C1, vv1)
+	if err != nil {
+		t.Errorf("There was an issue creating a basic quadratic expression: %v", err)
+	}
+
+	_, err = qe1.Multiply(b1)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf("Unexpected type of input to Multiply(): %T", b1),
 	) {
 		t.Errorf("There was an unexpected error in multiply: %v", err)
 	}
