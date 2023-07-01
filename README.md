@@ -109,6 +109,25 @@ you manipulate certain variables with this library, the
 objects are passed by reference and not by value. Feel free to
 ask if this is intentional by creating an issue.
 
+> Why do most functions return `error` values?
+
+There are two dominant approaches for handling errors/problems
+during numerical Go programs. One is to raise an exception/create a fatal flag which terminates the program.
+The other is to share error messages to the user using Go's build-in `error` type (or extensions of it) during
+most function calls. In most cases, these error messages will be `nil` indicating
+that no error occurred, but occasionally they will contain valuable information.
+
+The second approach is used here because it may be helpful for the library to explain to the user what is going on
+and how to use certain functions through a direct message. 
+Sometimes, the first method of error handling can point users to unintuitive/difficult to read parts of
+code. Hopefully, this is avoided using this format.
+
+## Design Philosophies
+
+* Share error information
+* Composability
+  * It should be possible to compose any math operation with any other (Assuming there are no dimension mismatch errors).
+
 ## To-Dos
 
 * [X] Create New AddConstr methods which work for vector constraints
@@ -146,3 +165,7 @@ ask if this is intentional by creating an issue.
 * [ ] Write changes to all AtVec() methods to output both elements AND errors (so we can detect out of length calls)
 * [ ] Determine whether or not to keep the Solution and Solver() interfaces in this module. It seems like they can be solver-specific.
 * [ ] Introduce MatrixVar object
+* [ ] Test that Transpose Method Properly Creates DIFFERENT objects (i.e., no copying by reference)
+  * [ ] KVectorTranspose
+  * [ ] VarVector
+  * [ ] VectorLinearExpression
