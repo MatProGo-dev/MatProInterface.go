@@ -138,7 +138,7 @@ code. Hopefully, this is avoided using this format.
             * [X] Constant
             * [X] Var
             * [X] ScalarLinearExpression
-            * [ ] QuadraticExpression
+            * [X] QuadraticExpression
         * [ ] Vectors
             * [ ] Vector Constant
             * [ ] VarVector
