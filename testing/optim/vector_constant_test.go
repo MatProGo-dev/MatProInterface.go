@@ -657,3 +657,25 @@ func TestKVector_Plus9(t *testing.T) {
 		t.Errorf("Unexpected error when adding kvector with bool! %v", err)
 	}
 }
+
+/*
+TestKVector_Transpose1
+Description:
+
+	Tests the transposition of a given vector returns the new type KVectorTranspose.
+*/
+func TestKVector_Transpose1(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+
+	// Algorithm
+	vecTransposed := vec1.Transpose()
+
+	if _, ok1 := vecTransposed.(optim.KVectorTranspose); !ok1 {
+		t.Errorf(
+			"Expected transposed KVector to be of type KVectorTranspose; received %Te instead.",
+			vecTransposed,
+		)
+	}
+}
