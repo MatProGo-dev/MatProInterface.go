@@ -61,6 +61,9 @@ type VectorExpression interface {
 
 	//AtVec returns the expression at a given index
 	AtVec(idx int) ScalarExpression
+
+	//Transpose returns the transpose of the given vector expression
+	Transpose() VectorExpression
 }
 
 /*
