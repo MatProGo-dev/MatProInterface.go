@@ -224,7 +224,7 @@ func TestVarVectorTranspose_Eq1(t *testing.T) {
 	}
 
 	zerosAsVecDense := optim.ZerosVector(vv1.Len())
-	zerosAsKVector := optim.KVector(zerosAsVecDense)
+	zerosAsKVector := optim.KVector(zerosAsVecDense).Transpose()
 
 	// Verify that constraint can be created with no issues.
 	_, err := vv1.Eq(zerosAsKVector)
@@ -261,7 +261,7 @@ func TestVarVectorTranspose_Eq2(t *testing.T) {
 }
 
 /*
-TestVarVectorTranspose_Eq2
+TestVarVectorTranspose_Eq3
 Description:
 
 	This test verifies that the Eq method works between a VarVectorTranspose and another var vector.
@@ -284,6 +284,34 @@ func TestVarVectorTranspose_Eq3(t *testing.T) {
 	_, err := vv1.Eq(vv2)
 	if err != nil {
 		t.Errorf("There was an error creating equality constraint between the two VarVectorTransposes: %v", err)
+	}
+}
+
+/*
+TestVarVectorTranspose_Eq4
+Description:
+
+	This test verifies that the Eq method does not work between a
+	VarVectorTranspose object and a normal KVector.
+*/
+func TestVarVectorTranspose_Eq4(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Eq1")
+	vv1 := m.AddVariableVector(10).Transpose()
+
+	zerosAsVecDense := optim.ZerosVector(vv1.Len())
+	zerosAsKVector := optim.KVector(zerosAsVecDense)
+
+	// Verify that constraint can be created with no issues.
+	_, err := vv1.Eq(zerosAsKVector)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot commpare VarVectorTranspose with a normal vector %v (%T); Try transposing one or the other!",
+			zerosAsKVector, zerosAsKVector,
+		),
+	) {
+		t.Errorf("There was an unexpected error when attempting to run Eq: %v", err)
 	}
 }
 
@@ -435,8 +463,8 @@ func TestVarVectorTranspose_Plus3(t *testing.T) {
 	// Constants
 	desLength := 10
 	m := optim.NewModel("Plus3")
-	vec1 := m.AddVariableVector(desLength)
-	k2 := optim.OnesVector(desLength)
+	vec1 := m.AddVariableVector(desLength).Transpose()
+	k2 := optim.KVectorTranspose(optim.OnesVector(desLength))
 
 	// Algorithm
 	sum3, err := vec1.Plus(k2)
@@ -444,7 +472,7 @@ func TestVarVectorTranspose_Plus3(t *testing.T) {
 		t.Errorf("There was an error computing addition: %v", err)
 	}
 
-	sum3AsVLE, ok := sum3.(optim.VectorLinearExpr)
+	sum3AsVLE, ok := sum3.(optim.VectorLinearExpressionTranspose)
 	if !ok {
 		t.Errorf(
 			"There was an issue converting sum3 (type %T) to type optim.VectorLinearExpr.",
@@ -469,7 +497,7 @@ func TestVarVectorTranspose_Plus3(t *testing.T) {
 	// Check the values of the constant vector
 	for vecIndex := 0; vecIndex < sum3AsVLE.Len(); vecIndex++ {
 		// Check that values of sum3AsVLE and vec1 match
-		if sum3AsVLE.C.AtVec(vecIndex) != k2.AtVec(vecIndex) {
+		if sum3AsVLE.C.AtVec(vecIndex) != float64(k2.AtVec(vecIndex).(optim.K)) {
 			t.Errorf(
 				"Expected the value at index in sum3.X[%v] (%v) to be the same as k2[%v] (%v).",
 				vecIndex,
@@ -491,8 +519,8 @@ func TestVarVectorTranspose_Plus4(t *testing.T) {
 	// Constants
 	desLength := 10
 	m := optim.NewModel("Plus4")
-	vec1 := m.AddVariableVector(desLength)
-	vec2 := m.AddVariableVector(desLength - 2)
+	vec1 := m.AddVariableVector(desLength).Transpose()
+	vec2 := m.AddVariableVector(desLength - 2).Transpose().(optim.VarVectorTranspose)
 	vec3 := optim.VarVectorTranspose{
 		append(vec2.Elements, vec1.AtVec(0).(optim.Variable), vec1.AtVec(1).(optim.Variable)),
 	}
@@ -503,7 +531,7 @@ func TestVarVectorTranspose_Plus4(t *testing.T) {
 		t.Errorf("There was an error computing addition: %v", err)
 	}
 
-	sum3AsVLE, ok := sum3.(optim.VectorLinearExpr)
+	sum3AsVLE, ok := sum3.(optim.VectorLinearExpressionTranspose)
 	if !ok {
 		t.Errorf(
 			"There was an issue converting sum3 (type %T) to type optim.VectorLinearExpr.",
@@ -720,6 +748,32 @@ func TestVarVectorTranspose_Plus5(t *testing.T) {
 				sum3AsVLE.C.AtVec(vecIndex),
 			)
 		}
+	}
+}
+
+/*
+TestVarVectorTranspose_Plus6
+Description:
+
+	Testing the Plus operator between a VarVectorTranspose and a KVector. Proper sizes were given.
+*/
+func TestVarVectorTranspose_Plus6(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("Plus6")
+	vec1 := m.AddVariableVector(desLength).Transpose()
+	k2 := optim.OnesVector(desLength)
+
+	// Algorithm
+	_, err := vec1.Plus(k2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot add VarVectorTranspose to a normal vector %v (%T); Try transposing one or the other!",
+			k2, k2,
+		),
+	) {
+		t.Errorf("There was an unexpected error computing addition: %v", err)
 	}
 }
 

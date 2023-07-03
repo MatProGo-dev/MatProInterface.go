@@ -231,7 +231,7 @@ func TestKVectorTranspose_Comparison2(t *testing.T) {
 	desLength := 10
 	m := optim.NewModel("Comparison2")
 	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
-	var vec2 = m.AddVariableVector(desLength)
+	var vec2 = m.AddVariableVector(desLength).Transpose()
 
 	// Create Constraint
 	constr, err := vec1.Comparison(vec2, optim.SenseLessThanEqual)
@@ -269,7 +269,7 @@ func TestKVectorTranspose_Comparison3(t *testing.T) {
 	c1 := optim.OnesVector(desLength)
 
 	// Use these to create expression.
-	ve1 := optim.VectorLinearExpr{
+	ve1 := optim.VectorLinearExpressionTranspose{
 		vec2, L1, c1,
 	}
 
@@ -318,6 +318,38 @@ func TestKVectorTranspose_Comparison4(t *testing.T) {
 	_, err := vec1.Comparison(ve1, optim.SenseGreaterThanEqual)
 	if strings.Contains(err.Error(), fmt.Sprintf("The two vector inputs to Eq() must have the same dimension, but #1 has dimension %v and #2 has dimension %v!", vec1.Len(), ve1.Len())) {
 		t.Errorf("There was an issue creating equality constraint between vec1 and vec2: %v", err)
+	}
+}
+
+/*
+TestKVectorTranspose_Comparison5
+Description:
+
+	This function tests that the Comparison() method is properly working
+	for KVectorTranspose.
+	Uses SenseLessThanEqual.
+	Comparison of:
+	- KVectorTranspose
+	- VarVector
+	Should throw error
+*/
+func TestKVectorTranspose_Comparison5(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("Comparison5")
+	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
+	var vec2 = m.AddVariableVector(desLength)
+
+	// Create Constraint
+	_, err := vec1.Comparison(vec2, optim.SenseLessThanEqual)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot compare KVectorTranspose with a normal vector of type %T; Try transposing one or the other!",
+			vec2,
+		),
+	) {
+		t.Errorf("There was an unexpected error when creating equality constraint between vec1 and vec2: %v", err)
 	}
 }
 
@@ -440,7 +472,7 @@ func TestKVectorTranspose_Plus4(t *testing.T) {
 	desLength := 10
 	//m := optim.NewModel()
 	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
-	var vec2 = optim.ZerosVector(desLength)
+	var vec2 = optim.KVector(optim.ZerosVector(desLength)).Transpose()
 
 	// Algorithm
 	eOut, err := vec1.Plus(vec2)
@@ -454,12 +486,12 @@ func TestKVectorTranspose_Plus4(t *testing.T) {
 	}
 
 	for dimIndex := 0; dimIndex < desLength; dimIndex++ {
-		if float64(vec3.AtVec(dimIndex).(optim.K)) != float64(vec1.AtVec(dimIndex).(optim.K))+vec2.AtVec(dimIndex) {
+		if float64(vec3.AtVec(dimIndex).(optim.K)) != float64(vec1.AtVec(dimIndex).(optim.K))+float64(vec2.AtVec(dimIndex).(optim.K)) {
 			t.Errorf(
 				"Expected v3.AtVec(%v) = %v; received %v",
 				dimIndex,
 				vec3.AtVec(dimIndex),
-				float64(vec1.AtVec(dimIndex).(optim.K))+vec2.AtVec(dimIndex),
+				float64(vec1.AtVec(dimIndex).(optim.K))+float64(vec2.AtVec(dimIndex).(optim.K)),
 			)
 		}
 	}
@@ -476,7 +508,7 @@ func TestKVectorTranspose_Plus5(t *testing.T) {
 	desLength := 10
 	//m := optim.NewModel()
 	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
-	var vec2 = optim.ZerosVector(desLength - 1)
+	var vec2 = optim.KVectorTranspose(optim.ZerosVector(desLength - 1))
 
 	// Algorithm
 	_, err := vec1.Plus(vec2)
@@ -527,7 +559,7 @@ func TestKVectorTranspose_Plus7(t *testing.T) {
 	desLength := 10
 	m := optim.NewModel("test-KVectorTranspose-plus7")
 	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
-	vec2 := m.AddVariableVector(desLength)
+	vec2 := m.AddVariableVector(desLength).Transpose()
 
 	// Algorithm
 	eOut, err := vec1.Plus(vec2)
@@ -535,7 +567,7 @@ func TestKVectorTranspose_Plus7(t *testing.T) {
 		t.Errorf("There was an issue adding the two expression: %v", err)
 	}
 
-	vec3, ok := eOut.(optim.VectorLinearExpr)
+	vec3, ok := eOut.(optim.VectorLinearExpressionTranspose)
 	if !ok {
 		t.Errorf("Expected vec3 to be of type optim.KVectorTranspose; received %T", eOut)
 	}
@@ -586,7 +618,7 @@ func TestKVectorTranspose_Plus8(t *testing.T) {
 	desLength := 10
 	m := optim.NewModel("test-KVectorTranspose-plus7")
 	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
-	vec2 := m.AddVariableVector(desLength)
+	vec2 := m.AddVariableVector(desLength).Transpose()
 
 	// Algorithm
 	eOut, err := vec2.Plus(vec1.Plus(vec2))
@@ -594,7 +626,7 @@ func TestKVectorTranspose_Plus8(t *testing.T) {
 		t.Errorf("There was an issue adding the two expression: %v", err)
 	}
 
-	vec3, ok := eOut.(optim.VectorLinearExpr)
+	vec3, ok := eOut.(optim.VectorLinearExpressionTranspose)
 	if !ok {
 		t.Errorf("Expected vec3 to be of type optim.KVectorTranspose; received %T", eOut)
 	}
@@ -652,7 +684,7 @@ func TestKVectorTranspose_Plus9(t *testing.T) {
 	_, err := vec1.Plus(b1)
 	if !strings.Contains(
 		err.Error(),
-		fmt.Sprintf("Unrecognized expression type %T for addition of KVectorTranspose kv.Plus(%v)!", b1, b1),
+		fmt.Sprintf("Unrecognized expression type %T for addition of KVectorTranspose kvt.Plus(%v)!", b1, b1),
 	) {
 		t.Errorf("Unexpected error when adding KVectorTranspose with bool! %v", err)
 	}

@@ -154,7 +154,7 @@ func (vle VectorLinearExpressionTranspose) Plus(e interface{}, extras ...interfa
 
 		// Algorithm
 		vleOut := vle
-		tempSum, err := KVector(vle.C).Plus(eConverted)
+		tempSum, err := KVectorTranspose(vle.C).Plus(eConverted)
 		if err != nil {
 			return vle,
 				fmt.Errorf(
@@ -162,7 +162,7 @@ func (vle VectorLinearExpressionTranspose) Plus(e interface{}, extras ...interfa
 					err,
 				)
 		}
-		KSum, _ := tempSum.(KVector)
+		KSum, _ := tempSum.(KVectorTranspose)
 		vleOut.C = mat.VecDense(KSum)
 
 		// Return
@@ -328,7 +328,11 @@ func (vle VectorLinearExpressionTranspose) Comparison(rhs interface{}, sense Con
 		}
 		return VectorConstraint{vle, rhsConverted, sense}, nil
 	case mat.VecDense:
-		return vle.Eq(KVector(rhsConverted))
+		return VectorConstraint{},
+			fmt.Errorf(
+				"Cannot compare VectorLinearExpressionTranspose with a normal vector %v (%T); Try transposing one or the other!",
+				rhsConverted, rhsConverted,
+			)
 	case VarVector:
 		return VectorConstraint{},
 			fmt.Errorf(

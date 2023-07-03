@@ -142,12 +142,15 @@ func (vvt VarVectorTranspose) Plus(eIn interface{}, extras ...interface{}) (Vect
 		}
 
 		// Algorithm
-		return VectorLinearExpr{
+		return VectorLinearExpressionTranspose{
 			L: Identity(vvLen), X: vvt.Transpose().(VarVector), C: mat.VecDense(eAsType),
 		}, nil
 	case mat.VecDense:
-		// Call KVector version
-		return vvt.Plus(KVector(eAsType))
+		return vvt,
+			fmt.Errorf(
+				"Cannot add VarVectorTranspose to a normal vector %v (%T); Try transposing one or the other!",
+				eAsType, eAsType,
+			)
 
 	case VarVector:
 		return vvt,
@@ -158,7 +161,7 @@ func (vvt VarVectorTranspose) Plus(eIn interface{}, extras ...interface{}) (Vect
 
 	case VarVectorTranspose:
 		// Use VLE based plus
-		eAsVLE := VectorLinearExpr{
+		eAsVLE := VectorLinearExpressionTranspose{
 			L: Identity(eAsType.Len()), X: eAsType.Transpose().(VarVector), C: ZerosVector(eAsType.Len()),
 		}
 
@@ -178,7 +181,6 @@ func (vvt VarVectorTranspose) Plus(eIn interface{}, extras ...interface{}) (Vect
 		errString := fmt.Sprintf("Unrecognized expression type %T for addition of VarVectorTranspose vvt.Plus(%v)!", eAsType, eAsType)
 		return VarVectorTranspose{}, fmt.Errorf(errString)
 	}
-	return vvt, fmt.Errorf("The Plus() method for VarVectorTranspose is not implemented yet!")
 }
 
 /*
@@ -222,9 +224,6 @@ Description:
 	input rhs as the right hand side if it is valid.
 */
 func (vvt VarVectorTranspose) Eq(rhs interface{}) (VectorConstraint, error) {
-	// Constants
-
-	// Algorithm
 	return vvt.Comparison(rhs, SenseEqual)
 
 }

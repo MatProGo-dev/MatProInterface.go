@@ -134,7 +134,7 @@ code. Hopefully, this is avoided using this format.
 * [ ] Mult
   * [ ] General Function (in operators.go)
     * [ ] Methods for
-        * [ ] Scalars
+        * [X] Scalars
             * [X] Constant
             * [X] Var
             * [X] ScalarLinearExpression

@@ -348,7 +348,7 @@ Description:
 */
 func TestVectorLinearExpressionTranspose_Eq1(t *testing.T) {
 	// Constants
-	m := optim.NewModel("Eq1")
+	m := optim.NewModel("VLETranspose-Eq1")
 
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
@@ -364,7 +364,7 @@ func TestVectorLinearExpressionTranspose_Eq1(t *testing.T) {
 		c,
 	}
 
-	ones0 := optim.OnesVector(2)
+	ones0 := optim.KVectorTranspose(optim.OnesVector(2))
 
 	// Create Constraint
 	constr, err := vle1.Eq(ones0)
@@ -458,7 +458,7 @@ func TestVectorLinearExpressionTranspose_Eq3(t *testing.T) {
 	}
 
 	onesVec1 := optim.OnesVector(2)
-	onesVec2 := optim.KVector(onesVec1)
+	onesVec2 := optim.KVector(onesVec1).Transpose()
 
 	// Create Constraint
 	vectorConstraint, err := vle1.Eq(onesVec2)
@@ -506,7 +506,7 @@ func TestVectorLinearExpressionTranspose_Eq4(t *testing.T) {
 	}
 
 	// Create equality comparison.
-	_, err = ve1.Eq(x)
+	_, err = ve1.Eq(x.Transpose())
 	if err != nil {
 		t.Errorf("There was an issue creating the equality constraint")
 	}
@@ -545,6 +545,49 @@ func TestVectorLinearExpressionTranspose_Eq5(t *testing.T) {
 	_, err = ve1.Eq(ve1)
 	if err != nil {
 		t.Errorf("There was an issue creating the equality constraint")
+	}
+
+}
+
+/*
+TestVectorLinearExpressionTranspose_Eq16
+Description:
+
+	Tests whether or not an equality constraint between a ones vector and a standard vector variable works well.
+	Eq comparison between:
+	- Vector Linear Expression, and
+	- mat.VecDense
+*/
+func TestVectorLinearExpressionTranspose_Eq6(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Eq6")
+
+	x := m.AddBinaryVariable()
+	y := m.AddBinaryVariable()
+
+	// Create Vector Variables
+	vv1 := optim.VarVector{
+		Elements: []optim.Variable{x, y},
+	}
+	c := optim.ZerosVector(2)
+	vle1 := optim.VectorLinearExpressionTranspose{
+		vv1,
+		optim.Identity(2),
+		c,
+	}
+
+	ones0 := optim.OnesVector(2)
+
+	// Create Constraint
+	_, err := vle1.Eq(ones0)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot compare VectorLinearExpressionTranspose with a normal vector %v (%T); Try transposing one or the other!",
+			ones0, ones0,
+		),
+	) {
+		t.Errorf("The wrong error was thrown while using Eq(): %v", err)
 	}
 
 }
@@ -634,7 +677,7 @@ func TestVectorLinearExpressionTranspose_Plus1(t *testing.T) {
 	n := 5
 	m := optim.NewModel("Plus1")
 
-	kv1 := optim.KVector(
+	kv1 := optim.KVectorTranspose(
 		optim.OnesVector(n),
 	)
 	vle2 := optim.VectorLinearExpressionTranspose{
@@ -704,7 +747,7 @@ func TestVectorLinearExpressionTranspose_Plus2(t *testing.T) {
 
 	kv1 := optim.KVector(
 		optim.OnesVector(n + 1),
-	)
+	).Transpose()
 	vle2 := optim.VectorLinearExpressionTranspose{
 		L: optim.Identity(n),
 		X: m.AddVariableVector(n),
@@ -733,9 +776,9 @@ Description:
 func TestVectorLinearExpressionTranspose_Plus3(t *testing.T) {
 	// Constants
 	n := 5
-	m := optim.NewModel("Plus3")
+	m := optim.NewModel("VLETranspose-Plus3")
 
-	kv1 := optim.KVector(
+	kv1 := optim.KVectorTranspose(
 		optim.OnesVector(n),
 	)
 	vle2 := optim.VectorLinearExpressionTranspose{
@@ -801,9 +844,9 @@ Description:
 func TestVectorLinearExpressionTranspose_Plus4(t *testing.T) {
 	// Constants
 	n := 5
-	m := optim.NewModel("Plus4")
+	m := optim.NewModel("VLETranspose-Plus4")
 
-	vv1 := m.AddVariableVector(n)
+	vv1 := m.AddVariableVector(n).Transpose()
 	vle2 := optim.VectorLinearExpressionTranspose{
 		L: optim.Identity(n),
 		X: m.AddVariableVector(n),
