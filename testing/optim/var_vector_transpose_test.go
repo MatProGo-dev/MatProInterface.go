@@ -46,6 +46,71 @@ func TestVarVectorTranspose_Length2(t *testing.T) {
 }
 
 /*
+TestVarVectorTranspose_NumVars1
+Description:
+
+	Tests that the NumVars() method is working properly for a length 10 VarVectorTranspose.
+*/
+func TestVarVectorTranspose_NumVars1(t *testing.T) {
+	m := optim.NewModel("NumVars1")
+	vv1 := m.AddVariableVector(10)
+
+	// Create Vector Variable
+	vv1T := vv1.Transpose()
+
+	if vv1T.NumVars() != 10 {
+		t.Errorf("The length of vv1 was %v; expected %v", vv1.Length(), 5)
+	}
+}
+
+/*
+TestVarVectorTranspose_LinearCoeff1
+Description:
+
+	Tests that the LinearCoeff() method is working properly for a length 10 VarVectorTranspose.
+	For a transposed vector, the linear coefficient L is the coefficient on the right of the variable.
+	(i.e., x^T L^T + c^T)
+*/
+func TestVarVectorTranspose_LinearCoeff1(t *testing.T) {
+	m := optim.NewModel("LinearCoeff1")
+	vv1 := m.AddVariableVector(10)
+
+	// Create Vector Variable
+	vv1T := vv1.Transpose()
+
+	L1 := vv1T.LinearCoeff()
+
+	nL, mL := L1.Dims()
+	if nL != 10 {
+		t.Errorf("Linear coefficient has %v rows; expected 10!", nL)
+	}
+	if mL != 10 {
+		t.Errorf("Linear coefficient has %v cols; expected 10!", mL)
+	}
+
+	for rowIndex := 0; rowIndex < nL; rowIndex++ {
+		for colIndex := 0; colIndex < mL; colIndex++ {
+			// Get elt and compare with 0 or 1.
+			if (rowIndex == colIndex) && (L1.At(rowIndex, colIndex) != 1.0) {
+				t.Errorf(
+					"The diagonal element at (%v,%v) should be 1.0; received %v",
+					rowIndex, colIndex,
+					L1.At(rowIndex, colIndex),
+				)
+			}
+			if (rowIndex != colIndex) && (L1.At(rowIndex, colIndex) != 0.0) {
+				t.Errorf(
+					"The diagonal element at (%v,%v) should be 0.0; received %v",
+					rowIndex, colIndex,
+					L1.At(rowIndex, colIndex),
+				)
+			}
+		}
+
+	}
+}
+
+/*
 TestVarVectorTranspose_At1
 Description:
 
@@ -376,7 +441,7 @@ func TestVarVectorTranspose_Comparison2(t *testing.T) {
 TestVarVectorTranspose_Plus1
 Description:
 
-	Testing the Plus operator between a VarVectorTranspose and a KVector. Proper sizes were given.
+	Testing the Plus operator between a VarVectorTranspose and a KVectorTranspose. Proper sizes were given.
 */
 func TestVarVectorTranspose_Plus1(t *testing.T) {
 	// Constants
@@ -386,12 +451,12 @@ func TestVarVectorTranspose_Plus1(t *testing.T) {
 	k2 := optim.KVector(optim.OnesVector(desLength))
 
 	// Algorithm
-	sum3, err := vec1.Plus(k2)
+	sum3, err := vec1.Transpose().Plus(k2.Transpose())
 	if err != nil {
 		t.Errorf("There was an error computing addition: %v", err)
 	}
 
-	sum3AsVLE, ok := sum3.(optim.VectorLinearExpr)
+	sum3AsVLE, ok := sum3.(optim.VectorLinearExpressionTranspose)
 	if !ok {
 		t.Errorf(
 			"There was an issue converting sum3 (type %T) to type optim.VectorLinearExpr.",
@@ -774,6 +839,144 @@ func TestVarVectorTranspose_Plus6(t *testing.T) {
 		),
 	) {
 		t.Errorf("There was an unexpected error computing addition: %v", err)
+	}
+}
+
+/*
+TestVarVectorTranspose_Plus7
+Description:
+
+	Testing the Plus operator between a VarVectorTranspose and a KVector. Proper sizes were given.
+*/
+func TestVarVectorTranspose_Plus7(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("Plus7")
+	vec1 := m.AddVariableVector(desLength)
+	k2 := optim.KVector(optim.OnesVector(desLength))
+
+	// Algorithm
+	_, err := vec1.Transpose().Plus(k2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot add VarVectorTranspose to a normal vector %v (%T); Try transposing one or the other!",
+			k2, k2,
+		),
+	) {
+		t.Errorf("There was an error computing addition: %v", err)
+	}
+}
+
+/*
+TestVarVectorTranspose_Plus8
+Description:
+
+	Testing the Plus operator between a VarVectorTranspose and a KVectorTranspose.
+	Improper lengths are used.
+*/
+func TestVarVectorTranspose_Plus8(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("Plus8")
+	vec1 := m.AddVariableVector(desLength)
+	k2 := optim.KVector(optim.OnesVector(desLength - 1))
+
+	// Algorithm
+	_, err := vec1.Transpose().Plus(k2.Transpose())
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"The lengths of two vectors in Plus must match! VarVectorTranspose has dimension %v, KVector has dimension %v",
+			vec1.Transpose().Len(),
+			k2.Transpose().Len(),
+		),
+	) {
+		t.Errorf("There was an error computing addition: %v", err)
+	}
+}
+
+/*
+TestVarVectorTranspose_Plus9
+Description:
+
+	Testing the Plus operator between a VarVectorTranspose and a VarVector.
+*/
+func TestVarVectorTranspose_Plus9(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("Plus9")
+	vec1 := m.AddVariableVector(desLength)
+	vec2 := m.AddVariableVector(desLength)
+
+	// Algorithm
+	_, err := vec1.Transpose().Plus(vec2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot add VarVectorTranspose to a normal vector %v (%T); Try transposing one or the other!",
+			vec2, vec2,
+		),
+	) {
+		t.Errorf("There was an error computing addition: %v", err)
+	}
+}
+
+/*
+TestVarVectorTranspose_Plus10
+Description:
+
+	Testing the Plus operator between a VarVectorTranspose and a ScalarLinearExpr.
+*/
+func TestVarVectorTranspose_Plus10(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("Plus10")
+	vec1 := m.AddVariableVector(desLength)
+	vec2 := m.AddVariableVector(desLength)
+	k3 := optim.KVector(optim.OnesVector(desLength))
+
+	// Algorithm
+	expr1, err := vec2.Plus(k3)
+	if err != nil {
+		t.Errorf("Unexpected error when adding together VarVectorTranspose and KVectorTranspose: %v", err)
+	}
+
+	_, err = vec1.Transpose().Plus(expr1)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot add VarVectorTranspose with a normal vector %v (%T); Try transposing one or the other!",
+			expr1, expr1,
+		),
+	) {
+		t.Errorf("There was an error computing addition: %v", err)
+	}
+}
+
+/*
+TestVarVectorTranspose_Plus11
+Description:
+
+	Testing the Plus operator between a VarVectorTranspose and a bool.
+*/
+func TestVarVectorTranspose_Plus11(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("Plus11")
+	vec1 := m.AddVariableVector(desLength)
+	b2 := false
+
+	// Algorithm
+	_, err := vec1.Transpose().Plus(b2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Unrecognized expression type %T for addition of VarVectorTranspose vvt.Plus(%v)!",
+			b2, b2,
+		),
+	) {
+		t.Errorf("There was an error computing addition: %v", err)
 	}
 }
 
