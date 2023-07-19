@@ -1,7 +1,6 @@
 package optim
 
 import (
-	"errors"
 	"fmt"
 	"time"
 )
@@ -177,47 +176,47 @@ func (m *Model) SetObjective(e ScalarExpression, sense ObjSense) {
 	m.Obj = NewObjective(e, sense)
 }
 
-// Optimize optimizes the model using the given solver type and returns the
-// solution or an error.
-func (m *Model) Optimize(solver Solver) (*Solution, error) {
-	// Variables
-	var err error
-
-	// Input Processing
-	if len(m.Variables) == 0 {
-		return nil, errors.New("no variables in model")
-	}
-
-	solver.ShowLog(m.ShowLog)
-
-	if m.TimeLimit > 0 {
-		solver.SetTimeLimit(m.TimeLimit.Seconds())
-	}
-
-	solver.AddVariables(m.Variables)
-
-	for _, constr := range m.Constraints {
-		solver.AddConstraint(constr)
-	}
-
-	mipSol, err := solver.Optimize()
-	defer solver.DeleteSolver()
-
-	if err != nil {
-		return nil, fmt.Errorf("There was an issue while trying to optimize the model: %v", err)
-	}
-
-	if mipSol.Status != OptimizationStatus_OPTIMAL {
-		errorMessage, err := mipSol.Status.ToMessage()
-		if err != nil {
-			return nil, fmt.Errorf("There was an issue converting optimization status to a message: %v", err)
-		}
-		return nil, fmt.Errorf(
-			"[Code = %d] %s",
-			mipSol.Status,
-			errorMessage,
-		)
-	}
-
-	return &mipSol, nil
-}
+//// Optimize optimizes the model using the given solver type and returns the
+//// solution or an error.
+//func (m *Model) Optimize(solver Solver) (*Solution, error) {
+//	// Variables
+//	var err error
+//
+//	// Input Processing
+//	if len(m.Variables) == 0 {
+//		return nil, errors.New("no variables in model")
+//	}
+//
+//	solver.ShowLog(m.ShowLog)
+//
+//	if m.TimeLimit > 0 {
+//		solver.SetTimeLimit(m.TimeLimit.Seconds())
+//	}
+//
+//	solver.AddVariables(m.Variables)
+//
+//	for _, constr := range m.Constraints {
+//		solver.AddConstraint(constr)
+//	}
+//
+//	mipSol, err := solver.Optimize()
+//	defer solver.DeleteSolver()
+//
+//	if err != nil {
+//		return nil, fmt.Errorf("There was an issue while trying to optimize the model: %v", err)
+//	}
+//
+//	if mipSol.Status != OptimizationStatus_OPTIMAL {
+//		errorMessage, err := mipSol.Status.ToMessage()
+//		if err != nil {
+//			return nil, fmt.Errorf("There was an issue converting optimization status to a message: %v", err)
+//		}
+//		return nil, fmt.Errorf(
+//			"[Code = %d] %s",
+//			mipSol.Status,
+//			errorMessage,
+//		)
+//	}
+//
+//	return &mipSol, nil
+//}

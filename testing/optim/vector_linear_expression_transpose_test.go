@@ -201,6 +201,41 @@ func TestVectorLinearExpressionTranspose_VariableIDs2(t *testing.T) {
 }
 
 /*
+TestVectorLinearExpressionTranspose_NumVars1
+Description:
+
+	This test the NumVars() method when a variable vector with a short, unique vectors.
+*/
+func TestVectorLinearExpressionTranspose_NumVars1(t *testing.T) {
+	m := optim.NewModel("VariableIDs1")
+	x := m.AddBinaryVariable()
+	y := m.AddBinaryVariable()
+
+	// Create Vector Variables
+	vv1 := optim.VarVector{
+		Elements: []optim.Variable{x, y},
+	}
+
+	L1 := *mat.NewDense(3, 2, []float64{1.0, 2.0, 3.0, 4.0, 5.0, 6.0})
+	c1 := *mat.NewVecDense(3, []float64{5.0, 6.0, 7.0})
+
+	// Use these to create expression.
+	ve1 := optim.VectorLinearExpressionTranspose{
+		vv1, L1, c1,
+	}
+
+	err := ve1.Check()
+	if err != nil {
+		t.Errorf("The vector linear expression was invalid! %v", err)
+	}
+
+	// ve1 should pass all checks.
+	if ve1.NumVars() != 2 {
+		t.Errorf("Unexpected number of variables. Received %v; expected 2", ve1.NumVars())
+	}
+}
+
+/*
 TestVectorLinearExpressionTranspose_Coeffs1
 Description:
 
@@ -299,43 +334,98 @@ func TestVectorLinearExpressionTranspose_Coeffs2(t *testing.T) {
 /*
 TestVectorLinearExpressionTranspose_LessEq1
 Description:
+
 	This tests that the less than or equal to command works with a constant input.
 */
-//func TestVectorLinearExpressionTranspose_LessEq1(t *testing.T) {
-//	// Constants
-//	m := optim.NewModel()
-//	x := m.AddBinaryVariable()
-//
-//	// Create Vector Variables
-//	vv1 := optim.VarVector{
-//		Elements: []optim.Variable{*x, *x, *x, *x},
-//	}
-//
-//	LElts := []float64{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0}
-//	L1 := mat.NewDense(2, 4, LElts)
-//	c1 := mat.NewVecDense(2, []float64{5.0, 6.0})
-//
-//	// Use these to create expression.
-//	ve1 := optim.VectorLinearExpressionTranspose{
-//		vv1, L1, c1,
-//	}
-//
-//	err := ve1.Check()
-//	if err != nil {
-//		t.Errorf("The vector linear expression was invalid! %v", err)
-//	}
-//
-//	// Algorithm
-//	constr1, err := ve1.LessEq(2.0)
-//	if err != nil {
-//		t.Errorf("There was an error computing the constraint ve1 <= 2.0: %v", err)
-//	}
-//
-//	if constr1.LeftHandSide != ve1 {
-//		t.Errorf("The left hand side (%v) should be the same as ve1 (%v).", constr1.LeftHandSide, ve1)
-//	}
-//
-//}
+func TestVectorLinearExpressionTranspose_LessEq1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestVectorLinearExpressionTranspose_LessEq1")
+	x := m.AddBinaryVariable()
+
+	// Create Vector Variables
+	vv1 := optim.VarVector{
+		Elements: []optim.Variable{x, x, x, x},
+	}
+
+	LElts := []float64{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0}
+	L1 := mat.NewDense(2, 4, LElts)
+	c1 := mat.NewVecDense(2, []float64{5.0, 6.0})
+
+	// Use these to create expression.
+	ve1 := optim.VectorLinearExpressionTranspose{
+		vv1, *L1, *c1,
+	}
+
+	err := ve1.Check()
+	if err != nil {
+		t.Errorf("The vector linear expression was invalid! %v", err)
+	}
+
+	// Algorithm
+	constr1, err := ve1.LessEq(
+		optim.KVectorTranspose(optim.OnesVector(ve1.Len())),
+	)
+	if err != nil {
+		t.Errorf("There was an error computing the constraint ve1 <= 2.0: %v", err)
+	}
+
+	if len(constr1.LeftHandSide.IDs()) != len(vv1.IDs()) {
+		t.Errorf("Left Hand")
+	}
+
+	if constr1.Sense != optim.SenseLessThanEqual {
+		t.Errorf("Expected constraint's sense to be SenseLessThanEqual; received %v", optim.SenseGreaterThanEqual)
+	}
+
+}
+
+/*
+TestVectorLinearExpressionTranspose_GreaterEq1
+Description:
+
+	This tests that the greater than or equal to command works with a constant input.
+*/
+func TestVectorLinearExpressionTranspose_GreaterEq1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestVectorLinearExpressionTranspose_GreaterEq1")
+	x := m.AddBinaryVariable()
+
+	// Create Vector Variables
+	vv1 := optim.VarVector{
+		Elements: []optim.Variable{x, x, x, x},
+	}
+
+	LElts := []float64{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0}
+	L1 := mat.NewDense(2, 4, LElts)
+	c1 := mat.NewVecDense(2, []float64{5.0, 6.0})
+
+	// Use these to create expression.
+	ve1 := optim.VectorLinearExpressionTranspose{
+		vv1, *L1, *c1,
+	}
+
+	err := ve1.Check()
+	if err != nil {
+		t.Errorf("The vector linear expression was invalid! %v", err)
+	}
+
+	// Algorithm
+	constr1, err := ve1.GreaterEq(
+		optim.KVectorTranspose(optim.OnesVector(ve1.Len())),
+	)
+	if err != nil {
+		t.Errorf("There was an error computing the constraint ve1 <= 2.0: %v", err)
+	}
+
+	if len(constr1.LeftHandSide.IDs()) != len(vv1.IDs()) {
+		t.Errorf("Left Hand")
+	}
+
+	if constr1.Sense != optim.SenseGreaterThanEqual {
+		t.Errorf("Expected constraint's sense to be SenseLessThanEqual; received %v", optim.SenseGreaterThanEqual)
+	}
+
+}
 
 /*
 TestVectorLinearExpressionTranspose_Eq1
