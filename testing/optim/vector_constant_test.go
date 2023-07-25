@@ -659,6 +659,58 @@ func TestKVector_Plus9(t *testing.T) {
 }
 
 /*
+TestKVector_Plus10
+Description:
+
+	Tests the addition of KVector with a KVectorTranspose
+*/
+func TestKVector_Plus10(t *testing.T) {
+	// Constants
+	desLength := 10
+	//m := optim.NewModel("test-kvector-plus7")
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	vec2 := optim.KVectorTranspose(optim.OnesVector(desLength))
+
+	// Algorithm
+	_, err := vec1.Plus(vec2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot add KVector with a transposed vector %T; Try transposing one or the other!",
+			vec2,
+		),
+	) {
+		t.Errorf("Unexpected error when adding kvector with bool! %v", err)
+	}
+}
+
+/*
+TestKVector_Plus11
+Description:
+
+	Tests the addition of KVector with a VarVectorTranspose
+*/
+func TestKVector_Plus11(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("test-kvector-plus11")
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	X1 := m.AddVariableVector(desLength)
+
+	// Algorithm
+	_, err := vec1.Plus(X1.Transpose())
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot add KVector with a transposed vector %T; Try transposing one or the other!",
+			X1.Transpose(),
+		),
+	) {
+		t.Errorf("Unexpected error when adding kvector with bool! %v", err)
+	}
+}
+
+/*
 TestKVector_Transpose1
 Description:
 
