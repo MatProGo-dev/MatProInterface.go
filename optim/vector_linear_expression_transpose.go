@@ -154,14 +154,7 @@ func (vle VectorLinearExpressionTranspose) Plus(e interface{}, extras ...interfa
 
 		// Algorithm
 		vleOut := vle
-		tempSum, err := KVectorTranspose(vle.C).Plus(eConverted)
-		if err != nil {
-			return vle,
-				fmt.Errorf(
-					"There was an issue computing the sum of a KVector with your VectorLinearExpressionTransposeession: %v",
-					err,
-				)
-		}
+		tempSum, _ := KVectorTranspose(vle.C).Plus(eConverted)
 		KSum, _ := tempSum.(KVectorTranspose)
 		vleOut.C = mat.VecDense(KSum)
 
@@ -230,7 +223,10 @@ func (vle VectorLinearExpressionTranspose) Plus(e interface{}, extras ...interfa
 
 		return vleOut, nil
 	default:
-		return vle, fmt.Errorf("The addition method has not yet been implemented!")
+		return vle, fmt.Errorf(
+			"The VectorLinearExpressionTranspose.Plus method has not yet been implemented for type %T!",
+			eConverted,
+		)
 	}
 }
 

@@ -428,6 +428,43 @@ func TestVectorLinearExpressionTranspose_GreaterEq1(t *testing.T) {
 }
 
 /*
+TestVectorLinearExpressionTranspose_Mult1
+Description:
+
+	Tests that the unfinished Mult() function is properly returning errors.
+*/
+func TestVectorLinearExpressionTranspose_Mult1(t *testing.T) {
+	// Constants
+
+	// Create model
+	m := optim.NewModel("TestVectorLinearExpressionTranspose_Mult1")
+	x := m.AddBinaryVariable()
+
+	// Create Vector Variables
+	vv1 := optim.VarVector{
+		Elements: []optim.Variable{x, x, x, x},
+	}
+
+	LElts := []float64{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0}
+	L1 := mat.NewDense(2, 4, LElts)
+	c1 := mat.NewVecDense(2, []float64{5.0, 6.0})
+
+	// Use these to create expression.
+	ve1 := optim.VectorLinearExpressionTranspose{
+		vv1, *L1, *c1,
+	}
+
+	// Algorithm
+	_, err := ve1.Mult(2.0)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf("The multiplication method has not yet been implemented!"),
+	) {
+		t.Errorf("Unexpected error after multiplication: %v", err)
+	}
+}
+
+/*
 TestVectorLinearExpressionTranspose_Eq1
 Description:
 
@@ -1162,4 +1199,459 @@ func TestVectorLinearExpressionTranspose_Plus6(t *testing.T) {
 			}
 		}
 	}
+}
+
+/*
+TestVectorLinearExpressionTranspose_Plus7
+Description:
+
+	Add VectorLinearExpressionTranspose to a KVector.
+*/
+func TestVectorLinearExpressionTranspose_Plus7(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("VLET Plus7")
+
+	kv1 := optim.KVector(
+		optim.OnesVector(n),
+	)
+	vle2 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.ZerosVector(n),
+	}
+
+	// Compute Sum
+	_, err := vle2.Plus(kv1)
+	if err == nil {
+		t.Errorf("There should have been an issue adding together these two vector expressions of different dimension, but none was received!")
+	}
+
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot add VectorLinearExpressioinTranspose with a normal vector %v (%T); Try transposing one or the other!",
+			kv1, kv1,
+		),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+}
+
+/*
+TestVectorLinearExpressionTranspose_Plus8
+Description:
+
+	Add VectorLinearExpressionTranspose to a VarVector.
+*/
+func TestVectorLinearExpressionTranspose_Plus8(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("VLET Plus7")
+
+	vle2 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.ZerosVector(n),
+	}
+
+	// Compute Sum
+	_, err := vle2.Plus(vle2.X)
+	if err == nil {
+		t.Errorf("There should have been an issue adding together these two vector expressions of different dimension, but none was received!")
+	}
+
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot add VectorLinearExpressioinTranspose with a normal vector %v (%T); Try transposing one or the other!",
+			vle2.X, vle2.X,
+		),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+}
+
+/*
+TestVectorLinearExpressionTranspose_Plus9
+Description:
+
+	Add VectorLinearExpressionTranspose to a VectorLinearExpression.
+*/
+func TestVectorLinearExpressionTranspose_Plus9(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("VLET Plus9")
+
+	vle2 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.ZerosVector(n),
+	}
+
+	// Compute Sum
+	_, err := vle2.Plus(true)
+	if err == nil {
+		t.Errorf("There should have been an issue adding together these two vector expressions of different dimension, but none was received!")
+	}
+
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"The VectorLinearExpressionTranspose.Plus method has not yet been implemented for type %T!",
+			true,
+		),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+}
+
+/*
+TestVectorLinearExpressionTranspose_Plus10
+Description:
+
+	Add VectorLinearExpressionTranspose to a VectorLinearExpression.
+*/
+func TestVectorLinearExpressionTranspose_Plus10(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("VLET Plus10")
+
+	vle2 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.ZerosVector(n),
+	}
+
+	// Compute Sum
+	_, err := vle2.Plus(vle2.Transpose())
+	if err == nil {
+		t.Errorf("There should have been an issue adding together these two vector expressions of different dimension, but none was received!")
+	}
+
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot add VectorLinearExpressioinTranspose with a normal vector %v (%T); Try transposing one or the other!",
+			vle2.Transpose(), vle2.Transpose(),
+		),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+}
+
+/*
+TestVectorLinearExpressionTranspose_Plus11
+Description:
+
+	Add VectorLinearExpressionTranspose to a VectorLinearExpressionTranspose
+	that is not of the right size.
+*/
+func TestVectorLinearExpressionTranspose_Plus11(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("VLET Plus11")
+
+	vle1 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n + 1),
+		X: m.AddVariableVector(n + 1),
+		C: optim.ZerosVector(n + 1),
+	}
+
+	vle2 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.ZerosVector(n),
+	}
+
+	// Compute Sum
+	_, err := vle1.Plus(vle2)
+	if err == nil {
+		t.Errorf("There should have been an issue adding together these two vector expressions of different dimension, but none was received!")
+	}
+
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"The length of input VectorLinearExpressionTranspose (%v) did not match the length of the VectorLinearExpressionTranspose (%v).",
+			vle2.Len(),
+			vle1.Len(),
+		),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+}
+
+/*
+TestVectorLinearExpressionTranspose_Comparison1
+Description:
+
+	Compares a VectorLinearExpressionTranspose with a constant vector.
+*/
+func TestVectorLinearExpressionTranspose_Comparison1(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("VLET Comparison1")
+
+	vle1 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.ZerosVector(n),
+	}
+	kv1 := optim.KVector(optim.OnesVector(n))
+
+	// Algorithm
+	_, err := vle1.Comparison(kv1, optim.SenseLessThanEqual)
+	if err == nil {
+		t.Errorf("Expected for there to be an error, but there was none.")
+	}
+
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot compare VectorLinearExpressionTranspose with a normal vector %v (%T); Try transposing one or the other!",
+			kv1, kv1,
+		),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+/*
+TestVectorLinearExpressionTranspose_Comparison2
+Description:
+
+	Compares a VectorLinearExpressionTranspose with a constant vector transpose.
+*/
+func TestVectorLinearExpressionTranspose_Comparison2(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("VLET Comparison2")
+
+	vle1 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.ZerosVector(n),
+	}
+	kv1 := optim.KVectorTranspose(optim.OnesVector(n + 1))
+
+	// Algorithm
+	_, err := vle1.Comparison(kv1, optim.SenseLessThanEqual)
+	if err == nil {
+		t.Errorf("Expected for there to be an error, but there was none.")
+	}
+
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"The two vector inputs to Eq() must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
+			vle1.Len(),
+			kv1.Len(),
+		),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+/*
+TestVectorLinearExpressionTranspose_Comparison3
+Description:
+
+	Compares a VectorLinearExpressionTranspose with a var vector.
+*/
+func TestVectorLinearExpressionTranspose_Comparison3(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("VLET Comparison1")
+
+	vle1 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.ZerosVector(n),
+	}
+	X1 := m.AddVariableVector(n)
+
+	// Algorithm
+	_, err := vle1.Comparison(X1, optim.SenseLessThanEqual)
+	if err == nil {
+		t.Errorf("Expected for there to be an error, but there was none.")
+	}
+
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot compare VectorLinearExpressionTranspose with a normal vector %v (%T); Try transposing one or the other!",
+			X1, X1,
+		),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+/*
+TestVectorLinearExpressionTranspose_Comparison4
+Description:
+
+	Compares a VectorLinearExpressionTranspose with a varVectorTranspose
+	of the wrong shape.
+*/
+func TestVectorLinearExpressionTranspose_Comparison4(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("VLET Comparison4")
+
+	vle1 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.ZerosVector(n),
+	}
+	X1 := m.AddVariableVector(n + 1)
+
+	// Algorithm
+	_, err := vle1.Comparison(X1.Transpose(), optim.SenseLessThanEqual)
+	if err == nil {
+		t.Errorf("Expected for there to be an error, but there was none.")
+	}
+
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"The two vector inputs to Eq() must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
+			vle1.Len(),
+			X1.Len(),
+		),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+/*
+TestVectorLinearExpressionTranspose_Comparison5
+Description:
+
+	Compares a VectorLinearExpressionTranspose with a vector linear expression.
+*/
+func TestVectorLinearExpressionTranspose_Comparison5(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("VLET Comparison5")
+
+	vle1 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.ZerosVector(n),
+	}
+
+	// Algorithm
+	_, err := vle1.Comparison(vle1.Transpose(), optim.SenseLessThanEqual)
+	if err == nil {
+		t.Errorf("Expected for there to be an error, but there was none.")
+	}
+
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot compare VectorLinearExpressionTranspose with a normal vector %v (%T); Try transposing one or the other!",
+			vle1.Transpose(), vle1.Transpose(),
+		),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+/*
+TestVectorLinearExpressionTranspose_Comparison6
+Description:
+
+	Compares a VectorLinearExpressionTranspose with a vector linear expression transpose of
+	the wrong shape.
+*/
+func TestVectorLinearExpressionTranspose_Comparison6(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("VLET Comparison6")
+
+	vle1 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.ZerosVector(n),
+	}
+
+	vle2 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n + 1),
+		X: m.AddVariableVector(n + 1),
+		C: optim.ZerosVector(n + 1),
+	}
+
+	// Algorithm
+	_, err := vle1.Comparison(vle2, optim.SenseLessThanEqual)
+	if err == nil {
+		t.Errorf("Expected for there to be an error, but there was none.")
+	}
+
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"The two vector inputs to Eq() must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
+			vle1.Len(),
+			vle2.Len(),
+		),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+/*
+TestVectorLinearExpressionTranspose_AtVec1
+Description:
+
+	Tests to make sure that AtVec properly works.
+*/
+func TestVectorLinearExpressionTranspose_AtVec1(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("VLET AtVec1")
+
+	vle1 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.ZerosVector(n),
+	}
+
+	// Expect
+	sle1 := vle1.AtVec(n - 1)
+	if _, ok := sle1.(optim.ScalarLinearExpr); !ok {
+		t.Errorf("Expected for vle1[n-1] to be a ScalarLinearExpr; received %T", sle1)
+	}
+
+}
+
+/*
+TestVectorLinearExpressionTranspose_Transpose1
+Description:
+
+	Tests to make sure that AtVec properly works.
+*/
+func TestVectorLinearExpressionTranspose_Transpose1(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("VLET Transpose1")
+
+	vle1 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.ZerosVector(n),
+	}
+
+	// Expect
+	vle2 := vle1.Transpose()
+	if _, ok := vle2.(optim.VectorLinearExpr); !ok {
+		t.Errorf("Expected for vle1.Transpose() to be a VectorLinearExpr; received %T", vle2)
+	}
+
 }
