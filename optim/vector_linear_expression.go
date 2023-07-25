@@ -444,5 +444,9 @@ Description:
 	This method creates the transpose of the current vector and returns it.
 */
 func (vle VectorLinearExpr) Transpose() VectorExpression {
-	return KVector(OnesVector(10))
+	return VectorLinearExpressionTranspose{
+		L: vle.L,
+		X: vle.X.Copy(),
+		C: vle.C,
+	}
 }

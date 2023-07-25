@@ -689,3 +689,177 @@ func TestKVectorTranspose_Plus9(t *testing.T) {
 		t.Errorf("Unexpected error when adding KVectorTranspose with bool! %v", err)
 	}
 }
+
+/*
+TestKVectorTranspose_Plus10
+Description:
+
+	Tests the addition of KVectorTranspose with a bool
+*/
+func TestKVectorTranspose_Plus10(t *testing.T) {
+	// Constants
+	desLength := 10
+	//m := optim.NewModel("test-KVectorTranspose-plus7")
+	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
+	v2 := optim.OnesVector(desLength)
+
+	// Algorithm
+	_, err := vec1.Plus(v2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Can not add KVectorTranspose to normal vector %v (type %T); transpose one or the other!",
+			v2, v2,
+		),
+	) {
+		t.Errorf("Unexpected error when adding KVectorTranspose with bool! %v", err)
+	}
+}
+
+/*
+TestKVectorTranspose_Plus11
+Description:
+
+	Tests the addition of KVectorTranspose with a bool
+*/
+func TestKVectorTranspose_Plus11(t *testing.T) {
+	// Constants
+	desLength := 10
+	//m := optim.NewModel("test-KVectorTranspose-plus7")
+	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
+	v2 := optim.KVector(optim.OnesVector(desLength))
+
+	// Algorithm
+	_, err := vec1.Plus(v2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Can not add KVectorTranspose to normal vector %v (type %T); transpose one or the other!",
+			v2, v2,
+		),
+	) {
+		t.Errorf("Unexpected error when adding KVectorTranspose with bool! %v", err)
+	}
+}
+
+/*
+TestKVectorTranspose_Plus12
+Description:
+
+	Tests the addition of KVectorTranspose with a varvector
+*/
+func TestKVectorTranspose_Plus12(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("test-KVectorTranspose-plus7")
+	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
+	v2 := m.AddVariableVector(desLength)
+
+	// Algorithm
+	_, err := vec1.Plus(v2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Can not add KVectorTranspose to normal vector %v (type %T); transpose one or the other!",
+			v2, v2,
+		),
+	) {
+		t.Errorf("Unexpected error when adding KVectorTranspose with bool! %v", err)
+	}
+}
+
+/*
+TestKVectorTranspose_Plus13
+Description:
+
+	Tests the addition of KVectorTranspose with a vle
+*/
+func TestKVectorTranspose_Plus13(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("test-KVectorTranspose-plus13")
+	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
+
+	vle1 := optim.VectorLinearExpr{
+		L: optim.Identity(desLength),
+		X: m.AddVariableVector(desLength),
+		C: optim.ZerosVector(desLength),
+	}
+
+	// Algorithm
+	_, err := vec1.Plus(vle1)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Can not add KVectorTranspose to normal vector %v (type %T); transpose one or the other!",
+			vle1, vle1,
+		),
+	) {
+		t.Errorf("Unexpected error when adding KVectorTranspose with bool! %v", err)
+	}
+}
+
+/*
+TestKVectorTranspose_Plus14
+Description:
+
+	Tests the addition of KVectorTranspose with a vletranspose
+*/
+func TestKVectorTranspose_Plus14(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("test-KVectorTranspose-plus14")
+	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
+
+	vle1 := optim.VectorLinearExpr{
+		L: optim.Identity(desLength),
+		X: m.AddVariableVector(desLength),
+		C: optim.ZerosVector(desLength),
+	}
+
+	// Algorithm
+	sum1, err := vec1.Plus(vle1.Transpose())
+	if err != nil {
+		t.Errorf("Expected no error; received %v", err)
+	}
+
+	if _, ok := sum1.(optim.VectorLinearExpressionTranspose); !ok {
+		t.Errorf(
+			"Sum of KVectorTranspose and VectorLinearExpressionTranspose is %T; expected optim.VectorLinearExpressionTranspose",
+			sum1,
+		)
+	}
+}
+
+/*
+TestKVectorTranspose_Mult1
+Description:
+
+	Tests that the scalar multiplication function works as expected.
+*/
+func TestKVectorTranspose_Mult1(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
+
+	// Algorithm
+	prod_out, err := vec1.Mult(30.0)
+	if err != nil {
+		t.Errorf("Unexpected error in multiplication: %v", err)
+	}
+
+	// Check elements of product
+	prod, ok := prod_out.(optim.KVectorTranspose)
+	if !ok {
+		t.Errorf("Unable to cast prod to optim.KVectorTranspose")
+	}
+
+	for elt_index := 0; elt_index < prod.Len(); elt_index++ {
+		if prod.AtVec(elt_index).(optim.K) != 30.0 {
+			t.Errorf(
+				"Expected all elements of L to ve 30.0; received %v",
+				prod.AtVec(elt_index),
+			)
+		}
+	}
+}
