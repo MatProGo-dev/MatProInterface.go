@@ -153,6 +153,33 @@ func TestVarVector_VariableIDs2(t *testing.T) {
 }
 
 /*
+TestVarVector_NumVars1
+Description:
+
+	This test will check to see vector of length 10
+	contains 2 n Vars.
+*/
+func TestVarVector_NumVars1(t *testing.T) {
+	m := optim.NewModel("NumVars1")
+	x := m.AddBinaryVariable()
+	y := m.AddBinaryVariable()
+
+	// Create Vector Variable
+	vv1 := optim.VarVector{
+		Elements: []optim.Variable{x, y, x},
+	}
+
+	nv := vv1.NumVars()
+	// Check to see that only x has ids in extractedIDs
+	if nv != 2 {
+		t.Errorf(
+			"There are two variable ID in the VarVector vv1, and yet %v was returned by the NumVars() method.",
+			nv,
+		)
+	}
+}
+
+/*
 TestVarVector_Constant1
 Description:
 
@@ -204,6 +231,59 @@ func TestVarVector_Constant2(t *testing.T) {
 		if constElt != 0.0 {
 			t.Errorf("Constant vector at index %v is %v; not 0.", eltIndex, constElt)
 		}
+	}
+}
+
+/*
+TestVarVector_LinearCoeff1
+Description:
+
+	This test will check to see vector of length 10
+	contains 10 n Vars.
+*/
+func TestVarVector_LinearCoeff1(t *testing.T) {
+	m := optim.NewModel("LinearCoeff1")
+	x := m.AddBinaryVariable()
+	y := m.AddBinaryVariable()
+
+	// Create Vector Variable
+	vv1 := optim.VarVector{
+		Elements: []optim.Variable{x, y, x},
+	}
+
+	identity0 := vv1.LinearCoeff()
+	// Check to see that only x has ids in extractedIDs
+	nR, nC := identity0.Dims()
+	if (nR != 3) || (nC != 3) {
+		t.Errorf(
+			"Exoected identity0 to be of shape (3,3); received (%v,%v)",
+			nR,
+			nC,
+		)
+	}
+
+	for rowIndex := 0; rowIndex < nR; rowIndex++ {
+		for colIndex := 0; colIndex < nC; colIndex++ {
+			if rowIndex == colIndex {
+				if identity0.At(rowIndex, colIndex) != 1.0 {
+					t.Errorf(
+						"Expected diagonal elements to be 1.0; received %v",
+						identity0.At(rowIndex, colIndex),
+					)
+				}
+			}
+
+			if rowIndex != colIndex {
+				if identity0.At(rowIndex, colIndex) != 0.0 {
+					t.Errorf(
+						"Expected diagonal elements to be 0.0; received %v",
+						identity0.At(rowIndex, colIndex),
+					)
+				}
+			}
+
+		}
+
 	}
 }
 
@@ -721,6 +801,35 @@ func TestVarVector_Plus5(t *testing.T) {
 			)
 		}
 	}
+}
+
+/*
+TestVarVector_Plus6
+Description:
+
+	Testing the Plus operator between a VarVector and a KVectorTranspose.
+	All vectors are of the same size.
+	No overlap between elements.
+*/
+func TestVarVector_Plus6(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("Plus6")
+	vec1 := m.AddVariableVector(desLength)
+	k2 := optim.KVectorTranspose(optim.OnesVector(desLength))
+
+	// Algorithm
+	_, err := vec1.Plus(k2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot add VarVector with a transposed vector %v (%T); Try transposing one or the other!",
+			k2, k2,
+		),
+	) {
+		t.Errorf("There was an unexpected error computing addition: %v", err)
+	}
+
 }
 
 /*
