@@ -317,7 +317,7 @@ func (vle VectorLinearExpr) Comparison(rhs interface{}, sense ConstrSense) (Vect
 		if rhsConverted.Len() != vle.Len() {
 			return VectorConstraint{},
 				fmt.Errorf(
-					"The two vector inputs to Eq() must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
+					"The two vector inputs to Comparison() must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
 					vle.Len(),
 					rhsConverted.Len(),
 				)
