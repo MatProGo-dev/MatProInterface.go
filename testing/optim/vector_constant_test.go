@@ -355,6 +355,68 @@ func TestKVector_Comparison5(t *testing.T) {
 }
 
 /*
+TestKVector_Comparison6
+Description:
+
+	Tests the Eq comparison of KVector with a VarVectorTranspose
+	results in a proper error.
+*/
+func TestKVector_Comparison6(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("test-Comparison6")
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	x1 := m.AddVariableVector(desLength)
+
+	// Algorithm
+	_, err := vec1.Comparison(x1.Transpose(), optim.SenseEqual)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot compare KVector with a transposed vector %T; Try transposing one or the other!",
+			x1.Transpose(),
+		),
+	) {
+		t.Errorf(
+			"Unexpected error when comparing kVector with VarVectorTranspose! %v",
+			err,
+		)
+	}
+
+}
+
+/*
+TestKVector_Comparison7
+Description:
+
+	Tests the Eq comparison of KVector with a KVector of incorrect length
+	results in a proper error.
+*/
+func TestKVector_Comparison7(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	var vec2 = optim.KVector(optim.OnesVector(desLength - 1))
+
+	// Algorithm
+	_, err := vec1.Comparison(vec2, optim.SenseEqual)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"The left hand side's dimension (%v) and the left hand side's dimension (%v) do not match!",
+			vec1.Len(),
+			vec2.Len(),
+		),
+	) {
+		t.Errorf(
+			"Unexpected error when comparing kVector with KVector of wrong size: %v",
+			err,
+		)
+	}
+
+}
+
+/*
 TestKVector_Plus1
 Description:
 
@@ -955,7 +1017,7 @@ func TestKVector_Eq1(t *testing.T) {
 	C1.SetVec(2, 13.0)
 
 	// Algorithm
-	_, err := vec1.GreaterEq(optim.KVector(C1).Transpose())
+	_, err := vec1.Eq(optim.KVector(C1).Transpose())
 	if !strings.Contains(
 		err.Error(),
 		fmt.Sprintf(
@@ -989,6 +1051,40 @@ func TestKVector_Transpose1(t *testing.T) {
 		t.Errorf(
 			"Expected transposed KVector to be of type KVectorTranspose; received %Te instead.",
 			vecTransposed,
+		)
+	}
+}
+
+/*
+TestKVector_Mult1
+Description:
+
+	Tests the multiplication of the KVector with a float.
+*/
+func TestKVector_Mult1(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+
+	// Algorithm
+	product, err := vec1.Mult(3.14)
+	if err != nil {
+		t.Errorf(
+			"There was an unexpected error performing multiplication: %v",
+			err,
+		)
+	}
+
+	productAsKVector, success := product.(optim.KVector)
+	if !success {
+		t.Errorf("There was an issue converting the product to a KVector!")
+	}
+
+	if productAsKVector.AtVec(0).(optim.K) != 3.14 {
+		t.Errorf(
+			"Expected product to contain elements of %v; received %v.",
+			3.14,
+			productAsKVector.AtVec(0),
 		)
 	}
 }
