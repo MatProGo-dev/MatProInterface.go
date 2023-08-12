@@ -425,6 +425,120 @@ func TestVarVector_Comparison2(t *testing.T) {
 }
 
 /*
+TestVarVector_Comparison3
+Description:
+
+	Tests that the Comparison() Method works well for future users.
+*/
+func TestVarVector_Comparison3(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("AtVec1")
+	vec1 := m.AddVariableVector(desLength)
+	kv1 := optim.KVector(optim.OnesVector(desLength)).Transpose()
+
+	// Compare
+	_, err := vec1.GreaterEq(kv1)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot compare VarVector with a transposed vector %v (%T); Try transposing one or the other!",
+			kv1, kv1,
+		),
+	) {
+		t.Errorf("Unexpected error when comparing two vectors: %v", err)
+	}
+
+}
+
+/*
+TestVarVector_Comparison4
+Description:
+
+	Tests that the Comparison() Method works for two VarVectors of different lengths.
+*/
+func TestVarVector_Comparison4(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("AtVec1")
+	vec1 := m.AddVariableVector(desLength)
+	vec2 := m.AddVariableVector(desLength - 1)
+
+	// Compare
+	_, err := vec1.Comparison(vec2, optim.SenseEqual)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"The two inputs to comparison '%v' must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
+			optim.SenseEqual,
+			vec1.Len(),
+			vec2.Len(),
+		),
+	) {
+		t.Errorf("Unexpected error when comparing VarVectors of different lengths: %v", err)
+	}
+
+}
+
+/*
+TestVarVector_Comparison5
+Description:
+
+	Tests that the Comparison() Method works well for a VarVector and
+	a VarVectorTranspose.
+*/
+func TestVarVector_Comparison5(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("AtVec1")
+	vec1 := m.AddVariableVector(desLength)
+	vec2 := m.AddVariableVector(desLength).Transpose()
+
+	// Compare
+	_, err := vec1.Comparison(vec2, optim.SenseEqual)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot compare VarVector with a transposed vector %v (%T); Try transposing one or the other!",
+			vec2, vec2,
+		),
+	) {
+		t.Errorf("Unexpected error when comparing VarVectors of different lengths: %v", err)
+	}
+
+}
+
+/*
+TestVarVector_Comparison6
+Description:
+
+	Tests that the Comparison() Method works well for a VarVector and
+	a VectorLinearExpressionTranspose.
+*/
+func TestVarVector_Comparison6(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("AtVec1")
+	vec1 := m.AddVariableVector(desLength)
+	vec2 := m.AddVariableVector(desLength)
+
+	sum1, _ := vec2.Plus(optim.OnesVector(desLength))
+
+	// Compare
+	_, err := vec1.Comparison(sum1.Transpose(), optim.SenseEqual)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot compare VarVector with a transposed vector %v (%T); Try transposing one or the other!",
+			sum1.Transpose(), sum1.Transpose(),
+		),
+	) {
+		t.Errorf("Unexpected error when comparing VarVectors of different lengths: %v", err)
+	}
+
+}
+
+/*
 TestVarVector_Plus1
 Description:
 
@@ -828,6 +942,138 @@ func TestVarVector_Plus6(t *testing.T) {
 		),
 	) {
 		t.Errorf("There was an unexpected error computing addition: %v", err)
+	}
+
+}
+
+/*
+TestVarVector_Plus7
+Description:
+
+	Testing the Plus operator between a VarVector and a VarVectorTranspose.
+*/
+func TestVarVector_Plus7(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("Plus5")
+	vec1 := m.AddVariableVector(desLength)
+	vec3 := m.AddVariableVector(desLength).Transpose()
+
+	// Algorithm
+	_, err := vec1.Plus(vec3)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot add VarVector with a transposed vector %v (%T); Try transposing one or the other!",
+			vec3, vec3,
+		),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+/*
+TestVarVector_Plus8
+Description:
+
+	Testing the Plus operator between a VarVector and a VectorLinearExpressionTranspose.
+*/
+func TestVarVector_Plus8(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("Plus8")
+	vec1 := m.AddVariableVector(desLength)
+
+	vec3 := m.AddVariableVector(desLength)
+	sum, _ := vec3.Plus(optim.OnesVector(desLength))
+
+	// Algorithm
+	_, err := vec1.Plus(sum.Transpose())
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot add VarVector with a transposed vector %v (%T); Try transposing one or the other!",
+			sum.Transpose(), sum.Transpose(),
+		),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+/*
+TestVarVector_Plus9
+Description:
+
+	Testing the Plus operator between a VarVector and a VectorLinearExpressionTranspose.
+*/
+func TestVarVector_Plus9(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("Plus9")
+	vec1 := m.AddVariableVector(desLength)
+
+	b1 := false
+
+	// Algorithm
+	_, err := vec1.Plus(b1)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Unrecognized expression type %T for addition of VarVector vv.Plus(%v)!",
+			b1, b1,
+		),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+/*
+TestVarVector_Mult1
+Descripiion:
+
+	Tests that the Mult() method currently returns errors.
+*/
+func TestVarVector_Mult1(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("AtVec1")
+	vec1 := m.AddVariableVector(desLength)
+
+	// Compute
+	_, err := vec1.Mult(21.0)
+	if !strings.Contains(
+		err.Error(),
+		"The Mult() method for VarVector is not implemented yet!",
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+/*
+TestVarVector_GreaterEq1
+Description:
+
+	Tests that the GreaterEq() Method works well for future users.
+*/
+func TestVarVector_GreaterEq1(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("AtVec1")
+	vec1 := m.AddVariableVector(desLength)
+	kv1 := optim.KVector(optim.OnesVector(desLength - 1))
+
+	// Compare
+	_, err := vec1.GreaterEq(kv1)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"The two inputs to comparison '%v' must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
+			optim.SenseGreaterThanEqual,
+			vec1.Len(),
+			kv1.Len(),
+		),
+	) {
+		t.Errorf("Unexpected error when comparing two vectors: %v", err)
 	}
 
 }

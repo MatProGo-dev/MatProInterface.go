@@ -182,7 +182,6 @@ func (vv VarVector) Plus(e interface{}, extras ...interface{}) (VectorExpression
 		errString := fmt.Sprintf("Unrecognized expression type %T for addition of VarVector vv.Plus(%v)!", e, e)
 		return VarVector{}, fmt.Errorf(errString)
 	}
-	return vv, fmt.Errorf("The Plus() method for VarVector is not implemented yet!")
 }
 
 /*
