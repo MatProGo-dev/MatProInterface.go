@@ -148,14 +148,14 @@ func (vle VectorLinearExpr) Plus(e interface{}, extras ...interface{}) (VectorEx
 
 		// Algorithm
 		vleOut := vle
-		tempSum, err := KVector(vle.C).Plus(eConverted)
-		if err != nil {
-			return vle,
-				fmt.Errorf(
-					"There was an issue computing the sum of a KVector with your VectorLinearExpression: %v",
-					err,
-				)
-		}
+		tempSum, _ := KVector(vle.C).Plus(eConverted)
+		//if err != nil {
+		//	return vle,
+		//		fmt.Errorf(
+		//			"There was an issue computing the sum of a KVector with your VectorLinearExpression: %v",
+		//			err,
+		//		)
+		//}
 		KSum, _ := tempSum.(KVector)
 		vleOut.C = mat.VecDense(KSum)
 
