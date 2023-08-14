@@ -147,13 +147,13 @@ code. Hopefully, this is avoided using this format.
     * [ ] General Function (in operators.go)
 * [ ] Introducing Optional Input for Variable Name to Var/VarVector
 * [ ] Consider renaming VarVector to VectorVar
-* [ ] VarVector
-    * [ ] Plus
-    * [ ] Multiply
-    * [ ] LessEq
-    * [ ] GreaterEq
-    * [ ] Eq
-    * [ ] Len
+* [X] VarVector
+    * [X] Plus
+    * [X] Multiply
+    * [X] LessEq
+    * [X] GreaterEq
+    * [X] Eq
+    * [X] Len
 * [ ] Decide whether or not we really need the Coeffs() method (What is it doing?)
 * [ ] Create function for easily creating MatDense:
     * [ ] ones matrices
@@ -165,7 +165,7 @@ code. Hopefully, this is avoided using this format.
 * [ ] Write changes to all AtVec() methods to output both elements AND errors (so we can detect out of length calls)
 * [ ] Determine whether or not to keep the Solution and Solver() interfaces in this module. It seems like they can be solver-specific.
 * [ ] Introduce MatrixVar object
-* [ ] Test that Transpose Method Properly Creates DIFFERENT objects (i.e., no copying by reference)
-  * [ ] KVectorTranspose
-  * [ ] VarVector
-  * [ ] VectorLinearExpression
+* [X] Test that Transpose Method Properly Creates DIFFERENT objects (i.e., no copying by reference)
+  * [X] KVectorTranspose
+  * [X] VarVector
+  * [X] VectorLinearExpression
