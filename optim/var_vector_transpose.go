@@ -259,10 +259,8 @@ func (vvt VarVectorTranspose) Comparison(rhs interface{}, sense ConstrSense) (Ve
 		}
 		return VectorConstraint{vvt, rhs0, sense}, nil
 	case mat.VecDense:
-		// Cast Type
-		rhsAsKVector := KVector(rhs0)
-
-		return vvt.Comparison(rhsAsKVector, sense)
+		// Cast Type to KVectorTranspose. Maybe I shouldn't do this?
+		return vvt.Comparison(KVectorTranspose(rhs0), sense)
 
 	case VarVector:
 		return VectorConstraint{},

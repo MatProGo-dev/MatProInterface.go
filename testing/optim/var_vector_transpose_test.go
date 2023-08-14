@@ -1014,3 +1014,85 @@ func TestVarVectorTranspose_AtVec1(t *testing.T) {
 		)
 	}
 }
+
+/*
+TestVarVectorTranspose_Mult1
+Description:
+
+	Verifies that the Mult() operator throws an error in its current form.
+*/
+func TestVarVectorTranspose_Mult1(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("AtVec1")
+	vec1 := m.AddVariableVector(desLength).Transpose()
+
+	// Check
+	_, err := vec1.Mult(2.9)
+	if !strings.Contains(
+		err.Error(),
+		"The Mult() method for VarVectorTranspose is not implemented yet!",
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+/*
+TestVarVectorTranspose_LessEq1
+Description:
+
+	Verifies that the LessEq method throws an error when the KVectorTranspose is
+	of the wrong length.
+*/
+func TestVarVectorTranspose_LessEq1(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("AtVec1")
+	vec1 := m.AddVariableVector(desLength).Transpose()
+	kv2 := optim.KVectorTranspose(optim.OnesVector(desLength - 1))
+
+	// Algorithm
+	_, err := vec1.LessEq(kv2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"The two inputs to comparison '%v' must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
+			optim.SenseLessThanEqual,
+			vec1.Len(),
+			kv2.Len(),
+		),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+/*
+TestVarVectorTranspose_GreaterEq1
+Description:
+
+	Verifies that the GreaterEq method throws an error when the KVectorTranspose is
+	of the wrong length.
+*/
+func TestVarVectorTranspose_GreaterEq1(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("AtVec1")
+	vec1 := m.AddVariableVector(desLength).Transpose()
+	kv2 := optim.OnesVector(desLength)
+
+	// Algorithm
+	constraint0, err := vec1.GreaterEq(kv2)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	if constraint0.Sense != optim.SenseGreaterThanEqual {
+		t.Errorf("Constraint should be a GreaterThanEqual constraint, but found the sense: %v", constraint0.Sense)
+	}
+
+	lhs0, ok1 := constraint0.LeftHandSide.(optim.VarVectorTranspose)
+	if !ok1 {
+		t.Errorf("Unexpected left hand side type %T for %v", lhs0, lhs0)
+	}
+
+}
