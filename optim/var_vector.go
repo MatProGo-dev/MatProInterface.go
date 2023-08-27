@@ -122,18 +122,15 @@ func (vv VarVector) Plus(e interface{}, extras ...interface{}) (VectorExpression
 	// Processing Extras
 
 	// Algorithm
-	switch e.(type) {
+	switch eAsType := e.(type) {
 	case KVector:
-		// Cast Variable
-		eAsKV, _ := e.(KVector)
-
 		// Check Lengths
-		if eAsKV.Len() != vv.Len() {
+		if eAsType.Len() != vv.Len() {
 			return VarVector{},
 				fmt.Errorf(
 					"The lengths of two vectors in Plus must match! VarVector has dimension %v, KVector has dimension %v",
 					vv.Len(),
-					eAsKV.Len(),
+					eAsType.Len(),
 				)
 		}
 
@@ -141,39 +138,50 @@ func (vv VarVector) Plus(e interface{}, extras ...interface{}) (VectorExpression
 		return VectorLinearExpr{
 			L: Identity(vvLen),
 			X: vv,
-			C: mat.VecDense(eAsKV),
+			C: mat.VecDense(eAsType),
 		}, nil
 	case mat.VecDense:
-		// Cast Variable
-		eAsVD, _ := e.(mat.VecDense)
-
 		// Call KVector version
-		return vv.Plus(KVector(eAsVD))
+		return vv.Plus(KVector(eAsType))
+
+	case KVectorTranspose:
+		return vv,
+			fmt.Errorf(
+				"Cannot add VarVector with a transposed vector %v (%T); Try transposing one or the other!",
+				eAsType, eAsType,
+			)
 
 	case VarVector:
-		// Cast Variable
-		eAsVV, _ := e.(VarVector)
-
 		// Use VLE based plus
 		eAsVLE := VectorLinearExpr{
-			L: Identity(eAsVV.Len()),
-			X: eAsVV,
-			C: ZerosVector(eAsVV.Len()),
+			L: Identity(eAsType.Len()),
+			X: eAsType,
+			C: ZerosVector(eAsType.Len()),
 		}
 
 		return vv.Plus(eAsVLE)
 
-	case VectorLinearExpr:
-		// Cast expression
-		eAsVLE, _ := e.(VectorLinearExpr)
+	case VarVectorTranspose:
+		return vv,
+			fmt.Errorf(
+				"Cannot add VarVector with a transposed vector %v (%T); Try transposing one or the other!",
+				eAsType, eAsType,
+			)
 
-		return eAsVLE.Plus(vv)
+	case VectorLinearExpr:
+		return eAsType.Plus(vv)
+
+	case VectorLinearExpressionTranspose:
+		return vv,
+			fmt.Errorf(
+				"Cannot add VarVector with a transposed vector %v (%T); Try transposing one or the other!",
+				eAsType, eAsType,
+			)
 
 	default:
 		errString := fmt.Sprintf("Unrecognized expression type %T for addition of VarVector vv.Plus(%v)!", e, e)
 		return VarVector{}, fmt.Errorf(errString)
 	}
-	return vv, fmt.Errorf("The Plus() method for VarVector is not implemented yet!")
 }
 
 /*
@@ -235,45 +243,51 @@ func (vv VarVector) Comparison(rhs interface{}, sense ConstrSense) (VectorConstr
 	// Constants
 
 	// Algorithm
-	switch rhs.(type) {
+	switch rhsConverted := rhs.(type) {
 	case KVector:
-		// Cast type
-		rhsAsKVector, _ := rhs.(KVector)
-
 		// Check length of input and output.
-		if vv.Len() != rhsAsKVector.Len() {
+		if vv.Len() != rhsConverted.Len() {
 			return VectorConstraint{},
 				fmt.Errorf(
 					"The two inputs to comparison '%v' must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
 					sense,
 					vv.Len(),
-					rhsAsKVector.Len(),
+					rhsConverted.Len(),
 				)
 		}
-		return VectorConstraint{vv, rhsAsKVector, sense}, nil
+		return VectorConstraint{vv, rhsConverted, sense}, nil
 	case mat.VecDense:
-		// Cast Type
-		rhsAsVecDense, _ := rhs.(mat.VecDense)
-		rhsAsKVector := KVector(rhsAsVecDense)
+		rhsAsKVector := KVector(rhsConverted)
 
 		return vv.Comparison(rhsAsKVector, sense)
 
-	case VarVector:
-		// Cast Type
-		rhsAsVV, _ := rhs.(VarVector)
+	case KVectorTranspose:
+		return VectorConstraint{},
+			fmt.Errorf(
+				"Cannot compare VarVector with a transposed vector %v (%T); Try transposing one or the other!",
+				rhsConverted, rhsConverted,
+			)
 
+	case VarVector:
 		// Check length of input and output.
-		if vv.Len() != rhsAsVV.Len() {
+		if vv.Len() != rhsConverted.Len() {
 			return VectorConstraint{},
 				fmt.Errorf(
 					"The two inputs to comparison '%v' must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
 					sense,
 					vv.Len(),
-					rhsAsVV.Len(),
+					rhsConverted.Len(),
 				)
 		}
 		// Do Computation
-		return VectorConstraint{vv, rhsAsVV, sense}, nil
+		return VectorConstraint{vv, rhsConverted, sense}, nil
+
+	case VarVectorTranspose:
+		return VectorConstraint{},
+			fmt.Errorf(
+				"Cannot compare VarVector with a transposed vector %v (%T); Try transposing one or the other!",
+				rhsConverted, rhsConverted,
+			)
 
 	case VectorLinearExpr:
 		// Cast type
@@ -281,6 +295,13 @@ func (vv VarVector) Comparison(rhs interface{}, sense ConstrSense) (VectorConstr
 
 		// Do computation
 		return rhsAsVLE.Comparison(vv, sense)
+
+	case VectorLinearExpressionTranspose:
+		return VectorConstraint{},
+			fmt.Errorf(
+				"Cannot compare VarVector with a transposed vector %v (%T); Try transposing one or the other!",
+				rhsConverted, rhsConverted,
+			)
 
 	default:
 		return VectorConstraint{}, fmt.Errorf("The Eq() method for VarVector is not implemented yet for type %T!", rhs)
@@ -299,4 +320,15 @@ func (vv VarVector) Copy() VarVector {
 
 	return VarVector{newVarSlice}
 
+}
+
+/*
+Transpose
+Description:
+
+	This method creates the transpose of the current vector and returns it.
+*/
+func (vv VarVector) Transpose() VectorExpression {
+	vvCopy := vv.Copy()
+	return VarVectorTranspose(vvCopy)
 }

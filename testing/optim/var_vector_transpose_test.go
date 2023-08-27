@@ -7,13 +7,13 @@ import (
 	"testing"
 )
 
-func TestVarVector_Length1(t *testing.T) {
+func TestVarVectorTranspose_Length1(t *testing.T) {
 	m := optim.NewModel("Length1")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
 	// Create Vector Variable
-	vv1 := optim.VarVector{
+	vv1 := optim.VarVectorTranspose{
 		Elements: []optim.Variable{x, y},
 	}
 
@@ -24,18 +24,18 @@ func TestVarVector_Length1(t *testing.T) {
 }
 
 /*
-TestVarVector_Length2
+TestVarVectorTranspose_Length2
 Description:
 
 	Tests that a larger vector variable (contains 5 elements) properly returns the right length.
 */
-func TestVarVector_Length2(t *testing.T) {
+func TestVarVectorTranspose_Length2(t *testing.T) {
 	m := optim.NewModel("Length2")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
 	// Create Vector Variable
-	vv1 := optim.VarVector{
+	vv1 := optim.VarVectorTranspose{
 		Elements: []optim.Variable{x, y, x, y, x},
 	}
 
@@ -46,18 +46,83 @@ func TestVarVector_Length2(t *testing.T) {
 }
 
 /*
-TestVarVector_At1
+TestVarVectorTranspose_NumVars1
+Description:
+
+	Tests that the NumVars() method is working properly for a length 10 VarVectorTranspose.
+*/
+func TestVarVectorTranspose_NumVars1(t *testing.T) {
+	m := optim.NewModel("NumVars1")
+	vv1 := m.AddVariableVector(10)
+
+	// Create Vector Variable
+	vv1T := vv1.Transpose()
+
+	if vv1T.NumVars() != 10 {
+		t.Errorf("The length of vv1 was %v; expected %v", vv1.Length(), 5)
+	}
+}
+
+/*
+TestVarVectorTranspose_LinearCoeff1
+Description:
+
+	Tests that the LinearCoeff() method is working properly for a length 10 VarVectorTranspose.
+	For a transposed vector, the linear coefficient L is the coefficient on the right of the variable.
+	(i.e., x^T L^T + c^T)
+*/
+func TestVarVectorTranspose_LinearCoeff1(t *testing.T) {
+	m := optim.NewModel("LinearCoeff1")
+	vv1 := m.AddVariableVector(10)
+
+	// Create Vector Variable
+	vv1T := vv1.Transpose()
+
+	L1 := vv1T.LinearCoeff()
+
+	nL, mL := L1.Dims()
+	if nL != 10 {
+		t.Errorf("Linear coefficient has %v rows; expected 10!", nL)
+	}
+	if mL != 10 {
+		t.Errorf("Linear coefficient has %v cols; expected 10!", mL)
+	}
+
+	for rowIndex := 0; rowIndex < nL; rowIndex++ {
+		for colIndex := 0; colIndex < mL; colIndex++ {
+			// Get elt and compare with 0 or 1.
+			if (rowIndex == colIndex) && (L1.At(rowIndex, colIndex) != 1.0) {
+				t.Errorf(
+					"The diagonal element at (%v,%v) should be 1.0; received %v",
+					rowIndex, colIndex,
+					L1.At(rowIndex, colIndex),
+				)
+			}
+			if (rowIndex != colIndex) && (L1.At(rowIndex, colIndex) != 0.0) {
+				t.Errorf(
+					"The diagonal element at (%v,%v) should be 0.0; received %v",
+					rowIndex, colIndex,
+					L1.At(rowIndex, colIndex),
+				)
+			}
+		}
+
+	}
+}
+
+/*
+TestVarVectorTranspose_At1
 Description:
 
 	Tests whether or not we can properly retrieve an element from a given vector.
 */
-func TestVarVector_At1(t *testing.T) {
+func TestVarVectorTranspose_At1(t *testing.T) {
 	m := optim.NewModel("At1")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
 	// Create Vector Variable
-	vv1 := optim.VarVector{
+	vv1 := optim.VarVectorTranspose{
 		Elements: []optim.Variable{x, y},
 	}
 
@@ -68,19 +133,19 @@ func TestVarVector_At1(t *testing.T) {
 }
 
 /*
-TestVarVector_At2
+TestVarVectorTranspose_At2
 Description:
 
 	Tests whether or not we can properly retrieve an element from a given vector.
 	Makes sure that if we change the extracted vector, it does not effect the element saved in the slice.
 */
-func TestVarVector_At2(t *testing.T) {
+func TestVarVectorTranspose_At2(t *testing.T) {
 	m := optim.NewModel("At2")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
 	// Create Vector Variable
-	vv1 := optim.VarVector{
+	vv1 := optim.VarVectorTranspose{
 		Elements: []optim.Variable{x, y},
 	}
 
@@ -93,19 +158,19 @@ func TestVarVector_At2(t *testing.T) {
 }
 
 /*
-TestVarVector_VariableIDs1
+TestVarVectorTranspose_VariableIDs1
 Description:
 
 	This test will check to see if 2 unique ids in a VariableVector object will be returned correctly when
 	the VariableIDs method is called.
 */
-func TestVarVector_VariableIDs1(t *testing.T) {
+func TestVarVectorTranspose_VariableIDs1(t *testing.T) {
 	m := optim.NewModel("VariableIDs1")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
 	// Create Vector Variable
-	vv1 := optim.VarVector{
+	vv1 := optim.VarVectorTranspose{
 		Elements: []optim.Variable{x, y},
 	}
 
@@ -121,19 +186,19 @@ func TestVarVector_VariableIDs1(t *testing.T) {
 }
 
 /*
-TestVarVector_VariableIDs2
+TestVarVectorTranspose_VariableIDs2
 Description:
 
 	This test will check to see if a single unique id in a large VariableVector object will be returned correctly when
 	the VariableIDs method is called.
 */
-func TestVarVector_VariableIDs2(t *testing.T) {
+func TestVarVectorTranspose_VariableIDs2(t *testing.T) {
 	m := optim.NewModel("VariableIDs2")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
 	// Create Vector Variable
-	vv1 := optim.VarVector{
+	vv1 := optim.VarVectorTranspose{
 		Elements: []optim.Variable{x, x, x},
 	}
 
@@ -153,45 +218,18 @@ func TestVarVector_VariableIDs2(t *testing.T) {
 }
 
 /*
-TestVarVector_NumVars1
+TestVarVectorTranspose_Constant1
 Description:
 
-	This test will check to see vector of length 10
-	contains 2 n Vars.
+	This test verifies that the constant method returns an all zero vector for any VarVectorTranspose object.
 */
-func TestVarVector_NumVars1(t *testing.T) {
-	m := optim.NewModel("NumVars1")
-	x := m.AddBinaryVariable()
-	y := m.AddBinaryVariable()
-
-	// Create Vector Variable
-	vv1 := optim.VarVector{
-		Elements: []optim.Variable{x, y, x},
-	}
-
-	nv := vv1.NumVars()
-	// Check to see that only x has ids in extractedIDs
-	if nv != 2 {
-		t.Errorf(
-			"There are two variable ID in the VarVector vv1, and yet %v was returned by the NumVars() method.",
-			nv,
-		)
-	}
-}
-
-/*
-TestVarVector_Constant1
-Description:
-
-	This test verifies that the constant method returns an all zero vector for any varvector object.
-*/
-func TestVarVector_Constant1(t *testing.T) {
+func TestVarVectorTranspose_Constant1(t *testing.T) {
 	m := optim.NewModel("Constant1")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
 	// Create Vector Variable
-	vv1 := optim.VarVector{
+	vv1 := optim.VarVectorTranspose{
 		Elements: []optim.Variable{x, y},
 	}
 
@@ -207,19 +245,19 @@ func TestVarVector_Constant1(t *testing.T) {
 }
 
 /*
-TestVarVector_Constant2
+TestVarVectorTranspose_Constant2
 Description:
 
-	This test verifies that the constant method returns an all zero vector for any varvector object.
+	This test verifies that the constant method returns an all zero vector for any VarVectorTranspose object.
 	This one will be extremely long.
 */
-func TestVarVector_Constant2(t *testing.T) {
+func TestVarVectorTranspose_Constant2(t *testing.T) {
 	m := optim.NewModel("Constant2")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
 	// Create Vector Variable
-	vv1 := optim.VarVector{
+	vv1 := optim.VarVectorTranspose{
 		Elements: []optim.Variable{x, y, x, y, x, y, x, y, x, y, x, y, x, y, x, y, x, y, x, y, x, y},
 	}
 
@@ -235,76 +273,23 @@ func TestVarVector_Constant2(t *testing.T) {
 }
 
 /*
-TestVarVector_LinearCoeff1
+TestVarVectorTranspose_Eq1
 Description:
 
-	This test will check to see vector of length 10
-	contains 10 n Vars.
+	This test verifies that the Eq method works between a VarVectorTranspose and another object.
 */
-func TestVarVector_LinearCoeff1(t *testing.T) {
-	m := optim.NewModel("LinearCoeff1")
-	x := m.AddBinaryVariable()
-	y := m.AddBinaryVariable()
-
-	// Create Vector Variable
-	vv1 := optim.VarVector{
-		Elements: []optim.Variable{x, y, x},
-	}
-
-	identity0 := vv1.LinearCoeff()
-	// Check to see that only x has ids in extractedIDs
-	nR, nC := identity0.Dims()
-	if (nR != 3) || (nC != 3) {
-		t.Errorf(
-			"Exoected identity0 to be of shape (3,3); received (%v,%v)",
-			nR,
-			nC,
-		)
-	}
-
-	for rowIndex := 0; rowIndex < nR; rowIndex++ {
-		for colIndex := 0; colIndex < nC; colIndex++ {
-			if rowIndex == colIndex {
-				if identity0.At(rowIndex, colIndex) != 1.0 {
-					t.Errorf(
-						"Expected diagonal elements to be 1.0; received %v",
-						identity0.At(rowIndex, colIndex),
-					)
-				}
-			}
-
-			if rowIndex != colIndex {
-				if identity0.At(rowIndex, colIndex) != 0.0 {
-					t.Errorf(
-						"Expected diagonal elements to be 0.0; received %v",
-						identity0.At(rowIndex, colIndex),
-					)
-				}
-			}
-
-		}
-
-	}
-}
-
-/*
-TestVarVector_Eq1
-Description:
-
-	This test verifies that the Eq method works between a varvector and another object.
-*/
-func TestVarVector_Eq1(t *testing.T) {
+func TestVarVectorTranspose_Eq1(t *testing.T) {
 	m := optim.NewModel("Eq1")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
 	// Create Vector Variable
-	vv1 := optim.VarVector{
+	vv1 := optim.VarVectorTranspose{
 		Elements: []optim.Variable{x, y, x, y, x, y, x, y, x, y, x, y, x, y, x, y, x, y, x, y, x, y},
 	}
 
 	zerosAsVecDense := optim.ZerosVector(vv1.Len())
-	zerosAsKVector := optim.KVector(zerosAsVecDense)
+	zerosAsKVector := optim.KVector(zerosAsVecDense).Transpose()
 
 	// Verify that constraint can be created with no issues.
 	_, err := vv1.Eq(zerosAsKVector)
@@ -314,19 +299,19 @@ func TestVarVector_Eq1(t *testing.T) {
 }
 
 /*
-TestVarVector_Eq2
+TestVarVectorTranspose_Eq2
 Description:
 
-	This test verifies that the Eq method works between a varvector and another object.
+	This test verifies that the Eq method works between a VarVectorTranspose and another object.
 	Comparison should be between var vector and an unsupported type.
 */
-func TestVarVector_Eq2(t *testing.T) {
+func TestVarVectorTranspose_Eq2(t *testing.T) {
 	m := optim.NewModel("Eq2")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
 	// Create Vector Variable
-	vv1 := optim.VarVector{
+	vv1 := optim.VarVectorTranspose{
 		Elements: []optim.Variable{x, y, x, y, x, y, x, y, x, y, x, y, x, y, x, y, x, y, x, y, x, y},
 	}
 
@@ -334,46 +319,74 @@ func TestVarVector_Eq2(t *testing.T) {
 
 	// Verify that constraint can be created with no issues.
 	_, err := vv1.Eq(badRHS)
-	expectedError := fmt.Sprintf("The Eq() method for VarVector is not implemented yet for type %T!", badRHS)
+	expectedError := fmt.Sprintf("The Eq() method for VarVectorTranspose is not implemented yet for type %T!", badRHS)
 	if !strings.Contains(err.Error(), expectedError) {
 		t.Errorf("Expected error \"%v\"; received \"%v\"", expectedError, err)
 	}
 }
 
 /*
-TestVarVector_Eq2
+TestVarVectorTranspose_Eq3
 Description:
 
-	This test verifies that the Eq method works between a varvector and another var vector.
+	This test verifies that the Eq method works between a VarVectorTranspose and another var vector.
 */
-func TestVarVector_Eq3(t *testing.T) {
+func TestVarVectorTranspose_Eq3(t *testing.T) {
 	m := optim.NewModel("Eq3")
 	x := m.AddBinaryVariable()
 	y := m.AddBinaryVariable()
 
 	// Create Vector Variable
-	vv1 := optim.VarVector{
+	vv1 := optim.VarVectorTranspose{
 		Elements: []optim.Variable{x, y, x, y, x, y, x, y, x, y, x, y, x, y, x, y, x, y, x, y, x, y},
 	}
 
-	vv2 := optim.VarVector{
+	vv2 := optim.VarVectorTranspose{
 		Elements: []optim.Variable{y, x, y, x, y, x, y, x, y, x, y, x, y, x, y, x, y, x, y, x, y, x},
 	}
 
 	// Verify that constraint can be created with no issues.
 	_, err := vv1.Eq(vv2)
 	if err != nil {
-		t.Errorf("There was an error creating equality constraint between the two varvectors: %v", err)
+		t.Errorf("There was an error creating equality constraint between the two VarVectorTransposes: %v", err)
 	}
 }
 
 /*
-TestVarVector_Comparison1
+TestVarVectorTranspose_Eq4
+Description:
+
+	This test verifies that the Eq method does not work between a
+	VarVectorTranspose object and a normal KVector.
+*/
+func TestVarVectorTranspose_Eq4(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Eq1")
+	vv1 := m.AddVariableVector(10).Transpose()
+
+	zerosAsVecDense := optim.ZerosVector(vv1.Len())
+	zerosAsKVector := optim.KVector(zerosAsVecDense)
+
+	// Verify that constraint can be created with no issues.
+	_, err := vv1.Eq(zerosAsKVector)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot commpare VarVectorTranspose with a normal vector %v (%T); Try transposing one or the other!",
+			zerosAsKVector, zerosAsKVector,
+		),
+	) {
+		t.Errorf("There was an unexpected error when attempting to run Eq: %v", err)
+	}
+}
+
+/*
+TestVarVectorTranspose_Comparison1
 Description:
 
 	Tests how well the comparison function works with a VectorLinearExpression comparison.
 */
-func TestVarVector_Comparison1(t *testing.T) {
+func TestVarVectorTranspose_Comparison1(t *testing.T) {
 	// Constants
 	desLength := 10
 	m := optim.NewModel("Comparison1")
@@ -396,13 +409,13 @@ func TestVarVector_Comparison1(t *testing.T) {
 }
 
 /*
-TestVarVector_Comparison2
+TestVarVectorTranspose_Comparison2
 Description:
 
 	Tests how well the comparison function works with a VectorLinearExpression comparison.
 	Valid comparison of
 */
-func TestVarVector_Comparison2(t *testing.T) {
+func TestVarVectorTranspose_Comparison2(t *testing.T) {
 	// Constants
 	desLength := 10
 	m := optim.NewModel("Comparison2")
@@ -425,126 +438,12 @@ func TestVarVector_Comparison2(t *testing.T) {
 }
 
 /*
-TestVarVector_Comparison3
+TestVarVectorTranspose_Plus1
 Description:
 
-	Tests that the Comparison() Method works well for future users.
+	Testing the Plus operator between a VarVectorTranspose and a KVectorTranspose. Proper sizes were given.
 */
-func TestVarVector_Comparison3(t *testing.T) {
-	// Constants
-	desLength := 10
-	m := optim.NewModel("AtVec1")
-	vec1 := m.AddVariableVector(desLength)
-	kv1 := optim.KVector(optim.OnesVector(desLength)).Transpose()
-
-	// Compare
-	_, err := vec1.GreaterEq(kv1)
-	if !strings.Contains(
-		err.Error(),
-		fmt.Sprintf(
-			"Cannot compare VarVector with a transposed vector %v (%T); Try transposing one or the other!",
-			kv1, kv1,
-		),
-	) {
-		t.Errorf("Unexpected error when comparing two vectors: %v", err)
-	}
-
-}
-
-/*
-TestVarVector_Comparison4
-Description:
-
-	Tests that the Comparison() Method works for two VarVectors of different lengths.
-*/
-func TestVarVector_Comparison4(t *testing.T) {
-	// Constants
-	desLength := 10
-	m := optim.NewModel("AtVec1")
-	vec1 := m.AddVariableVector(desLength)
-	vec2 := m.AddVariableVector(desLength - 1)
-
-	// Compare
-	_, err := vec1.Comparison(vec2, optim.SenseEqual)
-	if !strings.Contains(
-		err.Error(),
-		fmt.Sprintf(
-			"The two inputs to comparison '%v' must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
-			optim.SenseEqual,
-			vec1.Len(),
-			vec2.Len(),
-		),
-	) {
-		t.Errorf("Unexpected error when comparing VarVectors of different lengths: %v", err)
-	}
-
-}
-
-/*
-TestVarVector_Comparison5
-Description:
-
-	Tests that the Comparison() Method works well for a VarVector and
-	a VarVectorTranspose.
-*/
-func TestVarVector_Comparison5(t *testing.T) {
-	// Constants
-	desLength := 10
-	m := optim.NewModel("AtVec1")
-	vec1 := m.AddVariableVector(desLength)
-	vec2 := m.AddVariableVector(desLength).Transpose()
-
-	// Compare
-	_, err := vec1.Comparison(vec2, optim.SenseEqual)
-	if !strings.Contains(
-		err.Error(),
-		fmt.Sprintf(
-			"Cannot compare VarVector with a transposed vector %v (%T); Try transposing one or the other!",
-			vec2, vec2,
-		),
-	) {
-		t.Errorf("Unexpected error when comparing VarVectors of different lengths: %v", err)
-	}
-
-}
-
-/*
-TestVarVector_Comparison6
-Description:
-
-	Tests that the Comparison() Method works well for a VarVector and
-	a VectorLinearExpressionTranspose.
-*/
-func TestVarVector_Comparison6(t *testing.T) {
-	// Constants
-	desLength := 10
-	m := optim.NewModel("AtVec1")
-	vec1 := m.AddVariableVector(desLength)
-	vec2 := m.AddVariableVector(desLength)
-
-	sum1, _ := vec2.Plus(optim.OnesVector(desLength))
-
-	// Compare
-	_, err := vec1.Comparison(sum1.Transpose(), optim.SenseEqual)
-	if !strings.Contains(
-		err.Error(),
-		fmt.Sprintf(
-			"Cannot compare VarVector with a transposed vector %v (%T); Try transposing one or the other!",
-			sum1.Transpose(), sum1.Transpose(),
-		),
-	) {
-		t.Errorf("Unexpected error when comparing VarVectors of different lengths: %v", err)
-	}
-
-}
-
-/*
-TestVarVector_Plus1
-Description:
-
-	Testing the Plus operator between a VarVector and a KVector. Proper sizes were given.
-*/
-func TestVarVector_Plus1(t *testing.T) {
+func TestVarVectorTranspose_Plus1(t *testing.T) {
 	// Constants
 	desLength := 10
 	m := optim.NewModel("Plus1")
@@ -552,12 +451,12 @@ func TestVarVector_Plus1(t *testing.T) {
 	k2 := optim.KVector(optim.OnesVector(desLength))
 
 	// Algorithm
-	sum3, err := vec1.Plus(k2)
+	sum3, err := vec1.Transpose().Plus(k2.Transpose())
 	if err != nil {
 		t.Errorf("There was an error computing addition: %v", err)
 	}
 
-	sum3AsVLE, ok := sum3.(optim.VectorLinearExpr)
+	sum3AsVLE, ok := sum3.(optim.VectorLinearExpressionTranspose)
 	if !ok {
 		t.Errorf(
 			"There was an issue converting sum3 (type %T) to type optim.VectorLinearExpr.",
@@ -595,12 +494,12 @@ func TestVarVector_Plus1(t *testing.T) {
 }
 
 /*
-TestVarVector_Plus2
+TestVarVectorTranspose_Plus2
 Description:
 
-	Testing the Plus operator between a VarVector and a KVector. Incorrect sizes were given.
+	Testing the Plus operator between a VarVectorTranspose and a KVector. Incorrect sizes were given.
 */
-func TestVarVector_Plus2(t *testing.T) {
+func TestVarVectorTranspose_Plus2(t *testing.T) {
 	// Constants
 	desLength := 10
 	m := optim.NewModel("Plus2")
@@ -620,17 +519,17 @@ func TestVarVector_Plus2(t *testing.T) {
 }
 
 /*
-TestVarVector_Plus3
+TestVarVectorTranspose_Plus3
 Description:
 
-	Testing the Plus operator between a VarVector and a KVector. Proper sizes were given.
+	Testing the Plus operator between a VarVectorTranspose and a KVector. Proper sizes were given.
 */
-func TestVarVector_Plus3(t *testing.T) {
+func TestVarVectorTranspose_Plus3(t *testing.T) {
 	// Constants
 	desLength := 10
 	m := optim.NewModel("Plus3")
-	vec1 := m.AddVariableVector(desLength)
-	k2 := optim.OnesVector(desLength)
+	vec1 := m.AddVariableVector(desLength).Transpose()
+	k2 := optim.KVectorTranspose(optim.OnesVector(desLength))
 
 	// Algorithm
 	sum3, err := vec1.Plus(k2)
@@ -638,7 +537,7 @@ func TestVarVector_Plus3(t *testing.T) {
 		t.Errorf("There was an error computing addition: %v", err)
 	}
 
-	sum3AsVLE, ok := sum3.(optim.VectorLinearExpr)
+	sum3AsVLE, ok := sum3.(optim.VectorLinearExpressionTranspose)
 	if !ok {
 		t.Errorf(
 			"There was an issue converting sum3 (type %T) to type optim.VectorLinearExpr.",
@@ -663,7 +562,7 @@ func TestVarVector_Plus3(t *testing.T) {
 	// Check the values of the constant vector
 	for vecIndex := 0; vecIndex < sum3AsVLE.Len(); vecIndex++ {
 		// Check that values of sum3AsVLE and vec1 match
-		if sum3AsVLE.C.AtVec(vecIndex) != k2.AtVec(vecIndex) {
+		if sum3AsVLE.C.AtVec(vecIndex) != float64(k2.AtVec(vecIndex).(optim.K)) {
 			t.Errorf(
 				"Expected the value at index in sum3.X[%v] (%v) to be the same as k2[%v] (%v).",
 				vecIndex,
@@ -676,18 +575,18 @@ func TestVarVector_Plus3(t *testing.T) {
 }
 
 /*
-TestVarVector_Plus4
+TestVarVectorTranspose_Plus4
 Description:
 
-	Testing the Plus operator between a VarVector and a VarVector. All vectors are of same size. Some overlap in the variables but not all.
+	Testing the Plus operator between a VarVectorTranspose and a VarVectorTranspose. All vectors are of same size. Some overlap in the variables but not all.
 */
-func TestVarVector_Plus4(t *testing.T) {
+func TestVarVectorTranspose_Plus4(t *testing.T) {
 	// Constants
 	desLength := 10
 	m := optim.NewModel("Plus4")
-	vec1 := m.AddVariableVector(desLength)
-	vec2 := m.AddVariableVector(desLength - 2)
-	vec3 := optim.VarVector{
+	vec1 := m.AddVariableVector(desLength).Transpose()
+	vec2 := m.AddVariableVector(desLength - 2).Transpose().(optim.VarVectorTranspose)
+	vec3 := optim.VarVectorTranspose{
 		append(vec2.Elements, vec1.AtVec(0).(optim.Variable), vec1.AtVec(1).(optim.Variable)),
 	}
 
@@ -697,7 +596,7 @@ func TestVarVector_Plus4(t *testing.T) {
 		t.Errorf("There was an error computing addition: %v", err)
 	}
 
-	sum3AsVLE, ok := sum3.(optim.VectorLinearExpr)
+	sum3AsVLE, ok := sum3.(optim.VectorLinearExpressionTranspose)
 	if !ok {
 		t.Errorf(
 			"There was an issue converting sum3 (type %T) to type optim.VectorLinearExpr.",
@@ -798,13 +697,13 @@ func TestVarVector_Plus4(t *testing.T) {
 }
 
 /*
-TestVarVector_Plus5
+TestVarVectorTranspose_Plus5
 Description:
 
-	Testing the Plus operator between a VarVector and a VarVector. All vectors are of the same size.
+	Testing the Plus operator between a VarVectorTranspose and a VarVectorTranspose. All vectors are of the same size.
 	No overlap between elements.
 */
-func TestVarVector_Plus5(t *testing.T) {
+func TestVarVectorTranspose_Plus5(t *testing.T) {
 	// Constants
 	desLength := 10
 	m := optim.NewModel("Plus5")
@@ -918,173 +817,176 @@ func TestVarVector_Plus5(t *testing.T) {
 }
 
 /*
-TestVarVector_Plus6
+TestVarVectorTranspose_Plus6
 Description:
 
-	Testing the Plus operator between a VarVector and a KVectorTranspose.
-	All vectors are of the same size.
-	No overlap between elements.
+	Testing the Plus operator between a VarVectorTranspose and a KVector. Proper sizes were given.
 */
-func TestVarVector_Plus6(t *testing.T) {
+func TestVarVectorTranspose_Plus6(t *testing.T) {
 	// Constants
 	desLength := 10
 	m := optim.NewModel("Plus6")
-	vec1 := m.AddVariableVector(desLength)
-	k2 := optim.KVectorTranspose(optim.OnesVector(desLength))
+	vec1 := m.AddVariableVector(desLength).Transpose()
+	k2 := optim.OnesVector(desLength)
 
 	// Algorithm
 	_, err := vec1.Plus(k2)
 	if !strings.Contains(
 		err.Error(),
 		fmt.Sprintf(
-			"Cannot add VarVector with a transposed vector %v (%T); Try transposing one or the other!",
+			"Cannot add VarVectorTranspose to a normal vector %v (%T); Try transposing one or the other!",
 			k2, k2,
 		),
 	) {
 		t.Errorf("There was an unexpected error computing addition: %v", err)
 	}
-
 }
 
 /*
-TestVarVector_Plus7
+TestVarVectorTranspose_Plus7
 Description:
 
-	Testing the Plus operator between a VarVector and a VarVectorTranspose.
+	Testing the Plus operator between a VarVectorTranspose and a KVector. Proper sizes were given.
 */
-func TestVarVector_Plus7(t *testing.T) {
+func TestVarVectorTranspose_Plus7(t *testing.T) {
 	// Constants
 	desLength := 10
-	m := optim.NewModel("Plus5")
+	m := optim.NewModel("Plus7")
 	vec1 := m.AddVariableVector(desLength)
-	vec3 := m.AddVariableVector(desLength).Transpose()
+	k2 := optim.KVector(optim.OnesVector(desLength))
 
 	// Algorithm
-	_, err := vec1.Plus(vec3)
+	_, err := vec1.Transpose().Plus(k2)
 	if !strings.Contains(
 		err.Error(),
 		fmt.Sprintf(
-			"Cannot add VarVector with a transposed vector %v (%T); Try transposing one or the other!",
-			vec3, vec3,
+			"Cannot add VarVectorTranspose to a normal vector %v (%T); Try transposing one or the other!",
+			k2, k2,
 		),
 	) {
-		t.Errorf("Unexpected error: %v", err)
+		t.Errorf("There was an error computing addition: %v", err)
 	}
 }
 
 /*
-TestVarVector_Plus8
+TestVarVectorTranspose_Plus8
 Description:
 
-	Testing the Plus operator between a VarVector and a VectorLinearExpressionTranspose.
+	Testing the Plus operator between a VarVectorTranspose and a KVectorTranspose.
+	Improper lengths are used.
 */
-func TestVarVector_Plus8(t *testing.T) {
+func TestVarVectorTranspose_Plus8(t *testing.T) {
 	// Constants
 	desLength := 10
 	m := optim.NewModel("Plus8")
 	vec1 := m.AddVariableVector(desLength)
-
-	vec3 := m.AddVariableVector(desLength)
-	sum, _ := vec3.Plus(optim.OnesVector(desLength))
+	k2 := optim.KVector(optim.OnesVector(desLength - 1))
 
 	// Algorithm
-	_, err := vec1.Plus(sum.Transpose())
+	_, err := vec1.Transpose().Plus(k2.Transpose())
 	if !strings.Contains(
 		err.Error(),
 		fmt.Sprintf(
-			"Cannot add VarVector with a transposed vector %v (%T); Try transposing one or the other!",
-			sum.Transpose(), sum.Transpose(),
+			"The lengths of two vectors in Plus must match! VarVectorTranspose has dimension %v, KVector has dimension %v",
+			vec1.Transpose().Len(),
+			k2.Transpose().Len(),
 		),
 	) {
-		t.Errorf("Unexpected error: %v", err)
+		t.Errorf("There was an error computing addition: %v", err)
 	}
 }
 
 /*
-TestVarVector_Plus9
+TestVarVectorTranspose_Plus9
 Description:
 
-	Testing the Plus operator between a VarVector and a VectorLinearExpressionTranspose.
+	Testing the Plus operator between a VarVectorTranspose and a VarVector.
 */
-func TestVarVector_Plus9(t *testing.T) {
+func TestVarVectorTranspose_Plus9(t *testing.T) {
 	// Constants
 	desLength := 10
 	m := optim.NewModel("Plus9")
 	vec1 := m.AddVariableVector(desLength)
-
-	b1 := false
+	vec2 := m.AddVariableVector(desLength)
 
 	// Algorithm
-	_, err := vec1.Plus(b1)
+	_, err := vec1.Transpose().Plus(vec2)
 	if !strings.Contains(
 		err.Error(),
 		fmt.Sprintf(
-			"Unrecognized expression type %T for addition of VarVector vv.Plus(%v)!",
-			b1, b1,
+			"Cannot add VarVectorTranspose to a normal vector %v (%T); Try transposing one or the other!",
+			vec2, vec2,
 		),
 	) {
-		t.Errorf("Unexpected error: %v", err)
+		t.Errorf("There was an error computing addition: %v", err)
 	}
 }
 
 /*
-TestVarVector_Mult1
-Descripiion:
-
-	Tests that the Mult() method currently returns errors.
-*/
-func TestVarVector_Mult1(t *testing.T) {
-	// Constants
-	desLength := 10
-	m := optim.NewModel("AtVec1")
-	vec1 := m.AddVariableVector(desLength)
-
-	// Compute
-	_, err := vec1.Mult(21.0)
-	if !strings.Contains(
-		err.Error(),
-		"The Mult() method for VarVector is not implemented yet!",
-	) {
-		t.Errorf("Unexpected error: %v", err)
-	}
-}
-
-/*
-TestVarVector_GreaterEq1
+TestVarVectorTranspose_Plus10
 Description:
 
-	Tests that the GreaterEq() Method works well for future users.
+	Testing the Plus operator between a VarVectorTranspose and a ScalarLinearExpr.
 */
-func TestVarVector_GreaterEq1(t *testing.T) {
+func TestVarVectorTranspose_Plus10(t *testing.T) {
 	// Constants
 	desLength := 10
-	m := optim.NewModel("AtVec1")
+	m := optim.NewModel("Plus10")
 	vec1 := m.AddVariableVector(desLength)
-	kv1 := optim.KVector(optim.OnesVector(desLength - 1))
+	vec2 := m.AddVariableVector(desLength)
+	k3 := optim.KVector(optim.OnesVector(desLength))
 
-	// Compare
-	_, err := vec1.GreaterEq(kv1)
+	// Algorithm
+	expr1, err := vec2.Plus(k3)
+	if err != nil {
+		t.Errorf("Unexpected error when adding together VarVectorTranspose and KVectorTranspose: %v", err)
+	}
+
+	_, err = vec1.Transpose().Plus(expr1)
 	if !strings.Contains(
 		err.Error(),
 		fmt.Sprintf(
-			"The two inputs to comparison '%v' must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
-			optim.SenseGreaterThanEqual,
-			vec1.Len(),
-			kv1.Len(),
+			"Cannot add VarVectorTranspose with a normal vector %v (%T); Try transposing one or the other!",
+			expr1, expr1,
 		),
 	) {
-		t.Errorf("Unexpected error when comparing two vectors: %v", err)
+		t.Errorf("There was an error computing addition: %v", err)
 	}
-
 }
 
 /*
-TestVarVector_AtVec1
+TestVarVectorTranspose_Plus11
 Description:
 
-	Testing the At operator on a VarVector object.
+	Testing the Plus operator between a VarVectorTranspose and a bool.
 */
-func TestVarVector_AtVec1(t *testing.T) {
+func TestVarVectorTranspose_Plus11(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("Plus11")
+	vec1 := m.AddVariableVector(desLength)
+	b2 := false
+
+	// Algorithm
+	_, err := vec1.Transpose().Plus(b2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Unrecognized expression type %T for addition of VarVectorTranspose vvt.Plus(%v)!",
+			b2, b2,
+		),
+	) {
+		t.Errorf("There was an error computing addition: %v", err)
+	}
+}
+
+/*
+TestVarVectorTranspose_AtVec1
+Description:
+
+	Testing the At operator on a VarVectorTranspose object.
+*/
+func TestVarVectorTranspose_AtVec1(t *testing.T) {
 	// Constants
 	desLength := 10
 	m := optim.NewModel("AtVec1")
@@ -1111,4 +1013,86 @@ func TestVarVector_AtVec1(t *testing.T) {
 			idx1,
 		)
 	}
+}
+
+/*
+TestVarVectorTranspose_Mult1
+Description:
+
+	Verifies that the Mult() operator throws an error in its current form.
+*/
+func TestVarVectorTranspose_Mult1(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("AtVec1")
+	vec1 := m.AddVariableVector(desLength).Transpose()
+
+	// Check
+	_, err := vec1.Mult(2.9)
+	if !strings.Contains(
+		err.Error(),
+		"The Mult() method for VarVectorTranspose is not implemented yet!",
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+/*
+TestVarVectorTranspose_LessEq1
+Description:
+
+	Verifies that the LessEq method throws an error when the KVectorTranspose is
+	of the wrong length.
+*/
+func TestVarVectorTranspose_LessEq1(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("AtVec1")
+	vec1 := m.AddVariableVector(desLength).Transpose()
+	kv2 := optim.KVectorTranspose(optim.OnesVector(desLength - 1))
+
+	// Algorithm
+	_, err := vec1.LessEq(kv2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"The two inputs to comparison '%v' must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
+			optim.SenseLessThanEqual,
+			vec1.Len(),
+			kv2.Len(),
+		),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+/*
+TestVarVectorTranspose_GreaterEq1
+Description:
+
+	Verifies that the GreaterEq method throws an error when the KVectorTranspose is
+	of the wrong length.
+*/
+func TestVarVectorTranspose_GreaterEq1(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("AtVec1")
+	vec1 := m.AddVariableVector(desLength).Transpose()
+	kv2 := optim.OnesVector(desLength)
+
+	// Algorithm
+	constraint0, err := vec1.GreaterEq(kv2)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	if constraint0.Sense != optim.SenseGreaterThanEqual {
+		t.Errorf("Constraint should be a GreaterThanEqual constraint, but found the sense: %v", constraint0.Sense)
+	}
+
+	lhs0, ok1 := constraint0.LeftHandSide.(optim.VarVectorTranspose)
+	if !ok1 {
+		t.Errorf("Unexpected left hand side type %T for %v", lhs0, lhs0)
+	}
+
 }

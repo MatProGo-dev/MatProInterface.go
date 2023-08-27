@@ -52,6 +52,11 @@ func (v Variable) Constant() float64 {
 // expression.
 func (v Variable) Plus(e interface{}, errors ...error) (ScalarExpression, error) {
 	// Input Processing??
+	if len(errors) > 0 { // If any errors are given, then check them.
+		if errors[0] != nil {
+			return v, errors[0]
+		}
+	}
 
 	// Algorithm
 	switch e.(type) {

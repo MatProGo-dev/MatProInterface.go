@@ -1,7 +1,7 @@
 package optim
 
 /*
-vector_linear_expression.go
+vector_linear_expression_transpose.go
 Description:
 
 */
@@ -11,13 +11,13 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-// VectorLinearExpr represents a linear general expression of the form
+// VectorLinearExpressionTranspose represents a linear general expression of the form
 //
-//	L' * x + C
+//	x^T * L^T + C^T
 //
 // where L is an n x m matrix of coefficients that matches the dimension of x, the vector of variables
 // and C is a constant vector
-type VectorLinearExpr struct {
+type VectorLinearExpressionTranspose struct {
 	X VarVector
 	L mat.Dense // Matrix of coefficients. Should match the dimensions of XIndices
 	C mat.VecDense
@@ -27,9 +27,9 @@ type VectorLinearExpr struct {
 Check
 Description:
 
-	Checks to see if the VectorLinearExpression is well-defined.
+	Checks to see if the VectorLinearExpressionTransposeession is well-defined.
 */
-func (vle VectorLinearExpr) Check() error {
+func (vle VectorLinearExpressionTranspose) Check() error {
 	// Extract the dimension of the vector x
 	m := vle.X.Length()
 	nL, mL := vle.L.Dims()
@@ -45,7 +45,7 @@ func (vle VectorLinearExpr) Check() error {
 		return fmt.Errorf("Dimension of L (%v x %v) and C (length %v) do not match!", nL, mL, nC)
 	}
 
-	// If all other checks passed, then the VectorLinearExpression seems valid.
+	// If all other checks passed, then the VectorLinearExpressionTransposeession seems valid.
 	return nil
 }
 
@@ -55,7 +55,7 @@ Description:
 
 	Returns the MatProInterface ID of each variable in the current vector linear expression.
 */
-func (vle VectorLinearExpr) IDs() []uint64 {
+func (vle VectorLinearExpressionTranspose) IDs() []uint64 {
 	return vle.X.IDs()
 }
 
@@ -65,7 +65,7 @@ Description:
 
 	Returns the goop2 ID of each variable in the current vector linear expression.
 */
-func (vle VectorLinearExpr) NumVars() int {
+func (vle VectorLinearExpressionTranspose) NumVars() int {
 	return len(vle.IDs())
 }
 
@@ -75,7 +75,7 @@ Description:
 
 	Returns the matrix which is applied as a coefficient to the vector X in our expression.
 */
-func (vle VectorLinearExpr) LinearCoeff() mat.Dense {
+func (vle VectorLinearExpressionTranspose) LinearCoeff() mat.Dense {
 
 	return vle.L
 }
@@ -87,7 +87,7 @@ Description:
 	Returns the vector which is given as an offset vector in the linear expression represented by v
 	(the c in the above expression).
 */
-func (vle VectorLinearExpr) Constant() mat.VecDense {
+func (vle VectorLinearExpressionTranspose) Constant() mat.VecDense {
 
 	return vle.C
 }
@@ -98,7 +98,7 @@ Description:
 
 	Creates a VectorConstraint that declares vle is greater than or equal to the value to the right hand side rhs.
 */
-func (vle VectorLinearExpr) GreaterEq(rhs interface{}) (VectorConstraint, error) {
+func (vle VectorLinearExpressionTranspose) GreaterEq(rhs interface{}) (VectorConstraint, error) {
 	return vle.Comparison(rhs, SenseGreaterThanEqual)
 }
 
@@ -108,7 +108,7 @@ Description:
 
 	Creates a VectorConstraint that declares vle is less than or equal to the value to the right hand side rhs.
 */
-func (vle VectorLinearExpr) LessEq(rhs interface{}) (VectorConstraint, error) {
+func (vle VectorLinearExpressionTranspose) LessEq(rhs interface{}) (VectorConstraint, error) {
 	return vle.Comparison(rhs, SenseLessThanEqual)
 }
 
@@ -118,7 +118,7 @@ Description:
 
 	Returns an expression which scales every dimension of the vector linear expression by the input.
 */
-func (vle VectorLinearExpr) Mult(c float64) (VectorExpression, error) {
+func (vle VectorLinearExpressionTranspose) Mult(c float64) (VectorExpression, error) {
 	return vle, fmt.Errorf("The multiplication method has not yet been implemented!")
 }
 
@@ -128,7 +128,7 @@ Description:
 
 	Returns an expression which adds the expression e to the vector linear expression at hand.
 */
-func (vle VectorLinearExpr) Plus(e interface{}, extras ...interface{}) (VectorExpression, error) {
+func (vle VectorLinearExpressionTranspose) Plus(e interface{}, extras ...interface{}) (VectorExpression, error) {
 	// Constants
 	vleLen := vle.Len()
 
@@ -137,10 +137,16 @@ func (vle VectorLinearExpr) Plus(e interface{}, extras ...interface{}) (VectorEx
 	// Algorithm
 	switch eConverted := e.(type) {
 	case KVector:
+		return eConverted,
+			fmt.Errorf(
+				"Cannot add VectorLinearExpressioinTranspose with a normal vector %v (%T); Try transposing one or the other!",
+				eConverted, eConverted,
+			)
+	case KVectorTranspose:
 		// Check Length
 		if eConverted.Len() != vleLen {
 			return vle, fmt.Errorf(
-				"The length of input KVector (%v) did not match the length of the VectorLinearExpr (%v).",
+				"The length of input KVector (%v) did not match the length of the VectorLinearExpressionTranspose (%v).",
 				eConverted.Len(),
 				vleLen,
 			)
@@ -148,49 +154,41 @@ func (vle VectorLinearExpr) Plus(e interface{}, extras ...interface{}) (VectorEx
 
 		// Algorithm
 		vleOut := vle
-		tempSum, _ := KVector(vle.C).Plus(eConverted)
-		//if err != nil {
-		//	return vle,
-		//		fmt.Errorf(
-		//			"There was an issue computing the sum of a KVector with your VectorLinearExpression: %v",
-		//			err,
-		//		)
-		//}
-		KSum, _ := tempSum.(KVector)
+		tempSum, _ := KVectorTranspose(vle.C).Plus(eConverted)
+		KSum, _ := tempSum.(KVectorTranspose)
 		vleOut.C = mat.VecDense(KSum)
 
 		// Return
 		return vleOut, nil
-
-	case KVectorTranspose:
+	case VarVector:
 		return eConverted,
 			fmt.Errorf(
-				"Cannot add VectorLinearExpr with a transposed vector %v (%T); Try transposing one or the other!",
+				"Cannot add VectorLinearExpressioinTranspose with a normal vector %v (%T); Try transposing one or the other!",
 				eConverted, eConverted,
 			)
 
-	case VarVector:
-		eAsVLE := VectorLinearExpr{
+	case VarVectorTranspose:
+		eAsVLE := VectorLinearExpressionTranspose{
 			L: Identity(eConverted.Len()),
-			X: eConverted,
+			X: eConverted.Transpose().(VarVector),
 			C: ZerosVector(eConverted.Len()),
 		}
 
 		return vle.Plus(eAsVLE)
 
-	case VarVectorTranspose:
+	case VectorLinearExpr:
 		return eConverted,
 			fmt.Errorf(
-				"Cannot add VectorLinearExpr with a transposed vector %v (%T); Try transposing one or the other!",
+				"Cannot add VectorLinearExpressioinTranspose with a normal vector %v (%T); Try transposing one or the other!",
 				eConverted, eConverted,
 			)
 
-	case VectorLinearExpr:
+	case VectorLinearExpressionTranspose:
 		// Check Lengths
 		if eConverted.Len() != vleLen {
 			return vle,
 				fmt.Errorf(
-					"The length of input VectorLinearExpr (%v) did not match the length of the VectorLinearExpr (%v).",
+					"The length of input VectorLinearExpressionTranspose (%v) did not match the length of the VectorLinearExpressionTranspose (%v).",
 					eConverted.Len(),
 					vleLen,
 				)
@@ -224,15 +222,11 @@ func (vle VectorLinearExpr) Plus(e interface{}, extras ...interface{}) (VectorEx
 		}
 
 		return vleOut, nil
-
-	case VectorLinearExpressionTranspose:
-		return eConverted,
-			fmt.Errorf(
-				"Cannot add VectorLinearExpr with a transposed vector %v (%T); Try transposing one or the other!",
-				eConverted, eConverted,
-			)
 	default:
-		return vle, fmt.Errorf("The addition method has not yet been implemented!")
+		return vle, fmt.Errorf(
+			"The VectorLinearExpressionTranspose.Plus method has not yet been implemented for type %T!",
+			eConverted,
+		)
 	}
 }
 
@@ -243,7 +237,7 @@ Description:
 	Returns a constraint between the current vector linear expression and the input given
 	as the right hand side.
 */
-//func (v VectorLinearExpr) LessEq(rhsIn interface{}) (VectorConstraint, error) {
+//func (v VectorLinearExpressionTranspose) LessEq(rhsIn interface{}) (VectorConstraint, error) {
 //	// Output depends on the input type
 //	switch rhsIn.(type) {
 //	case K:
@@ -274,7 +268,7 @@ Description:
 	Creates a constraint between the current vector linear expression v and the
 	rhs given by rhs.
 */
-func (vle VectorLinearExpr) Eq(rhs interface{}) (VectorConstraint, error) {
+func (vle VectorLinearExpressionTranspose) Eq(rhs interface{}) (VectorConstraint, error) {
 	return vle.Comparison(rhs, SenseEqual)
 }
 
@@ -284,7 +278,7 @@ Description:
 
 	The size of the constraint.
 */
-func (vle VectorLinearExpr) Len() int {
+func (vle VectorLinearExpressionTranspose) Len() int {
 	// Constants
 
 	// Algorithm
@@ -298,7 +292,7 @@ Description:
 	Compares the input vector linear expression with respect to the expression rhsIn and the sense
 	senseIn.
 */
-func (vle VectorLinearExpr) Comparison(rhs interface{}, sense ConstrSense) (VectorConstraint, error) {
+func (vle VectorLinearExpressionTranspose) Comparison(rhs interface{}, sense ConstrSense) (VectorConstraint, error) {
 	// Constants
 
 	// Check Input
@@ -313,46 +307,35 @@ func (vle VectorLinearExpr) Comparison(rhs interface{}, sense ConstrSense) (Vect
 	// Algorithm
 	switch rhsConverted := rhs.(type) {
 	case KVector:
+		return VectorConstraint{},
+			fmt.Errorf(
+				"Cannot compare VectorLinearExpressionTranspose with a normal vector %v (%T); Try transposing one or the other!",
+				rhsConverted, rhsConverted,
+			)
+	case KVectorTranspose:
 		// Check length of input and output.
 		if rhsConverted.Len() != vle.Len() {
 			return VectorConstraint{},
 				fmt.Errorf(
-					"The two vector inputs to Comparison() must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
+					"The two vector inputs to Eq() must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
 					vle.Len(),
 					rhsConverted.Len(),
 				)
 		}
 		return VectorConstraint{vle, rhsConverted, sense}, nil
 	case mat.VecDense:
-		return vle.Eq(KVector(rhsConverted))
-
-	case KVectorTranspose:
 		return VectorConstraint{},
 			fmt.Errorf(
-				"Cannot compare VectorLinearExpr with a transposed vector %v (%T); Try transposing one or the other!",
+				"Cannot compare VectorLinearExpressionTranspose with a normal vector %v (%T); Try transposing one or the other!",
 				rhsConverted, rhsConverted,
 			)
-
-	case VectorLinearExpr:
-		// Check length of input and output.
-		if rhsConverted.Len() != vle.Len() {
-			return VectorConstraint{},
-				fmt.Errorf(
-					"The two vector inputs to Eq() must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
-					vle.Len(),
-					rhsConverted.Len(),
-				)
-		}
-		return VectorConstraint{vle, rhsConverted, sense}, nil
-
-	case VectorLinearExpressionTranspose:
-		return VectorConstraint{},
-			fmt.Errorf(
-				"Cannot compare VectorLinearExpr with a transposed vector %v (%T); Try transposing one or the other!",
-				rhsConverted, rhsConverted,
-			)
-
 	case VarVector:
+		return VectorConstraint{},
+			fmt.Errorf(
+				"Cannot compare VectorLinearExpressionTranspose with a normal vector %v (%T); Try transposing one or the other!",
+				rhsConverted, rhsConverted,
+			)
+	case VarVectorTranspose:
 		// Check length of input and output.
 		if rhsConverted.Len() != vle.Len() {
 			return VectorConstraint{},
@@ -363,13 +346,23 @@ func (vle VectorLinearExpr) Comparison(rhs interface{}, sense ConstrSense) (Vect
 				)
 		}
 		return VectorConstraint{vle, rhsConverted, sense}, nil
-
-	case VarVectorTranspose:
+	case VectorLinearExpr:
 		return VectorConstraint{},
 			fmt.Errorf(
-				"Cannot compare VectorLinearExpr with a transposed vector %v (%T); Try transposing one or the other!",
+				"Cannot compare VectorLinearExpressionTranspose with a normal vector %v (%T); Try transposing one or the other!",
 				rhsConverted, rhsConverted,
 			)
+	case VectorLinearExpressionTranspose:
+		// Check length of input and output.
+		if rhsConverted.Len() != vle.Len() {
+			return VectorConstraint{},
+				fmt.Errorf(
+					"The two vector inputs to Eq() must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
+					vle.Len(),
+					rhsConverted.Len(),
+				)
+		}
+		return VectorConstraint{vle, rhsConverted, sense}, nil
 
 	default:
 		return VectorConstraint{}, fmt.Errorf("The comparison of vector linear expression %v with object of type %T is not currently supported.", vle, rhs)
@@ -380,18 +373,18 @@ func (vle VectorLinearExpr) Comparison(rhs interface{}, sense ConstrSense) (Vect
 RewriteInTermsOf
 Description:
 
-	Rewrites the VectorLinearExpression in terms of a new set of variables vv
+	Rewrites the VectorLinearExpressionTransposeession in terms of a new set of variables vv
 
 Assumes:
 
 	vv contains all unique variables.
 	All elements of vle.X are in vv.
 */
-func (vle VectorLinearExpr) RewriteInTermsOf(vv VarVector) VectorLinearExpr {
+func (vle VectorLinearExpressionTranspose) RewriteInTermsOf(vv VarVector) VectorLinearExpressionTranspose {
 	// Constants
 
 	// Create new empty vle
-	vleOut := VectorLinearExpr{
+	vleOut := VectorLinearExpressionTranspose{
 		L: ZerosMatrix(vle.Len(), vv.Len()),
 		X: vv,
 		C: vle.C,
@@ -421,7 +414,7 @@ func (vle VectorLinearExpr) RewriteInTermsOf(vv VarVector) VectorLinearExpr {
 AtVec
 Description:
 */
-func (vle VectorLinearExpr) AtVec(idx int) ScalarExpression {
+func (vle VectorLinearExpressionTranspose) AtVec(idx int) ScalarExpression {
 	// Constants
 	Li := vle.L.RowView(idx)
 	LiAsVecDense := Li.(*mat.VecDense)
@@ -443,8 +436,8 @@ Description:
 
 	This method creates the transpose of the current vector and returns it.
 */
-func (vle VectorLinearExpr) Transpose() VectorExpression {
-	return VectorLinearExpressionTranspose{
+func (vle VectorLinearExpressionTranspose) Transpose() VectorExpression {
+	return VectorLinearExpr{
 		L: vle.L,
 		X: vle.X.Copy(),
 		C: vle.C,

@@ -140,6 +140,186 @@ func TestExpression_ToExpression3(t *testing.T) {
 }
 
 /*
+TestExpression_ToExpression4
+Description:
+
+	Tests whether or not a VarVectorTranspose is correctly detected as an expression.
+*/
+func TestExpression_ToExpression4(t *testing.T) {
+	// Constant
+	m := optim.NewModel("ToExpression4")
+	vv1 := m.AddVariableVector(10)
+
+	var e1 interface{} = vv1.Transpose()
+	// Algorithm
+
+	e1AsSQE, err := optim.ToExpression(e1)
+	if err != nil {
+		t.Errorf("Received unexpected error when evaluating ToExpression(): %v", err)
+	}
+
+	_, ok1 := e1AsSQE.(optim.VarVectorTranspose)
+	if !ok1 {
+		t.Errorf("Expected for e1 to be of Variable type; received %T", e1AsSQE)
+	}
+
+}
+
+/*
+TestExpression_ToExpression5
+Description:
+
+	Tests whether or not a K is correctly detected as an expression.
+*/
+func TestExpression_ToExpression5(t *testing.T) {
+	// Constant
+	k1 := optim.K(3.14)
+
+	var e1 interface{} = k1
+	// Algorithm
+
+	e1AsSQE, err := optim.ToExpression(e1)
+	if err != nil {
+		t.Errorf("Received unexpected error when evaluating ToExpression(): %v", err)
+	}
+
+	_, ok1 := e1AsSQE.(optim.K)
+	if !ok1 {
+		t.Errorf("Expected for e1 to be of Variable type; received %T", e1AsSQE)
+	}
+
+}
+
+/*
+TestExpression_ToExpression6
+Description:
+
+	Tests whether or not a mat.VecDense is correctly detected as an expression.
+*/
+func TestExpression_ToExpression6(t *testing.T) {
+	// Constant
+	vd1 := optim.OnesVector(7)
+
+	var e1 interface{} = vd1
+	// Algorithm
+
+	e1AsSQE, err := optim.ToExpression(e1)
+	if err != nil {
+		t.Errorf("Received unexpected error when evaluating ToExpression(): %v", err)
+	}
+
+	_, ok1 := e1AsSQE.(optim.KVector)
+	if !ok1 {
+		t.Errorf("Expected for e1 to be of Variable type; received %T", e1AsSQE)
+	}
+
+}
+
+/*
+TestExpression_ToExpression7
+Description:
+
+	Tests whether or not a KVector is correctly detected as an expression.
+*/
+func TestExpression_ToExpression7(t *testing.T) {
+	// Constant
+	kv1 := optim.KVector(optim.OnesVector(7))
+
+	var e1 interface{} = kv1
+	// Algorithm
+
+	e1AsSQE, err := optim.ToExpression(e1)
+	if err != nil {
+		t.Errorf("Received unexpected error when evaluating ToExpression(): %v", err)
+	}
+
+	_, ok1 := e1AsSQE.(optim.KVector)
+	if !ok1 {
+		t.Errorf("Expected for e1 to be of Variable type; received %T", e1AsSQE)
+	}
+
+}
+
+/*
+TestExpression_ToExpression8
+Description:
+
+	Tests whether or not a VectorLinearExpr is correctly detected as an expression.
+*/
+func TestExpression_ToExpression8(t *testing.T) {
+	// Constant
+	m := optim.NewModel("ToExpression8")
+	vv1 := m.AddVariableVector(10)
+	sum1, _ := vv1.Plus(optim.OnesVector(vv1.Len()))
+
+	var e1 interface{} = sum1
+	// Algorithm
+
+	e1AsSQE, err := optim.ToExpression(e1)
+	if err != nil {
+		t.Errorf("Received unexpected error when evaluating ToExpression(): %v", err)
+	}
+
+	_, ok1 := e1AsSQE.(optim.VectorLinearExpr)
+	if !ok1 {
+		t.Errorf("Expected for e1 to be of Variable type; received %T", e1AsSQE)
+	}
+
+}
+
+/*
+TestExpression_ToExpression9
+Description:
+
+	Tests whether or not a KVectorTranspose is correctly detected as an expression.
+*/
+func TestExpression_ToExpression9(t *testing.T) {
+	// Constant
+	kv1 := optim.KVector(optim.OnesVector(7))
+
+	var e1 interface{} = kv1.Transpose()
+	// Algorithm
+
+	e1AsSQE, err := optim.ToExpression(e1)
+	if err != nil {
+		t.Errorf("Received unexpected error when evaluating ToExpression(): %v", err)
+	}
+
+	_, ok1 := e1AsSQE.(optim.KVectorTranspose)
+	if !ok1 {
+		t.Errorf("Expected for e1 to be of Variable type; received %T", e1AsSQE)
+	}
+
+}
+
+/*
+TestExpression_ToExpression10
+Description:
+
+	Tests whether or not a VectorLinearExpressionTranspose is correctly detected as an expression.
+*/
+func TestExpression_ToExpression10(t *testing.T) {
+	// Constant
+	m := optim.NewModel("ToExpression10")
+	vv1 := m.AddVariableVector(10).Transpose()
+	sum1, _ := vv1.Plus(optim.KVector(optim.OnesVector(vv1.Len())).Transpose())
+
+	var e1 interface{} = sum1
+	// Algorithm
+
+	e1AsSQE, err := optim.ToExpression(e1)
+	if err != nil {
+		t.Errorf("Received unexpected error when evaluating ToExpression(): %v", err)
+	}
+
+	_, ok1 := e1AsSQE.(optim.VectorLinearExpressionTranspose)
+	if !ok1 {
+		t.Errorf("Expected for e1 to be of Variable type; received %T", e1AsSQE)
+	}
+
+}
+
+/*
 TestExpression_IsExpression1
 Description:
 

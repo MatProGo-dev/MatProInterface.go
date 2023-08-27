@@ -1,6 +1,7 @@
 package optim_test
 
 import (
+	"fmt"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"gonum.org/v1/gonum/mat"
 	"strings"
@@ -832,6 +833,396 @@ func TestQuadraticExpr_RewriteInTermsOfIndices1(t *testing.T) {
 
 	if qvNew.C != 0.0 {
 		t.Errorf("Expected for new C to be 0; received %v", qvNew.C)
+	}
+
+}
+
+/*
+TestQuadraticExpr_Multiply1
+Description:
+
+	Tests whether or not the Multiply() function works for a quadratic expression
+	and a constant one.
+*/
+func TestQuadraticExpr_Multiply1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Multiply1")
+
+	vv1 := m.AddVariableVector(2)
+
+	Q1_aoa := [][]float64{
+		[]float64{1.0, 2.0},
+		[]float64{3.0, 4.0},
+	}
+
+	L1_a := []float64{1.0, 7.0}
+
+	C1 := 3.14
+
+	// Preparing constants for NewQuadraticExpr
+	Q1_vals := append(Q1_aoa[0], Q1_aoa[1]...)
+	Q1 := *mat.NewDense(2, 2, Q1_vals)
+
+	L1 := *mat.NewVecDense(2, L1_a)
+
+	// Quantities for Second Expression
+	f1 := 11.0
+
+	// Algorithm
+	qe1, err := optim.NewQuadraticExpr(Q1, L1, C1, vv1)
+	if err != nil {
+		t.Errorf("There was an issue creating a basic quadratic expression: %v", err)
+	}
+
+	e3, err := qe1.Multiply(f1)
+	if err != nil {
+		t.Errorf("There was an issue multiplying qe1 and f1: %v", err)
+	}
+
+	qv3, ok := e3.(optim.ScalarQuadraticExpression)
+	if !ok {
+		t.Errorf("Unable to convert expression to Quadratic Expression.")
+	}
+
+	// Number of variables for this quadratic expression should be 2
+	if qv3.NumVars() != 2 {
+		t.Errorf(
+			"Expected for 3 variable to be found in quadratic expression; function says %v variables exist.",
+			qv3.NumVars(),
+		)
+	}
+
+	if qv3.L.AtVec(0) != f1*qe1.L.AtVec(0) {
+		t.Errorf(
+			"Expected for L's 0-th element to be %v; received %v",
+			f1*qe1.L.AtVec(0),
+			qv3.L.AtVec(0),
+		)
+	}
+
+	if qv3.L.AtVec(1) != f1*qe1.L.AtVec(1) {
+		t.Errorf(
+			"Expected for L's 1-th element to be %v; received %v",
+			f1*qe1.L.AtVec(1),
+			qv3.L.AtVec(1),
+		)
+	}
+
+	if qv3.C != qe1.C*f1 {
+		t.Errorf(
+			"Expected for constant of final quadratic expression to be %v; received %v",
+			f1*qe1.C,
+			qv3.C,
+		)
+	}
+
+}
+
+/*
+TestQuadraticExpr_Multiply2
+Description:
+
+	Tests whether or not the Multiply() function works for a quadratic expression
+	and a constant one (K).
+*/
+func TestQuadraticExpr_Multiply2(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Multiply2")
+
+	vv1 := m.AddVariableVector(2)
+
+	Q1_aoa := [][]float64{
+		[]float64{1.0, 2.0},
+		[]float64{3.0, 4.0},
+	}
+
+	L1_a := []float64{1.0, 7.0}
+
+	C1 := 3.14
+
+	// Preparing constants for NewQuadraticExpr
+	Q1_vals := append(Q1_aoa[0], Q1_aoa[1]...)
+	Q1 := *mat.NewDense(2, 2, Q1_vals)
+
+	L1 := *mat.NewVecDense(2, L1_a)
+
+	// Quantities for Second Expression
+	K1 := optim.K(11.0)
+
+	// Algorithm
+	qe1, err := optim.NewQuadraticExpr(Q1, L1, C1, vv1)
+	if err != nil {
+		t.Errorf("There was an issue creating a basic quadratic expression: %v", err)
+	}
+
+	e3, err := qe1.Multiply(K1)
+	if err != nil {
+		t.Errorf("There was an issue multiplying qe1 and k1: %v", err)
+	}
+
+	qv3, ok := e3.(optim.ScalarQuadraticExpression)
+	if !ok {
+		t.Errorf("Unable to convert expression to Quadratic Expression.")
+	}
+
+	// Number of variables for this quadratic expression should be 2
+	if qv3.NumVars() != 2 {
+		t.Errorf(
+			"Expected for 3 variable to be found in quadratic expression; function says %v variables exist.",
+			qv3.NumVars(),
+		)
+	}
+
+	if qv3.L.AtVec(0) != float64(K1)*qe1.L.AtVec(0) {
+		t.Errorf(
+			"Expected for L's 0-th element to be %v; received %v",
+			float64(K1)*qe1.L.AtVec(0),
+			qv3.L.AtVec(0),
+		)
+	}
+
+	if qv3.L.AtVec(1) != float64(K1)*qe1.L.AtVec(1) {
+		t.Errorf(
+			"Expected for L's 1-th element to be %v; received %v",
+			float64(K1)*qe1.L.AtVec(1),
+			qv3.L.AtVec(1),
+		)
+	}
+
+	if qv3.C != qe1.C*float64(K1) {
+		t.Errorf(
+			"Expected for constant of final quadratic expression to be %v; received %v",
+			float64(K1)*qe1.C,
+			qv3.C,
+		)
+	}
+
+}
+
+/*
+TestQuadraticExpr_Multiply3
+Description:
+
+	Tests whether or not the Multiply() function works for a quadratic expression
+	and a variable.
+*/
+func TestQuadraticExpr_Multiply3(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Multiply3")
+
+	vv1 := m.AddVariableVector(2)
+	v2 := m.AddVariable()
+
+	Q1_aoa := [][]float64{
+		[]float64{1.0, 2.0},
+		[]float64{3.0, 4.0},
+	}
+
+	L1_a := []float64{1.0, 7.0}
+
+	C1 := 3.14
+
+	// Preparing constants for NewQuadraticExpr
+	Q1_vals := append(Q1_aoa[0], Q1_aoa[1]...)
+	Q1 := *mat.NewDense(2, 2, Q1_vals)
+
+	L1 := *mat.NewVecDense(2, L1_a)
+
+	// Algorithm
+	qe1, err := optim.NewQuadraticExpr(Q1, L1, C1, vv1)
+	if err != nil {
+		t.Errorf("There was an issue creating a basic quadratic expression: %v", err)
+	}
+
+	_, err = qe1.Multiply(v2)
+	if !strings.Contains(
+		err.Error(),
+		"Attempted to multiply Variable with ScalarQuadraticExpression which would result in degree 3 expression! MatProInterface can not currently handle such a high degree polynomial!",
+	) {
+		t.Errorf("There was an unexpected error in multiply: %v", err)
+	}
+
+}
+
+/*
+TestQuadraticExpr_Multiply4
+Description:
+
+	Tests whether or not the Multiply() function works for a quadratic expression
+	and a variable.
+*/
+func TestQuadraticExpr_Multiply4(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Multiply4")
+
+	vv1 := m.AddVariableVector(2)
+	vv2 := m.AddVariableVector(2)
+
+	Q1_aoa := [][]float64{
+		[]float64{1.0, 2.0},
+		[]float64{3.0, 4.0},
+	}
+
+	L1_a := []float64{1.0, 7.0}
+
+	C1 := 3.14
+
+	// Preparing constants for NewQuadraticExpr
+	Q1_vals := append(Q1_aoa[0], Q1_aoa[1]...)
+	Q1 := *mat.NewDense(2, 2, Q1_vals)
+
+	L1 := *mat.NewVecDense(2, L1_a)
+
+	// Algorithm
+	qe1, err := optim.NewQuadraticExpr(Q1, L1, C1, vv1)
+	if err != nil {
+		t.Errorf("There was an issue creating a basic quadratic expression: %v", err)
+	}
+
+	sle2 := optim.ScalarLinearExpr{
+		L: L1, X: vv2, C: 0.1,
+	}
+
+	_, err = qe1.Multiply(sle2)
+	if !strings.Contains(
+		err.Error(),
+		"Attempted to multiply ScalarLinearExpr with ScalarQuadraticExpression which would result in degree 3 expression! MatProInterface can not currently handle such a high degree polynomial!",
+	) {
+		t.Errorf("There was an unexpected error in multiply: %v", err)
+	}
+
+}
+
+/*
+TestQuadraticExpr_Multiply5
+Description:
+
+	Tests whether or not the Multiply() function works for a quadratic expression
+	and a ScalarQuadraticExpression.
+*/
+func TestQuadraticExpr_Multiply5(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Multiply4")
+
+	vv1 := m.AddVariableVector(2)
+
+	Q1_aoa := [][]float64{
+		[]float64{1.0, 2.0},
+		[]float64{3.0, 4.0},
+	}
+
+	L1_a := []float64{1.0, 7.0}
+
+	C1 := 3.14
+
+	// Preparing constants for NewQuadraticExpr
+	Q1_vals := append(Q1_aoa[0], Q1_aoa[1]...)
+	Q1 := *mat.NewDense(2, 2, Q1_vals)
+
+	L1 := *mat.NewVecDense(2, L1_a)
+
+	// Algorithm
+	qe1, err := optim.NewQuadraticExpr(Q1, L1, C1, vv1)
+	if err != nil {
+		t.Errorf("There was an issue creating a basic quadratic expression: %v", err)
+	}
+
+	_, err = qe1.Multiply(qe1)
+	if !strings.Contains(
+		err.Error(),
+		"Attempted to multiply ScalarQuadraticExpression with ScalarQuadraticExpression which would result in degree 4 expression! MatProInterface can not currently handle such a high degree polynomial!",
+	) {
+		t.Errorf("There was an unexpected error in multiply: %v", err)
+	}
+
+}
+
+/*
+TestQuadraticExpr_Multiply6
+Description:
+
+	Tests whether or not the Multiply() function works for a quadratic expression
+	and a ScalarQuadraticExpression AND an error is also passed.
+*/
+func TestQuadraticExpr_Multiply6(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Multiply4")
+
+	vv1 := m.AddVariableVector(2)
+
+	Q1_aoa := [][]float64{
+		[]float64{1.0, 2.0},
+		[]float64{3.0, 4.0},
+	}
+
+	L1_a := []float64{1.0, 7.0}
+
+	C1 := 3.14
+
+	// Preparing constants for NewQuadraticExpr
+	Q1_vals := append(Q1_aoa[0], Q1_aoa[1]...)
+	Q1 := *mat.NewDense(2, 2, Q1_vals)
+
+	L1 := *mat.NewVecDense(2, L1_a)
+
+	// Algorithm
+	err1 := fmt.Errorf("Dummy error!")
+	qe1, err := optim.NewQuadraticExpr(Q1, L1, C1, vv1)
+	if err != nil {
+		t.Errorf("There was an issue creating a basic quadratic expression: %v", err)
+	}
+
+	_, err = qe1.Multiply(qe1, err1)
+	if !strings.Contains(
+		err.Error(),
+		err1.Error(),
+	) {
+		t.Errorf("There was an unexpected error in multiply: %v", err)
+	}
+
+}
+
+/*
+TestQuadraticExpr_Multiply7
+Description:
+
+	Tests whether or not the Multiply() function works for a quadratic expression
+	and a ScalarQuadraticExpression AND an error is also passed.
+*/
+func TestQuadraticExpr_Multiply7(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Multiply7")
+
+	vv1 := m.AddVariableVector(2)
+
+	Q1_aoa := [][]float64{
+		[]float64{1.0, 2.0},
+		[]float64{3.0, 4.0},
+	}
+
+	L1_a := []float64{1.0, 7.0}
+
+	C1 := 3.14
+
+	// Preparing constants for NewQuadraticExpr
+	Q1_vals := append(Q1_aoa[0], Q1_aoa[1]...)
+	Q1 := *mat.NewDense(2, 2, Q1_vals)
+
+	L1 := *mat.NewVecDense(2, L1_a)
+
+	// Algorithm
+	b1 := false
+	qe1, err := optim.NewQuadraticExpr(Q1, L1, C1, vv1)
+	if err != nil {
+		t.Errorf("There was an issue creating a basic quadratic expression: %v", err)
+	}
+
+	_, err = qe1.Multiply(b1)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf("Unexpected type of input to Multiply(): %T", b1),
+	) {
+		t.Errorf("There was an unexpected error in multiply: %v", err)
 	}
 
 }

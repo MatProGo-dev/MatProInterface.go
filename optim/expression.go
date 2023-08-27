@@ -67,9 +67,15 @@ func ToExpression(eIn interface{}) (Expression, error) {
 		return ToExpression(KVector(e))
 	case KVector:
 		return e, nil
+	case KVectorTranspose:
+		return e, nil
 	case VarVector:
 		return e, nil
+	case VarVectorTranspose:
+		return e, nil
 	case VectorLinearExpr:
+		return e, nil
+	case VectorLinearExpressionTranspose:
 		return e, nil
 	default:
 		return K(-1.0), fmt.Errorf("Unexpected type input to ToExpression(): %T", eIn)

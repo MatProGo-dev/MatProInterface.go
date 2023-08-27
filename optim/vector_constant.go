@@ -136,11 +136,32 @@ func (kv KVector) Plus(eIn interface{}, extras ...interface{}) (VectorExpression
 
 		return KVector(result), nil
 
+	case KVectorTranspose:
+		return kv,
+			fmt.Errorf(
+				"Cannot add KVector with a transposed vector %T; Try transposing one or the other!",
+				e,
+			)
+
 	case VarVector:
 		return e.Plus(kv)
 
+	case VarVectorTranspose:
+		return kv,
+			fmt.Errorf(
+				"Cannot add KVector with a transposed vector %T; Try transposing one or the other!",
+				e,
+			)
+
 	case VectorLinearExpr:
 		return e.Plus(kv)
+
+	case VectorLinearExpressionTranspose:
+		return kv,
+			fmt.Errorf(
+				"Cannot add KVector with a transposed vector %T; Try transposing one or the other!",
+				e,
+			)
 
 	default:
 		errString := fmt.Sprintf("Unrecognized expression type %T for addition of KVector kv.Plus(%v)!", e, e)
@@ -195,39 +216,48 @@ func (kv KVector) Eq(rhsIn interface{}) (VectorConstraint, error) {
 }
 
 func (kv KVector) Comparison(rhs interface{}, sense ConstrSense) (VectorConstraint, error) {
-	switch rhs.(type) {
+	switch rhsConverted := rhs.(type) {
 	case KVector:
-		// Cast type
-		rhsAsKVector, _ := rhs.(KVector)
-
 		// Check Lengths
-		if kv.Len() != rhsAsKVector.Len() {
+		if kv.Len() != rhsConverted.Len() {
 			return VectorConstraint{},
 				fmt.Errorf(
 					"The left hand side's dimension (%v) and the left hand side's dimension (%v) do not match!",
 					kv.Len(),
-					rhsAsKVector.Len(),
+					rhsConverted.Len(),
 				)
 		}
 
 		// Return constraint
 		return VectorConstraint{
 			LeftHandSide:  kv,
-			RightHandSide: rhsAsKVector,
+			RightHandSide: rhsConverted,
 			Sense:         sense,
 		}, nil
+	case KVectorTranspose:
+		return VectorConstraint{},
+			fmt.Errorf(
+				"Cannot compare KVector with a transposed vector %T; Try transposing one or the other!",
+				rhsConverted,
+			)
 	case VarVector:
-		// Cast type
-		rhsAsVV, _ := rhs.(VarVector)
-
 		// Return constraint
-		return rhsAsVV.Comparison(kv, sense)
+		return rhsConverted.Comparison(kv, sense)
+	case VarVectorTranspose:
+		return VectorConstraint{},
+			fmt.Errorf(
+				"Cannot compare KVector with a transposed vector %T; Try transposing one or the other!",
+				rhsConverted,
+			)
 	case VectorLinearExpr:
-		// Cast Type
-		rhsAsVLE, _ := rhs.(VectorLinearExpr)
-
 		// Return constraint
-		return rhsAsVLE.Comparison(kv, sense)
+		return rhsConverted.Comparison(kv, sense)
+	case VectorLinearExpressionTranspose:
+		return VectorConstraint{},
+			fmt.Errorf(
+				"Cannot compare KVector with a transposed vector %T; Try transposing one or the other!",
+				rhsConverted,
+			)
 	default:
 		// Return an error
 		return VectorConstraint{}, fmt.Errorf("The input to KVector's '%v' comparison (%v) has unexpected type: %T", sense, rhs, rhs)
@@ -244,4 +274,14 @@ Description:
 func (kv KVector) Multiply(term1 interface{}, extras ...interface{}) (Expression, error) {
 	// TODO: Implement this!
 	return K(0), fmt.Errorf("The Multiply() method for KVector has not been implemented yet!")
+}
+
+/*
+Transpose
+Description:
+
+	This method creates the transpose of the current vector and returns it.
+*/
+func (kv KVector) Transpose() VectorExpression {
+	return KVectorTranspose(kv)
 }

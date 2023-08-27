@@ -322,6 +322,101 @@ func TestKVector_Comparison4(t *testing.T) {
 }
 
 /*
+TestKVector_Comparison5
+Description:
+
+	Tests the Eq comparison of KVector with a bool
+	results in a proper error.
+*/
+func TestKVector_Comparison5(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+
+	// Algorithm
+	_, err := vec1.Comparison(false, optim.SenseEqual)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"The input to KVector's '%v' comparison (%v) has unexpected type: %T",
+			optim.SenseEqual, false, false,
+		),
+	) {
+		t.Errorf(
+			"The input to KVector's '%v' comparison (%v) has unexpected type: %T",
+			optim.SenseEqual, false, false,
+		)
+		t.Errorf(
+			"Unexpected error when comparing kVector with bool! %v",
+			err,
+		)
+	}
+
+}
+
+/*
+TestKVector_Comparison6
+Description:
+
+	Tests the Eq comparison of KVector with a VarVectorTranspose
+	results in a proper error.
+*/
+func TestKVector_Comparison6(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("test-Comparison6")
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	x1 := m.AddVariableVector(desLength)
+
+	// Algorithm
+	_, err := vec1.Comparison(x1.Transpose(), optim.SenseEqual)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot compare KVector with a transposed vector %T; Try transposing one or the other!",
+			x1.Transpose(),
+		),
+	) {
+		t.Errorf(
+			"Unexpected error when comparing kVector with VarVectorTranspose! %v",
+			err,
+		)
+	}
+
+}
+
+/*
+TestKVector_Comparison7
+Description:
+
+	Tests the Eq comparison of KVector with a KVector of incorrect length
+	results in a proper error.
+*/
+func TestKVector_Comparison7(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	var vec2 = optim.KVector(optim.OnesVector(desLength - 1))
+
+	// Algorithm
+	_, err := vec1.Comparison(vec2, optim.SenseEqual)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"The left hand side's dimension (%v) and the left hand side's dimension (%v) do not match!",
+			vec1.Len(),
+			vec2.Len(),
+		),
+	) {
+		t.Errorf(
+			"Unexpected error when comparing kVector with KVector of wrong size: %v",
+			err,
+		)
+	}
+
+}
+
+/*
 TestKVector_Plus1
 Description:
 
@@ -655,5 +750,341 @@ func TestKVector_Plus9(t *testing.T) {
 		fmt.Sprintf("Unrecognized expression type %T for addition of KVector kv.Plus(%v)!", b1, b1),
 	) {
 		t.Errorf("Unexpected error when adding kvector with bool! %v", err)
+	}
+}
+
+/*
+TestKVector_Plus10
+Description:
+
+	Tests the addition of KVector with a KVectorTranspose
+*/
+func TestKVector_Plus10(t *testing.T) {
+	// Constants
+	desLength := 10
+	//m := optim.NewModel("test-kvector-plus7")
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	vec2 := optim.KVectorTranspose(optim.OnesVector(desLength))
+
+	// Algorithm
+	_, err := vec1.Plus(vec2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot add KVector with a transposed vector %T; Try transposing one or the other!",
+			vec2,
+		),
+	) {
+		t.Errorf("Unexpected error when adding kvector with bool! %v", err)
+	}
+}
+
+/*
+TestKVector_Plus11
+Description:
+
+	Tests the addition of KVector with a VarVectorTranspose
+*/
+func TestKVector_Plus11(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("test-kvector-plus11")
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	X1 := m.AddVariableVector(desLength)
+
+	// Algorithm
+	_, err := vec1.Plus(X1.Transpose())
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot add KVector with a transposed vector %T; Try transposing one or the other!",
+			X1.Transpose(),
+		),
+	) {
+		t.Errorf("Unexpected error when adding kvector with bool! %v", err)
+	}
+}
+
+/*
+TestKVector_Plus12
+Description:
+
+	Tests the addition of KVector with a VectorLinearExpression
+*/
+func TestKVector_Plus12(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("test-kvector-plus12")
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	X1 := m.AddVariableVector(desLength)
+	A1 := optim.Identity(X1.Len())
+	A1.Set(0, 0, 2.0)
+	C1 := optim.ZerosVector(desLength)
+	C1.SetVec(2, 13.0)
+
+	vle1 := optim.VectorLinearExpr{
+		X1, A1, C1,
+	}
+
+	// Algorithm
+	sum, err := vec1.Plus(vle1)
+	if err != nil {
+		t.Errorf(
+			"There was an issue computing the sum: %v",
+			err,
+		)
+	}
+
+	sumAsVLE, successful := sum.(optim.VectorLinearExpr)
+	if !successful {
+		t.Errorf(
+			"The received sum is not a VectorLinearExpression; it's %T",
+			sum,
+		)
+	}
+
+	if C1.AtVec(2)+1 != sumAsVLE.C.AtVec(2) {
+		t.Errorf(
+			"sum.C[%v] = %v =/= %v",
+			2, sumAsVLE.C.AtVec(2), C1.AtVec(2)+1.0,
+		)
+	}
+
+	lhs0 := vec1.AtVec(0).(optim.K)
+	if float64(lhs0) != sumAsVLE.C.AtVec(0) {
+		t.Errorf(
+			"sum.C[%v] = %v =/= %v",
+			0, sumAsVLE.C.AtVec(0), vec1.AtVec(0),
+		)
+	}
+
+}
+
+/*
+TestKVector_Plus13
+Description:
+
+	Tests the addition of KVector with a VectorLinearExpressionTranspose
+*/
+func TestKVector_Plus13(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("test-kvector-plus13")
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	X1 := m.AddVariableVector(desLength)
+	A1 := optim.Identity(X1.Len())
+	A1.Set(0, 0, 2.0)
+	C1 := optim.ZerosVector(desLength)
+	C1.SetVec(2, 13.0)
+
+	vlet1 := optim.VectorLinearExpressionTranspose{
+		X1, A1, C1,
+	}
+
+	// Algorithm
+	_, err := vec1.Plus(vlet1)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot add KVector with a transposed vector %T; Try transposing one or the other!",
+			vlet1,
+		),
+	) {
+		t.Errorf(
+			"Unexpected error when adding kvector with VectorLinearExpressionTranspose! %v",
+			err,
+		)
+	}
+
+}
+
+/*
+TestKVector_Multiply1
+Description:
+
+	Tests the multiplication of the KVector with a float.
+*/
+func TestKVector_Multiply1(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+
+	// Algorithm
+	_, err := vec1.Multiply(3.14)
+	if !strings.Contains(
+		err.Error(),
+		"The Multiply() method for KVector has not been implemented yet!",
+	) {
+		t.Errorf(
+			"There was an unexpected error performing multiplication: %v",
+			err,
+		)
+	}
+}
+
+/*
+TestKVector_LessEq1
+Description:
+
+	Tests the LessEq comparison of KVector with a VectorLinearExpressionTranspose.
+	(should result in an error)
+*/
+func TestKVector_LessEq1(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("test-kvector-less-eq1")
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	X1 := m.AddVariableVector(desLength)
+	A1 := optim.Identity(X1.Len())
+	A1.Set(0, 0, 2.0)
+	C1 := optim.ZerosVector(desLength)
+	C1.SetVec(2, 13.0)
+
+	vlet1 := optim.VectorLinearExpressionTranspose{
+		X1, A1, C1,
+	}
+
+	// Algorithm
+	_, err := vec1.LessEq(vlet1)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot compare KVector with a transposed vector %T; Try transposing one or the other!",
+			vlet1,
+		),
+	) {
+		t.Errorf(
+			"Unexpected error when comparing kvector with VectorLinearExpressionTranspose! %v",
+			err,
+		)
+	}
+
+}
+
+/*
+TestKVector_GreaterEq1
+Description:
+
+	Tests the LessEq comparison of KVector with a VectorLinearExpression
+	with different variable lengths.
+	(should result in an error)
+*/
+func TestKVector_GreaterEq1(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("test-kvector-greater-eq1")
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	X1 := m.AddVariableVector(desLength - 1)
+	A1 := optim.Identity(X1.Len())
+	A1.Set(0, 0, 2.0)
+	C1 := optim.ZerosVector(X1.Len())
+	C1.SetVec(2, 13.0)
+
+	vle1 := optim.VectorLinearExpr{
+		X1, A1, C1,
+	}
+
+	// Algorithm
+	_, err := vec1.GreaterEq(vle1)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"The two vector inputs to Comparison() must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
+			vle1.Len(),
+			vec1.Len(),
+		),
+	) {
+		t.Errorf(
+			"Unexpected error when comparing kvector with VectorLinearExpr! %v",
+			err,
+		)
+	}
+
+}
+
+/*
+TestKVector_Eq1
+Description:
+
+	Tests the Eq comparison of KVector with a KVectorTranspose
+	results in a proper error.
+*/
+func TestKVector_Eq1(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	C1 := optim.ZerosVector(desLength)
+	C1.SetVec(2, 13.0)
+
+	// Algorithm
+	_, err := vec1.Eq(optim.KVector(C1).Transpose())
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot compare KVector with a transposed vector %T; Try transposing one or the other!",
+			optim.KVector(C1).Transpose(),
+		),
+	) {
+		t.Errorf(
+			"Unexpected error when comparing kvector with KVectorTranspose! %v",
+			err,
+		)
+	}
+
+}
+
+/*
+TestKVector_Transpose1
+Description:
+
+	Tests the transposition of a given vector returns the new type KVectorTranspose.
+*/
+func TestKVector_Transpose1(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+
+	// Algorithm
+	vecTransposed := vec1.Transpose()
+
+	if _, ok1 := vecTransposed.(optim.KVectorTranspose); !ok1 {
+		t.Errorf(
+			"Expected transposed KVector to be of type KVectorTranspose; received %Te instead.",
+			vecTransposed,
+		)
+	}
+}
+
+/*
+TestKVector_Mult1
+Description:
+
+	Tests the multiplication of the KVector with a float.
+*/
+func TestKVector_Mult1(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+
+	// Algorithm
+	product, err := vec1.Mult(3.14)
+	if err != nil {
+		t.Errorf(
+			"There was an unexpected error performing multiplication: %v",
+			err,
+		)
+	}
+
+	productAsKVector, success := product.(optim.KVector)
+	if !success {
+		t.Errorf("There was an issue converting the product to a KVector!")
+	}
+
+	if productAsKVector.AtVec(0).(optim.K) != 3.14 {
+		t.Errorf(
+			"Expected product to contain elements of %v; received %v.",
+			3.14,
+			productAsKVector.AtVec(0),
+		)
 	}
 }

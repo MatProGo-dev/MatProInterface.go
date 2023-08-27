@@ -60,37 +60,33 @@ func (sle ScalarLinearExpr) Constant() float64 {
 // Plus adds the current expression to another and returns the resulting
 // expression
 func (sle ScalarLinearExpr) Plus(e interface{}, errors ...error) (ScalarExpression, error) {
-	// Algorithm depends on the type of eIn.
-	switch e.(type) {
-	case float64:
-		// Cast
-		eAsFloat64 := e.(float64)
+	// Input Processing
+	if len(errors) > 0 {
+		if errors[0] != nil {
+			return sle, errors[0]
+		}
+	}
 
+	// Algorithm depends on the type of eIn.
+	switch eAsType := e.(type) {
+	case float64:
 		// Use the version of Plus defined for K
-		return sle.Plus(K(eAsFloat64))
+		return sle.Plus(K(eAsType))
 
 	case K:
-		// Collect Expression
-		KIn := e.(K)
-
 		// Create new expression and add to its constant term
 		sleOut := sle.Copy()
-		sleOut.C += float64(KIn)
+		sleOut.C += float64(eAsType)
 
 		return sleOut, nil
 	case Variable:
-		// Collect Expression
-		vIn := e.(Variable)
-		return vIn.Plus(sle)
+		return eAsType.Plus(sle)
 
 	case ScalarLinearExpr:
-		// Collect Expressions
-		linearEIn := e.(ScalarLinearExpr)
-
 		// Get Combined set of Variables
-		newX := UniqueVars(append(sle.X.Elements, linearEIn.X.Elements...))
+		newX := UniqueVars(append(sle.X.Elements, eAsType.X.Elements...))
 		newSLEAligned, _ := sle.RewriteInTermsOf(VarVector{newX})
-		linearEInAligned, _ := linearEIn.RewriteInTermsOf(VarVector{newX})
+		linearEInAligned, _ := eAsType.RewriteInTermsOf(VarVector{newX})
 
 		// Create new vector
 		var newSLE ScalarLinearExpr = newSLEAligned // get copy of e
@@ -100,13 +96,10 @@ func (sle ScalarLinearExpr) Plus(e interface{}, errors ...error) (ScalarExpressi
 		(&newSLE.L).AddVec(&newSLE.L, &linearEInAligned.L)
 
 		// Add constants together
-		newSLE.C += linearEIn.C
+		newSLE.C += eAsType.C
 		return newSLE, nil
 
 	case ScalarQuadraticExpression:
-
-		//var newQExpr QuadraticExpr = *qe // get copy of e
-		quadraticEIn := e.(ScalarQuadraticExpression)
 		//
 		//// Get Combined set of Variables
 		//newX := UniqueVars(append(newQExpr.X.Elements, quadraticEIn.X.Elements...))
@@ -126,7 +119,7 @@ func (sle ScalarLinearExpr) Plus(e interface{}, errors ...error) (ScalarExpressi
 		//// Add constants together
 		//newQExprAligned.C += quadraticEInAligned.C
 		//return newQExprAligned, nil
-		return quadraticEIn.Plus(sle)
+		return eAsType.Plus(sle)
 
 	default:
 		fmt.Println("Unexpected type given to Plus().")

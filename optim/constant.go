@@ -127,6 +127,13 @@ Description:
 func (c K) Multiply(term1 interface{}, errors ...error) (Expression, error) {
 	// Constants
 
+	// Input Processing
+	if len(errors) > 0 {
+		if errors[0] != nil {
+			return c, errors[0]
+		}
+	}
+
 	// Algorithm
 	switch term1.(type) {
 	case float64:
