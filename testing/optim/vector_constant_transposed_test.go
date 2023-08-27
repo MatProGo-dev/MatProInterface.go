@@ -354,6 +354,86 @@ func TestKVectorTranspose_Comparison5(t *testing.T) {
 }
 
 /*
+TestKVectorTranspose_LessEq1
+Description:
+
+	This function tests that the LessEq() method is properly working for KVector inputs.
+*/
+func TestKVectorTranspose_LessEq1(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
+	var vec2 = optim.KVector(optim.ZerosVector(desLength))
+
+	// Create Constraint
+	_, err := vec1.LessEq(vec2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Cannot compare KVectorTranspose with a normal vector %T; Try transposing one or the other!",
+			vec2,
+		),
+	) {
+		t.Errorf("There was an unexpected error when doing improper LessEq: %v", err)
+	}
+}
+
+/*
+TestKVectorTranspose_GreaterEq1
+Description:
+
+	This function tests that the GreaterEq() method is properly working for
+	KVectorTranspose inputs of improper length.
+*/
+func TestKVectorTranspose_GreaterEq1(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
+	var vec2 = optim.KVectorTranspose(optim.ZerosVector(desLength - 1))
+
+	// Create Constraint
+	_, err := vec1.GreaterEq(vec2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"The left hand side's dimension (%v) and the left hand side's dimension (%v) do not match!",
+			vec1.Len(),
+			vec2.Len(),
+		),
+	) {
+		t.Errorf("There was an unexpected error computing GreaterEq(): %v", err)
+	}
+}
+
+/*
+TestKVectorTranspose_Eq1
+Description:
+
+	This function tests that the Eq() method is properly working for
+	when given an unexpected type input.
+*/
+func TestKVectorTranspose_Eq1(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
+	b2 := false
+
+	// Create Constraint
+	_, err := vec1.Eq(b2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"The input to KVectorTranspose's '%v' comparison (%v) has unexpected type: %T",
+			optim.SenseEqual,
+			b2,
+			b2,
+		),
+	) {
+		t.Errorf("There was an unexpected error computing Eq(): %v", err)
+	}
+}
+
+/*
 TestKVectorTranspose_Plus1
 Description:
 
@@ -861,5 +941,53 @@ func TestKVectorTranspose_Mult1(t *testing.T) {
 				prod.AtVec(elt_index),
 			)
 		}
+	}
+}
+
+/*
+TestKVectorTranspose_Multiply1
+Description:
+
+	Tests that the scalar multiplication function works as expected.
+*/
+func TestKVectorTranspose_Multiply1(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
+
+	// Algorithm
+	_, err := vec1.Multiply(30.0)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf("The Multiply() method for KVectorTranspose has not been implemented yet!"),
+	) {
+		t.Errorf("There was an unexpected error when computing multiply: %v", err)
+	}
+}
+
+/*
+TestKVectorTranspose_Transpose1
+Description:
+
+	Tests that the transpose function works as expected.
+*/
+func TestKVectorTranspose_Transpose1(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
+
+	// Algorithm
+	vec1T := vec1.Transpose()
+	_, ok := vec1T.(optim.KVector)
+	if !ok {
+		t.Errorf("The transposed KVectorTranspose is of type %T; not KVector", vec1T)
+	}
+
+	if vec1.Len() != vec1T.Len() {
+		t.Errorf(
+			"The length of vec1 is %v, but the transposed vector has length %v. They should be the same!",
+			vec1.Len(),
+			vec1T.Len(),
+		)
 	}
 }
