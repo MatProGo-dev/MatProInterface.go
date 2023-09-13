@@ -956,12 +956,30 @@ func TestKVectorTranspose_Multiply1(t *testing.T) {
 	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
 
 	// Algorithm
-	_, err := vec1.Multiply(30.0)
-	if !strings.Contains(
-		err.Error(),
-		fmt.Sprintf("The Multiply() method for KVectorTranspose has not been implemented yet!"),
-	) {
+	vec2, err := vec1.Multiply(30.0)
+	if err != nil {
 		t.Errorf("There was an unexpected error when computing multiply: %v", err)
+	}
+
+	vec2prime, ok := vec2.(optim.KVectorTranspose)
+	if !ok {
+		t.Errorf(
+			"There was a problem converting vec2 to a KVectorTranspose object! Received object of type %T instead!",
+			vec2,
+		)
+	}
+
+	for vec1Index := 0; vec1Index < vec1.Len(); vec1Index++ {
+		if float64(vec2prime.AtVec(vec1Index).(optim.K)) != 30.0*float64(vec1.AtVec(vec1Index).(optim.K)) {
+			t.Errorf(
+				"vec2[%v] = %v =/= %v = %v * vec1[%v]",
+				vec1Index,
+				vec2prime.AtVec(vec1Index),
+				30.0*float64(vec1.AtVec(vec1Index).(optim.K)),
+				30.0,
+				vec1.AtVec(vec1Index),
+			)
+		}
 	}
 }
 
