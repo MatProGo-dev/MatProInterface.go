@@ -287,6 +287,43 @@ func (kvt KVectorTranspose) Multiply(e interface{}, extras ...interface{}) (Expr
 		result.ScaleVec(eConverted, &kvAsVec)
 
 		return KVectorTranspose(result), nil
+	case K:
+		// Convert to float64
+		eAsFloat := float64(eConverted)
+
+		return kvt.Multiply(eAsFloat)
+
+	case mat.VecDense:
+		// Check dimensions
+		if eConverted.Len() != kvt.Len() {
+			return kvt, fmt.Errorf(
+				"KVectorTranspose of length %v can not be multiplied with a mat.VecDense of different length (%v).",
+				kvt.Len(),
+				eConverted.Len(),
+			)
+		}
+
+		// Do the dot product
+		var result float64
+		kvtAsVec := mat.VecDense(kvt)
+		result = mat.Dot(&kvtAsVec, &eConverted)
+
+		return K(result), nil
+
+	case KVector:
+		// Check dimensions
+		if eConverted.Len() != kvt.Len() {
+			return kvt, fmt.Errorf(
+				"KVectorTranspose of length %v can not be multiplied with a KVector of different length (%v).",
+				kvt.Len(),
+				eConverted.Len(),
+			)
+		}
+		// Convert to mat.VecDense
+		eAsVecDense := mat.VecDense(eConverted)
+
+		return kvt.Multiply(eAsVecDense)
+
 	default:
 		return kvt, fmt.Errorf(
 			"The input to KVectorTranspose's Multiply method (%v) has unexpected type: %T",
