@@ -37,7 +37,7 @@ type VectorExpression interface {
 
 	// Mult multiplies the current expression with another and returns the
 	// resulting expression
-	Mult(c float64) (VectorExpression, error)
+	Multiply(e interface{}, extras ...interface{}) (Expression, error)
 
 	// LessEq returns a less than or equal to (<=) constraint between the
 	// current expression and another

@@ -118,8 +118,26 @@ Description:
 
 	Returns an expression which scales every dimension of the vector linear expression by the input.
 */
-func (vle VectorLinearExpressionTranspose) Mult(c float64) (VectorExpression, error) {
-	return vle, fmt.Errorf("The multiplication method has not yet been implemented!")
+func (vlet VectorLinearExpressionTranspose) Mult(c float64) (VectorExpression, error) {
+	return vlet, fmt.Errorf("The multiplication method has not yet been implemented!")
+}
+
+/*
+Multiply
+Description:
+
+	Multiplication of a VarVector with another expression.
+*/
+func (vlet VectorLinearExpressionTranspose) Multiply(e interface{}, extras ...interface{}) (Expression, error) {
+	// TODO: Implement This!
+
+	switch eConverted := e.(type) {
+	default:
+		return vlet, fmt.Errorf(
+			"The input to VarVector's Multiply() method (%v) has unexpected type: %T",
+			eConverted, e,
+		)
+	}
 }
 
 /*

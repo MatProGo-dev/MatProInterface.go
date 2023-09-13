@@ -276,9 +276,24 @@ Description:
 
 	This method is used to compute the multiplication of the input vector constant with another term.
 */
-func (kvt KVectorTranspose) Multiply(term1 interface{}, extras ...interface{}) (Expression, error) {
+func (kvt KVectorTranspose) Multiply(e interface{}, extras ...interface{}) (Expression, error) {
 	// TODO: Implement this!
-	return K(0), fmt.Errorf("The Multiply() method for KVectorTranspose has not been implemented yet!")
+
+	switch eConverted := e.(type) {
+	case float64:
+		// Use mat.Vector's multiplication method
+		var result mat.VecDense
+		kvAsVec := mat.VecDense(kvt)
+		result.ScaleVec(eConverted, &kvAsVec)
+
+		return KVectorTranspose(result), nil
+	default:
+		return kvt, fmt.Errorf(
+			"The input to KVectorTranspose's Multiply method (%v) has unexpected type: %T",
+			e, e,
+		)
+
+	}
 }
 
 /*

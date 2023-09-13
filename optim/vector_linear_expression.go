@@ -123,6 +123,24 @@ func (vle VectorLinearExpr) Mult(c float64) (VectorExpression, error) {
 }
 
 /*
+Multiply
+Description:
+
+	Multiplication of a VarVector with another expression.
+*/
+func (vle VectorLinearExpr) Multiply(e interface{}, extras ...interface{}) (Expression, error) {
+	// TODO: Implement This!
+
+	switch eConverted := e.(type) {
+	default:
+		return vle, fmt.Errorf(
+			"The input to VectorLinearExpr's Multiply() method (%v) has unexpected type: %T",
+			eConverted, e,
+		)
+	}
+}
+
+/*
 Plus
 Description:
 

@@ -195,6 +195,24 @@ func (vvt VarVectorTranspose) Mult(c float64) (VectorExpression, error) {
 }
 
 /*
+Multiply
+Description:
+
+	Multiplication of a VarVectorTranspose with another expression.
+*/
+func (vvt VarVectorTranspose) Multiply(e interface{}, extras ...interface{}) (Expression, error) {
+	// TODO: Implement This!
+
+	switch eConverted := e.(type) {
+	default:
+		return vvt, fmt.Errorf(
+			"The input to VarVectorTranspose's Multiply() method (%v) has unexpected type: %T.",
+			eConverted, e,
+		)
+	}
+}
+
+/*
 LessEq
 Description:
 

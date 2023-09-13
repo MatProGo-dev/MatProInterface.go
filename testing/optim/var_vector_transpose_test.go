@@ -1016,28 +1016,6 @@ func TestVarVectorTranspose_AtVec1(t *testing.T) {
 }
 
 /*
-TestVarVectorTranspose_Mult1
-Description:
-
-	Verifies that the Mult() operator throws an error in its current form.
-*/
-func TestVarVectorTranspose_Mult1(t *testing.T) {
-	// Constants
-	desLength := 10
-	m := optim.NewModel("AtVec1")
-	vec1 := m.AddVariableVector(desLength).Transpose()
-
-	// Check
-	_, err := vec1.Mult(2.9)
-	if !strings.Contains(
-		err.Error(),
-		"The Mult() method for VarVectorTranspose is not implemented yet!",
-	) {
-		t.Errorf("Unexpected error: %v", err)
-	}
-}
-
-/*
 TestVarVectorTranspose_LessEq1
 Description:
 
