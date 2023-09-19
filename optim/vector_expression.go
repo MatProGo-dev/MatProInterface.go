@@ -136,6 +136,7 @@ func ToVectorExpression(e interface{}) (VectorExpression, error) {
 	if !IsVectorExpression(e) {
 		return KVector(OnesVector(1)), fmt.Errorf(
 			"the input interface is of type %T, which is not recognized as a VectorExpression.",
+			e,
 		)
 	}
 
