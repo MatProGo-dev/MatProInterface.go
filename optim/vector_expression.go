@@ -6,7 +6,10 @@ Description:
 	An improvement/successor to the scalar expr interface.
 */
 
-import "gonum.org/v1/gonum/mat"
+import (
+	"fmt"
+	"gonum.org/v1/gonum/mat"
+)
 
 /*
 VectorExpression
@@ -94,3 +97,64 @@ func NewVectorExpression(c mat.VecDense) VectorLinearExpr {
 //
 //	return nil
 //}
+
+/*
+IsVectorExpression
+Description:
+
+	Determines whether or not an input object is a valid "VectorExpression" according to MatProInterface.
+*/
+func IsVectorExpression(e interface{}) bool {
+	// Check each type
+	switch e.(type) {
+	case VarVector:
+		return true
+	case VarVectorTranspose:
+		return true
+	case VectorLinearExpr:
+		return true
+	case VectorLinearExpressionTranspose:
+		return true
+	case KVector:
+		return true
+	case KVectorTranspose:
+		return true
+	default:
+		return false
+
+	}
+}
+
+/*
+ToVectorExpression
+Description:
+
+	Converts the input expression to a valid type that implements "VectorExpression".
+*/
+func ToVectorExpression(e interface{}) (VectorExpression, error) {
+	// Input Processing
+	if !IsVectorExpression(e) {
+		return KVector(OnesVector(1)), fmt.Errorf(
+			"the input interface is of type %T, which is not recognized as a VectorExpression.",
+		)
+	}
+
+	// Convert
+	switch e2 := e.(type) {
+	case KVector:
+		return e2, nil
+	case KVectorTranspose:
+		return e2, nil
+	case VectorLinearExpr:
+		return e2, nil
+	case VectorLinearExpressionTranspose:
+		return e2, nil
+	case mat.VecDense:
+		return KVector(e2), nil
+	default:
+		return KVector(OnesVector(1)), fmt.Errorf(
+			"unexpected vector expression conversion requested for type %T!",
+			e,
+		)
+	}
+}
