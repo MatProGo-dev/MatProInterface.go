@@ -279,6 +279,21 @@ Description:
 func (kvt KVectorTranspose) Multiply(e interface{}, extras ...interface{}) (Expression, error) {
 	// TODO: Implement this!
 
+	// Input Processing
+	if IsVectorExpression(e) {
+		// Check dimensions
+		e2, _ := ToVectorExpression(e)
+		if e2.Len() != kvt.Len() {
+			return kvt, fmt.Errorf(
+				"KVectorTranspose of length %v can not be multiplied with a %T of different length (%v).",
+				kvt.Len(),
+				e2,
+				e2.Len(),
+			)
+		}
+	}
+
+	// Compute Multiplication
 	switch eConverted := e.(type) {
 	case float64:
 		// Use mat.Vector's multiplication method
@@ -294,15 +309,6 @@ func (kvt KVectorTranspose) Multiply(e interface{}, extras ...interface{}) (Expr
 		return kvt.Multiply(eAsFloat)
 
 	case mat.VecDense:
-		// Check dimensions
-		if eConverted.Len() != kvt.Len() {
-			return kvt, fmt.Errorf(
-				"KVectorTranspose of length %v can not be multiplied with a mat.VecDense of different length (%v).",
-				kvt.Len(),
-				eConverted.Len(),
-			)
-		}
-
 		// Do the dot product
 		var result float64
 		kvtAsVec := mat.VecDense(kvt)
@@ -311,18 +317,20 @@ func (kvt KVectorTranspose) Multiply(e interface{}, extras ...interface{}) (Expr
 		return K(result), nil
 
 	case KVector:
-		// Check dimensions
-		if eConverted.Len() != kvt.Len() {
-			return kvt, fmt.Errorf(
-				"KVectorTranspose of length %v can not be multiplied with a KVector of different length (%v).",
-				kvt.Len(),
-				eConverted.Len(),
-			)
-		}
 		// Convert to mat.VecDense
 		eAsVecDense := mat.VecDense(eConverted)
 
 		return kvt.Multiply(eAsVecDense)
+
+	case KVectorTranspose:
+		// Immediately return error.
+		return kvt, fmt.Errorf(
+			"dimension mismatch! Cannot multiply KVectorTranspose with a transposed vector of type %T; Try transposing one or the other!",
+			eConverted,
+		)
+
+	case VectorLinearExpr:
+		return eConverted.Multiply(kvt)
 
 	default:
 		return kvt, fmt.Errorf(
