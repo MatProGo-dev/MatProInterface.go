@@ -277,9 +277,12 @@ Description:
 	This method is used to compute the multiplication of the input vector constant with another term.
 */
 func (kvt KVectorTranspose) Multiply(e interface{}, extras ...interface{}) (Expression, error) {
-	// TODO: Implement this!
-
 	// Input Processing
+	err := CheckExtras(extras)
+	if err != nil {
+		return kvt, err
+	}
+
 	if IsVectorExpression(e) {
 		// Check dimensions
 		e2, _ := ToVectorExpression(e)
@@ -331,6 +334,13 @@ func (kvt KVectorTranspose) Multiply(e interface{}, extras ...interface{}) (Expr
 
 	case VectorLinearExpr:
 		return eConverted.Multiply(kvt)
+
+	case VectorLinearExpressionTranspose:
+		// Immediately return error.
+		return kvt, fmt.Errorf(
+			"dimension mismatch! Cannot multiply KVectorTranspose with a transposed vector of type %T; Try transposing one or the other!",
+			eConverted,
+		)
 
 	default:
 		return kvt, fmt.Errorf(

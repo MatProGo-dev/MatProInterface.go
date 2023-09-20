@@ -146,6 +146,10 @@ func ToVectorExpression(e interface{}) (VectorExpression, error) {
 		return e2, nil
 	case KVectorTranspose:
 		return e2, nil
+	case VarVector:
+		return e2, nil
+	case VarVectorTranspose:
+		return e2, nil
 	case VectorLinearExpr:
 		return e2, nil
 	case VectorLinearExpressionTranspose:

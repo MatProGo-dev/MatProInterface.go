@@ -271,9 +271,79 @@ Description:
 
 	This method is used to compute the multiplication of the input vector constant with another term.
 */
-func (kv KVector) Multiply(term1 interface{}, extras ...interface{}) (Expression, error) {
-	// TODO: Implement this!
-	return K(0), fmt.Errorf("The Multiply() method for KVector has not been implemented yet!")
+func (kv KVector) Multiply(e interface{}, extras ...interface{}) (Expression, error) {
+	// Input Processing
+	err := CheckExtras(extras)
+	if err != nil {
+		return kv, err
+	}
+
+	if IsVectorExpression(e) {
+		// Check dimensions
+		e2, _ := ToVectorExpression(e)
+		if e2.Len() != kv.Len() {
+			return kv, fmt.Errorf(
+				"KVectorTranspose of length %v can not be multiplied with a %T of different length (%v).",
+				kv.Len(),
+				e2,
+				e2.Len(),
+			)
+		}
+	}
+
+	// Compute Multiplication
+	switch eConverted := e.(type) {
+	case float64:
+		// Use mat.Vector's multiplication method
+		var result mat.VecDense
+		kvAsVec := mat.VecDense(kv)
+		result.ScaleVec(eConverted, &kvAsVec)
+
+		return KVectorTranspose(result), nil
+	case K:
+		// Convert to float64
+		eAsFloat := float64(eConverted)
+
+		return kv.Multiply(eAsFloat)
+
+	case mat.VecDense:
+		// Do the dot product
+		var result float64
+		kvtAsVec := mat.VecDense(kv)
+		result = mat.Dot(&kvtAsVec, &eConverted)
+
+		return K(result), nil
+
+	case KVector:
+		// Immediately return error.
+		return kv, fmt.Errorf(
+			"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
+			eConverted,
+		)
+
+	case KVectorTranspose:
+		// Convert to mat.VecDense
+		eAsVecDense := mat.VecDense(eConverted)
+
+		return kv.Multiply(eAsVecDense)
+
+	case VectorLinearExpr:
+		// Immediately return error.
+		return kv, fmt.Errorf(
+			"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
+			eConverted,
+		)
+
+	case VectorLinearExpressionTranspose:
+		return eConverted.Multiply(kv)
+
+	default:
+		return kv, fmt.Errorf(
+			"The input to KVectorTranspose's Multiply method (%v) has unexpected type: %T",
+			e, e,
+		)
+
+	}
 }
 
 /*
