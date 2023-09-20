@@ -218,3 +218,41 @@ func Identity(dim int) mat.Dense {
 
 	return zeroBase
 }
+
+/*
+CheckExtras
+Description:
+*/
+func CheckExtras(extras []interface{}) error {
+	// Constants
+
+	// Check all of the extras to see if one of them contains an error
+	switch {
+	case len(extras) == 1:
+		if extras[0] == nil {
+			return nil
+		}
+		fmt.Println(extras)
+		fmt.Println(len(extras))
+
+		// Check to see if the input is an error or not.
+		switch e := extras[0].(type) {
+		case error:
+			return e
+		default:
+			return fmt.Errorf(
+				"unexpected type of input as an 'extra': %T",
+				e,
+			)
+		}
+
+	case len(extras) > 1:
+		return fmt.Errorf(
+			"did not expect to receive more than one element in 'extras' input; received %v",
+			len(extras),
+		)
+	}
+
+	// If extras has length 0, then return nil
+	return nil
+}
