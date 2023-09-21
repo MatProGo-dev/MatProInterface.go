@@ -283,7 +283,7 @@ func (kv KVector) Multiply(e interface{}, extras ...interface{}) (Expression, er
 		e2, _ := ToVectorExpression(e)
 		if e2.Len() != kv.Len() {
 			return kv, fmt.Errorf(
-				"KVectorTranspose of length %v can not be multiplied with a %T of different length (%v).",
+				"KVector of length %v can not be multiplied with a %T of different length (%v).",
 				kv.Len(),
 				e2,
 				e2.Len(),
@@ -299,7 +299,7 @@ func (kv KVector) Multiply(e interface{}, extras ...interface{}) (Expression, er
 		kvAsVec := mat.VecDense(kv)
 		result.ScaleVec(eConverted, &kvAsVec)
 
-		return KVectorTranspose(result), nil
+		return KVector(result), nil
 	case K:
 		// Convert to float64
 		eAsFloat := float64(eConverted)
@@ -307,12 +307,10 @@ func (kv KVector) Multiply(e interface{}, extras ...interface{}) (Expression, er
 		return kv.Multiply(eAsFloat)
 
 	case mat.VecDense:
-		// Do the dot product
-		var result float64
-		kvtAsVec := mat.VecDense(kv)
-		result = mat.Dot(&kvtAsVec, &eConverted)
-
-		return K(result), nil
+		// Send warning until we create matrix type.
+		return kv, fmt.Errorf(
+			"MatProInterface does not currently support operations that result in matrices! if you want this feature, create an issue!",
+		)
 
 	case KVector:
 		// Immediately return error.
@@ -322,10 +320,23 @@ func (kv KVector) Multiply(e interface{}, extras ...interface{}) (Expression, er
 		)
 
 	case KVectorTranspose:
-		// Convert to mat.VecDense
-		eAsVecDense := mat.VecDense(eConverted)
+		// Send warning until we create matrix type.
+		return kv, fmt.Errorf(
+			"MatProInterface does not currently support operations that result in matrices! if you want this feature, create an issue!",
+		)
 
-		return kv.Multiply(eAsVecDense)
+	case VarVector:
+		// Immediately return error.
+		return kv, fmt.Errorf(
+			"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
+			eConverted,
+		)
+
+	case VarVectorTranspose:
+		// Send warning until we create matrix type.
+		return kv, fmt.Errorf(
+			"MatProInterface does not currently support operations that result in matrices! if you want this feature, create an issue!",
+		)
 
 	case VectorLinearExpr:
 		// Immediately return error.
@@ -335,7 +346,10 @@ func (kv KVector) Multiply(e interface{}, extras ...interface{}) (Expression, er
 		)
 
 	case VectorLinearExpressionTranspose:
-		return eConverted.Multiply(kv)
+		// Send warning until we create matrix type.
+		return kv, fmt.Errorf(
+			"MatProInterface does not currently support operations that result in matrices! if you want this feature, create an issue!",
+		)
 
 	default:
 		return kv, fmt.Errorf(

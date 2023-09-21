@@ -201,9 +201,43 @@ Description:
 	Multiplication of a VarVectorTranspose with another expression.
 */
 func (vvt VarVectorTranspose) Multiply(e interface{}, extras ...interface{}) (Expression, error) {
-	// TODO: Implement This!
+	// Input Processing
+	err := CheckExtras(extras)
+	if err != nil {
+		return vvt, err
+	}
 
+	if IsVectorExpression(e) {
+		// Check dimensions
+		e2, _ := ToVectorExpression(e)
+		if e2.Len() != vvt.Len() {
+			return vvt, fmt.Errorf(
+				"VarVectorTranspose of length %v can not be multiplied with a %T of different length (%v).",
+				vvt.Len(),
+				e2,
+				e2.Len(),
+			)
+		}
+	}
+
+	// Multiply Algorithms
 	switch eConverted := e.(type) {
+	case KVector:
+		// Collect Unique Variables
+		vv := VarVector{UniqueVars(vvt.Elements)}
+
+		// Assemble the vector used in the linear expression.
+		L := ZerosVector(vv.Len())
+		eLen := eConverted.Len()
+		for kvIndex := 0; kvIndex < eLen; kvIndex++ {
+			// Get coefficient and variable at kvIndex
+			kv_i := eConverted.AtVec(kvIndex)
+			vvt_i := vvt.AtVec(kvIndex)
+
+			indexOfvvt_i, _ := FindInSlice(vvt_i.(Variable), vv.Elements)
+			L.SetVec(indexOfvvt_i, float64(kv_i.(K)))
+		}
+		return ScalarLinearExpr{L: L, X: vv, C: 0}, nil
 	default:
 		return vvt, fmt.Errorf(
 			"The input to VarVectorTranspose's Multiply() method (%v) has unexpected type: %T.",

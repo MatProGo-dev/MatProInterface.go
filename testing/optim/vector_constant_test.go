@@ -910,15 +910,29 @@ func TestKVector_Multiply1(t *testing.T) {
 	var vec1 = optim.KVector(optim.OnesVector(desLength))
 
 	// Algorithm
-	_, err := vec1.Multiply(3.14)
-	if !strings.Contains(
-		err.Error(),
-		"The Multiply() method for KVector has not been implemented yet!",
-	) {
+	scaledVec0, err := vec1.Multiply(3.14)
+	if err != nil {
+		t.Errorf("unexpected error when multiplying KVector with a constant: %v", err)
+	}
+
+	scaledVec1, ok := scaledVec0.(optim.KVector)
+	if !ok {
 		t.Errorf(
-			"There was an unexpected error performing multiplication: %v",
-			err,
+			"expected scaled constant vector to be of type optim.KVector; received %T",
+			scaledVec0,
 		)
+	}
+
+	// Check elements of scaledVec1
+	sv2 := mat.VecDense(scaledVec1)
+	for ii, elt := range (&sv2).RawVector().Data {
+		if elt != 3.14 {
+			t.Errorf(
+				"Element %v of scaledVec is %v; expected %v",
+				ii, elt,
+				3.14,
+			)
+		}
 	}
 }
 

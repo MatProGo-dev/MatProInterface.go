@@ -332,6 +332,15 @@ func (kvt KVectorTranspose) Multiply(e interface{}, extras ...interface{}) (Expr
 			eConverted,
 		)
 
+	case VarVector:
+		return eConverted.Transpose().Multiply(kvt.Transpose())
+
+	case VarVectorTranspose:
+		// Immediately return error.
+		return kvt, fmt.Errorf(
+			"dimension mismatch! Cannot multiply KVectorTranspose with a transposed vector of type %T; Try transposing one or the other!",
+			eConverted,
+		)
 	case VectorLinearExpr:
 		return eConverted.Multiply(kvt)
 
