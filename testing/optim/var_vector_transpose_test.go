@@ -1074,3 +1074,108 @@ func TestVarVectorTranspose_GreaterEq1(t *testing.T) {
 	}
 
 }
+
+/*
+TestVarVectorTranspose_Multiply1
+Description:
+
+	Tests that the simple multiplication of a VarVectorTranspose with a KVector
+	produces the right size of output for a unique varvector and KVector.
+*/
+func TestVarVectorTranspose_Multiply1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("VarVectorTranspose_Multiply1")
+	N := 4
+	vv1 := m.AddVariableVector(4)
+	vvt1 := vv1.Transpose()
+	kv1 := optim.KVector(optim.OnesVector(N))
+
+	// Perform Multiply
+	prod1, err := vvt1.Multiply(kv1)
+	if err != nil {
+		t.Errorf("There was an unexpected error computing product: %v", err)
+	}
+
+	prod2, ok := prod1.(optim.ScalarLinearExpr)
+	if !ok {
+		t.Errorf(
+			"Expected product to be of type optim.ScalarLinearExpr; received %T",
+			prod2,
+		)
+	}
+
+	if prod2.X.Len() != N {
+		t.Errorf("Product contains an X vector of length %v; expected length %v", prod2.X.Len(), N)
+	}
+
+	for LIndex := 0; LIndex < prod2.L.Len(); LIndex++ {
+		L_i := prod2.L.AtVec(LIndex)
+
+		if L_i != 1.0 {
+			t.Errorf(
+				"Expected L[%v] = %v; received %v",
+				LIndex, 1.0,
+				L_i,
+			)
+		}
+
+	}
+}
+
+/*
+TestVarVectorTranspose_Multiply2
+Description:
+
+	Tests that the simple multiplication of a VarVectorTranspose with a KVector
+	produces the right size of output for a NON-unique varvector and KVector.
+*/
+func TestVarVectorTranspose_Multiply2(t *testing.T) {
+	// Constants
+	m := optim.NewModel("VarVectorTranspose_Multiply2")
+	N := 4
+	vv0 := m.AddVariableVector(N - 1)
+	vv1 := optim.VarVector{Elements: append(vv0.Elements, vv0.Elements[2])}
+	vvt1 := vv1.Transpose()
+	kv1 := optim.KVector(optim.OnesVector(N))
+
+	// Perform Multiply
+	prod1, err := vvt1.Multiply(kv1)
+	if err != nil {
+		t.Errorf("There was an unexpected error computing product: %v", err)
+	}
+
+	prod2, ok := prod1.(optim.ScalarLinearExpr)
+	if !ok {
+		t.Errorf(
+			"Expected product to be of type optim.ScalarLinearExpr; received %T",
+			prod2,
+		)
+	}
+
+	if prod2.X.Len() != N-1 {
+		t.Errorf("Product contains an X vector of length %v; expected length %v", prod2.X.Len(), N-1)
+	}
+
+	for LIndex := 0; LIndex < prod2.L.Len(); LIndex++ {
+		L_i := prod2.L.AtVec(LIndex)
+
+		if LIndex != 2 {
+			if L_i != 1.0 {
+				t.Errorf(
+					"Expected L[%v] = %v; received %v",
+					LIndex, 1.0,
+					L_i,
+				)
+			}
+		} else {
+			if L_i != 2.0 {
+				t.Errorf(
+					"Expected L[%v] = %v; received %v",
+					LIndex, 1.0,
+					L_i,
+				)
+			}
+		}
+
+	}
+}

@@ -235,7 +235,7 @@ func (vvt VarVectorTranspose) Multiply(e interface{}, extras ...interface{}) (Ex
 			vvt_i := vvt.AtVec(kvIndex)
 
 			indexOfvvt_i, _ := FindInSlice(vvt_i.(Variable), vv.Elements)
-			L.SetVec(indexOfvvt_i, float64(kv_i.(K)))
+			L.SetVec(indexOfvvt_i, float64(kv_i.(K))+L.AtVec(indexOfvvt_i))
 		}
 		return ScalarLinearExpr{L: L, X: vv, C: 0}, nil
 	default:
