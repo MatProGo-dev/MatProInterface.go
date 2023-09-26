@@ -3,6 +3,7 @@ package optim_test
 import (
 	"fmt"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
+	"gonum.org/v1/gonum/mat"
 	"strings"
 	"testing"
 )
@@ -1177,5 +1178,133 @@ func TestVarVectorTranspose_Multiply2(t *testing.T) {
 			}
 		}
 
+	}
+}
+
+/*
+TestVarVectorTranspose_Multiply3
+Description:
+
+	Tests that the simple multiplication of a VarVectorTranspose with a mat.VecDense
+	produces the right size of output for a NON-unique varvector and mat.VecDense.
+*/
+func TestVarVectorTranspose_Multiply3(t *testing.T) {
+	// Constants
+	m := optim.NewModel("VarVectorTranspose_Multiply2")
+	N := 4
+	vv0 := m.AddVariableVector(N - 1)
+	vv1 := optim.VarVector{Elements: append(vv0.Elements, vv0.Elements[2])}
+	vvt1 := vv1.Transpose()
+	vd1 := optim.OnesVector(N)
+	var vd1Scaled mat.VecDense
+	vd1Scaled.ScaleVec(2.0, &vd1)
+
+	// Perform Multiply
+	prod1, err := vvt1.Multiply(vd1Scaled)
+	if err != nil {
+		t.Errorf("There was an unexpected error computing product: %v", err)
+	}
+
+	prod2, ok := prod1.(optim.ScalarLinearExpr)
+	if !ok {
+		t.Errorf(
+			"Expected product to be of type optim.ScalarLinearExpr; received %T",
+			prod2,
+		)
+	}
+
+	if prod2.X.Len() != N-1 {
+		t.Errorf("Product contains an X vector of length %v; expected length %v", prod2.X.Len(), N-1)
+	}
+
+	for LIndex := 0; LIndex < prod2.L.Len(); LIndex++ {
+		L_i := prod2.L.AtVec(LIndex)
+
+		if LIndex != 2 {
+			if L_i != 2.0 {
+				t.Errorf(
+					"Expected L[%v] = %v; received %v",
+					LIndex, 1.0,
+					L_i,
+				)
+			}
+		} else {
+			if L_i != 4.0 {
+				t.Errorf(
+					"Expected L[%v] = %v; received %v",
+					LIndex, 1.0,
+					L_i,
+				)
+			}
+		}
+
+	}
+}
+
+/*
+TestVarVectorTranspose_Multiply4
+Description:
+
+	Tests that the simple multiplication of a VarVectorTranspose with a float64
+	produces the right size of output for a NON-unique varvector and float64.
+*/
+func TestVarVectorTranspose_Multiply4(t *testing.T) {
+	// Constants
+	m := optim.NewModel("VarVectorTranspose_Multiply2")
+	N := 4
+	vv0 := m.AddVariableVector(N - 1)
+	vv1 := optim.VarVector{Elements: append(vv0.Elements, vv0.Elements[2])}
+	vvt1 := vv1.Transpose()
+	f1 := 2.5
+
+	// Perform Multiply
+	prod1, err := vvt1.Multiply(f1)
+	if err != nil {
+		t.Errorf("There was an unexpected error computing product: %v", err)
+	}
+
+	prod2, ok := prod1.(optim.VectorLinearExpressionTranspose)
+	if !ok {
+		t.Errorf(
+			"Expected product to be of type optim.VectorLinearExpressionTranspose; received %T",
+			prod2,
+		)
+	}
+
+	for ii := 0; ii < prod2.X.Len(); ii++ {
+		for jj := 0; jj < prod2.X.Len(); jj++ {
+			L_ij := prod2.L.At(ii, jj)
+			if ii == jj {
+				if L_ij != f1 {
+					t.Errorf(
+						"Expected L[%v,%v] = %v; received %v",
+						ii, jj,
+						f1,
+						L_ij,
+					)
+				}
+			} else {
+				if L_ij != 0.0 {
+					t.Errorf(
+						"Expected L[%v,%v] = %v; received %v",
+						ii, jj,
+						0.0,
+						L_ij,
+					)
+				}
+			}
+		}
+	}
+
+	// Check C vector
+	for cIndex := 0; cIndex < prod2.C.Len(); cIndex++ {
+		C_i := prod2.C.AtVec(cIndex)
+		if C_i != 0.0 {
+			t.Errorf(
+				"C should be a zero vector, but C[%v] = %v",
+				cIndex,
+				C_i,
+			)
+		}
 	}
 }

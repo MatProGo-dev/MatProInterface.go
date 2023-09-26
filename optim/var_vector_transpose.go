@@ -222,6 +222,23 @@ func (vvt VarVectorTranspose) Multiply(e interface{}, extras ...interface{}) (Ex
 
 	// Multiply Algorithms
 	switch eConverted := e.(type) {
+	case float64:
+		// Create scaled identity matrix
+		I := Identity(vvt.Len())
+		var scaledI mat.Dense
+		scaledI.Scale(eConverted, &I)
+
+		// Copy vvt
+		vvtCopy := vvt.Copy()
+
+		return VectorLinearExpressionTranspose{
+			L: scaledI, X: vvtCopy.Transpose().(VarVector), C: ZerosVector(vvt.Len()),
+		}, nil
+
+	case mat.VecDense:
+		// Convert to KVector
+		eAsKVector := KVector(eConverted)
+		return vvt.Multiply(eAsKVector)
 	case KVector:
 		// Collect Unique Variables
 		vv := VarVector{UniqueVars(vvt.Elements)}
