@@ -184,17 +184,6 @@ func (vvt VarVectorTranspose) Plus(eIn interface{}, extras ...interface{}) (Vect
 }
 
 /*
-Mult
-Description:
-
-	This member function computest the multiplication of the receiver vector var with some
-	incoming vector expression (may result in quadratic?).
-*/
-func (vvt VarVectorTranspose) Mult(c float64) (VectorExpression, error) {
-	return vvt, fmt.Errorf("The Mult() method for VarVectorTranspose is not implemented yet!")
-}
-
-/*
 Multiply
 Description:
 
@@ -234,6 +223,8 @@ func (vvt VarVectorTranspose) Multiply(e interface{}, extras ...interface{}) (Ex
 		return VectorLinearExpressionTranspose{
 			L: scaledI, X: vvtCopy.Transpose().(VarVector), C: ZerosVector(vvt.Len()),
 		}, nil
+	case K:
+		return vvt.Multiply(float64(eConverted))
 
 	case mat.VecDense:
 		// Convert to KVector
@@ -255,6 +246,7 @@ func (vvt VarVectorTranspose) Multiply(e interface{}, extras ...interface{}) (Ex
 			L.SetVec(indexOfvvt_i, float64(kv_i.(K))+L.AtVec(indexOfvvt_i))
 		}
 		return ScalarLinearExpr{L: L, X: vv, C: 0}, nil
+
 	default:
 		return vvt, fmt.Errorf(
 			"The input to VarVectorTranspose's Multiply() method (%v) has unexpected type: %T.",
@@ -334,7 +326,7 @@ func (vvt VarVectorTranspose) Comparison(rhs interface{}, sense ConstrSense) (Ve
 	case VarVector:
 		return VectorConstraint{},
 			fmt.Errorf(
-				"Cannot commpare VarVectorTranspose with a normal vector %v (%T); Try transposing one or the other!",
+				"Cannot compare VarVectorTranspose with a normal vector %v (%T); Try transposing one or the other!",
 				rhs0, rhs0,
 			)
 
@@ -355,7 +347,7 @@ func (vvt VarVectorTranspose) Comparison(rhs interface{}, sense ConstrSense) (Ve
 	case VectorLinearExpr:
 		return VectorConstraint{},
 			fmt.Errorf(
-				"Cannot commpare VarVectorTranspose with a normal vector %v (%T); Try transposing one or the other!",
+				"cannot compare VarVectorTranspose with a normal vector %v (%T); try transposing one or the other!",
 				rhs0, rhs0,
 			)
 
