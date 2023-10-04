@@ -107,6 +107,12 @@ Description:
 func IsVectorExpression(e interface{}) bool {
 	// Check each type
 	switch e.(type) {
+	case mat.VecDense:
+		return true
+	case KVector:
+		return true
+	case KVectorTranspose:
+		return true
 	case VarVector:
 		return true
 	case VarVectorTranspose:
@@ -114,10 +120,6 @@ func IsVectorExpression(e interface{}) bool {
 	case VectorLinearExpr:
 		return true
 	case VectorLinearExpressionTranspose:
-		return true
-	case KVector:
-		return true
-	case KVectorTranspose:
 		return true
 	default:
 		return false
