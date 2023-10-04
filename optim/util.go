@@ -13,13 +13,9 @@ const INFINITY = 1e100
 // SumVars returns the sum of the given variables. It creates a new empty
 // expression and adds to it the given variables.
 func SumVars(vs ...Variable) ScalarExpression {
-	var err error
 	newExpr := NewScalarExpression(0)
 	for _, v := range vs {
-		newExpr, err = newExpr.Plus(v)
-		if err != nil {
-			panic("Unexpected error!")
-		}
+		newExpr, _ = newExpr.Plus(v)
 	}
 	return newExpr
 }
@@ -29,7 +25,7 @@ func SumVars(vs ...Variable) ScalarExpression {
 func SumRow(vs [][]Variable, row int) ScalarExpression {
 	newExpr := NewScalarExpression(0)
 	for col := 0; col < len(vs[0]); col++ {
-		newExpr.Plus(vs[row][col])
+		newExpr, _ = newExpr.Plus(vs[row][col])
 	}
 	return newExpr
 }
@@ -39,7 +35,7 @@ func SumRow(vs [][]Variable, row int) ScalarExpression {
 func SumCol(vs [][]Variable, col int) ScalarExpression {
 	newExpr := NewScalarExpression(0)
 	for row := 0; row < len(vs); row++ {
-		newExpr.Plus(vs[row][col])
+		newExpr, _ = newExpr.Plus(vs[row][col])
 	}
 	return newExpr
 }
@@ -53,6 +49,8 @@ Description:
 	If it is not, then this function returns the index -1 and the boolean value false.
 */
 func FindInSlice(xIn interface{}, sliceIn interface{}) (int, error) {
+	// Constants
+	allowedTypes := []string{"string", "int", "uint64", "Variable"}
 
 	switch x := xIn.(type) {
 	case string:
@@ -100,7 +98,11 @@ func FindInSlice(xIn interface{}, sliceIn interface{}) (int, error) {
 	case Variable:
 		slice, ok := sliceIn.([]Variable)
 		if !ok {
-			return -1, fmt.Errorf("The input slice was not of type %T; expected type %T", x, slice)
+			return -1, fmt.Errorf(
+				"the input slice is of type %T, but the element we're searching for is of type %T",
+				sliceIn,
+				x,
+			)
 		}
 
 		// Perform Search
@@ -114,7 +116,12 @@ func FindInSlice(xIn interface{}, sliceIn interface{}) (int, error) {
 		return xLocationInSliceIn, nil
 
 	default:
-		return -1, fmt.Errorf("The FindInSlice() function was only defined for type string, not type %T:", xIn)
+
+		return -1, fmt.Errorf(
+			"the FindInSlice() function was only defined for types %v, not type %T:",
+			allowedTypes,
+			xIn,
+		)
 	}
 
 }
@@ -232,8 +239,6 @@ func CheckExtras(extras []interface{}) error {
 		if extras[0] == nil {
 			return nil
 		}
-		fmt.Println(extras)
-		fmt.Println(len(extras))
 
 		// Check to see if the input is an error or not.
 		switch e := extras[0].(type) {
