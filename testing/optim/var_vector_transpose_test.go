@@ -457,7 +457,7 @@ Description:
 func TestVarVectorTranspose_Comparison3(t *testing.T) {
 	// Constants
 	desLength := 10
-	m := optim.NewModel("Comparison2")
+	m := optim.NewModel("Comparison3")
 	var vec1 = m.AddVariableVector(desLength).Transpose()
 	var vec2 = m.AddVariableVector(desLength)
 
@@ -469,7 +469,7 @@ func TestVarVectorTranspose_Comparison3(t *testing.T) {
 	if !strings.Contains(
 		err.Error(),
 		fmt.Sprintf(
-			"Cannot commpare VarVectorTranspose with a normal vector %v (%T); Try transposing one or the other!",
+			"Cannot compare VarVectorTranspose with a normal vector %v (%T); Try transposing one or the other!",
 			vec2, vec2,
 		),
 	) {
