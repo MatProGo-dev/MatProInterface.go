@@ -261,3 +261,26 @@ func CheckExtras(extras []interface{}) error {
 	// If extras has length 0, then return nil
 	return nil
 }
+
+/*
+CheckErrors
+Description:
+*/
+func CheckErrors(extras []error) error {
+	// Constants
+
+	// Check all of the extras to see if one of them contains an error
+	switch {
+	case len(extras) == 1:
+		return extras[0]
+
+	case len(extras) > 1:
+		return fmt.Errorf(
+			"did not expect to receive more than one element in 'extras' input; received %v",
+			len(extras),
+		)
+	}
+
+	// If extras has length 0, then return nil
+	return nil
+}
