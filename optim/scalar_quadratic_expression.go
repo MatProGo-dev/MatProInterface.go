@@ -267,32 +267,6 @@ func (qe ScalarQuadraticExpression) Plus(e interface{}, errors ...error) (Scalar
 
 }
 
-// // Mult multiplies the current expression to another and returns the
-// // resulting expression
-///*
-//Mult
-//Description:
-//	Mult multiplies the current expression to another and returns the
-//	resulting expression
-//*/
-//func (qe ScalarQuadraticExpression) Mult(c float64) (ScalarExpression, error) {
-//	// Create Output
-//	var newQE ScalarQuadraticExpression = ScalarQuadraticExpression{
-//		X: (qe).X,
-//	}
-//
-//	// Iterate through all of the rows and columns of Q
-//	newQE.Q.Scale(c, &qe.Q)
-//
-//	// Iterate through the linear coefficients
-//	newQE.L.ScaleVec(c, &qe.L)
-//
-//	// Update through the constant
-//	qe.C *= c
-//
-//	return qe, nil
-//}
-
 /*
 LessEq
 Description:
@@ -300,8 +274,9 @@ Description:
 	LessEq returns a less than or equal to (<=) constraint between the
 	current expression and another
 */
-func (qe ScalarQuadraticExpression) LessEq(other ScalarExpression) (ScalarConstraint, error) {
-	return qe.Comparison(other, SenseLessThanEqual)
+func (qe ScalarQuadraticExpression) LessEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+	// Input Processing
+	return qe.Comparison(rhsIn, SenseLessThanEqual, errors...)
 }
 
 /*
@@ -311,8 +286,8 @@ Description:
 	GreaterEq returns a greater than or equal to (>=) constraint between the
 	current expression and another
 */
-func (qe ScalarQuadraticExpression) GreaterEq(other ScalarExpression) (ScalarConstraint, error) {
-	return qe.Comparison(other, SenseGreaterThanEqual)
+func (qe ScalarQuadraticExpression) GreaterEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+	return qe.Comparison(rhsIn, SenseGreaterThanEqual, errors...)
 }
 
 /*
@@ -323,8 +298,8 @@ Description:
 	Eq returns an equality (==) constraint between the current expression
 	and another
 */
-func (qe ScalarQuadraticExpression) Eq(other ScalarExpression) (ScalarConstraint, error) {
-	return qe.Comparison(other, SenseEqual)
+func (qe ScalarQuadraticExpression) Eq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+	return qe.Comparison(rhsIn, SenseEqual, errors...)
 }
 
 /*
@@ -337,7 +312,13 @@ Usage:
 
 	constr, err := qe.Comparison(expr1,SenseGreaterThanEqual)
 */
-func (qe ScalarQuadraticExpression) Comparison(rhs ScalarExpression, sense ConstrSense) (ScalarConstraint, error) {
+func (qe ScalarQuadraticExpression) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (ScalarConstraint, error) {
+	// Input Processing
+	rhs, err := ToScalarExpression(rhsIn)
+	if err != nil {
+		return ScalarConstraint{}, err
+	}
+
 	return ScalarConstraint{qe, rhs, sense}, nil
 }
 

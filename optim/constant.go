@@ -89,20 +89,20 @@ func (c K) Plus(e interface{}, errors ...error) (ScalarExpression, error) {
 
 // LessEq returns a less than or equal to (<=) constraint between the
 // current expression and another
-func (c K) LessEq(other ScalarExpression) (ScalarConstraint, error) {
-	return c.Comparison(other, SenseLessThanEqual)
+func (c K) LessEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+	return c.Comparison(rhsIn, SenseLessThanEqual, errors...)
 }
 
 // GreaterEq returns a greater than or equal to (>=) constraint between the
 // current expression and another
-func (c K) GreaterEq(other ScalarExpression) (ScalarConstraint, error) {
-	return c.Comparison(other, SenseGreaterThanEqual)
+func (c K) GreaterEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+	return c.Comparison(rhsIn, SenseGreaterThanEqual, errors...)
 }
 
 // Eq returns an equality (==) constraint between the current expression
 // and another
-func (c K) Eq(other ScalarExpression) (ScalarConstraint, error) {
-	return c.Comparison(other, SenseEqual)
+func (c K) Eq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+	return c.Comparison(rhsIn, SenseEqual, errors...)
 }
 
 /*
@@ -111,7 +111,13 @@ Description:
 
 	This method compares the receiver with expression rhs in the sense provided by sense.
 */
-func (c K) Comparison(rhs ScalarExpression, sense ConstrSense) (ScalarConstraint, error) {
+func (c K) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (ScalarConstraint, error) {
+	// InputProcessing
+	rhs, err := ToScalarExpression(rhsIn)
+	if err != nil {
+		return ScalarConstraint{}, err
+	}
+
 	// Constants
 
 	// Algorithm

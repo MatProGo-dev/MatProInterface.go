@@ -139,20 +139,20 @@ func (sle ScalarLinearExpr) Plus(e interface{}, errors ...error) (ScalarExpressi
 
 // LessEq returns a less than or equal to (<=) constraint between the
 // current expression and another
-func (sle ScalarLinearExpr) LessEq(other ScalarExpression) (ScalarConstraint, error) {
-	return sle.Comparison(other, SenseLessThanEqual)
+func (sle ScalarLinearExpr) LessEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+	return sle.Comparison(rhsIn, SenseLessThanEqual, errors...)
 }
 
 // GreaterEq returns a greater than or equal to (>=) constraint between the
 // current expression and another
-func (sle ScalarLinearExpr) GreaterEq(other ScalarExpression) (ScalarConstraint, error) {
-	return sle.Comparison(other, SenseGreaterThanEqual)
+func (sle ScalarLinearExpr) GreaterEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+	return sle.Comparison(rhsIn, SenseGreaterThanEqual, errors...)
 }
 
 // Eq returns an equality (==) constraint between the current expression
 // and another
-func (sle ScalarLinearExpr) Eq(other ScalarExpression) (ScalarConstraint, error) {
-	return sle.Comparison(other, SenseEqual)
+func (sle ScalarLinearExpr) Eq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+	return sle.Comparison(rhsIn, SenseEqual, errors...)
 }
 
 /*
@@ -165,7 +165,13 @@ Usage:
 
 	constr, err := e.Comparison(expr1,SenseGreaterThanEqual)
 */
-func (sle ScalarLinearExpr) Comparison(rhs ScalarExpression, sense ConstrSense) (ScalarConstraint, error) {
+func (sle ScalarLinearExpr) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (ScalarConstraint, error) {
+	// Input Processing
+	rhs, err := ToScalarExpression(rhsIn)
+	if err != nil {
+		return ScalarConstraint{}, err
+	}
+
 	return ScalarConstraint{sle, rhs, sense}, nil
 }
 

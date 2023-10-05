@@ -1345,3 +1345,36 @@ func TestScalarQuadraticExpression_Coeffs1(t *testing.T) {
 		)
 	}
 }
+
+/*
+TestScalarQuadraticExpression_LessEq1
+Description:
+
+	Tests whether or not the LessEq function works properly
+*/
+func TestScalarQuadraticExpression_LessEq1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("testsqe_LessEq1")
+	N := 10
+	x := m.AddVariableVector(N)
+
+	qe1 := optim.ScalarQuadraticExpression{
+		Q: optim.Identity(N),
+		X: x,
+		L: optim.OnesVector(N),
+		C: 3.14,
+	}
+
+	// Create constraint
+	sc1, err := qe1.LessEq(1.0)
+	if err != nil {
+		t.Errorf("Unexpected error after running LessEq(): %v", err)
+	}
+
+	if sc1.Sense != optim.SenseLessThanEqual {
+		t.Errorf(
+			"Sense of the LessEq comparison is not SenseLessThanEqual; it's %v",
+			sc1.Sense,
+		)
+	}
+}
