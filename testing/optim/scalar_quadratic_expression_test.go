@@ -1611,7 +1611,7 @@ Description:
 */
 func TestScalarQuadraticExpression_Check1(t *testing.T) {
 	// Constants
-	m := optim.NewModel("testsqe_LessEq1")
+	m := optim.NewModel("testsqe_Check1")
 	N := 3
 	x := m.AddVariableVector(N)
 
@@ -1635,7 +1635,7 @@ func TestScalarQuadraticExpression_Check1(t *testing.T) {
 		fmt.Sprintf(
 			"The number of indices was %v which did not match the number of columns in QIn (%v).",
 			qe1.X.Len(),
-			N,
+			N-1,
 		),
 	) {
 		t.Errorf("Unexpected error occurred: %v", err)
