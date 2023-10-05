@@ -115,7 +115,7 @@ Description:
 	This member function computes the addition of the receiver vector var with the
 	incoming vector expression ve.
 */
-func (vv VarVector) Plus(e interface{}, extras ...interface{}) (VectorExpression, error) {
+func (vv VarVector) Plus(e interface{}, errors ...error) (VectorExpression, error) {
 	// Constants
 	vvLen := vv.Len()
 
@@ -201,7 +201,7 @@ Description:
 
 	Multiplication of a VarVector with another expression.
 */
-func (vv VarVector) Multiply(e interface{}, extras ...interface{}) (Expression, error) {
+func (vv VarVector) Multiply(e interface{}, errors ...error) (Expression, error) {
 	// TODO: Implement This!
 
 	switch eConverted := e.(type) {

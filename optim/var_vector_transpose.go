@@ -116,7 +116,7 @@ Description:
 	This member function computes the addition of the receiver vector var with the
 	incoming vector expression ve.
 */
-func (vvt VarVectorTranspose) Plus(eIn interface{}, extras ...interface{}) (VectorExpression, error) {
+func (vvt VarVectorTranspose) Plus(eIn interface{}, errors ...error) (VectorExpression, error) {
 	// Constants
 	vvLen := vvt.Len()
 
@@ -189,9 +189,9 @@ Description:
 
 	Multiplication of a VarVectorTranspose with another expression.
 */
-func (vvt VarVectorTranspose) Multiply(e interface{}, extras ...interface{}) (Expression, error) {
+func (vvt VarVectorTranspose) Multiply(e interface{}, errors ...error) (Expression, error) {
 	// Input Processing
-	err := CheckExtras(extras)
+	err := CheckErrors(errors)
 	if err != nil {
 		return vvt, err
 	}

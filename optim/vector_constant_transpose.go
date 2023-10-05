@@ -86,7 +86,7 @@ Description:
 
 	Adds the current expression to another and returns the resulting expression
 */
-func (kvt KVectorTranspose) Plus(eIn interface{}, extras ...interface{}) (VectorExpression, error) {
+func (kvt KVectorTranspose) Plus(eIn interface{}, errors ...error) (VectorExpression, error) {
 	// Constants
 	kvLen := kvt.Len()
 
@@ -276,9 +276,9 @@ Description:
 
 	This method is used to compute the multiplication of the input vector constant with another term.
 */
-func (kvt KVectorTranspose) Multiply(e interface{}, extras ...interface{}) (Expression, error) {
+func (kvt KVectorTranspose) Multiply(e interface{}, errors ...error) (Expression, error) {
 	// Input Processing
-	err := CheckExtras(extras)
+	err := CheckErrors(errors)
 	if err != nil {
 		return kvt, err
 	}

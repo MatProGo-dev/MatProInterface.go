@@ -778,6 +778,77 @@ func TestQuadraticExpr_Plus6(t *testing.T) {
 }
 
 /*
+TestQuadraticExpr_Plus7
+Description:
+
+	Tests whether or not the function returns a proper error
+	when an error is provided.
+*/
+func TestQuadraticExpr_Plus7(t *testing.T) {
+	// Constants
+	m := optim.NewModel("SQE_Plus7")
+	N := 10
+	sqe1 := optim.ScalarQuadraticExpression{
+		Q: optim.Identity(N),
+		L: optim.OnesVector(N),
+		X: m.AddVariableVector(N),
+		C: 3.14,
+	}
+
+	v := m.AddVariable()
+	err0 := fmt.Errorf("test")
+
+	// Use plus with a variable vector
+	_, err := sqe1.Plus(v, err0)
+	if err == nil {
+		t.Errorf("Expected error, but received none!")
+	}
+
+	if !strings.Contains(
+		err.Error(),
+		err0.Error(),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+/*
+TestQuadraticExpr_Plus8
+Description:
+
+	Tests whether or not the function returns a proper error when a bad input
+	is given.
+*/
+func TestQuadraticExpr_Plus8(t *testing.T) {
+	// Constants
+	m := optim.NewModel("SQE_Plus8")
+	N := 10
+	sqe1 := optim.ScalarQuadraticExpression{
+		Q: optim.Identity(N),
+		L: optim.OnesVector(N),
+		X: m.AddVariableVector(N),
+		C: 3.14,
+	}
+
+	b1 := false
+
+	// Use plus with a variable vector
+	_, err := sqe1.Plus(b1)
+	if err == nil {
+		t.Errorf("Expected error, but received none!")
+	}
+
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Unexpected type (%T) given as argument to Plus: %v.", b1, b1,
+		),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+/*
 TestQuadraticExpr_RewriteInTermsOfIndices1
 Description:
 
@@ -1225,4 +1296,52 @@ func TestQuadraticExpr_Multiply7(t *testing.T) {
 		t.Errorf("There was an unexpected error in multiply: %v", err)
 	}
 
+}
+
+/*
+TestScalarQuadraticExpression_Coeffs1
+Description:
+
+	Tests whether or not the scalar quadratic expression's coefficients
+	function works.
+*/
+func TestScalarQuadraticExpression_Coeffs1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("testsqe_coeffs1")
+	N := 10
+	x := m.AddVariableVector(N)
+
+	qe1 := optim.ScalarQuadraticExpression{
+		Q: optim.Identity(N),
+		X: x,
+		L: optim.OnesVector(N),
+		C: 3.14,
+	}
+
+	// Algorithm
+	c := qe1.Coeffs()
+	for rowIndex := 0; rowIndex < N; rowIndex++ {
+		for colIndex := 0; colIndex < N; colIndex++ {
+			if rowIndex == colIndex {
+				if c[rowIndex*N+colIndex] != 1.0 {
+					t.Errorf(
+						"Expected c[%v] = 1.0 (because it refers to Q[%v,%v]).",
+						rowIndex*N+colIndex,
+						rowIndex,
+						colIndex,
+					)
+				}
+			}
+
+		}
+	}
+
+	if len(c) != N*N+N+1 {
+		t.Errorf(
+			"Expected for coefficient vector to contain %v elements for SQE with X of length %v; received %v",
+			N*N+N+1,
+			N,
+			len(c),
+		)
+	}
 }

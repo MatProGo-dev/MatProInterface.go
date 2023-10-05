@@ -128,7 +128,7 @@ Description:
 
 	Multiplication of a VarVector with another expression.
 */
-func (vlet VectorLinearExpressionTranspose) Multiply(e interface{}, extras ...interface{}) (Expression, error) {
+func (vlet VectorLinearExpressionTranspose) Multiply(e interface{}, errors ...error) (Expression, error) {
 	// TODO: Implement This!
 
 	switch eConverted := e.(type) {
@@ -146,7 +146,7 @@ Description:
 
 	Returns an expression which adds the expression e to the vector linear expression at hand.
 */
-func (vle VectorLinearExpressionTranspose) Plus(e interface{}, extras ...interface{}) (VectorExpression, error) {
+func (vle VectorLinearExpressionTranspose) Plus(e interface{}, errors ...error) (VectorExpression, error) {
 	// Constants
 	vleLen := vle.Len()
 

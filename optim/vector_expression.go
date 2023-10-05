@@ -36,11 +36,11 @@ type VectorExpression interface {
 
 	// Plus adds the current expression to another and returns the resulting
 	// expression
-	Plus(e interface{}, extras ...interface{}) (VectorExpression, error)
+	Plus(e interface{}, errors ...error) (VectorExpression, error)
 
 	// Mult multiplies the current expression with another and returns the
 	// resulting expression
-	Multiply(e interface{}, extras ...interface{}) (Expression, error)
+	Multiply(e interface{}, errors ...error) (Expression, error)
 
 	// LessEq returns a less than or equal to (<=) constraint between the
 	// current expression and another
