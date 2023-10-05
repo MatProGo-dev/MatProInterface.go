@@ -98,7 +98,7 @@ func ToScalarExpression(e interface{}) (ScalarExpression, error) {
 	// Input Processing
 	if !IsScalarExpression(e) {
 		return K(1.0), fmt.Errorf(
-			"the input interface is of type %T, which is not recognized as a VectorExpression.",
+			"the input interface is of type %T, which is not recognized as a ScalarExpression.",
 			e,
 		)
 	}

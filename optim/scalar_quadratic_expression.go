@@ -319,6 +319,11 @@ func (qe ScalarQuadraticExpression) Comparison(rhsIn interface{}, sense ConstrSe
 		return ScalarConstraint{}, err
 	}
 
+	err = CheckErrors(errors)
+	if err != nil {
+		return ScalarConstraint{}, err
+	}
+
 	return ScalarConstraint{qe, rhs, sense}, nil
 }
 
@@ -357,17 +362,15 @@ func (qe ScalarQuadraticExpression) RewriteInTermsOf(newX VarVector) (ScalarQuad
 			oldQterm := qe.Q.At(oi1Index, oi2Index)
 
 			// Get the new indices corresponding to oi1 and oi2
-			ni1Index, err := FindInSlice(oldElt1, newX.Elements)
-			if err != nil {
+			ni1Index, _ := FindInSlice(oldElt1, newX.Elements)
+			if ni1Index == -1 {
 				return newQE, fmt.Errorf("The element %v was found in the old X indices, but it does not exist in the new ones!", oldElt1)
 			}
-			//newElt1 := newX.Elements[ni1Index]
 
-			ni2Index, err := FindInSlice(oldElt2, newX.Elements)
-			if err != nil {
+			ni2Index, _ := FindInSlice(oldElt2, newX.Elements)
+			if ni2Index == -1 {
 				return newQE, fmt.Errorf("The element %v was found in the old X indices, but it does not exist in the new ones!", oldElt2)
 			}
-			//newElt2 := newX.Elements[ni2Index]
 
 			// Plug the oldQterm into newQ
 			newQE.Q.Set(ni1Index, ni2Index, oldQterm)
@@ -383,11 +386,7 @@ func (qe ScalarQuadraticExpression) RewriteInTermsOf(newX VarVector) (ScalarQuad
 		oldLterm := qe.L.AtVec(oi1Index)
 
 		// Get the new indices corresponding to oi1 and oi2
-		ni1Index, err := FindInSlice(oldElt1, newX.Elements)
-		if err != nil {
-			return newQE, fmt.Errorf("The element %v was found in the old X, but it does not exist in the new ones!", oldElt1)
-		}
-		//newIndex1 := newXIndices[ni1Index]
+		ni1Index, _ := FindInSlice(oldElt1, newX.Elements) // No error handling or bad indexes should happen at this point.
 
 		// Plug the oldQterm into newQ
 		offset := ZerosVector(dimX)
