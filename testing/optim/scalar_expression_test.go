@@ -35,3 +35,63 @@ func TestScalarExpression_NewScalarExpression1(t *testing.T) {
 		)
 	}
 }
+
+/*
+TestScalarExpression_IsScalarExpression1
+Description:
+
+	Tests whether or not the IsScalarExpression function works on ScalarQuadraticExpression.
+*/
+func TestScalarExpression_IsScalarExpression1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("testse_IsScalarExpression1")
+	N := 10
+	x := m.AddVariableVector(N)
+
+	qe1 := optim.ScalarQuadraticExpression{
+		Q: optim.Identity(N),
+		X: x,
+		L: optim.OnesVector(N),
+		C: 3.14,
+	}
+
+	// Check
+	if !optim.IsScalarExpression(qe1) {
+		t.Errorf("ScalarQuadraticExpression is a scalar expression, but the toolbox does not think so!")
+	}
+}
+
+/*
+TestScalarExpression_ToScalarExpression1
+Description:
+
+	Tests how the conversion function ToScalarExpression() works on a
+	scalar quadratic expression.
+*/
+func TestScalarExpression_ToScalarExpression1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("testse_ToScalarExpression1")
+	N := 10
+	x := m.AddVariableVector(N)
+
+	qe1 := optim.ScalarQuadraticExpression{
+		Q: optim.Identity(N),
+		X: x,
+		L: optim.OnesVector(N),
+		C: 3.14,
+	}
+
+	// Algorithm
+	sqe2, err := optim.ToScalarExpression(qe1)
+	if err != nil {
+		t.Errorf("ToScalarExpression created an error: %v", err)
+	}
+
+	_, ok := sqe2.(optim.ScalarQuadraticExpression)
+	if !ok {
+		t.Errorf(
+			"sqe2 should be a ScalarQuadraticExpression, but it was %T",
+			sqe2,
+		)
+	}
+}
