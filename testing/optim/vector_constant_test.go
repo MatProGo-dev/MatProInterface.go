@@ -432,7 +432,7 @@ func TestKVector_Plus1(t *testing.T) {
 	// Algorithm
 	eOut, err := vec1.Plus(vec2)
 	if err != nil {
-		t.Errorf("There was an issue adding the two expression.")
+		t.Errorf("There was an issue adding the two expression: %v", err)
 	}
 
 	vec3, ok := eOut.(optim.KVector)
@@ -578,8 +578,10 @@ func TestKVector_Plus5(t *testing.T) {
 	if !strings.Contains(
 		err.Error(),
 		fmt.Sprintf(
-			"Length of vectors in sum do not match! Vectors have lengths %v and %v!",
-			vec1.Len(), vec2.Len(),
+			"KVector of shape (%v,1) dimension mismatch with %T of shape (%v,1)",
+			vec1.Len(),
+			optim.KVector(vec2),
+			vec2.Len(),
 		)) {
 		t.Errorf("The wrong error was detected! %v", err)
 	}
@@ -603,8 +605,10 @@ func TestKVector_Plus6(t *testing.T) {
 	if !strings.Contains(
 		err.Error(),
 		fmt.Sprintf(
-			"Length of vectors in sum do not match! Vectors have lengths %v and %v!",
-			vec1.Len(), vec2.Len(),
+			"KVector of shape (%v,1) dimension mismatch with %T of shape (%v,1)",
+			vec1.Len(),
+			vec2,
+			vec2.Len(),
 		)) {
 		t.Errorf("The wrong error was detected! %v", err)
 	}
