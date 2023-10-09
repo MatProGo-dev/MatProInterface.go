@@ -87,10 +87,14 @@ Description:
 	Adds the current expression to another and returns the resulting expression
 */
 func (kv KVector) Plus(eIn interface{}, errors ...error) (VectorExpression, error) {
+	// Input Processing
+	err := CheckErrors(errors)
+	if err != nil {
+		return kv, err
+	}
+
 	// Constants
 	kvLen := kv.Len()
-
-	// Extras Management
 
 	// Management
 	switch e := eIn.(type) {
@@ -305,6 +309,43 @@ func (kv KVector) Multiply(e interface{}, errors ...error) (Expression, error) {
 		eAsFloat := float64(eConverted)
 
 		return kv.Multiply(eAsFloat)
+	case Variable:
+		// Create a VectorLinearExpression Output
+		vv := VarVector{[]Variable{eConverted}}
+		L := ZerosMatrix(kv.Len(), 1)
+		for kIndex := 0; kIndex < kv.Len(); kIndex++ {
+			L.Set(kIndex, 0, float64(kv.AtVec(kIndex).(K)))
+		}
+
+		return VectorLinearExpr{
+			L: L,
+			X: vv,
+			C: ZerosVector(kv.Len()),
+		}, nil
+
+	case ScalarLinearExpr:
+		// Create a VectorLinearExpression to Output
+		L := ZerosMatrix(kv.Len(), eConverted.X.Len())
+		for rowIndex := 0; rowIndex < kv.Len(); rowIndex++ {
+			for colIndex := 0; colIndex < eConverted.X.Len(); colIndex++ {
+				L.Set(
+					rowIndex, colIndex,
+					eConverted.L.AtVec(colIndex)*float64(kv.AtVec(rowIndex).(K)),
+				)
+			}
+		}
+		C := ZerosVector(kv.Len())
+		for rowIndex := 0; rowIndex < kv.Len(); rowIndex++ {
+			C.SetVec(
+				rowIndex,
+				eConverted.C*float64(kv.AtVec(rowIndex).(K)),
+			)
+		}
+		return VectorLinearExpr{
+			L: L,
+			C: C,
+			X: eConverted.X.Copy(),
+		}, nil
 
 	case mat.VecDense:
 		// Send warning until we create matrix type.

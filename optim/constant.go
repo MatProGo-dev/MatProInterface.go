@@ -113,6 +113,11 @@ Description:
 */
 func (c K) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (ScalarConstraint, error) {
 	// InputProcessing
+	err := CheckErrors(errors)
+	if err != nil {
+		return ScalarConstraint{}, err
+	}
+
 	rhs, err := ToScalarExpression(rhsIn)
 	if err != nil {
 		return ScalarConstraint{}, err
@@ -134,49 +139,52 @@ func (c K) Multiply(term1 interface{}, errors ...error) (Expression, error) {
 	// Constants
 
 	// Input Processing
-	if len(errors) > 0 {
-		if errors[0] != nil {
-			return c, errors[0]
+	err := CheckErrors(errors)
+	if err != nil {
+		return c, err
+	}
+
+	if IsVectorExpression(term1) {
+		// Check dimensions
+		term1AsVE, _ := ToVectorExpression(term1)
+		if term1AsVE.Len() != 1 { // Dimension mismatch
+			return c, fmt.Errorf(
+				"cannot multiply constant %v of shape (1,1) with vector of shape (%v,1)",
+				c,
+				term1AsVE.Len(),
+			)
 		}
 	}
 
 	// Algorithm
-	switch term1.(type) {
+	switch term1Converted := term1.(type) {
 	case float64:
-		term1AsFloat, _ := term1.(float64)
-		return c.Multiply(K(term1AsFloat))
+		return c.Multiply(K(term1Converted))
 	case K:
-		term1AsK, _ := term1.(K)
-		return c * term1AsK, nil
+		return c * term1Converted, nil
 	case Variable:
-		// Cast
-		term1AsV, _ := term1.(Variable)
-
 		// Algorithm
-		term1AsSLE := term1AsV.ToScalarLinearExpression()
+		term1AsSLE := term1Converted.ToScalarLinearExpression()
 
 		return c.Multiply(term1AsSLE)
 	case ScalarLinearExpr:
-		// Cast
-		term1AsSLE, _ := term1.(ScalarLinearExpr)
-
 		// Scale all vectors and constants
-		sleOut := term1AsSLE.Copy()
+		sleOut := term1Converted.Copy()
 		sleOut.L.ScaleVec(float64(c), &sleOut.L)
-		sleOut.C = term1AsSLE.C * float64(c)
+		sleOut.C = term1Converted.C * float64(c)
 
 		return sleOut, nil
 	case ScalarQuadraticExpression:
-		// Cast
-		term1AsSQE, _ := term1.(ScalarQuadraticExpression)
-
 		// Scale all matrices and constants
 		var sqeOut ScalarQuadraticExpression
-		sqeOut.Q.Scale(float64(c), &term1AsSQE.Q)
-		sqeOut.L.ScaleVec(float64(c), &term1AsSQE.L)
-		sqeOut.C = float64(c) * term1AsSQE.C
+		sqeOut.Q.Scale(float64(c), &term1Converted.Q)
+		sqeOut.L.ScaleVec(float64(c), &term1Converted.L)
+		sqeOut.C = float64(c) * term1Converted.C
 
 		return sqeOut, nil
+	case KVector:
+		return term1Converted.Multiply(c)
+
 	default:
 		return K(0), fmt.Errorf("Unexpected type of term1 in the Multiply() method: %T (%v)", term1, term1)
 
