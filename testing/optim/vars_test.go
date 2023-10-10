@@ -1,6 +1,7 @@
 package optim_test
 
 import (
+	"fmt"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"strings"
 	"testing"
@@ -11,6 +12,50 @@ vars_test.go
 Description:
 	Testing functions relevant to the Var() object. (Scalar Variable)
 */
+
+/*
+TestVar_NumVars1
+Description:
+
+	Tests whether or not NumVars returns 1 for a single variable.
+*/
+func TestVar_NumVars1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("NumVars1")
+	x := m.AddVariable()
+
+	// Test
+	if x.NumVars() != 1 {
+		t.Errorf(
+			"The number of variables in a %T should be 1; received %v",
+			x,
+			x.NumVars(),
+		)
+	}
+
+}
+
+/*
+TestVar_Constant1
+Description:
+
+	Tests whether or not NumVars returns 0 as the constant included in the a single variable.
+*/
+func TestVar_Constant1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Var-Constant1")
+	x := m.AddVariable()
+
+	// Test
+	if x.Constant() != 0.0 {
+		t.Errorf(
+			"The number of variables in a %T should be 1; received %v",
+			x,
+			x.NumVars(),
+		)
+	}
+
+}
 
 /*
 TestVar_Plus1
@@ -282,6 +327,81 @@ func TestVar_Plus4(t *testing.T) {
 	// Checking Constant terms
 	if sumAsSLE.C != qe1.C {
 		t.Errorf("Expected sum's constant to be %v; received %v.", qe1.C, sumAsSLE.C)
+	}
+}
+
+/*
+TestVar_Plus5
+Description:
+
+	Tests that the Plus method properly throws an error.
+*/
+func TestVar_Plus5(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Plus1")
+	x := m.AddVariable()
+
+	k1 := optim.K(1.0)
+	err0 := fmt.Errorf("Test")
+
+	// Algorithm
+	_, err := x.Plus(k1, err0)
+	if err == nil {
+		t.Errorf("There was not an error, when we expected!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			err0.Error(),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestVar_Plus6
+Description:
+
+	Tests the approach of performing addition of a var with a var
+	when the var is the same.
+*/
+func TestVar_Plus6(t *testing.T) {
+	// Constants
+	m := optim.NewModel("Plus2")
+	x := m.AddVariable()
+
+	// Algorithm
+	tempSum, err := x.Plus(x)
+	if err != nil {
+		t.Errorf("There was an issue computing sum: %v", err)
+	}
+
+	sumAsSLE, ok1 := tempSum.(optim.ScalarLinearExpr)
+	if !ok1 {
+		t.Errorf("The sum is expected to be a ScalarLinearExpression but it was not! (Type = %T)", tempSum)
+	}
+
+	if sumAsSLE.X.Len() != 1 {
+		t.Errorf("Expected sum to have scalar variable, but found %v items.", sumAsSLE.X.Len())
+	}
+
+	if sumAsSLE.X.AtVec(0).(optim.Variable).ID != x.ID {
+		t.Errorf(
+			"Expected scalar variable (ID %v) to have same ID as x's ID (%v), but they are different.",
+			sumAsSLE.X.AtVec(0).(optim.Variable).ID,
+			x.ID,
+		)
+	}
+
+	if sumAsSLE.L.AtVec(0) != 2.0 {
+		t.Errorf(
+			"Expected L[0] = 2.0; received %v",
+			sumAsSLE.L.AtVec(0),
+		)
+	}
+
+	if sumAsSLE.C != 0.0 {
+		t.Errorf("Expected sum's constant to be %v; received %v.", 0.0, sumAsSLE.C)
 	}
 }
 
