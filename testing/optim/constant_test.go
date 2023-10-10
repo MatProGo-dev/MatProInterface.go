@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"gonum.org/v1/gonum/mat"
+	"strings"
 	"testing"
 )
 
@@ -495,6 +496,83 @@ func TestK_Eq1(t *testing.T) {
 }
 
 /*
+TestK_Comparison1
+Description:
+
+	Tests the comparison method's error handling properties.
+*/
+func TestK_Comparison1(t *testing.T) {
+	// Constants
+	k1 := optim.K(2.3)
+	f2 := 2.18
+	err0 := fmt.Errorf("Test")
+
+	// Comparison
+	_, err := k1.Comparison(f2, optim.SenseGreaterThanEqual, err0)
+	if err == nil {
+		t.Errorf("No error was thrown, when it should have been")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			err0.Error(),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestK_Comparison2
+Description:
+
+	Tests the comparison method's error handling properties
+	with nil error.
+*/
+func TestK_Comparison2(t *testing.T) {
+	// Constants
+	k1 := optim.K(2.3)
+	f2 := 2.18
+	var err0 error = nil
+
+	// Comparison
+	_, err := k1.Comparison(f2, optim.SenseGreaterThanEqual, err0)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+}
+
+/*
+TestK_Comparison3
+Description:
+
+	Tests the comparison method's error handling properties.
+*/
+func TestK_Comparison3(t *testing.T) {
+	// Constants
+	k1 := optim.K(2.3)
+	kv1 := optim.KVector(optim.OnesVector(10))
+
+	// Comparison
+	_, err := k1.Comparison(kv1, optim.SenseGreaterThanEqual)
+	if err == nil {
+		t.Errorf("There were no errors, but there should have been!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf(
+				"the input interface is of type %T, which is not recognized as a ScalarExpression.",
+				kv1,
+			),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
 TestK_Multiply1
 Description:
 
@@ -676,5 +754,125 @@ func TestK_Multiply4(t *testing.T) {
 				)
 			}
 		}
+	}
+}
+
+/*
+TestK_Multiply5
+Description:
+
+	Tests the ability to multiply a constant with another constant,
+	but with a bad error.
+*/
+func TestK_Multiply5(t *testing.T) {
+	// Constants
+	c1 := optim.K(3.14)
+	c2 := optim.K(6.86)
+	err0 := fmt.Errorf("Test")
+
+	// Algorithm
+	_, err := c1.Multiply(c2, err0)
+	if err == nil {
+		t.Errorf("There was not an error, but there should have been!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			err0.Error(),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestK_Multiply6
+Description:
+
+	Tests the ability to multiply a constant with a constant vector.
+*/
+func TestK_Multiply6(t *testing.T) {
+	// Constants
+	c1 := optim.K(3.14)
+	kv2 := optim.KVector(optim.OnesVector(21))
+
+	// Algorithm
+	_, err := c1.Multiply(kv2)
+	if err == nil {
+		t.Errorf("There was not an error, but there should have been!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf(
+				"cannot multiply constant %v of shape (1,1) with vector of shape (%v,1)",
+				c1,
+				kv2.Len(),
+			),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestK_Multiply7
+Description:
+
+Tests the ability to multiply a constant with a float.
+*/
+func TestK_Multiply7(t *testing.T) {
+	// Constants
+	c1 := optim.K(3.14)
+	f2 := 6.86
+
+	// Algorithm
+	expr1, err := c1.Multiply(f2)
+	if err != nil {
+		t.Errorf("There was an issue multiplying two constants: %v", err)
+	}
+
+	expr1AsK, ok := expr1.(optim.K)
+	if !ok {
+		t.Errorf("There was an issue converting the product to a constant!")
+	}
+
+	if float64(expr1AsK) != 3.14*f2 {
+		t.Errorf(
+			"Expected product to have value %v; received %v",
+			3.14*6.86,
+			expr1AsK,
+		)
+	}
+}
+
+/*
+TestK_Multiply8
+Description:
+
+Tests the ability to multiply a constant with a float.
+*/
+func TestK_Multiply8(t *testing.T) {
+	// Constants
+	c1 := optim.K(3.14)
+	kv2 := optim.KVector(optim.OnesVector(1))
+
+	// Algorithm
+	expr1, err := c1.Multiply(kv2)
+	if err != nil {
+		t.Errorf("There was an issue multiplying two constants: %v", err)
+	}
+
+	expr1AsKV, ok := expr1.(optim.KVector)
+	if !ok {
+		t.Errorf("There was an issue converting the product to a constant!")
+	}
+
+	if float64(expr1AsKV.AtVec(0).(optim.K)) != 3.14*1.0 {
+		t.Errorf(
+			"Expected product to have value %v; received %v",
+			3.14*1.0,
+			expr1AsKV.AtVec(0),
+		)
 	}
 }

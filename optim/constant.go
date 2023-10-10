@@ -52,21 +52,10 @@ func (c K) Constant() float64 {
 // Plus adds the current expression to another and returns the resulting
 // expression
 func (c K) Plus(e interface{}, errors ...error) (ScalarExpression, error) {
-	// TODO: Create input processing to:
-	// 			- process errors in the extras slice
-	//			- address extra input expressions in extras
-
 	// Input Processing
-	switch {
-	case len(errors) > 2:
-		return K(INFINITY), fmt.Errorf(
-			"We expect for there to be at most one error! Received %v!",
-			len(errors),
-		)
-	case len(errors) == 1:
-		if errors[0] != nil {
-			return K(INFINITY), errors[0]
-		}
+	err := CheckErrors(errors)
+	if err != nil {
+		return c, err
 	}
 
 	// Switching based on input type
