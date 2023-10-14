@@ -1111,6 +1111,66 @@ func TestKVectorTranspose_Multiply5(t *testing.T) {
 }
 
 /*
+TestKVectorTranspose_Multiply6
+Description:
+
+	Tests that the multiplication function works as expected when a bad error is provided.
+*/
+func TestKVectorTranspose_Multiply6(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
+	f2 := 3.1
+	err0 := fmt.Errorf("Test")
+
+	// Algorithm
+	_, err := vec1.Multiply(f2, err0)
+	if err == nil {
+		t.Errorf("Expected an error, but received none!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			err0.Error(),
+		) {
+			t.Errorf("Unexpected output of err! %v", err)
+		}
+	}
+
+}
+
+/*
+TestKVectorTranspose_Multiply7
+Description:
+
+	Tests that the multiplication function works as expected when a vector of the wrong length is provided.
+*/
+func TestKVectorTranspose_Multiply7(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
+	vec2 := optim.KVector(optim.OnesVector(desLength - 1))
+
+	// Algorithm
+	_, err := vec1.Multiply(vec2)
+	if err == nil {
+		t.Errorf("Expected an error, but received none!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf(
+				"KVectorTranspose of length %v can not be multiplied with a %T of different length (%v).",
+				vec1.Len(),
+				vec2,
+				vec2.Len(),
+			),
+		) {
+			t.Errorf("Unexpected output of err! %v", err)
+		}
+	}
+
+}
+
+/*
 TestKVectorTranspose_Transpose1
 Description:
 
