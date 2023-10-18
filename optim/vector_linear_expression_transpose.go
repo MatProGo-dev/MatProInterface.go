@@ -8,7 +8,6 @@ Description:
 
 import (
 	"fmt"
-	mpiErrors "github.com/MatProGo-dev/MatProInterface.go/errors"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -148,18 +147,26 @@ func (vlet VectorLinearExpressionTranspose) Multiply(e interface{}, errors ...er
 		}
 	}
 
+	if IsScalarExpression(e) {
+		// Check to see if the dimension is 1
+		se, _ := ToScalarExpression(e)
+		if vlet.Len() != 1 {
+			return vlet, DimensionError{
+				Operation: "Multiply",
+				Arg1:      vlet,
+				Arg2:      se,
+			}
+		}
+	}
+
 	switch eConverted := e.(type) {
 	case float64:
-		if vlet.Len() != 1 {
-			return vlet, mpiErrors.DimensionError{
-				Operation: "Multiply",
-				Arg1Dims:  vlet.Dims(),
-				Arg2Dims:  K(eConverted).Dims(),
-			}
-		} else {
-			eAsK := K(eConverted)
-			return eAsK.Multiply(vlet)
-		}
+		eAsK := K(eConverted)
+		return eAsK.Multiply(vlet)
+	case K:
+		return eConverted.Multiply(vlet)
+	case Variable:
+		return eConverted.Multiply(vlet)
 
 	default:
 		return vlet, fmt.Errorf(
