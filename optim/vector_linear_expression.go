@@ -539,3 +539,13 @@ func (vle VectorLinearExpr) Copy() VectorLinearExpr {
 	out.X = vle.X.Copy()
 	return out
 }
+
+/*
+Dims
+Description:
+
+	This method returns the dimensions of the KVectorTranspose object.
+*/
+func (vle VectorLinearExpr) Dims() []uint64 {
+	return []uint64{uint64(vle.Len()), 1}
+}

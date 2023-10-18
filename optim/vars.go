@@ -366,3 +366,13 @@ func (v Variable) ToScalarLinearExpression() ScalarLinearExpr {
 		C: 0,
 	}
 }
+
+/*
+Dims
+Description:
+
+	Returns the dimension of the Variable object (should be scalar).
+*/
+func (v Variable) Dims() []uint64 {
+	return []uint64{1, 1}
+}

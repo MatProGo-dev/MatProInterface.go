@@ -129,9 +129,38 @@ Description:
 	Multiplication of a VarVector with another expression.
 */
 func (vlet VectorLinearExpressionTranspose) Multiply(e interface{}, errors ...error) (Expression, error) {
-	// TODO: Implement This!
+	// Input Processing
+	err := CheckErrors(errors)
+	if err != nil {
+		return vlet, err
+	}
+
+	if IsVectorExpression(e) {
+		// Check dimensions
+		ve, _ := ToVectorExpression(e)
+		if ve.Len() != vlet.Len() {
+			return vlet, fmt.Errorf(
+				"dimension of VectorLinearExpressionTranspose %v does not match the vector expression's dimension %v",
+				vlet.Len(),
+				ve.Len(),
+			)
+		}
+	}
 
 	switch eConverted := e.(type) {
+	case float64:
+		if vlet.Len() != 1 {
+			//return vlet, mpiErrors.DimensionError{
+			//	Operation:        "Multiply",
+			//	DimensionsOfArg1: []int{1, vlet.Len()},
+			//	DimensionsOfArg2: []int{1, 1},
+			//}
+			return vlet, nil
+		} else {
+			eAsK := K(eConverted)
+			return eAsK.Multiply(vlet)
+		}
+
 	default:
 		return vlet, fmt.Errorf(
 			"The input to VarVector's Multiply() method (%v) has unexpected type: %T",
@@ -286,8 +315,8 @@ Description:
 	Creates a constraint between the current vector linear expression v and the
 	rhs given by rhs.
 */
-func (vle VectorLinearExpressionTranspose) Eq(rhs interface{}) (VectorConstraint, error) {
-	return vle.Comparison(rhs, SenseEqual)
+func (vlet VectorLinearExpressionTranspose) Eq(rhs interface{}) (VectorConstraint, error) {
+	return vlet.Comparison(rhs, SenseEqual)
 }
 
 /*
@@ -296,11 +325,11 @@ Description:
 
 	The size of the constraint.
 */
-func (vle VectorLinearExpressionTranspose) Len() int {
+func (vlet VectorLinearExpressionTranspose) Len() int {
 	// Constants
 
 	// Algorithm
-	return vle.C.Len()
+	return vlet.C.Len()
 }
 
 /*
@@ -310,15 +339,15 @@ Description:
 	Compares the input vector linear expression with respect to the expression rhsIn and the sense
 	senseIn.
 */
-func (vle VectorLinearExpressionTranspose) Comparison(rhs interface{}, sense ConstrSense) (VectorConstraint, error) {
+func (vlet VectorLinearExpressionTranspose) Comparison(rhs interface{}, sense ConstrSense) (VectorConstraint, error) {
 	// Constants
 
 	// Check Input
-	err := vle.Check()
+	err := vlet.Check()
 	if err != nil {
 		return VectorConstraint{}, fmt.Errorf(
 			"There was an issue in the provided vector linear expression %v: %v",
-			vle, err,
+			vlet, err,
 		)
 	}
 
@@ -332,15 +361,15 @@ func (vle VectorLinearExpressionTranspose) Comparison(rhs interface{}, sense Con
 			)
 	case KVectorTranspose:
 		// Check length of input and output.
-		if rhsConverted.Len() != vle.Len() {
+		if rhsConverted.Len() != vlet.Len() {
 			return VectorConstraint{},
 				fmt.Errorf(
 					"The two vector inputs to Eq() must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
-					vle.Len(),
+					vlet.Len(),
 					rhsConverted.Len(),
 				)
 		}
-		return VectorConstraint{vle, rhsConverted, sense}, nil
+		return VectorConstraint{vlet, rhsConverted, sense}, nil
 	case mat.VecDense:
 		return VectorConstraint{},
 			fmt.Errorf(
@@ -355,15 +384,15 @@ func (vle VectorLinearExpressionTranspose) Comparison(rhs interface{}, sense Con
 			)
 	case VarVectorTranspose:
 		// Check length of input and output.
-		if rhsConverted.Len() != vle.Len() {
+		if rhsConverted.Len() != vlet.Len() {
 			return VectorConstraint{},
 				fmt.Errorf(
 					"The two vector inputs to Eq() must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
-					vle.Len(),
+					vlet.Len(),
 					rhsConverted.Len(),
 				)
 		}
-		return VectorConstraint{vle, rhsConverted, sense}, nil
+		return VectorConstraint{vlet, rhsConverted, sense}, nil
 	case VectorLinearExpr:
 		return VectorConstraint{},
 			fmt.Errorf(
@@ -372,18 +401,18 @@ func (vle VectorLinearExpressionTranspose) Comparison(rhs interface{}, sense Con
 			)
 	case VectorLinearExpressionTranspose:
 		// Check length of input and output.
-		if rhsConverted.Len() != vle.Len() {
+		if rhsConverted.Len() != vlet.Len() {
 			return VectorConstraint{},
 				fmt.Errorf(
 					"The two vector inputs to Eq() must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
-					vle.Len(),
+					vlet.Len(),
 					rhsConverted.Len(),
 				)
 		}
-		return VectorConstraint{vle, rhsConverted, sense}, nil
+		return VectorConstraint{vlet, rhsConverted, sense}, nil
 
 	default:
-		return VectorConstraint{}, fmt.Errorf("The comparison of vector linear expression %v with object of type %T is not currently supported.", vle, rhs)
+		return VectorConstraint{}, fmt.Errorf("The comparison of vector linear expression %v with object of type %T is not currently supported.", vlet, rhs)
 	}
 }
 
@@ -398,33 +427,33 @@ Assumes:
 	vv contains all unique variables.
 	All elements of vle.X are in vv.
 */
-func (vle VectorLinearExpressionTranspose) RewriteInTermsOf(vv VarVector) VectorLinearExpressionTranspose {
+func (vlet VectorLinearExpressionTranspose) RewriteInTermsOf(vv VarVector) VectorLinearExpressionTranspose {
 	// Constants
 
 	// Create new empty vle
-	vleOut := VectorLinearExpressionTranspose{
-		L: ZerosMatrix(vle.Len(), vv.Len()),
+	vletOut := VectorLinearExpressionTranspose{
+		L: ZerosMatrix(vlet.Len(), vv.Len()),
 		X: vv,
-		C: vle.C,
+		C: vlet.C,
 	}
 
 	// Create new L
-	nR, _ := vleOut.L.Dims()
-	for xIndex, tempVar := range vle.X.Elements {
+	nR, _ := vletOut.L.Dims()
+	for xIndex, tempVar := range vlet.X.Elements {
 		// Identify new index of x
-		xIndexInVV, _ := FindInSlice(tempVar, vleOut.X.Elements)
+		xIndexInVV, _ := FindInSlice(tempVar, vletOut.X.Elements)
 
 		// Change all columns
 		for rowI := 0; rowI < nR; rowI++ {
-			vleOut.L.Set(
+			vletOut.L.Set(
 				rowI, xIndexInVV,
-				vle.L.At(rowI, xIndex),
+				vlet.L.At(rowI, xIndex),
 			)
 		}
 	}
 
 	// Return new vle
-	return vleOut
+	return vletOut
 
 }
 
@@ -432,16 +461,16 @@ func (vle VectorLinearExpressionTranspose) RewriteInTermsOf(vv VarVector) Vector
 AtVec
 Description:
 */
-func (vle VectorLinearExpressionTranspose) AtVec(idx int) ScalarExpression {
+func (vlet VectorLinearExpressionTranspose) AtVec(idx int) ScalarExpression {
 	// Constants
-	Li := vle.L.RowView(idx)
+	Li := vlet.L.RowView(idx)
 	LiAsVecDense := Li.(*mat.VecDense)
 
 	// Cast
 	sleOut := ScalarLinearExpr{
 		L: *LiAsVecDense,
-		X: vle.X,
-		C: vle.C.AtVec(idx),
+		X: vlet.X,
+		C: vlet.C.AtVec(idx),
 	}
 
 	return sleOut
@@ -454,10 +483,21 @@ Description:
 
 	This method creates the transpose of the current vector and returns it.
 */
-func (vle VectorLinearExpressionTranspose) Transpose() VectorExpression {
+func (vlet VectorLinearExpressionTranspose) Transpose() VectorExpression {
 	return VectorLinearExpr{
-		L: vle.L,
-		X: vle.X.Copy(),
-		C: vle.C,
+		L: vlet.L,
+		X: vlet.X.Copy(),
+		C: vlet.C,
 	}
+}
+
+/*
+Dims
+Description:
+
+	Returns the dimensions of the VectorLinearExpressionTranspose
+	object.
+*/
+func (vlet VectorLinearExpressionTranspose) Dims() []uint64 {
+	return []uint64{1, uint64(vlet.Len())}
 }

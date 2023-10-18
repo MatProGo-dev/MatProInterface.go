@@ -174,8 +174,18 @@ func (c K) Multiply(term1 interface{}, errors ...error) (Expression, error) {
 	case KVector:
 		return term1Converted.Multiply(c)
 
+	case VectorLinearExpressionTranspose:
+		var vletOut VectorLinearExpressionTranspose
+		vletOut.L.Scale(float64(c), &term1Converted.L)
+		vletOut.C.ScaleVec(float64(c), &term1Converted.C)
+
+		return vletOut, nil
 	default:
 		return K(0), fmt.Errorf("Unexpected type of term1 in the Multiply() method: %T (%v)", term1, term1)
 
 	}
+}
+
+func (c K) Dims() []uint64 {
+	return []uint64{1, 1} // Signifies scalar
 }

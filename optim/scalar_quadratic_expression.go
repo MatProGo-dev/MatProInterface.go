@@ -457,3 +457,7 @@ func (qe ScalarQuadraticExpression) Multiply(val interface{}, errors ...error) (
 		return qe, fmt.Errorf("Unexpected type of input to Multiply(): %T", val)
 	}
 }
+
+func (qe ScalarQuadraticExpression) Dims() []uint64 {
+	return []uint64{1, 1}
+}

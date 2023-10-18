@@ -350,3 +350,13 @@ func (vv VarVector) Transpose() VectorExpression {
 	vvCopy := vv.Copy()
 	return VarVectorTranspose(vvCopy)
 }
+
+/*
+Dims
+Description:
+
+	Dimensions of the variable vector.
+*/
+func (vv VarVector) Dims() []uint64 {
+	return []uint64{uint64(vv.Len()), 1}
+}

@@ -25,6 +25,9 @@ type Expression interface {
 	// Vars returns a slice of the Var ids in the expression
 	IDs() []uint64
 
+	// Dims returns a slice describing the true dimensions of a given expression (scalar, vector, or matrix)
+	Dims() []uint64
+
 	//// Plus adds the current expression to another and returns the resulting
 	//// expression
 	// Plus(e Expression, extras interface{}) (Expression, error)

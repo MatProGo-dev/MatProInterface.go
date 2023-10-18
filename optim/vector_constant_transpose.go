@@ -369,3 +369,13 @@ Description:
 func (kvt KVectorTranspose) Transpose() VectorExpression {
 	return KVector(kvt)
 }
+
+/*
+Dims
+Description:
+
+	This method returns the dimensions of the KVectorTranspose object.
+*/
+func (kvt KVectorTranspose) Dims() []uint64 {
+	return []uint64{1, uint64(kvt.Len())}
+}
