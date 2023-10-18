@@ -414,6 +414,6 @@ Description:
 
 	Returns the dimension of the constant vector.
 */
-func (kv KVector) Dims() []uint64 {
-	return []uint64{uint64(kv.Len()), 1}
+func (kv KVector) Dims() []uint {
+	return []uint{uint(kv.Len()), 1}
 }

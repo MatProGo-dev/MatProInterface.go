@@ -186,6 +186,6 @@ func (c K) Multiply(term1 interface{}, errors ...error) (Expression, error) {
 	}
 }
 
-func (c K) Dims() []uint64 {
-	return []uint64{1, 1} // Signifies scalar
+func (c K) Dims() []uint {
+	return []uint{1, 1} // Signifies scalar
 }

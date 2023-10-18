@@ -376,6 +376,6 @@ Description:
 
 	This method returns the dimensions of the KVectorTranspose object.
 */
-func (kvt KVectorTranspose) Dims() []uint64 {
-	return []uint64{1, uint64(kvt.Len())}
+func (kvt KVectorTranspose) Dims() []uint {
+	return []uint{1, uint(kvt.Len())}
 }

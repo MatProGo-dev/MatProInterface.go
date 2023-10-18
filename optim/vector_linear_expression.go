@@ -546,6 +546,6 @@ Description:
 
 	This method returns the dimensions of the KVectorTranspose object.
 */
-func (vle VectorLinearExpr) Dims() []uint64 {
-	return []uint64{uint64(vle.Len()), 1}
+func (vle VectorLinearExpr) Dims() []uint {
+	return []uint{uint(vle.Len()), 1}
 }
