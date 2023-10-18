@@ -51,6 +51,10 @@ type ScalarExpression interface {
 	//Multiply
 	// Multiplies the given scalar expression with another expression
 	Multiply(term1 interface{}, errors ...error) (Expression, error)
+
+	//Dims
+	// Returns the dimensions of the scalar expression (should always be 1,1)
+	Dims() []uint
 }
 
 // NewExpr returns a new expression with a single additive constant value, c,

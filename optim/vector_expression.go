@@ -67,6 +67,9 @@ type VectorExpression interface {
 
 	//Transpose returns the transpose of the given vector expression
 	Transpose() VectorExpression
+
+	// Dims returns the dimensions of the given expression
+	Dims() []uint
 }
 
 /*
