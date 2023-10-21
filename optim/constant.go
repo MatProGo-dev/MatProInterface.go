@@ -2,6 +2,7 @@ package optim
 
 import (
 	"fmt"
+	"gonum.org/v1/gonum/mat"
 )
 
 // Integer constants represnting commonly used numbers. Makes for better
@@ -136,12 +137,12 @@ func (c K) Multiply(term1 interface{}, errors ...error) (Expression, error) {
 	if IsVectorExpression(term1) {
 		// Check dimensions
 		term1AsVE, _ := ToVectorExpression(term1)
-		if term1AsVE.Len() != 1 { // Dimension mismatch
-			return c, fmt.Errorf(
-				"cannot multiply constant %v of shape (1,1) with vector of shape (%v,1)",
-				c,
-				term1AsVE.Len(),
-			)
+		if term1AsVE.Dims()[0] != 1 { // Dimension mismatch
+			return c, DimensionError{
+				Operation: "Multiply",
+				Arg1:      c,
+				Arg2:      term1AsVE,
+			}
 		}
 	}
 
@@ -172,12 +173,47 @@ func (c K) Multiply(term1 interface{}, errors ...error) (Expression, error) {
 
 		return sqeOut, nil
 	case KVector:
-		return term1Converted.Multiply(c)
+		var prod mat.VecDense = ZerosVector(term1Converted.Len())
+		term1AsVecDense := mat.VecDense(term1Converted)
 
+		prod.ScaleVec(float64(c), &term1AsVecDense)
+
+		return KVector(prod), nil
+	case KVectorTranspose:
+		var prod mat.VecDense = ZerosVector(term1Converted.Len())
+		term1AsVecDense := mat.VecDense(term1Converted)
+
+		prod.ScaleVec(float64(c), &term1AsVecDense)
+
+		return KVectorTranspose(prod), nil
+	case VarVector:
+		var vleOut VectorLinearExpr
+		vleOut.X = term1Converted.Copy()
+		tempIdentity := Identity(term1Converted.Len()) // Is this needed?
+		vleOut.L.Scale(float64(c), &tempIdentity)
+		vleOut.C = ZerosVector(term1Converted.Len())
+
+		return vleOut, nil
+	case VarVectorTranspose:
+		var vleOut VectorLinearExpressionTranspose
+		vleOut.X = term1Converted.Transpose().Copy()
+		tempIdentity := Identity(term1Converted.Len()) // Is this needed?
+		vleOut.L.Scale(float64(c), &tempIdentity)
+		vleOut.C = ZerosVector(term1Converted.Len())
+
+		return vleOut, nil
+	case VectorLinearExpr:
+		var vleOut VectorLinearExpr
+		vleOut.L.Scale(float64(c), &term1Converted.L)
+		vleOut.C.ScaleVec(float64(c), &term1Converted.C)
+		vleOut.X = term1Converted.X.Copy()
+
+		return vleOut, nil
 	case VectorLinearExpressionTranspose:
 		var vletOut VectorLinearExpressionTranspose
 		vletOut.L.Scale(float64(c), &term1Converted.L)
 		vletOut.C.ScaleVec(float64(c), &term1Converted.C)
+		vletOut.X = term1Converted.X.Copy()
 
 		return vletOut, nil
 	default:

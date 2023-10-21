@@ -234,59 +234,54 @@ Description:
 
 	multiplies the current expression to another and returns the resulting expression
 */
-func (sle ScalarLinearExpr) Multiply(val interface{}, errors ...error) (Expression, error) {
-	// Constants
+func (sle ScalarLinearExpr) Multiply(rightInput interface{}, errors ...error) (Expression, error) {
+	// Input Processing
+	err := CheckErrors(errors)
+	if err != nil {
+		return sle, err
+	}
 
-	// TODO[Kwesi]: Build input processing logic here
+	if IsVectorExpression(rightInput) {
+		rightInputAsVE, _ := ToVectorExpression(rightInput)
+		if rightInputAsVE.Dims()[0] != 1 {
+			return sle, DimensionError{
+				Operation: "Multiply",
+				Arg1:      sle,
+				Arg2:      rightInputAsVE,
+			}
+		}
+	}
 
 	// Algorithm
-	switch val.(type) {
+	switch right := rightInput.(type) {
 	case float64:
-		// Cast
-		cAsFloat := val.(float64)
-
-		cAsK := K(cAsFloat)
-		// Compute
-		return cAsK.Multiply(sle)
-
+		rightAsK := K(right)
+		return rightAsK.Multiply(sle)
 	case K:
-		// Cast variable
-		cAsK := val.(K)
-
-		// Compute
-		return cAsK.Multiply(sle)
-
+		return right.Multiply(sle)
 	case Variable:
-		// Cast
-		valAsVar := val.(Variable)
-
-		// Compute
-		return valAsVar.Multiply(sle)
-
+		return right.Multiply(sle)
 	case ScalarLinearExpr:
-		// Cast
-		valAsSLE := val.(ScalarLinearExpr)
-
 		// Algorithm
 		sqeOut := ScalarQuadraticExpression{
 			X: VarVector{
-				UniqueVars(append(valAsSLE.X.Elements, sle.X.Elements...)),
+				UniqueVars(append(right.X.Elements, sle.X.Elements...)),
 			},
-			C: valAsSLE.C * sle.C,
+			C: right.C * sle.C,
 		}
 		sqeOut.Q = ZerosMatrix(sqeOut.X.Len(), sqeOut.X.Len())
 		sqeOut.L = ZerosVector(sqeOut.X.Len())
 
 		// Update Q
 		for xIndex1 := 0; xIndex1 < sle.X.Len(); xIndex1++ {
-			for xIndex2 := 0; xIndex2 < valAsSLE.X.Len(); xIndex2++ {
+			for xIndex2 := 0; xIndex2 < right.X.Len(); xIndex2++ {
 				// Get x1 and x2
 				x1 := sle.X.AtVec(xIndex1)
-				x2 := valAsSLE.X.AtVec(xIndex2)
+				x2 := right.X.AtVec(xIndex2)
 
 				// Find coefficients associated with x1 and x2 in
 				coeff1 := sle.L.AtVec(xIndex1)
-				coeff2 := valAsSLE.L.AtVec(xIndex2)
+				coeff2 := right.L.AtVec(xIndex2)
 
 				// Place product into Q matrix
 				x1LocInSQEOut, _ := FindInSlice(x1, sqeOut.X.Elements)
@@ -317,30 +312,66 @@ func (sle ScalarLinearExpr) Multiply(val interface{}, errors ...error) (Expressi
 			x1LocInSQEOut, _ := FindInSlice(x1, sqeOut.X.Elements)
 			sqeOut.L.SetVec(
 				x1LocInSQEOut,
-				sqeOut.L.AtVec(x1LocInSQEOut)+sle.L.AtVec(xIndex1)*valAsSLE.C,
+				sqeOut.L.AtVec(x1LocInSQEOut)+sle.L.AtVec(xIndex1)*right.C,
 			)
 		}
 		// Second, update according to valAsSLE.L multiplied by val.C
-		for xIndex2 := 0; xIndex2 < valAsSLE.X.Len(); xIndex2++ {
+		for xIndex2 := 0; xIndex2 < right.X.Len(); xIndex2++ {
 			x2 := sle.X.AtVec(xIndex2)
 			x2LocInSQEOut, _ := FindInSlice(x2, sqeOut.X.Elements)
 			sqeOut.L.SetVec(
 				x2LocInSQEOut,
-				sqeOut.L.AtVec(x2LocInSQEOut)+valAsSLE.L.AtVec(xIndex2)*sle.C,
+				sqeOut.L.AtVec(x2LocInSQEOut)+right.L.AtVec(xIndex2)*sle.C,
 			)
 		}
 
 		return sqeOut, nil
 
 	case ScalarQuadraticExpression:
-		// Cast
-		//valAsSQE := val.(ScalarQuadraticExpression)
-
 		// Return error
 		return ScalarQuadraticExpression{}, fmt.Errorf("Can not multiply ScalarLinearExpr with ScalarQuadraticExpression. MatProInterface can not represent polynomials higher than degree 2.")
 
+	case KVector:
+		// This should only be active for KVector of length 1
+		var prodAsVLE VectorLinearExpr
+		prodAsVLE.X = sle.X.Copy()
+
+		prodAsVLE.L = ZerosMatrix(1, sle.X.Len())
+		rightAt0 := right.AtVec(0)
+		for ii := 0; ii < sle.X.Len(); ii++ {
+			prodAsVLE.L.Set(0, ii,
+				float64(rightAt0)*sle.L.AtVec(ii),
+			)
+		}
+
+		prodAsVLE.C = OnesVector(right.Len())
+		rightAsVD := mat.VecDense(right)
+		prodAsVLE.C.ScaleVec(sle.C, &rightAsVD)
+
+		return prodAsVLE, nil
+
+	case KVectorTranspose:
+		var prodAsVLET VectorLinearExpressionTranspose
+		prodAsVLET.X = sle.X.Copy()
+
+		prodAsVLET.L = ZerosMatrix(right.Len(), sle.X.Len())
+		rightAsVD := mat.VecDense(right)
+		for rowIndex := 0; rowIndex < right.Len(); rowIndex++ {
+			for colIndex := 0; colIndex < sle.X.Len(); colIndex++ {
+				prodAsVLET.L.Set(
+					rowIndex, colIndex,
+					rightAsVD.AtVec(rowIndex)*sle.L.AtVec(colIndex),
+				)
+			}
+		}
+
+		prodAsVLET.C = OnesVector(right.Len())
+		prodAsVLET.C.ScaleVec(sle.C, &rightAsVD)
+
+		return prodAsVLET, nil
+
 	default:
-		return sle, fmt.Errorf("Unexpected type of val: %T", val)
+		return sle, fmt.Errorf("Unexpected type of val: %T", right)
 	}
 }
 
