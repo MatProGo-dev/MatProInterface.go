@@ -196,7 +196,7 @@ func (c K) Multiply(term1 interface{}, errors ...error) (Expression, error) {
 		return vleOut, nil
 	case VarVectorTranspose:
 		var vleOut VectorLinearExpressionTranspose
-		vleOut.X = term1Converted.Transpose().Copy()
+		vleOut.X = term1Converted.Copy().Transpose().(VarVector)
 		tempIdentity := Identity(term1Converted.Len()) // Is this needed?
 		vleOut.L.Scale(float64(c), &tempIdentity)
 		vleOut.C = ZerosVector(term1Converted.Len())

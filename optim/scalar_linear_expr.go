@@ -337,7 +337,7 @@ func (sle ScalarLinearExpr) Multiply(rightInput interface{}, errors ...error) (E
 		prodAsVLE.X = sle.X.Copy()
 
 		prodAsVLE.L = ZerosMatrix(1, sle.X.Len())
-		rightAt0 := right.AtVec(0)
+		rightAt0 := right.AtVec(0).(K)
 		for ii := 0; ii < sle.X.Len(); ii++ {
 			prodAsVLE.L.Set(0, ii,
 				float64(rightAt0)*sle.L.AtVec(ii),

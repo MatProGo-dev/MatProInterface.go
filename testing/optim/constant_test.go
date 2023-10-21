@@ -803,11 +803,7 @@ func TestK_Multiply6(t *testing.T) {
 	} else {
 		if !strings.Contains(
 			err.Error(),
-			fmt.Sprintf(
-				"cannot multiply constant %v of shape (1,1) with vector of shape (%v,1)",
-				c1,
-				kv2.Len(),
-			),
+			optim.DimensionError{Operation: "Multiply", Arg1: c1, Arg2: kv2}.Error(),
 		) {
 			t.Errorf("Unexpected error: %v", err)
 		}
