@@ -159,19 +159,45 @@ func (vlet VectorLinearExpressionTranspose) Multiply(e interface{}, errors ...er
 		}
 	}
 
-	switch eConverted := e.(type) {
+	switch right := e.(type) {
 	case float64:
-		eAsK := K(eConverted)
+		eAsK := K(right)
 		return eAsK.Multiply(vlet)
 	case K:
-		return eConverted.Multiply(vlet)
+		return right.Multiply(vlet)
 	case Variable:
-		return eConverted.Multiply(vlet)
+		return right.Multiply(vlet)
+	case VarVector:
+		// Compile all of the unique variables
+		newX := VarVector{
+			UniqueVars(append(vlet.X.Elements, right.Elements...)),
+		}
+
+		// Rewrite vlet in terms of these new variables
+		newVLET := vlet.RewriteInTermsOf(newX)
+		nr_L, _ := newVLET.L.Dims()
+
+		// Multiplication should now be easier?
+		Q := ZerosMatrix(vlet.Len(), vlet.Len())
+		for rowIndex := 0; rowIndex < nr_L; rowIndex++ {
+			for colIndex := 0; colIndex < vlet.Len(); colIndex++ {
+				Q.Set(
+					rowIndex, colIndex,
+					vlet.L.At(rowIndex, colIndex),
+				)
+			}
+		}
+		L := ZerosVector(vlet.Len())
+		L.CopyVec(&newVLET.C)
+
+		return ScalarQuadraticExpression{
+			Q: Q, L: L, C: 0.0, X: newX,
+		}, nil
 
 	default:
 		return vlet, fmt.Errorf(
 			"The input to VarVector's Multiply() method (%v) has unexpected type: %T",
-			eConverted, e,
+			right, e,
 		)
 	}
 }

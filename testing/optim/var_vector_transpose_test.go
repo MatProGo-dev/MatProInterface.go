@@ -3,6 +3,7 @@ package optim_test
 import (
 	"fmt"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
+	"github.com/MatProGo-dev/MatProInterface.go/symbolic/matrix"
 	"gonum.org/v1/gonum/mat"
 	"strings"
 	"testing"
@@ -1565,6 +1566,342 @@ func TestVarVectorTranspose_Multiply8(t *testing.T) {
 		),
 	) {
 		t.Errorf("Unexpected error: %v", err)
+	}
+
+}
+
+/*
+TestVarVectorTranspose_Multiply9
+Description:
+
+	Tests the multiplication of a VarVectorTranspose with a
+	vector constant transpose.
+	(When lengths are not matching, this should throw an error)
+*/
+func TestVarVectorTranspose_Multiply9(t *testing.T) {
+	// Constants
+	m := optim.NewModel("VarVectorTranspose_Multiply9")
+	N := 4
+	vv0 := m.AddVariableVector(N)
+	vvt0 := vv0.Transpose()
+
+	kv1 := optim.KVector(optim.OnesVector(N))
+	kvt1 := kv1.Transpose()
+
+	// Attempt Multiplication
+	_, err := vvt0.Multiply(kvt1)
+	if err == nil {
+		t.Errorf("No error was thrown, but we expected some!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			optim.DimensionError{vvt0, kvt1, "Multiply"}.Error(),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestVarVectorTranspose_Multiply10
+Description:
+
+	Tests the multiplication of a VarVectorTranspose with a
+	vector constant transpose.
+	(When lengths are mismatched, this should throw an error)
+*/
+func TestVarVectorTranspose_Multiply10(t *testing.T) {
+	// Constants
+	m := optim.NewModel("VarVectorTranspose_Multiply10")
+	N := 1
+	vv0 := m.AddVariableVector(N)
+	vvt0 := vv0.Transpose()
+
+	kv1 := optim.KVector(optim.OnesVector(N))
+	kvt1 := kv1.Transpose()
+
+	// Attempt Multiplication
+	prod, err := vvt0.Multiply(kvt1)
+	if err != nil {
+		t.Errorf("Unexpected error in multiplication: %v", err)
+	}
+
+	// Check that product is a scalar linear expression
+	prodAsSLE, tf := prod.(optim.ScalarLinearExpr)
+	if !tf {
+		t.Errorf("prod is of type %T, expected type ScalarLinearExpr!", prod)
+	}
+
+	if prodAsSLE.L.Len() != 1 {
+		t.Errorf("prod as SLE should have scalar linear coefficient, but instead it is a vector of length %v", prodAsSLE.L.Len())
+	}
+	if prodAsSLE.C != 0.0 {
+		t.Errorf("prod has an offset of %v; expectd 0.0", prodAsSLE.C)
+	}
+
+}
+
+/*
+TestVarVectorTranspose_Multiply11
+Description:
+
+	Tests the multiplication of a VarVectorTranspose with a
+	mat.Dense object.
+	(When dimensions are mismatched, this should throw an error)
+*/
+func TestVarVectorTranspose_Multiply11(t *testing.T) {
+	// Constants
+	m := optim.NewModel("VarVectorTranspose_Multiply11")
+	N := 4
+	vv0 := m.AddVariableVector(N)
+	vvt0 := vv0.Transpose()
+
+	mat1 := matrix.Zeros(N+1, N)
+
+	// Attempt Multiplication
+	_, err := vvt0.Multiply(mat1)
+	if err == nil {
+		t.Errorf("there were no errors, but we expected for them to exist!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			optim.DimensionError{
+				Arg1:      vvt0,
+				Arg2:      matrix.Constant(mat1),
+				Operation: "Multiply",
+			}.Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestVarVectorTranspose_Multiply12
+Description:
+
+	Tests the multiplication of a VarVectorTranspose with a
+	proper mat.Dense object.
+*/
+func TestVarVectorTranspose_Multiply12(t *testing.T) {
+	// Constants
+	m := optim.NewModel("VarVectorTranspose_Multiply12")
+	N := 4
+	vv0 := m.AddVariableVector(N)
+	vvt0 := vv0.Transpose()
+
+	mat1 := matrix.Identity(N)
+	mat1.Set(1, 1, 3.0)
+
+	// Attempt Multiplication
+	prod, err := vvt0.Multiply(mat1)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	prodAsVLE, tf := prod.(optim.VectorLinearExpr)
+	if !tf {
+		t.Errorf("expected the product to be of type VectorLinearExpr; received type %T", prod)
+	}
+
+	M := prodAsVLE.L.T()
+	nx, ny := mat1.Dims()
+	for rowIndex := 0; rowIndex < ny; rowIndex++ {
+		for colIndex := 0; colIndex < nx; colIndex++ {
+			if M.At(rowIndex, colIndex) != mat1.At(colIndex, rowIndex) {
+				t.Errorf(
+					"Expected L^T[%v,%v]=%v; received %v",
+					rowIndex, colIndex,
+					mat1.At(colIndex, rowIndex),
+					M.At(rowIndex, colIndex),
+				)
+			}
+		}
+	}
+
+	for rowIndex := 0; rowIndex < prodAsVLE.C.Len(); rowIndex++ {
+		if prodAsVLE.C.AtVec(rowIndex) != 0.0 {
+			t.Errorf(
+				"expected all elements of C to be 0.0, but C[%v] = %v",
+				rowIndex,
+				prodAsVLE.C.AtVec(rowIndex),
+			)
+		}
+
+	}
+
+	// Check that shape of the two matrices match
+	nx_M, ny_M := M.Dims()
+	if (nx_M != ny) || (ny_M != nx) {
+		t.Errorf(
+			"expected M (= L^T) to have shape (%v,%v); received (%v,%v)",
+			ny, nx,
+			nx_M, ny_M,
+		)
+	}
+
+	if nx_M != prodAsVLE.C.Len() {
+		t.Errorf(
+			"dimension of C (%v) must match that of M (%v x %v)",
+			prodAsVLE.C.Len(),
+			nx_M, ny_M,
+		)
+	}
+
+}
+
+/*
+TestVarVectorTranspose_Multiply13
+Description:
+
+	Tests the multiplication of a VarVectorTranspose with a
+	proper matrix.Constant object.
+*/
+func TestVarVectorTranspose_Multiply13(t *testing.T) {
+	// Constants
+	m := optim.NewModel("VarVectorTranspose_Multiply13")
+	N := 4
+	vv0 := m.AddVariableVector(N)
+	vvt0 := vv0.Transpose()
+
+	mat1 := matrix.Zeros(N, N+2)
+	mat1.Set(1, 1, 3.0)
+	mat2 := matrix.Constant(mat1)
+
+	// Attempt Multiplication
+	prod, err := vvt0.Multiply(mat2)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	prodAsVLE, tf := prod.(optim.VectorLinearExpr)
+	if !tf {
+		t.Errorf("expected the product to be of type VectorLinearExpr; received type %T", prod)
+	}
+
+	M := prodAsVLE.L.T()
+	nx, ny := mat1.Dims()
+	for rowIndex := 0; rowIndex < ny; rowIndex++ {
+		for colIndex := 0; colIndex < nx; colIndex++ {
+			if M.At(rowIndex, colIndex) != mat1.At(colIndex, rowIndex) {
+				t.Errorf(
+					"Expected L^T[%v,%v]=%v; received %v",
+					rowIndex, colIndex,
+					mat1.At(colIndex, rowIndex),
+					M.At(rowIndex, colIndex),
+				)
+			}
+		}
+	}
+
+	for rowIndex := 0; rowIndex < prodAsVLE.C.Len(); rowIndex++ {
+		if prodAsVLE.C.AtVec(rowIndex) != 0.0 {
+			t.Errorf(
+				"expected all elements of C to be 0.0, but C[%v] = %v",
+				rowIndex,
+				prodAsVLE.C.AtVec(rowIndex),
+			)
+		}
+
+	}
+
+	// Check that shape of the two matrices match
+	nx_M, ny_M := M.Dims()
+	if (nx_M != ny) || (ny_M != nx) {
+		t.Errorf(
+			"expected M (= L^T) to have shape (%v,%v); received (%v,%v)",
+			ny, nx,
+			nx_M, ny_M,
+		)
+	}
+
+	if nx_M != prodAsVLE.C.Len() {
+		t.Errorf(
+			"dimension of C (%v) must match that of M (%v x %v)",
+			prodAsVLE.C.Len(),
+			nx_M, ny_M,
+		)
+	}
+
+}
+
+/*
+TestVarVectorTranspose_Multiply14
+Description:
+
+	Tests the multiplication of a VarVectorTranspose with a
+	proper optim.VectorLinearExpr object.
+	(Used a varVector that is identical to vvt0 in VectorLinearExpression)
+*/
+func TestVarVectorTranspose_Multiply14(t *testing.T) {
+	// Constants
+	m := optim.NewModel("VarVectorTranspose_Multiply13")
+	N := 4
+	vv0 := m.AddVariableVector(N)
+	vvt0 := vv0.Transpose()
+
+	mat1 := matrix.Zeros(N, N)
+	mat1.Set(1, 1, 4.0)
+	vle2 := optim.VectorLinearExpr{
+		L: mat1,
+		X: vv0,
+		C: optim.OnesVector(N),
+	}
+
+	// Attempt Multiplication
+	prod, err := vvt0.Multiply(vle2)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	prodAsSQE, tf := prod.(optim.ScalarQuadraticExpression)
+	if !tf {
+		t.Errorf("expected the product to be of type VectorLinearExpr; received type %T", prod)
+	}
+
+	nx, ny := mat1.Dims()
+	for rowIndex := 0; rowIndex < nx; rowIndex++ {
+		for colIndex := 0; colIndex < ny; colIndex++ {
+			if prodAsSQE.Q.At(rowIndex, colIndex) != mat1.At(colIndex, rowIndex) {
+				t.Errorf(
+					"Expected Q[%v,%v]=%v; received %v",
+					rowIndex, colIndex,
+					mat1.At(colIndex, rowIndex),
+					prodAsSQE.Q.At(rowIndex, colIndex),
+				)
+			}
+		}
+	}
+
+	for rowIndex := 0; rowIndex < prodAsSQE.L.Len(); rowIndex++ {
+		if prodAsSQE.L.AtVec(rowIndex) != 1.0 {
+			t.Errorf(
+				"expected all elements of C to be 1.0, but C[%v] = %v",
+				rowIndex,
+				prodAsSQE.L.AtVec(rowIndex),
+			)
+		}
+
+	}
+
+	// Check that shape of the two matrices match
+	nx_Q, ny_Q := prodAsSQE.Q.Dims()
+	if (nx_Q != ny) || (ny_Q != nx) {
+		t.Errorf(
+			"expected M (= L^T) to have shape (%v,%v); received (%v,%v)",
+			ny, nx,
+			nx_Q, ny_Q,
+		)
+	}
+
+	if nx_Q != prodAsSQE.L.Len() {
+		t.Errorf(
+			"dimension of L (%v) must match that of M (%v x %v)",
+			prodAsSQE.L.Len(),
+			nx_Q, ny_Q,
+		)
 	}
 
 }

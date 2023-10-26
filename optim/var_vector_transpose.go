@@ -2,6 +2,7 @@ package optim
 
 import (
 	"fmt"
+	"github.com/MatProGo-dev/MatProInterface.go/symbolic/matrix"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -199,23 +200,34 @@ func (vvt VarVectorTranspose) Multiply(e interface{}, errors ...error) (Expressi
 	if IsVectorExpression(e) {
 		// Check dimensions
 		e2, _ := ToVectorExpression(e)
-		if e2.Len() != vvt.Len() {
-			return vvt, fmt.Errorf(
-				"VarVectorTranspose of length %v can not be multiplied with a %T of different length (%v).",
-				vvt.Len(),
-				e2,
-				e2.Len(),
-			)
+		if vvt.Dims()[1] != e2.Dims()[0] {
+			return vvt, DimensionError{
+				Arg1:      vvt,
+				Arg2:      e2,
+				Operation: "Multiply",
+			}
+		}
+	}
+
+	if matrix.IsMatrixExpression(e) {
+		// Check Dimensions
+		e2, _ := matrix.ToMatrixExpression(e)
+		if vvt.Dims()[1] != e2.Dims()[0] {
+			return vvt, DimensionError{
+				Arg1:      vvt,
+				Arg2:      e2,
+				Operation: "Multiply",
+			}
 		}
 	}
 
 	// Multiply Algorithms
-	switch eConverted := e.(type) {
+	switch right := e.(type) {
 	case float64:
 		// Create scaled identity matrix
 		I := Identity(vvt.Len())
 		var scaledI mat.Dense
-		scaledI.Scale(eConverted, &I)
+		scaledI.Scale(right, &I)
 
 		// Copy vvt
 		vvtCopy := vvt.Copy()
@@ -223,23 +235,25 @@ func (vvt VarVectorTranspose) Multiply(e interface{}, errors ...error) (Expressi
 		return VectorLinearExpressionTranspose{
 			L: scaledI, X: vvtCopy.Transpose().(VarVector), C: ZerosVector(vvt.Len()),
 		}, nil
+
 	case K:
-		return vvt.Multiply(float64(eConverted))
+		return vvt.Multiply(float64(right))
 
 	case mat.VecDense:
 		// Convert to KVector
-		eAsKVector := KVector(eConverted)
+		eAsKVector := KVector(right)
 		return vvt.Multiply(eAsKVector)
+
 	case KVector:
 		// Collect Unique Variables
 		vv := VarVector{UniqueVars(vvt.Elements)}
 
 		// Assemble the vector used in the linear expression.
 		L := ZerosVector(vv.Len())
-		eLen := eConverted.Len()
+		eLen := right.Len()
 		for kvIndex := 0; kvIndex < eLen; kvIndex++ {
 			// Get coefficient and variable at kvIndex
-			kv_i := eConverted.AtVec(kvIndex)
+			kv_i := right.AtVec(kvIndex)
 			vvt_i := vvt.AtVec(kvIndex)
 
 			indexOfvvt_i, _ := FindInSlice(vvt_i.(Variable), vv.Elements)
@@ -247,10 +261,66 @@ func (vvt VarVectorTranspose) Multiply(e interface{}, errors ...error) (Expressi
 		}
 		return ScalarLinearExpr{L: L, X: vv, C: 0}, nil
 
+	case KVectorTranspose:
+		// This is only valid if vvt is of length 1.
+		kv := right.Transpose().(KVector)
+
+		prod := ScalarLinearExpr{
+			L: mat.VecDense(kv),
+			X: vvt.Copy().Transpose().(VarVector),
+			C: 0.0,
+		}
+
+		return prod, nil
+
+	case VectorLinearExpr:
+		// Collect Unique Variables
+		newVV := VarVector{UniqueVars(append(vvt.Elements, right.X.Elements...))}
+
+		// Rewrite VLE in terms of newVV
+		newVLE := right.RewriteInTermsOf(newVV)
+
+		prod0, _ := vvt.Multiply(newVLE.L)
+		prod1, _ := prod0.(VectorLinearExpressionTranspose).Multiply(vvt.Transpose())
+		prod := prod1
+
+		// Add in Elements for product of vvt with constant C
+		prod, _ = prod.(ScalarQuadraticExpression).Plus(
+			vvt.Multiply(KVector(right.C)),
+		)
+
+		return prod, nil
+
+	case mat.Dense:
+		nx, ny := right.Dims()
+
+		// Create product
+		var prod VectorLinearExpressionTranspose
+		prod.L = ZerosMatrix(ny, nx)
+		for rowIndex := 0; rowIndex < ny; rowIndex++ {
+			for colIndex := 0; colIndex < nx; colIndex++ {
+				prod.L.Set(
+					rowIndex, colIndex,
+					right.At(colIndex, rowIndex),
+				)
+			}
+		}
+
+		// Create X
+		x := vvt.Copy().Transpose()
+		prod.X = x.(VarVector) // Convert to VarVector
+
+		// Create C
+		prod.C = ZerosVector(nx)
+
+		return prod, nil
+
+	case matrix.Constant:
+		return vvt.Multiply(mat.Dense(right))
 	default:
 		return vvt, fmt.Errorf(
 			"The input to VarVectorTranspose's Multiply() method (%v) has unexpected type: %T.",
-			eConverted, e,
+			right, e,
 		)
 	}
 }
@@ -364,7 +434,7 @@ func (vvt VarVectorTranspose) Copy() VarVectorTranspose {
 	// Constants
 
 	// Algorithm
-	newVarSlice := []Variable{}
+	var newVarSlice []Variable
 	for varIndex := 0; varIndex < vvt.Len(); varIndex++ {
 		// Append to newVar Slice
 		newVarSlice = append(newVarSlice, vvt.Elements[varIndex])

@@ -201,14 +201,50 @@ Description:
 
 	Multiplication of a VarVector with another expression.
 */
-func (vv VarVector) Multiply(e interface{}, errors ...error) (Expression, error) {
-	// TODO: Implement This!
+func (vv VarVector) Multiply(rightIn interface{}, errors ...error) (Expression, error) {
+	//Input Processing
+	err := CheckErrors(errors)
+	if err != nil {
+		return vv, err
+	}
 
-	switch eConverted := e.(type) {
+	if IsVectorExpression(rightIn) {
+		rightAsVE, _ := ToVectorExpression(rightIn)
+		if vv.Dims()[1] != rightAsVE.Dims()[0] {
+			return vv, DimensionError{
+				Operation: "Multiply",
+				Arg1:      vv,
+				Arg2:      rightAsVE,
+			}
+		}
+	}
+
+	switch right := rightIn.(type) {
+	case KVector:
+		//KVector must be a scalar.
+		rightAsVD := mat.VecDense(right)
+		k0 := rightAsVD.AtVec(0)
+
+		// Multiply all elements of vector with this.
+		var prod VectorLinearExpr
+		prod.X = vv.Copy()
+
+		prod.L = ZerosMatrix(vv.Len(), vv.Len())
+		tempIdentity := Identity(vv.Len())
+		prod.L.Scale(k0, &tempIdentity)
+
+		prod.C = ZerosVector(vv.Len())
+
+		return prod, nil
+
+	case KVectorTranspose:
+		// KVector must be a scalar. Do the same thing as for KVector.
+		return vv.Multiply(right.Transpose())
+
 	default:
 		return vv, fmt.Errorf(
 			"The input to VarVector's Multiply() method (%v) has unexpected type: %T",
-			eConverted, e,
+			right, rightIn,
 		)
 	}
 }
