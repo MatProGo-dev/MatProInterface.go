@@ -10,6 +10,20 @@ Description:
 */
 type Constant mat.Dense
 
+func (c Constant) NumVars() int {
+	return 0
+}
+
+/*
+IDs
+Description:
+
+	Returns the IDs of any variables in the expression.
+*/
+func (c Constant) IDs() []uint64 {
+	return []uint64{}
+}
+
 func (c Constant) Dims() []uint {
 	dense := mat.Dense(c)
 	nR, nC := dense.Dims()
