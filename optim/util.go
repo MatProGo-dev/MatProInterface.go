@@ -200,7 +200,7 @@ func ZerosMatrix(nR, nC int) mat.Dense {
 	elts := make([]float64, nR*nC)
 	for rowIndex := 0; rowIndex < nR; rowIndex++ {
 		for colIndex := 0; colIndex < nC; colIndex++ {
-			elts[rowIndex*nR+colIndex] = 0.0
+			elts[rowIndex*nC+colIndex] = 0.0
 		}
 	}
 
