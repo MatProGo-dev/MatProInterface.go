@@ -1,7 +1,6 @@
 package matrix
 
 import (
-	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -11,6 +10,12 @@ import (
 
 type Expression interface {
 	Dims() []uint // Computes the dimensions of the input matrix
+
+	// IDs
+	// Returns the ids of any variables in the matrix expression
+	IDs() []uint64
+
+	NumVars() int // Returns the number of variables in the matrix expression
 }
 
 /*
@@ -41,7 +46,7 @@ Description:
 func ToMatrixExpression(e interface{}) (Expression, error) {
 	// Input Processing
 	if !IsMatrixExpression(e) {
-		return Constant(optim.ZerosMatrix(0, 0)), TypeError{e}
+		return Constant(Zeros(0, 0)), TypeError{e}
 	}
 
 	// Convert
@@ -51,6 +56,6 @@ func ToMatrixExpression(e interface{}) (Expression, error) {
 	case Constant:
 		return candidate, nil
 	default:
-		return Constant(optim.ZerosMatrix(1, 1)), TypeError{e}
+		return Constant(Zeros(1, 1)), TypeError{e}
 	}
 }
