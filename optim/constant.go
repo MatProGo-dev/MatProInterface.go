@@ -134,15 +134,12 @@ func (c K) Multiply(term1 interface{}, errors ...error) (Expression, error) {
 		return c, err
 	}
 
-	if IsVectorExpression(term1) {
+	if IsExpression(term1) {
 		// Check dimensions
-		term1AsVE, _ := ToVectorExpression(term1)
-		if term1AsVE.Dims()[0] != 1 { // Dimension mismatch
-			return c, DimensionError{
-				Operation: "Multiply",
-				Arg1:      c,
-				Arg2:      term1AsVE,
-			}
+		term1AsE, _ := ToExpression(term1)
+		err = CheckDimensionsInMultiplication(c, term1AsE)
+		if err != nil {
+			return c, err
 		}
 	}
 
