@@ -2,7 +2,6 @@ package optim
 
 import (
 	"fmt"
-	"gonum.org/v1/gonum/mat"
 )
 
 /*
@@ -49,42 +48,6 @@ type Expression interface {
 	//Eq(e ScalarExpression) *ScalarConstraint
 }
 
-func ToExpression(eIn interface{}) (Expression, error) {
-	// Constants
-
-	// Algorithm
-
-	// Attempt conversion to float64
-	switch e := eIn.(type) {
-	case float64:
-		return K(e), nil
-	case K:
-		return e, nil
-	case Variable:
-		return e, nil
-	case ScalarLinearExpr:
-		return e, nil
-	case ScalarQuadraticExpression:
-		return e, nil
-	case mat.VecDense:
-		return ToExpression(KVector(e))
-	case KVector:
-		return e, nil
-	case KVectorTranspose:
-		return e, nil
-	case VarVector:
-		return e, nil
-	case VarVectorTranspose:
-		return e, nil
-	case VectorLinearExpr:
-		return e, nil
-	case VectorLinearExpressionTranspose:
-		return e, nil
-	default:
-		return K(-1.0), fmt.Errorf("Unexpected type input to ToExpression(): %T", eIn)
-	}
-}
-
 /*
 IsExpression
 Description:
@@ -92,11 +55,30 @@ Description:
 	Tests whether or not the input variable is one of the expression types.
 */
 func IsExpression(e interface{}) bool {
-	// Constants
+	return IsScalarExpression(e) || IsVectorExpression(e)
+}
 
-	// Checks
-	_, isScalarExpression := e.(ScalarExpression)
-	_, isVectorExpression := e.(VectorExpression)
+func ToExpression(e interface{}) (Expression, error) {
+	switch {
+	case IsScalarExpression(e):
+		return ToScalarExpression(e)
+	case IsVectorExpression(e):
+		return ToVectorExpression(e)
+	default:
+		return K(INFINITY), fmt.Errorf("the input expression is not recognized as a scalar or vector expression.")
+	}
+}
 
-	return isScalarExpression || isVectorExpression
+func CheckDimensionsInMultiplication(left, right Expression) error {
+	// Check that the # of columns in left
+	// matches the # of rows in right
+	if left.Dims()[1] != right.Dims()[0] {
+		return DimensionError{
+			Operation: "Multiply",
+			Arg1:      left,
+			Arg2:      right,
+		}
+	}
+	// If dimensions match, then return nothing.
+	return nil
 }
