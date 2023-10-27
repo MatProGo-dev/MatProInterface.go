@@ -1458,12 +1458,11 @@ func TestVarVectorTranspose_Multiply6(t *testing.T) {
 	}
 	if !strings.Contains(
 		err.Error(),
-		fmt.Sprintf(
-			"VarVectorTranspose of length %v can not be multiplied with a %T of different length (%v).",
-			vvt0.Len(),
-			kv0,
-			kv0.Len(),
-		),
+		optim.DimensionError{
+			Operation: "Multiply",
+			Arg1:      vvt0,
+			Arg2:      kv0,
+		}.Error(),
 	) {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -1701,7 +1700,7 @@ func TestVarVectorTranspose_Multiply12(t *testing.T) {
 		t.Errorf("unexpected error: %v", err)
 	}
 
-	prodAsVLE, tf := prod.(optim.VectorLinearExpr)
+	prodAsVLE, tf := prod.(optim.VectorLinearExpressionTranspose)
 	if !tf {
 		t.Errorf("expected the product to be of type VectorLinearExpr; received type %T", prod)
 	}
@@ -1776,32 +1775,32 @@ func TestVarVectorTranspose_Multiply13(t *testing.T) {
 		t.Errorf("unexpected error: %v", err)
 	}
 
-	prodAsVLE, tf := prod.(optim.VectorLinearExpr)
+	prodAsVLET, tf := prod.(optim.VectorLinearExpressionTranspose)
 	if !tf {
 		t.Errorf("expected the product to be of type VectorLinearExpr; received type %T", prod)
 	}
 
-	M := prodAsVLE.L.T()
-	nx, ny := mat1.Dims()
-	for rowIndex := 0; rowIndex < ny; rowIndex++ {
-		for colIndex := 0; colIndex < nx; colIndex++ {
-			if M.At(rowIndex, colIndex) != mat1.At(colIndex, rowIndex) {
+	M := prodAsVLET.L.T()
+	nr, nc := mat1.Dims()
+	for rowIndex := 0; rowIndex < nr; rowIndex++ {
+		for colIndex := 0; colIndex < nc; colIndex++ {
+			if M.At(rowIndex, colIndex) != mat1.At(rowIndex, colIndex) {
 				t.Errorf(
 					"Expected L^T[%v,%v]=%v; received %v",
-					rowIndex, colIndex,
-					mat1.At(colIndex, rowIndex),
-					M.At(rowIndex, colIndex),
+					colIndex, rowIndex,
+					mat1.At(rowIndex, colIndex),
+					M.At(colIndex, rowIndex),
 				)
 			}
 		}
 	}
 
-	for rowIndex := 0; rowIndex < prodAsVLE.C.Len(); rowIndex++ {
-		if prodAsVLE.C.AtVec(rowIndex) != 0.0 {
+	for rowIndex := 0; rowIndex < prodAsVLET.C.Len(); rowIndex++ {
+		if prodAsVLET.C.AtVec(rowIndex) != 0.0 {
 			t.Errorf(
 				"expected all elements of C to be 0.0, but C[%v] = %v",
 				rowIndex,
-				prodAsVLE.C.AtVec(rowIndex),
+				prodAsVLET.C.AtVec(rowIndex),
 			)
 		}
 
@@ -1809,18 +1808,18 @@ func TestVarVectorTranspose_Multiply13(t *testing.T) {
 
 	// Check that shape of the two matrices match
 	nx_M, ny_M := M.Dims()
-	if (nx_M != ny) || (ny_M != nx) {
+	if (nx_M != nr) || (ny_M != nc) {
 		t.Errorf(
 			"expected M (= L^T) to have shape (%v,%v); received (%v,%v)",
-			ny, nx,
+			nr, nc,
 			nx_M, ny_M,
 		)
 	}
 
-	if nx_M != prodAsVLE.C.Len() {
+	if ny_M != prodAsVLET.C.Len() {
 		t.Errorf(
 			"dimension of C (%v) must match that of M (%v x %v)",
-			prodAsVLE.C.Len(),
+			prodAsVLET.C.Len(),
 			nx_M, ny_M,
 		)
 	}

@@ -292,13 +292,13 @@ func (vvt VarVectorTranspose) Multiply(e interface{}, errors ...error) (Expressi
 		return prod, nil
 
 	case mat.Dense:
-		nx, ny := right.Dims()
+		nr, nc := right.Dims()
 
 		// Create product
 		var prod VectorLinearExpressionTranspose
-		prod.L = ZerosMatrix(ny, nx)
-		for rowIndex := 0; rowIndex < ny; rowIndex++ {
-			for colIndex := 0; colIndex < nx; colIndex++ {
+		prod.L = ZerosMatrix(nc, nr)
+		for rowIndex := 0; rowIndex < nc; rowIndex++ {
+			for colIndex := 0; colIndex < nr; colIndex++ {
 				prod.L.Set(
 					rowIndex, colIndex,
 					right.At(colIndex, rowIndex),
@@ -311,7 +311,7 @@ func (vvt VarVectorTranspose) Multiply(e interface{}, errors ...error) (Expressi
 		prod.X = x.(VarVector) // Convert to VarVector
 
 		// Create C
-		prod.C = ZerosVector(nx)
+		prod.C = ZerosVector(nc)
 
 		return prod, nil
 
