@@ -1655,3 +1655,373 @@ func TestVectorLinearExpressionTranspose_Transpose1(t *testing.T) {
 	}
 
 }
+
+/*
+TestVectorLinearExpressionTranspose_Multiply1
+Description:
+
+	Tests what happens if the errors input contains a bad error choice.
+*/
+func TestVectorLinearExpressionTranspose_Multiply1(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("VLET Multiply 1")
+
+	// Create arguments
+	vlet1 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.ZerosVector(n),
+	}
+
+	k2 := optim.ZerosVector(n)
+
+	err3 := fmt.Errorf("Test")
+
+	// Compute Product
+	_, err := vlet1.Multiply(k2, err3)
+	if err == nil {
+		t.Errorf("no error was thrown when it should've!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			err3.Error(),
+		) {
+			t.Errorf(
+				"Unexpected error: %v", err,
+			)
+		}
+	}
+}
+
+/*
+TestVectorLinearExpressionTranspose_Multiply2
+Description:
+
+	Tests what happens if the errors input contains a nil error choice.
+*/
+func TestVectorLinearExpressionTranspose_Multiply2(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("VLET Multiply 2")
+
+	// Create arguments
+	vlet1 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.OnesVector(n),
+	}
+
+	k2 := optim.OnesVector(n)
+	k2.SetVec(2, 3.0)
+	k2.SetVec(3, 21.0)
+
+	var err3 error
+
+	// Compute Product
+	prod, err := vlet1.Multiply(k2, err3)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	prodAsSLE, tf := prod.(optim.ScalarLinearExpr)
+	if !tf {
+		t.Errorf(
+			"prod was not of type ScalarQuadraticExpression; it was %T",
+			prod,
+		)
+	}
+
+	// Check elements of the product
+	L0 := optim.ZerosVector(n)
+	k2AsVD := mat.VecDense(k2)
+	L0.MulVec(vlet1.L.T(), &k2AsVD)
+
+	// Check each of the components of the
+	for LIndex := 0; LIndex < n; LIndex++ {
+		if L0.AtVec(LIndex) != prodAsSLE.L.AtVec(LIndex) {
+			t.Errorf(
+				"L[%v] = %v =/= %v as expected",
+				LIndex,
+				prodAsSLE.L.AtVec(LIndex),
+				L0.AtVec(LIndex),
+			)
+		}
+	}
+
+	if mat.Dot(&(vlet1.C), &k2AsVD) != prodAsSLE.C {
+		t.Errorf(
+			"C = %v =/= %v as expected",
+			mat.Dot(&(vlet1.C), &k2AsVD),
+			prodAsSLE.C,
+		)
+	}
+}
+
+/*
+TestVectorLinearExpressionTranspose_Multiply3
+Description:
+
+	Tests what happens if the input to errors has a
+	float input but has large size.
+*/
+func TestVectorLinearExpressionTranspose_Multiply3(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("VLET Multiply 3")
+
+	// Create arguments
+	C2 := optim.OnesVector(n)
+	C2.SetVec(0, 2.71)
+	vlet1 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: C2,
+	}
+
+	f2 := 3.14
+
+	// Compute Product
+	_, err := vlet1.Multiply(f2)
+	if err == nil {
+		t.Errorf("expected an error to be thrown, but none were!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			optim.DimensionError{
+				Operation: "Multiply",
+				Arg1:      vlet1,
+				Arg2:      optim.K(f2),
+			}.Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestVectorLinearExpressionTranspose_Multiply4
+Description:
+
+	Tests what happens if the input to errors has a
+	float input. With VLE that happens to be of dimension 1.
+*/
+func TestVectorLinearExpressionTranspose_Multiply4(t *testing.T) {
+	// Constants
+	n := 1
+	m := optim.NewModel("VLET Multiply 4")
+
+	// Create arguments
+	C2 := optim.OnesVector(n)
+	C2.SetVec(0, 2.71)
+	vlet1 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: C2,
+	}
+
+	f2 := 3.14
+
+	// Compute Product
+	prod, err := vlet1.Multiply(f2)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	prodAsSLE, tf := prod.(optim.ScalarLinearExpr)
+	if !tf {
+		t.Errorf(
+			"prod was not of type ScalarQuadraticExpression; it was %T",
+			prod,
+		)
+	}
+
+	// Check elements of the product
+	LLen := prodAsSLE.L.Len()
+	for colIndex := 0; colIndex < LLen; colIndex++ {
+		if prodAsSLE.L.AtVec(colIndex) != vlet1.L.At(0, colIndex)*f2 {
+			t.Errorf(
+				"L[%v,%v] = %v =/= %v",
+				0, colIndex,
+				prodAsSLE.L.AtVec(colIndex),
+				vlet1.L.At(0, colIndex)*f2,
+			)
+		}
+	}
+
+	if prodAsSLE.C != C2.AtVec(0)*f2 {
+		t.Errorf(
+			"C = %v =/= %v as expected",
+			prodAsSLE.C,
+			C2.AtVec(0)*f2,
+		)
+	}
+}
+
+/*
+TestVectorLinearExpressionTranspose_ToScalarExpression1
+Description:
+
+	ToScalarExpression() should throw an error because the vlet1
+	was malformed.
+*/
+func TestVectorLinearExpressionTranspose_ToScalarExpression1(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("VLET ToScalarExpression 1")
+
+	// Create arguments
+	C2 := optim.OnesVector(n - 1)
+	C2.SetVec(0, 2.71)
+	vlet1 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: C2,
+	}
+
+	// Try to run ToScalarExpression
+	_, err := vlet1.ToScalarLinearExpression()
+	if err == nil {
+		t.Errorf("there was no error thrown, when there should have been.")
+	} else {
+		nL, mL := vlet1.L.Dims()
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf(
+				"Dimension of L (%v x %v) and C (length %v) do not match!",
+				nL, mL,
+				vlet1.C.Len(),
+			),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestVectorLinearExpressionTranspose_ToScalarExpression2
+Description:
+
+	ToScalarExpression() should throw an error when the vlet1
+	has dimension larger than 1.
+*/
+func TestVectorLinearExpressionTranspose_ToScalarExpression2(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("VLET ToScalarExpression 2")
+
+	// Create arguments
+	C2 := optim.OnesVector(n)
+	C2.SetVec(0, 2.71)
+	vlet1 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: C2,
+	}
+
+	// Try to run ToScalarExpression
+	_, err := vlet1.ToScalarLinearExpression()
+	if err == nil {
+		t.Errorf("there was no error thrown, when there should have been.")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf(
+				"can not simplify VectorLinearExpressionTranspose of dimension higher than 1!",
+			),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestVectorLinearExpressionTranspose_ToScalarExpression3
+Description:
+
+	ToScalarExpression() should throw an error when the vlet1
+	has dimension 1.
+*/
+func TestVectorLinearExpressionTranspose_ToScalarExpression3(t *testing.T) {
+	// Constants
+	n := 1
+	m := optim.NewModel("VLET ToScalarExpression 3")
+
+	// Create arguments
+	C2 := optim.OnesVector(1)
+	C2.SetVec(0, 2.71)
+	vlet1 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: C2,
+	}
+
+	// Try to run ToScalarExpression
+	sle, err := vlet1.ToScalarLinearExpression()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	if sle.L.AtVec(0) != 1.0 {
+		t.Errorf(
+			"L[0] = %v =/= %v",
+			sle.L.AtVec(0),
+			1.0,
+		)
+	}
+
+	if sle.C != 2.71 {
+		t.Errorf("C = %v =/= %v", sle.C, 2.71)
+	}
+
+}
+
+/*
+TestVectorLinearExpressionTranspose_ToScalarExpression4
+Description:
+
+	ToScalarExpression() should throw an error when the vlet1
+	has dimension 1 AND is a non square matrix.
+*/
+func TestVectorLinearExpressionTranspose_ToScalarExpression4(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("VLET ToScalarExpression 4")
+
+	// Create arguments
+	L2 := optim.ZerosMatrix(1, n)
+	L2.Set(0, 1, 2.14)
+	L2.Set(0, 3, 2.159)
+
+	C2 := optim.OnesVector(1)
+	C2.SetVec(0, 2.71)
+	vlet1 := optim.VectorLinearExpressionTranspose{
+		L: L2,
+		X: m.AddVariableVector(n),
+		C: C2,
+	}
+
+	// Try to run ToScalarExpression
+	sle, err := vlet1.ToScalarLinearExpression()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	for colIndex := 0; colIndex < n; colIndex++ {
+		if sle.L.AtVec(colIndex) != L2.At(0, colIndex) {
+			t.Errorf(
+				"L[0] = %v =/= %v",
+				sle.L.AtVec(0),
+				L2.At(0, colIndex),
+			)
+		}
+	}
+
+	if sle.C != 2.71 {
+		t.Errorf("C = %v =/= %v", sle.C, 2.71)
+	}
+
+}

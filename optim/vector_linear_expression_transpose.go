@@ -29,11 +29,11 @@ Description:
 
 	Checks to see if the VectorLinearExpressionTransposeession is well-defined.
 */
-func (vle VectorLinearExpressionTranspose) Check() error {
+func (vlet VectorLinearExpressionTranspose) Check() error {
 	// Extract the dimension of the vector x
-	m := vle.X.Length()
-	nL, mL := vle.L.Dims()
-	nC := vle.C.Len()
+	m := vlet.X.Length()
+	nL, mL := vlet.L.Dims()
+	nC := vlet.C.Len()
 
 	// Compare the length of vector x with the appropriate dimension of L
 	if m != mL {
@@ -76,7 +76,6 @@ Description:
 	Returns the matrix which is applied as a coefficient to the vector X in our expression.
 */
 func (vle VectorLinearExpressionTranspose) LinearCoeff() mat.Dense {
-
 	return vle.L
 }
 
@@ -128,45 +127,56 @@ Description:
 
 	Multiplication of a VarVector with another expression.
 */
-func (vlet VectorLinearExpressionTranspose) Multiply(e interface{}, errors ...error) (Expression, error) {
+func (vlet VectorLinearExpressionTranspose) Multiply(rightIn interface{}, errors ...error) (Expression, error) {
 	// Input Processing
-	err := CheckErrors(errors)
+	err := vlet.Check()
 	if err != nil {
 		return vlet, err
 	}
 
-	if IsVectorExpression(e) {
-		// Check dimensions
-		ve, _ := ToVectorExpression(e)
-		if ve.Len() != vlet.Len() {
-			return vlet, fmt.Errorf(
-				"dimension of VectorLinearExpressionTranspose %v does not match the vector expression's dimension %v",
-				vlet.Len(),
-				ve.Len(),
-			)
+	err = CheckErrors(errors)
+	if err != nil {
+		return vlet, err
+	}
+
+	if IsExpression(rightIn) {
+		rightAsE, _ := ToExpression(rightIn)
+		err = CheckDimensionsInMultiplication(vlet, rightAsE)
+		if err != nil {
+			return vlet, err
 		}
 	}
 
-	if IsScalarExpression(e) {
-		// Check to see if the dimension is 1
-		se, _ := ToScalarExpression(e)
-		if vlet.Len() != 1 {
-			return vlet, DimensionError{
-				Operation: "Multiply",
-				Arg1:      vlet,
-				Arg2:      se,
-			}
-		}
-	}
-
-	switch right := e.(type) {
+	switch right := rightIn.(type) {
 	case float64:
-		eAsK := K(right)
-		return eAsK.Multiply(vlet)
+		// vlet must be a scalar
+		sle, _ := vlet.ToScalarLinearExpression()
+		return sle.Multiply(right)
 	case K:
-		return right.Multiply(vlet)
+		// vlet must be a scalar
+		sle, _ := vlet.ToScalarLinearExpression()
+		return sle.Multiply(right)
 	case Variable:
-		return right.Multiply(vlet)
+		// vlet must be a scalar
+		sle, _ := vlet.ToScalarLinearExpression()
+		return sle.Multiply(right)
+	case mat.VecDense:
+		return vlet.Multiply(KVector(right))
+	case KVector:
+		// Compute Product of right with L
+
+		L := ZerosVector(right.Len())
+		rightAsVD := mat.VecDense(right)
+		L.MulVec(vlet.L.T(), &rightAsVD)
+
+		// Compute dot product of right with vlet.C
+		C := mat.Dot(&(vlet.C), &rightAsVD)
+		return ScalarLinearExpr{
+			X: vlet.X.Copy(),
+			L: L,
+			C: C,
+		}, nil
+
 	case VarVector:
 		// Compile all of the unique variables
 		newX := VarVector{
@@ -197,7 +207,7 @@ func (vlet VectorLinearExpressionTranspose) Multiply(e interface{}, errors ...er
 	default:
 		return vlet, fmt.Errorf(
 			"The input to VarVector's Multiply() method (%v) has unexpected type: %T",
-			right, e,
+			right, rightIn,
 		)
 	}
 }
@@ -533,4 +543,27 @@ Description:
 */
 func (vlet VectorLinearExpressionTranspose) Dims() []uint {
 	return []uint{1, uint(vlet.Len())}
+}
+
+func (vlet VectorLinearExpressionTranspose) ToScalarLinearExpression() (ScalarLinearExpr, error) {
+	// Check Errors
+	err := vlet.Check()
+	if err != nil {
+		return ScalarLinearExpr{}, err
+	}
+
+	// Check Dimensions
+	if vlet.Dims()[1] > 1 {
+		return ScalarLinearExpr{}, fmt.Errorf("can not simplify VectorLinearExpressionTranspose of dimension higher than 1!")
+	}
+
+	// Convert L to a vector
+	L := ZerosVector(vlet.X.Len())
+	for xIndex := 0; xIndex < L.Len(); xIndex++ {
+		L.SetVec(xIndex, vlet.L.At(0, xIndex))
+	}
+
+	// Convert C to a scalar
+	C := vlet.C.AtVec(0)
+	return ScalarLinearExpr{L: L, X: vlet.X.Copy(), C: C}, nil
 }
