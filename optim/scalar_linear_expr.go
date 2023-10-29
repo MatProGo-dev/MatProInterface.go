@@ -57,14 +57,36 @@ func (sle ScalarLinearExpr) Constant() float64 {
 	return sle.C
 }
 
+/*
+Check
+Description:
+*/
+func (sle ScalarLinearExpr) Check() error {
+	// Compare lengths of X and L
+	if sle.L.Len() != sle.X.Len() {
+		return fmt.Errorf(
+			"the length of L (%v) does not match that of X (%v)!",
+			sle.L.Len(),
+			sle.X.Len(),
+		)
+	}
+
+	// All checks passed
+	return nil
+}
+
 // Plus adds the current expression to another and returns the resulting
 // expression
 func (sle ScalarLinearExpr) Plus(e interface{}, errors ...error) (ScalarExpression, error) {
 	// Input Processing
-	if len(errors) > 0 {
-		if errors[0] != nil {
-			return sle, errors[0]
-		}
+	err := sle.Check()
+	if err != nil {
+		return sle, err
+	}
+
+	err = CheckErrors(errors)
+	if err != nil {
+		return sle, err
 	}
 
 	// Algorithm depends on the type of eIn.
@@ -236,19 +258,21 @@ Description:
 */
 func (sle ScalarLinearExpr) Multiply(rightInput interface{}, errors ...error) (Expression, error) {
 	// Input Processing
-	err := CheckErrors(errors)
+	err := sle.Check()
 	if err != nil {
 		return sle, err
 	}
 
-	if IsVectorExpression(rightInput) {
-		rightInputAsVE, _ := ToVectorExpression(rightInput)
-		if rightInputAsVE.Dims()[0] != 1 {
-			return sle, DimensionError{
-				Operation: "Multiply",
-				Arg1:      sle,
-				Arg2:      rightInputAsVE,
-			}
+	err = CheckErrors(errors)
+	if err != nil {
+		return sle, err
+	}
+
+	if IsExpression(rightInput) {
+		rightInputAsE, _ := ToExpression(rightInput)
+		err = CheckDimensionsInMultiplication(sle, rightInputAsE)
+		if err != nil {
+			return sle, err
 		}
 	}
 

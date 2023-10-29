@@ -1,6 +1,7 @@
 package optim_test
 
 import (
+	"fmt"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"gonum.org/v1/gonum/mat"
 	"strings"
@@ -41,26 +42,49 @@ func TestLinearExpr_CoeffsAndConstant1(t *testing.T) {
 	}
 }
 
-//func TestLinearExprCoeffsAndConstant(t *testing.T) {
-//	m := optim.NewModel()
-//	x := m.AddBinaryVar()
-//	y := m.AddBinaryVar()
-//
-//	// 2 * x + 4 * y - 5
-//	coeffs := []float64{2, 4}
-//	constant := -5.0
-//	expr := optim.Sum(x.Mult(coeffs[0]), y.Mult(coeffs[1]), optim.K(constant))
-//
-//	for i, coeff := range expr.Coeffs() {
-//		if coeffs[i] != coeff {
-//			t.Errorf("Coeff mismatch: %v != %v", coeff, coeffs[i])
-//		}
-//	}
-//
-//	if expr.Constant() != constant {
-//		t.Errorf("Constant mismatch: %v != %v", expr.Constant(), constant)
-//	}
-//}
+/*
+TestScalarLinearExpr_IDs1
+Description:
+
+	Tests how well the IDs() method works for the ScalarLinearExpr
+*/
+func TestScalarLinearExpr_IDs1(t *testing.T) {
+	// Constants
+	N := 4
+	m := optim.NewModel("Plus1")
+	vv1 := m.AddVariableVector(N)
+
+	sle1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(N),
+		X: vv1,
+		C: 2.14,
+	}
+
+	// Check the IDs method
+	ids0 := sle1.IDs()
+	if len(ids0) != N {
+		t.Errorf(
+			"Expected %v IDs; received %v",
+			len(ids0),
+			N,
+		)
+	}
+
+	var idsToCompare []uint64
+	for _, variable := range vv1.Elements {
+		idsToCompare = append(idsToCompare, variable.ID)
+	}
+
+	for _, elt := range ids0 {
+		if foundIndex, _ := optim.FindInSlice(elt, idsToCompare); foundIndex == -1 {
+			t.Errorf(
+				"could not find id %v in original set of IDs.",
+				elt,
+			)
+		}
+	}
+
+}
 
 /*
 TestScalarLinearExpr_Plus1
@@ -838,6 +862,82 @@ func TestScalarLinearExpr_Multiply7(t *testing.T) {
 			"Expected for specific error to occur, but received %v", err)
 	}
 
+}
+
+/*
+TestScalarLinearExpr_Multiply8
+Description:
+
+	Verifies that a malformed scalar linear expression throws an
+	error when used in a multiply().
+*/
+func TestScalarLinearExpr_Multiply8(t *testing.T) {
+	// Constants
+	N := 4
+	m := optim.NewModel("Multiply8")
+	vv1 := m.AddVariableVector(N)
+
+	sle1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(N - 1),
+		X: vv1,
+		C: 2.14,
+	}
+
+	// Multiply!
+	_, err := sle1.Multiply(3.14)
+	if err == nil {
+		t.Errorf("there were no errors, but we expected some!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf(
+				"the length of L (%v) does not match that of X (%v)!",
+				sle1.L.Len(),
+				sle1.X.Len(),
+			),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestScalarLinearExpr_Multiply9
+Description:
+
+	Verifies that a multiplication with a vector of non-unit length
+	throws an error when used in a multiply().
+*/
+func TestScalarLinearExpr_Multiply9(t *testing.T) {
+	// Constants
+	N := 4
+	m := optim.NewModel("TestSLE-Multiply9")
+	vv1 := m.AddVariableVector(N)
+
+	sle1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(N),
+		X: vv1,
+		C: 2.14,
+	}
+
+	kv2 := optim.KVector(optim.OnesVector(N))
+
+	// Multiply!
+	_, err := sle1.Multiply(kv2)
+	if err == nil {
+		t.Errorf("there were no errors, but we expected some!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			optim.DimensionError{
+				Operation: "Multiply",
+				Arg1:      sle1,
+				Arg2:      kv2,
+			}.Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
 }
 
 /*
