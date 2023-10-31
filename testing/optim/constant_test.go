@@ -872,3 +872,42 @@ func TestK_Multiply8(t *testing.T) {
 		)
 	}
 }
+
+/*
+TestK_Multiply9
+Description:
+
+Tests the ability to multiply a constant with a KVectorTranspose.
+*/
+func TestK_Multiply9(t *testing.T) {
+	// Constants
+	N := 3
+	c1 := optim.K(3.14)
+	vd2 := optim.OnesVector(N)
+	vd2.SetVec(1, 2.0)
+
+	kv2 := optim.KVectorTranspose(vd2)
+
+	// Algorithm
+	expr1, err := c1.Multiply(kv2)
+	if err != nil {
+		t.Errorf("There was an issue multiplying two constants: %v", err)
+	}
+
+	expr1AsKV, ok := expr1.(optim.KVectorTranspose)
+	if !ok {
+		t.Errorf("There was an issue converting the product to a constant!")
+	}
+
+	expr1AsVD := mat.VecDense(expr1AsKV)
+	for eltIndex := 0; eltIndex < expr1AsVD.Len(); eltIndex++ {
+		if expr1AsVD.AtVec(eltIndex) != vd2.AtVec(eltIndex)*3.14 {
+			t.Errorf(
+				"Expected prod[%v] = %v; received %v",
+				eltIndex,
+				expr1AsVD.AtVec(eltIndex),
+				vd2.AtVec(eltIndex)*3.14,
+			)
+		}
+	}
+}
