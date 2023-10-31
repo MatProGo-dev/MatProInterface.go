@@ -189,6 +189,16 @@ Usage:
 */
 func (sle ScalarLinearExpr) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (ScalarConstraint, error) {
 	// Input Processing
+	err := sle.Check()
+	if err != nil {
+		return ScalarConstraint{}, err
+	}
+
+	err = CheckErrors(errors)
+	if err != nil {
+		return ScalarConstraint{}, err
+	}
+
 	rhs, err := ToScalarExpression(rhsIn)
 	if err != nil {
 		return ScalarConstraint{}, err

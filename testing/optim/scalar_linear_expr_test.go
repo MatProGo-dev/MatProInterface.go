@@ -87,6 +87,151 @@ func TestScalarLinearExpr_IDs1(t *testing.T) {
 }
 
 /*
+TestScalarLinearExpr_GreaterEq1
+Description:
+
+	Makes sure that GreaterEq works for an arbitrary input.
+*/
+func TestScalarLinearExpr_GreaterEq1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("SLE-GreaterEq1")
+	N := 3
+	vv1 := m.AddVariableVector(N)
+	L1 := optim.OnesVector(N)
+
+	sle1 := optim.ScalarLinearExpr{
+		L: L1,
+		X: vv1,
+		C: 3.14,
+	}
+
+	// Algorithm
+	constr2, err := sle1.GreaterEq(1.0)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	lhs, tf := constr2.LeftHandSide.(optim.ScalarLinearExpr)
+	if !tf {
+		t.Errorf(
+			"the left hand side was not identified as a ScalarLinearExpr but instead %T",
+			constr2.LeftHandSide,
+		)
+	}
+
+	if lhs.C != sle1.C {
+		t.Errorf(
+			"lhs.C = %v =/= %v = sle1.C",
+			lhs.C,
+			sle1.C,
+		)
+	}
+
+}
+
+/*
+TestScalarLinearExpr_Eq1
+Description:
+
+	Makes sure that Eq works with a
+	variable.
+*/
+func TestScalarLinearExpr_Eq1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("SLE-Eq1")
+	N := 3
+	vv1 := m.AddVariableVector(N)
+	L1 := optim.OnesVector(N)
+
+	sle1 := optim.ScalarLinearExpr{
+		L: L1,
+		X: vv1,
+		C: 3.14,
+	}
+
+	v2 := m.AddVariable()
+
+	// Algorithm
+	constr2, err := sle1.GreaterEq(v2)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	lhs, tf := constr2.LeftHandSide.(optim.ScalarLinearExpr)
+	if !tf {
+		t.Errorf(
+			"the left hand side was not identified as a ScalarLinearExpr but instead %T",
+			constr2.LeftHandSide,
+		)
+	}
+
+	if lhs.C != sle1.C {
+		t.Errorf(
+			"lhs.C = %v =/= %v = sle1.C",
+			lhs.C,
+			sle1.C,
+		)
+	}
+
+	rhs, tf := constr2.RightHandSide.(optim.Variable)
+	if !tf {
+		t.Errorf(
+			"the right hand side was not identified as a variable; it is instead a %T",
+			constr2.RightHandSide,
+		)
+	}
+
+	if rhs.ID != v2.ID {
+		t.Errorf(
+			"rhs.ID = %v =/= %v = v2.ID",
+			rhs.ID, v2.ID,
+		)
+	}
+
+}
+
+/*
+TestScalarLinearExpr_Comparison1
+Description:
+
+	Makes sure that Comparison throws an error when compared with a
+	constant with a malformed sle!
+*/
+func TestScalarLinearExpr_Comparison1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("SLE-Eq1")
+	N := 3
+	vv1 := m.AddVariableVector(N - 1)
+	L1 := optim.OnesVector(N)
+
+	sle1 := optim.ScalarLinearExpr{
+		L: L1,
+		X: vv1,
+		C: 3.14,
+	}
+
+	v2 := m.AddVariable()
+
+	// Algorithm
+	_, err := sle1.GreaterEq(v2)
+	if err == nil {
+		t.Errorf("no error was thrown, but there should have been!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf(
+				"the length of L (%v) does not match that of X (%v)!",
+				sle1.L.Len(),
+				sle1.X.Len(),
+			),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
 TestScalarLinearExpr_Plus1
 Description:
 
@@ -295,8 +440,8 @@ func TestScalarLinearExpression_Plus3(t *testing.T) {
 	v3 := m.AddVariableClassic(-10, 10, optim.Continuous)
 
 	Q1_aoa := [][]float64{
-		[]float64{1.0, 2.0},
-		[]float64{3.0, 4.0},
+		{1.0, 2.0},
+		{3.0, 4.0},
 	}
 
 	L1_a := []float64{1.0, 7.0}
