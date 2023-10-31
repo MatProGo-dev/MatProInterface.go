@@ -1188,7 +1188,7 @@ Description:
 func TestKVector_Multiply11(t *testing.T) {
 	// Constants
 	desLength := 10
-	m := optim.NewModel("KVector_Multiply9")
+	m := optim.NewModel("KVector_Multiply11")
 	var vec1 = optim.KVector(optim.OnesVector(desLength))
 	vec2 := m.AddVariableVector(desLength)
 	vle3, _ := vec2.Plus(optim.OnesVector(desLength))
