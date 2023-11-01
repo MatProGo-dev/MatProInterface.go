@@ -368,6 +368,6 @@ Description:
 
 	Returns the dimension of the Variable object (should be scalar).
 */
-func (v Variable) Dims() []uint {
-	return []uint{1, 1}
+func (v Variable) Dims() []int {
+	return []int{1, 1}
 }

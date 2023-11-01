@@ -25,7 +25,7 @@ type Expression interface {
 	IDs() []uint64
 
 	// Dims returns a slice describing the true dimensions of a given expression (scalar, vector, or matrix)
-	Dims() []uint
+	Dims() []int
 
 	//// Plus adds the current expression to another and returns the resulting
 	//// expression

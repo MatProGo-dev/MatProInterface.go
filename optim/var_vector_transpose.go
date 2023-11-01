@@ -461,6 +461,6 @@ Description:
 
 	This method returns the dimension of the VarVectorTranspose object.
 */
-func (vvt VarVectorTranspose) Dims() []uint {
-	return []uint{1, uint(vvt.Len())}
+func (vvt VarVectorTranspose) Dims() []int {
+	return []int{1, vvt.Len()}
 }

@@ -541,8 +541,8 @@ Description:
 	Returns the dimensions of the VectorLinearExpressionTranspose
 	object.
 */
-func (vlet VectorLinearExpressionTranspose) Dims() []uint {
-	return []uint{1, uint(vlet.Len())}
+func (vlet VectorLinearExpressionTranspose) Dims() []int {
+	return []int{1, vlet.Len()}
 }
 
 func (vlet VectorLinearExpressionTranspose) ToScalarLinearExpression() (ScalarLinearExpr, error) {

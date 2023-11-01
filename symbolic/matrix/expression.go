@@ -9,7 +9,7 @@ import (
 //================
 
 type Expression interface {
-	Dims() []uint // Computes the dimensions of the input matrix
+	Dims() []int // Computes the dimensions of the input matrix
 
 	// IDs
 	// Returns the ids of any variables in the matrix expression

@@ -54,7 +54,7 @@ type ScalarExpression interface {
 
 	//Dims
 	// Returns the dimensions of the scalar expression (should always be 1,1)
-	Dims() []uint
+	Dims() []int
 }
 
 // NewExpr returns a new expression with a single additive constant value, c,

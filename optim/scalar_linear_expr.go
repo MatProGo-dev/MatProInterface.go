@@ -410,6 +410,6 @@ Description:
 
 	Dimensions of a
 */
-func (sle ScalarLinearExpr) Dims() []uint {
-	return []uint{1, 1} // Represents scalar
+func (sle ScalarLinearExpr) Dims() []int {
+	return []int{1, 1} // Represents scalar
 }

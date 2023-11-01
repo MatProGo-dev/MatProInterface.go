@@ -393,6 +393,6 @@ Description:
 
 	Dimensions of the variable vector.
 */
-func (vv VarVector) Dims() []uint {
-	return []uint{uint(vv.Len()), 1}
+func (vv VarVector) Dims() []int {
+	return []int{vv.Len(), 1}
 }

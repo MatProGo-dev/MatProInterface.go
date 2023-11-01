@@ -458,6 +458,6 @@ func (qe ScalarQuadraticExpression) Multiply(val interface{}, errors ...error) (
 	}
 }
 
-func (qe ScalarQuadraticExpression) Dims() []uint {
-	return []uint{1, 1}
+func (qe ScalarQuadraticExpression) Dims() []int {
+	return []int{1, 1}
 }
