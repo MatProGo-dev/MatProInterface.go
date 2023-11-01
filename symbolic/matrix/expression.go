@@ -46,7 +46,7 @@ Description:
 func ToMatrixExpression(e interface{}) (Expression, error) {
 	// Input Processing
 	if !IsMatrixExpression(e) {
-		return Constant(Zeros(0, 0)), TypeError{e}
+		return Constant(Zeros(1, 1)), TypeError{e}
 	}
 
 	// Convert
