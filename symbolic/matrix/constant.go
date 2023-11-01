@@ -24,8 +24,8 @@ func (c Constant) IDs() []uint64 {
 	return []uint64{}
 }
 
-func (c Constant) Dims() []uint {
+func (c Constant) Dims() []int {
 	dense := mat.Dense(c)
 	nR, nC := dense.Dims()
-	return []uint{uint(nR), uint(nC)}
+	return []int{nR, nC}
 }
