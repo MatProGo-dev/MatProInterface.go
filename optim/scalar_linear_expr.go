@@ -144,20 +144,9 @@ func (sle ScalarLinearExpr) Plus(e interface{}, errors ...error) (ScalarExpressi
 		return eAsType.Plus(sle)
 
 	default:
-		fmt.Println("Unexpected type given to Plus().")
-
 		return ScalarQuadraticExpression{}, UnexpectedInputError{InputInQuestion: e, Operation: "Plus"}
 	}
 }
-
-//// Mult multiplies the current expression to another and returns the
-//// resulting expression
-//func (sle ScalarLinearExpr) Mult(c float64) (ScalarExpression, error) {
-//	sle.L.ScaleVec(c, &sle.L)
-//	sle.C *= c
-//
-//	return sle, nil
-//}
 
 // LessEq returns a less than or equal to (<=) constraint between the
 // current expression and another
@@ -367,22 +356,9 @@ func (sle ScalarLinearExpr) Multiply(rightInput interface{}, errors ...error) (E
 
 	case KVector:
 		// This should only be active for KVector of length 1
-		var prodAsVLE VectorLinearExpr
-		prodAsVLE.X = sle.X.Copy()
+		k0 := right.AtVec(0).(K)
 
-		prodAsVLE.L = ZerosMatrix(1, sle.X.Len())
-		rightAt0 := right.AtVec(0).(K)
-		for ii := 0; ii < sle.X.Len(); ii++ {
-			prodAsVLE.L.Set(0, ii,
-				float64(rightAt0)*sle.L.AtVec(ii),
-			)
-		}
-
-		prodAsVLE.C = OnesVector(right.Len())
-		rightAsVD := mat.VecDense(right)
-		prodAsVLE.C.ScaleVec(sle.C, &rightAsVD)
-
-		return prodAsVLE, nil
+		return sle.Multiply(k0)
 
 	case KVectorTranspose:
 		var prodAsVLET VectorLinearExpressionTranspose

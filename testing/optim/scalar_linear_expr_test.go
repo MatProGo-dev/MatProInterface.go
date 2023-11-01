@@ -1244,6 +1244,50 @@ func TestScalarLinearExpr_Multiply9(t *testing.T) {
 }
 
 /*
+TestScalarLinearExpr_Multiply10
+Description:
+
+	Verifies that a multiplication with a KVector of unit length
+	doesn't throw an error.
+*/
+func TestScalarLinearExpr_Multiply10(t *testing.T) {
+	// Constants
+	N := 2
+	m := optim.NewModel("TestSLE-Multiply10")
+	vv1 := m.AddVariableVector(N)
+
+	sle1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(N),
+		X: vv1,
+		C: 2.14,
+	}
+
+	kv2 := optim.KVector(optim.OnesVector(1))
+
+	// Multiply!
+	prod, err := sle1.Multiply(kv2)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	prodAsSLE, tf := prod.(optim.ScalarLinearExpr)
+	if !tf {
+		t.Errorf(
+			"Expected product to be a ScalarLinearExpr; received %T",
+			prod,
+		)
+	}
+
+	if prodAsSLE.C != sle1.C {
+		t.Errorf(
+			"prodAsSLE.C = %v =/= %v = sle1.C",
+			prodAsSLE.C,
+			sle1.C,
+		)
+	}
+}
+
+/*
 TestScalarLinearExpr_NewLinearExpr1
 Description:
 
