@@ -575,6 +575,164 @@ func TestScalarLinearExpression_Plus4(t *testing.T) {
 }
 
 /*
+TestScalarLinearExpression_Plus5
+Description:
+
+	Verifies that Plus() throws an error when the scalar linear expression
+	is not well-formed.
+*/
+func TestScalarLinearExpression_Plus5(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestSLE Plus5")
+	N := 4
+
+	sle1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(N + 1),
+		X: m.AddVariableVector(N),
+		C: -1.0,
+	}
+
+	// Algorithm
+	_, err := sle1.Plus(21.0)
+	if err == nil {
+		t.Errorf(
+			"No error was thrown with a malformed plus, but there should have been one!",
+		)
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf(
+				"the length of L (%v) does not match that of X (%v)!",
+				sle1.L.Len(),
+				sle1.X.Len(),
+			),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestScalarLinearExpression_Plus6
+Description:
+
+	Verifies that Plus() throws an error when a non-nil
+	error is provided.
+*/
+func TestScalarLinearExpression_Plus6(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestSLE Plus6")
+	N := 4
+
+	sle1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(N),
+		X: m.AddVariableVector(N),
+		C: -1.0,
+	}
+
+	// Algorithm
+	_, err := sle1.Plus(21.0, fmt.Errorf("test"))
+	if err == nil {
+		t.Errorf(
+			"No error was thrown with a malformed plus, but there should have been one!",
+		)
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			"test",
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestScalarLinearExpression_Plus7
+Description:
+
+	Verifies that Plus() throws an error when a nil
+	error is provided.
+*/
+func TestScalarLinearExpression_Plus7(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestSLE Plus7")
+	N := 4
+
+	var err0 error
+
+	sle1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(N),
+		X: m.AddVariableVector(N),
+		C: -1.0,
+	}
+
+	// Algorithm
+	sum, err := sle1.Plus(21.0, err0)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	sumAsSLE, tf := sum.(optim.ScalarLinearExpr)
+	if !tf {
+		t.Errorf(
+			"Expected sum to be of type ScalarLinearExpr; received %T",
+			sum,
+		)
+	}
+
+	if sumAsSLE.C != 20.0 {
+		t.Errorf(
+			"sumAsSLE.C = %v =/= %v as expected",
+			sumAsSLE.C,
+			20.0,
+		)
+	}
+
+}
+
+/*
+TestScalarLinearExpression_Plus8
+Description:
+
+	Verifies that Plus() throws an error when a bad
+	input is provided.
+*/
+func TestScalarLinearExpression_Plus8(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestSLE Plus8")
+	N := 4
+
+	var err0 error
+
+	sle1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(N),
+		X: m.AddVariableVector(N),
+		C: -1.0,
+	}
+
+	// Algorithm
+	_, err := sle1.Plus(err0)
+	if err == nil {
+		t.Errorf(
+			"No error was thrown, but it should have been!",
+		)
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			optim.UnexpectedInputError{
+				InputInQuestion: err0,
+				Operation:       "Plus",
+			}.Error(),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
 TestScalarLinearExpr_Multiply1
 Description:
 

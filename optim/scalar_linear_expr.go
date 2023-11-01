@@ -146,7 +146,7 @@ func (sle ScalarLinearExpr) Plus(e interface{}, errors ...error) (ScalarExpressi
 	default:
 		fmt.Println("Unexpected type given to Plus().")
 
-		return ScalarQuadraticExpression{}, fmt.Errorf("Unexpected type (%T) given as first argument to Plus as %v.", e, e)
+		return ScalarQuadraticExpression{}, UnexpectedInputError{InputInQuestion: e, Operation: "Plus"}
 	}
 }
 

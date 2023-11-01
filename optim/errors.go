@@ -16,6 +16,11 @@ type DimensionError struct {
 	Operation string // Either multiply or Plus
 }
 
+type UnexpectedInputError struct {
+	InputInQuestion interface{}
+	Operation       string
+}
+
 /* Methods */
 
 func (de DimensionError) Error() string {
@@ -51,4 +56,12 @@ func (de DimensionError) ArgDimsAsStrings() []string {
 
 	return []string{arg1DimsAsString, arg2DimsAsString}
 
+}
+
+func (uie UnexpectedInputError) Error() string {
+	return fmt.Sprintf(
+		"Unexpected input to \"%v\" operation: %T",
+		uie.Operation,
+		uie.InputInQuestion,
+	)
 }
