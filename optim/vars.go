@@ -371,3 +371,22 @@ Description:
 func (v Variable) Dims() []int {
 	return []int{1, 1}
 }
+
+/*
+Check
+Description:
+
+	Checks whether or not the Variable has a sensible initialization.
+*/
+func (v Variable) Check() error {
+	// Check that the lower bound is below is the upper bound
+	if v.Lower > v.Upper {
+		return fmt.Errorf(
+			"lower bound (%v) of variable is above upper bound (%v).",
+			v.Lower, v.Upper,
+		)
+	}
+
+	// If nothing was thrown, then return nil!
+	return nil
+}
