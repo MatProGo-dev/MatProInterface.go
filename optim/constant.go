@@ -144,73 +144,81 @@ func (c K) Multiply(term1 interface{}, errors ...error) (Expression, error) {
 	}
 
 	// Algorithm
-	switch term1Converted := term1.(type) {
+	switch right := term1.(type) {
 	case float64:
-		return c.Multiply(K(term1Converted))
+		return c.Multiply(K(right))
 	case K:
-		return c * term1Converted, nil
+		return c * right, nil
 	case Variable:
 		// Algorithm
-		term1AsSLE := term1Converted.ToScalarLinearExpression()
+		term1AsSLE := right.ToScalarLinearExpression()
 
 		return c.Multiply(term1AsSLE)
 	case ScalarLinearExpr:
 		// Scale all vectors and constants
-		sleOut := term1Converted.Copy()
+		sleOut := right.Copy()
 		sleOut.L.ScaleVec(float64(c), &sleOut.L)
-		sleOut.C = term1Converted.C * float64(c)
+		sleOut.C = right.C * float64(c)
 
 		return sleOut, nil
 	case ScalarQuadraticExpression:
 		// Scale all matrices and constants
 		var sqeOut ScalarQuadraticExpression
-		sqeOut.Q.Scale(float64(c), &term1Converted.Q)
-		sqeOut.L.ScaleVec(float64(c), &term1Converted.L)
-		sqeOut.C = float64(c) * term1Converted.C
+		sqeOut.Q.Scale(float64(c), &right.Q)
+		sqeOut.L.ScaleVec(float64(c), &right.L)
+		sqeOut.C = float64(c) * right.C
 
 		return sqeOut, nil
 	case KVector:
-		var prod mat.VecDense = ZerosVector(term1Converted.Len())
-		term1AsVecDense := mat.VecDense(term1Converted)
+		var prod mat.VecDense = ZerosVector(right.Len())
+		term1AsVecDense := mat.VecDense(right)
 
 		prod.ScaleVec(float64(c), &term1AsVecDense)
 
 		return KVector(prod), nil
 	case KVectorTranspose:
-		var prod mat.VecDense = ZerosVector(term1Converted.Len())
-		term1AsVecDense := mat.VecDense(term1Converted)
+		var prod mat.VecDense = ZerosVector(right.Len())
+		term1AsVecDense := mat.VecDense(right)
 
 		prod.ScaleVec(float64(c), &term1AsVecDense)
 
 		return KVectorTranspose(prod), nil
 	case VarVector:
-		var vleOut VectorLinearExpr
-		vleOut.X = term1Converted.Copy()
-		tempIdentity := Identity(term1Converted.Len()) // Is this needed?
-		vleOut.L.Scale(float64(c), &tempIdentity)
-		vleOut.C = ZerosVector(term1Converted.Len())
-
-		return vleOut, nil
+		// VarVector is of unit length.
+		return ScalarLinearExpr{
+			L: OnesVector(1),
+			X: right.Copy(),
+			C: 0.0,
+		}, nil
 	case VarVectorTranspose:
-		var vleOut VectorLinearExpressionTranspose
-		vleOut.X = term1Converted.Copy().Transpose().(VarVector)
-		tempIdentity := Identity(term1Converted.Len()) // Is this needed?
-		vleOut.L.Scale(float64(c), &tempIdentity)
-		vleOut.C = ZerosVector(term1Converted.Len())
+		if right.Len() == 1 {
+			rightTransposed := right.Transpose().(VarVector)
+			return ScalarLinearExpr{
+				L: OnesVector(1),
+				X: rightTransposed.Copy(),
+				C: 0.0,
+			}, nil
+		} else {
+			var vleOut VectorLinearExpressionTranspose
+			vleOut.X = right.Copy().Transpose().(VarVector)
+			tempIdentity := Identity(right.Len()) // Is this needed?
+			vleOut.L.Scale(float64(c), &tempIdentity)
+			vleOut.C = ZerosVector(right.Len())
 
-		return vleOut, nil
+			return vleOut, nil
+		}
 	case VectorLinearExpr:
 		var vleOut VectorLinearExpr
-		vleOut.L.Scale(float64(c), &term1Converted.L)
-		vleOut.C.ScaleVec(float64(c), &term1Converted.C)
-		vleOut.X = term1Converted.X.Copy()
+		vleOut.L.Scale(float64(c), &right.L)
+		vleOut.C.ScaleVec(float64(c), &right.C)
+		vleOut.X = right.X.Copy()
 
 		return vleOut, nil
 	case VectorLinearExpressionTranspose:
 		var vletOut VectorLinearExpressionTranspose
-		vletOut.L.Scale(float64(c), &term1Converted.L)
-		vletOut.C.ScaleVec(float64(c), &term1Converted.C)
-		vletOut.X = term1Converted.X.Copy()
+		vletOut.L.Scale(float64(c), &right.L)
+		vletOut.C.ScaleVec(float64(c), &right.C)
+		vletOut.X = right.X.Copy()
 
 		return vletOut, nil
 	default:
@@ -221,4 +229,8 @@ func (c K) Multiply(term1 interface{}, errors ...error) (Expression, error) {
 
 func (c K) Dims() []int {
 	return []int{1, 1} // Signifies scalar
+}
+
+func (c K) Check() error {
+	return nil
 }

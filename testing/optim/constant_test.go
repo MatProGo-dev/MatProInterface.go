@@ -911,3 +911,83 @@ func TestK_Multiply9(t *testing.T) {
 		}
 	}
 }
+
+/*
+TestK_Multiply10
+Description:
+
+	Tests the ability to multiply a constant with a VarVector
+	of non-unit length.
+*/
+func TestK_Multiply10(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestK_Multiply10")
+	N := 3
+	c1 := optim.K(3.14)
+
+	kv2 := m.AddVariableVector(N)
+
+	// Algorithm
+	_, err := c1.Multiply(kv2)
+	if err == nil {
+		t.Errorf("no error was thrown, but there should have been!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			optim.DimensionError{
+				Operation: "Multiply",
+				Arg1:      c1,
+				Arg2:      kv2,
+			}.Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestK_Multiply11
+Description:
+
+	Tests the ability to multiply a constant with a VarVector
+	of unit length.
+*/
+func TestK_Multiply11(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestK_Multiply10")
+	N := 1
+	c1 := optim.K(3.14)
+
+	kv2 := m.AddVariableVector(N)
+
+	// Algorithm
+	prod, err := c1.Multiply(kv2)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	prodAsSLE, tf := prod.(optim.ScalarLinearExpr)
+	if !tf {
+		t.Errorf("expected product to be of type ScalarLinearExpr; received %T", prod)
+	}
+
+	if prodAsSLE.C != 0.0 {
+		t.Errorf("prod.C = %v =/= 0.0", prodAsSLE.C)
+	}
+}
+
+/*
+TestK_Check1
+Description:
+
+	Tests that the Check() method returns nil as expected.
+*/
+func TestK_Check1(t *testing.T) {
+	// Constants
+	k1 := optim.K(3.14)
+
+	// Algorithm
+	if k1.Check() != nil {
+		t.Errorf("unexpected error: %v", k1.Check())
+	}
+}
