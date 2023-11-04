@@ -1,6 +1,7 @@
 package optim_test
 
 import (
+	"fmt"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"gonum.org/v1/gonum/mat"
 	"strings"
@@ -41,26 +42,194 @@ func TestLinearExpr_CoeffsAndConstant1(t *testing.T) {
 	}
 }
 
-//func TestLinearExprCoeffsAndConstant(t *testing.T) {
-//	m := optim.NewModel()
-//	x := m.AddBinaryVar()
-//	y := m.AddBinaryVar()
-//
-//	// 2 * x + 4 * y - 5
-//	coeffs := []float64{2, 4}
-//	constant := -5.0
-//	expr := optim.Sum(x.Mult(coeffs[0]), y.Mult(coeffs[1]), optim.K(constant))
-//
-//	for i, coeff := range expr.Coeffs() {
-//		if coeffs[i] != coeff {
-//			t.Errorf("Coeff mismatch: %v != %v", coeff, coeffs[i])
-//		}
-//	}
-//
-//	if expr.Constant() != constant {
-//		t.Errorf("Constant mismatch: %v != %v", expr.Constant(), constant)
-//	}
-//}
+/*
+TestScalarLinearExpr_IDs1
+Description:
+
+	Tests how well the IDs() method works for the ScalarLinearExpr
+*/
+func TestScalarLinearExpr_IDs1(t *testing.T) {
+	// Constants
+	N := 4
+	m := optim.NewModel("Plus1")
+	vv1 := m.AddVariableVector(N)
+
+	sle1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(N),
+		X: vv1,
+		C: 2.14,
+	}
+
+	// Check the IDs method
+	ids0 := sle1.IDs()
+	if len(ids0) != N {
+		t.Errorf(
+			"Expected %v IDs; received %v",
+			len(ids0),
+			N,
+		)
+	}
+
+	var idsToCompare []uint64
+	for _, variable := range vv1.Elements {
+		idsToCompare = append(idsToCompare, variable.ID)
+	}
+
+	for _, elt := range ids0 {
+		if foundIndex, _ := optim.FindInSlice(elt, idsToCompare); foundIndex == -1 {
+			t.Errorf(
+				"could not find id %v in original set of IDs.",
+				elt,
+			)
+		}
+	}
+
+}
+
+/*
+TestScalarLinearExpr_GreaterEq1
+Description:
+
+	Makes sure that GreaterEq works for an arbitrary input.
+*/
+func TestScalarLinearExpr_GreaterEq1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("SLE-GreaterEq1")
+	N := 3
+	vv1 := m.AddVariableVector(N)
+	L1 := optim.OnesVector(N)
+
+	sle1 := optim.ScalarLinearExpr{
+		L: L1,
+		X: vv1,
+		C: 3.14,
+	}
+
+	// Algorithm
+	constr2, err := sle1.GreaterEq(1.0)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	lhs, tf := constr2.LeftHandSide.(optim.ScalarLinearExpr)
+	if !tf {
+		t.Errorf(
+			"the left hand side was not identified as a ScalarLinearExpr but instead %T",
+			constr2.LeftHandSide,
+		)
+	}
+
+	if lhs.C != sle1.C {
+		t.Errorf(
+			"lhs.C = %v =/= %v = sle1.C",
+			lhs.C,
+			sle1.C,
+		)
+	}
+
+}
+
+/*
+TestScalarLinearExpr_Eq1
+Description:
+
+	Makes sure that Eq works with a
+	variable.
+*/
+func TestScalarLinearExpr_Eq1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("SLE-Eq1")
+	N := 3
+	vv1 := m.AddVariableVector(N)
+	L1 := optim.OnesVector(N)
+
+	sle1 := optim.ScalarLinearExpr{
+		L: L1,
+		X: vv1,
+		C: 3.14,
+	}
+
+	v2 := m.AddVariable()
+
+	// Algorithm
+	constr2, err := sle1.GreaterEq(v2)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	lhs, tf := constr2.LeftHandSide.(optim.ScalarLinearExpr)
+	if !tf {
+		t.Errorf(
+			"the left hand side was not identified as a ScalarLinearExpr but instead %T",
+			constr2.LeftHandSide,
+		)
+	}
+
+	if lhs.C != sle1.C {
+		t.Errorf(
+			"lhs.C = %v =/= %v = sle1.C",
+			lhs.C,
+			sle1.C,
+		)
+	}
+
+	rhs, tf := constr2.RightHandSide.(optim.Variable)
+	if !tf {
+		t.Errorf(
+			"the right hand side was not identified as a variable; it is instead a %T",
+			constr2.RightHandSide,
+		)
+	}
+
+	if rhs.ID != v2.ID {
+		t.Errorf(
+			"rhs.ID = %v =/= %v = v2.ID",
+			rhs.ID, v2.ID,
+		)
+	}
+
+}
+
+/*
+TestScalarLinearExpr_Comparison1
+Description:
+
+	Makes sure that Comparison throws an error when compared with a
+	constant with a malformed sle!
+*/
+func TestScalarLinearExpr_Comparison1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("SLE-Eq1")
+	N := 3
+	vv1 := m.AddVariableVector(N - 1)
+	L1 := optim.OnesVector(N)
+
+	sle1 := optim.ScalarLinearExpr{
+		L: L1,
+		X: vv1,
+		C: 3.14,
+	}
+
+	v2 := m.AddVariable()
+
+	// Algorithm
+	_, err := sle1.GreaterEq(v2)
+	if err == nil {
+		t.Errorf("no error was thrown, but there should have been!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf(
+				"the length of L (%v) does not match that of X (%v)!",
+				sle1.L.Len(),
+				sle1.X.Len(),
+			),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+
+}
 
 /*
 TestScalarLinearExpr_Plus1
@@ -271,8 +440,8 @@ func TestScalarLinearExpression_Plus3(t *testing.T) {
 	v3 := m.AddVariableClassic(-10, 10, optim.Continuous)
 
 	Q1_aoa := [][]float64{
-		[]float64{1.0, 2.0},
-		[]float64{3.0, 4.0},
+		{1.0, 2.0},
+		{3.0, 4.0},
 	}
 
 	L1_a := []float64{1.0, 7.0}
@@ -401,6 +570,164 @@ func TestScalarLinearExpression_Plus4(t *testing.T) {
 
 	if sle3.C != le2.C {
 		t.Errorf("Expected for constant of final quadratic expression to be %v; received %v", le2.C+le2.C, sle3.C)
+	}
+
+}
+
+/*
+TestScalarLinearExpression_Plus5
+Description:
+
+	Verifies that Plus() throws an error when the scalar linear expression
+	is not well-formed.
+*/
+func TestScalarLinearExpression_Plus5(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestSLE Plus5")
+	N := 4
+
+	sle1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(N + 1),
+		X: m.AddVariableVector(N),
+		C: -1.0,
+	}
+
+	// Algorithm
+	_, err := sle1.Plus(21.0)
+	if err == nil {
+		t.Errorf(
+			"No error was thrown with a malformed plus, but there should have been one!",
+		)
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf(
+				"the length of L (%v) does not match that of X (%v)!",
+				sle1.L.Len(),
+				sle1.X.Len(),
+			),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestScalarLinearExpression_Plus6
+Description:
+
+	Verifies that Plus() throws an error when a non-nil
+	error is provided.
+*/
+func TestScalarLinearExpression_Plus6(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestSLE Plus6")
+	N := 4
+
+	sle1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(N),
+		X: m.AddVariableVector(N),
+		C: -1.0,
+	}
+
+	// Algorithm
+	_, err := sle1.Plus(21.0, fmt.Errorf("test"))
+	if err == nil {
+		t.Errorf(
+			"No error was thrown with a malformed plus, but there should have been one!",
+		)
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			"test",
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestScalarLinearExpression_Plus7
+Description:
+
+	Verifies that Plus() throws an error when a nil
+	error is provided.
+*/
+func TestScalarLinearExpression_Plus7(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestSLE Plus7")
+	N := 4
+
+	var err0 error
+
+	sle1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(N),
+		X: m.AddVariableVector(N),
+		C: -1.0,
+	}
+
+	// Algorithm
+	sum, err := sle1.Plus(21.0, err0)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	sumAsSLE, tf := sum.(optim.ScalarLinearExpr)
+	if !tf {
+		t.Errorf(
+			"Expected sum to be of type ScalarLinearExpr; received %T",
+			sum,
+		)
+	}
+
+	if sumAsSLE.C != 20.0 {
+		t.Errorf(
+			"sumAsSLE.C = %v =/= %v as expected",
+			sumAsSLE.C,
+			20.0,
+		)
+	}
+
+}
+
+/*
+TestScalarLinearExpression_Plus8
+Description:
+
+	Verifies that Plus() throws an error when a bad
+	input is provided.
+*/
+func TestScalarLinearExpression_Plus8(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestSLE Plus8")
+	N := 4
+
+	var err0 error
+
+	sle1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(N),
+		X: m.AddVariableVector(N),
+		C: -1.0,
+	}
+
+	// Algorithm
+	_, err := sle1.Plus(err0)
+	if err == nil {
+		t.Errorf(
+			"No error was thrown, but it should have been!",
+		)
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			optim.UnexpectedInputError{
+				InputInQuestion: err0,
+				Operation:       "Plus",
+			}.Error(),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
 	}
 
 }
@@ -838,6 +1165,126 @@ func TestScalarLinearExpr_Multiply7(t *testing.T) {
 			"Expected for specific error to occur, but received %v", err)
 	}
 
+}
+
+/*
+TestScalarLinearExpr_Multiply8
+Description:
+
+	Verifies that a malformed scalar linear expression throws an
+	error when used in a multiply().
+*/
+func TestScalarLinearExpr_Multiply8(t *testing.T) {
+	// Constants
+	N := 4
+	m := optim.NewModel("Multiply8")
+	vv1 := m.AddVariableVector(N)
+
+	sle1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(N - 1),
+		X: vv1,
+		C: 2.14,
+	}
+
+	// Multiply!
+	_, err := sle1.Multiply(3.14)
+	if err == nil {
+		t.Errorf("there were no errors, but we expected some!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf(
+				"the length of L (%v) does not match that of X (%v)!",
+				sle1.L.Len(),
+				sle1.X.Len(),
+			),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestScalarLinearExpr_Multiply9
+Description:
+
+	Verifies that a multiplication with a vector of non-unit length
+	throws an error when used in a multiply().
+*/
+func TestScalarLinearExpr_Multiply9(t *testing.T) {
+	// Constants
+	N := 4
+	m := optim.NewModel("TestSLE-Multiply9")
+	vv1 := m.AddVariableVector(N)
+
+	sle1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(N),
+		X: vv1,
+		C: 2.14,
+	}
+
+	kv2 := optim.KVector(optim.OnesVector(N))
+
+	// Multiply!
+	_, err := sle1.Multiply(kv2)
+	if err == nil {
+		t.Errorf("there were no errors, but we expected some!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			optim.DimensionError{
+				Operation: "Multiply",
+				Arg1:      sle1,
+				Arg2:      kv2,
+			}.Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestScalarLinearExpr_Multiply10
+Description:
+
+	Verifies that a multiplication with a KVector of unit length
+	doesn't throw an error.
+*/
+func TestScalarLinearExpr_Multiply10(t *testing.T) {
+	// Constants
+	N := 2
+	m := optim.NewModel("TestSLE-Multiply10")
+	vv1 := m.AddVariableVector(N)
+
+	sle1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(N),
+		X: vv1,
+		C: 2.14,
+	}
+
+	kv2 := optim.KVector(optim.OnesVector(1))
+
+	// Multiply!
+	prod, err := sle1.Multiply(kv2)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	prodAsSLE, tf := prod.(optim.ScalarLinearExpr)
+	if !tf {
+		t.Errorf(
+			"Expected product to be a ScalarLinearExpr; received %T",
+			prod,
+		)
+	}
+
+	if prodAsSLE.C != sle1.C {
+		t.Errorf(
+			"prodAsSLE.C = %v =/= %v = sle1.C",
+			prodAsSLE.C,
+			sle1.C,
+		)
+	}
 }
 
 /*

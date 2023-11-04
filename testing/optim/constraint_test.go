@@ -132,3 +132,33 @@ func TestConstraint_IsConstraint5(t *testing.T) {
 		t.Errorf("The scalar constraint is not implementing a Constraint() interface!")
 	}
 }
+
+/*
+TestConstraint_IsConstraint6
+Description:
+
+	This test verifies if a pointer to a scalar constraint is properly detected by IsConstraint.
+*/
+func TestConstraint_IsConstraint6(t *testing.T) {
+	// Constants
+	m := optim.NewModel("IsConstraint6")
+
+	// Create a scalar constraint.
+
+	lhs0 := optim.One
+	x := m.AddBinaryVariable()
+
+	scalarConstr0, err := optim.Eq(lhs0, x)
+	if err != nil {
+		t.Errorf("An error occurred constructing the equality constraint: %v", err)
+	}
+
+	sc1, ok := scalarConstr0.(optim.ScalarConstraint)
+	if !ok {
+		t.Errorf("Expected result of Eq to return a ScalarConstraint, but received %T", sc1)
+	}
+
+	if !optim.IsConstraint(&sc1) {
+		t.Errorf("The scalar constraint is not implementing a Constraint() interface!")
+	}
+}

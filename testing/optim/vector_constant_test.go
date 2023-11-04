@@ -432,7 +432,7 @@ func TestKVector_Plus1(t *testing.T) {
 	// Algorithm
 	eOut, err := vec1.Plus(vec2)
 	if err != nil {
-		t.Errorf("There was an issue adding the two expression.")
+		t.Errorf("There was an issue adding the two expression: %v", err)
 	}
 
 	vec3, ok := eOut.(optim.KVector)
@@ -578,8 +578,10 @@ func TestKVector_Plus5(t *testing.T) {
 	if !strings.Contains(
 		err.Error(),
 		fmt.Sprintf(
-			"Length of vectors in sum do not match! Vectors have lengths %v and %v!",
-			vec1.Len(), vec2.Len(),
+			"KVector of shape (%v,1) dimension mismatch with %T of shape (%v,1)",
+			vec1.Len(),
+			optim.KVector(vec2),
+			vec2.Len(),
 		)) {
 		t.Errorf("The wrong error was detected! %v", err)
 	}
@@ -603,8 +605,10 @@ func TestKVector_Plus6(t *testing.T) {
 	if !strings.Contains(
 		err.Error(),
 		fmt.Sprintf(
-			"Length of vectors in sum do not match! Vectors have lengths %v and %v!",
-			vec1.Len(), vec2.Len(),
+			"KVector of shape (%v,1) dimension mismatch with %T of shape (%v,1)",
+			vec1.Len(),
+			vec2,
+			vec2.Len(),
 		)) {
 		t.Errorf("The wrong error was detected! %v", err)
 	}
@@ -910,15 +914,317 @@ func TestKVector_Multiply1(t *testing.T) {
 	var vec1 = optim.KVector(optim.OnesVector(desLength))
 
 	// Algorithm
-	_, err := vec1.Multiply(3.14)
+	scaledVec0, err := vec1.Multiply(3.14)
+	if err != nil {
+		t.Errorf("unexpected error when multiplying KVector with a constant: %v", err)
+	}
+
+	scaledVec1, ok := scaledVec0.(optim.KVector)
+	if !ok {
+		t.Errorf(
+			"expected scaled constant vector to be of type optim.KVector; received %T",
+			scaledVec0,
+		)
+	}
+
+	// Check elements of scaledVec1
+	sv2 := mat.VecDense(scaledVec1)
+	for ii, elt := range (&sv2).RawVector().Data {
+		if elt != 3.14 {
+			t.Errorf(
+				"Element %v of scaledVec is %v; expected %v",
+				ii, elt,
+				3.14,
+			)
+		}
+	}
+}
+
+/*
+TestKVector_Multiply2
+Description:
+
+	Tests the multiplication of the KVector with a float and an error.
+*/
+func TestKVector_Multiply2(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	err0 := fmt.Errorf("Test")
+
+	// Algorithm
+	_, err := vec1.Multiply(3.14, err0)
 	if !strings.Contains(
 		err.Error(),
-		"The Multiply() method for KVector has not been implemented yet!",
+		err0.Error(),
 	) {
 		t.Errorf(
-			"There was an unexpected error performing multiplication: %v",
+			"unexpected error when multiplying KVector with a constant: %v",
 			err,
 		)
+	}
+}
+
+/*
+TestKVector_Multiply3
+Description:
+
+	Tests the multiplication of the KVector with a KVector of different length.
+*/
+func TestKVector_Multiply3(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	vec2 := optim.KVector(optim.OnesVector(desLength - 1))
+
+	// Algorithm
+	_, err := vec1.Multiply(vec2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"KVector of length %v can not be multiplied with a %T of different length (%v).",
+			vec1.Len(),
+			vec2,
+			vec2.Len(),
+		),
+	) {
+		t.Errorf(
+			"unexpected error when multiplying KVector with a constant: %v",
+			err,
+		)
+	}
+}
+
+/*
+TestKVector_Multiply4
+Description:
+
+	Tests the multiplication of the KVector with a constant K.
+*/
+func TestKVector_Multiply4(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+
+	// Algorithm
+	scaledVec0, err := vec1.Multiply(optim.K(3.14))
+	if err != nil {
+		t.Errorf("unexpected error when multiplying KVector with a constant: %v", err)
+	}
+
+	scaledVec1, ok := scaledVec0.(optim.KVector)
+	if !ok {
+		t.Errorf(
+			"expected scaled constant vector to be of type optim.KVector; received %T",
+			scaledVec0,
+		)
+	}
+
+	// Check elements of scaledVec1
+	sv2 := mat.VecDense(scaledVec1)
+	for ii, elt := range (&sv2).RawVector().Data {
+		if elt != 3.14 {
+			t.Errorf(
+				"Element %v of scaledVec is %v; expected %v",
+				ii, elt,
+				3.14,
+			)
+		}
+	}
+}
+
+/*
+TestKVector_Multiply5
+Description:
+
+	Tests the multiplication of the KVector with a mat.VecDense object.
+*/
+func TestKVector_Multiply5(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+
+	// Algorithm
+	_, err := vec1.Multiply(optim.OnesVector(desLength))
+	if !strings.Contains(
+		err.Error(),
+		"MatProInterface does not currently support operations that result in matrices! if you want this feature, create an issue!",
+	) {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+/*
+TestKVector_Multiply6
+Description:
+
+	Tests the multiplication of the KVector with a KVector.
+*/
+func TestKVector_Multiply6(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+
+	// Algorithm
+	_, err := vec1.Multiply(
+		optim.KVector(optim.OnesVector(desLength)),
+	)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
+			optim.KVector(optim.OnesVector(desLength)),
+		),
+	) {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+/*
+TestKVector_Multiply7
+Description:
+
+	Tests the multiplication of the KVector with a KVectorTranspose object.
+*/
+func TestKVector_Multiply7(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+
+	// Algorithm
+	_, err := vec1.Multiply(
+		optim.KVector(optim.OnesVector(desLength)).Transpose(),
+	)
+	if !strings.Contains(
+		err.Error(),
+		"MatProInterface does not currently support operations that result in matrices! if you want this feature, create an issue!",
+	) {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+/*
+TestKVector_Multiply8
+Description:
+
+	Tests the multiplication of the KVector with a VarVector.
+*/
+func TestKVector_Multiply8(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("KVector_Multiply8")
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	vec2 := m.AddVariableVector(desLength)
+
+	// Algorithm
+	_, err := vec1.Multiply(vec2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
+			vec2,
+		),
+	) {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+/*
+TestKVector_Multiply9
+Description:
+
+	Tests the multiplication of the KVector with a KVectorTranspose object.
+*/
+func TestKVector_Multiply9(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("KVector_Multiply9")
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	vec2 := m.AddVariableVector(desLength)
+
+	// Algorithm
+	_, err := vec1.Multiply(vec2.Transpose())
+	if !strings.Contains(
+		err.Error(),
+		"MatProInterface does not currently support operations that result in matrices! if you want this feature, create an issue!",
+	) {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+/*
+TestKVector_Multiply10
+Description:
+
+	Tests the multiplication of the KVector with a VarVector.
+*/
+func TestKVector_Multiply10(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("KVector_Multiply10")
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	vec2 := m.AddVariableVector(desLength)
+	vle3, _ := vec2.Plus(optim.OnesVector(desLength))
+
+	// Algorithm
+	_, err := vec1.Multiply(vle3)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
+			vle3,
+		),
+	) {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+/*
+TestKVector_Multiply11
+Description:
+
+	Tests the multiplication of the KVector with a KVectorTranspose object.
+*/
+func TestKVector_Multiply11(t *testing.T) {
+	// Constants
+	desLength := 10
+	m := optim.NewModel("KVector_Multiply11")
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	vec2 := m.AddVariableVector(desLength)
+	vle3, _ := vec2.Plus(optim.OnesVector(desLength))
+
+	// Algorithm
+	_, err := vec1.Multiply(vle3.Transpose())
+	if !strings.Contains(
+		err.Error(),
+		"MatProInterface does not currently support operations that result in matrices! if you want this feature, create an issue!",
+	) {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+/*
+TestKVector_Multiply12
+Description:
+
+	Tests the multiplication of the KVector with a KVectorTranspose object.
+*/
+func TestKVector_Multiply12(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVector(optim.OnesVector(desLength))
+	b2 := false
+
+	// Algorithm
+	_, err := vec1.Multiply(b2)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"The input to KVectorTranspose's Multiply method (%v) has unexpected type: %T",
+			b2, b2,
+		),
+	) {
+		t.Errorf("unexpected error: %v", err)
 	}
 }
 

@@ -52,10 +52,9 @@ func (v Variable) Constant() float64 {
 // expression.
 func (v Variable) Plus(e interface{}, errors ...error) (ScalarExpression, error) {
 	// Input Processing??
-	if len(errors) > 0 { // If any errors are given, then check them.
-		if errors[0] != nil {
-			return v, errors[0]
-		}
+	err := CheckErrors(errors)
+	if err != nil {
+		return v, err
 	}
 
 	// Algorithm
@@ -155,20 +154,20 @@ func (v Variable) Plus(e interface{}, errors ...error) (ScalarExpression, error)
 
 // LessEq returns a less than or equal to (<=) constraint between the
 // current expression and another
-func (v Variable) LessEq(other ScalarExpression) (ScalarConstraint, error) {
-	return v.Comparison(other, SenseLessThanEqual)
+func (v Variable) LessEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+	return v.Comparison(rhsIn, SenseLessThanEqual, errors...)
 }
 
 // GreaterEq returns a greater than or equal to (>=) constraint between the
 // current expression and another
-func (v Variable) GreaterEq(other ScalarExpression) (ScalarConstraint, error) {
-	return v.Comparison(other, SenseGreaterThanEqual)
+func (v Variable) GreaterEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+	return v.Comparison(rhsIn, SenseGreaterThanEqual, errors...)
 }
 
 // Eq returns an equality (==) constraint between the current expression
 // and another
-func (v Variable) Eq(other ScalarExpression) (ScalarConstraint, error) {
-	return v.Comparison(other, SenseEqual)
+func (v Variable) Eq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+	return v.Comparison(rhsIn, SenseEqual, errors...)
 }
 
 /*
@@ -181,7 +180,12 @@ Usage:
 
 	constr, err := v.Comparison(expr1,SenseGreaterThanEqual)
 */
-func (v Variable) Comparison(rhs ScalarExpression, sense ConstrSense) (ScalarConstraint, error) {
+func (v Variable) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (ScalarConstraint, error) {
+	// Input Processing
+	rhs, err := ToScalarExpression(rhsIn)
+	if err != nil {
+		return ScalarConstraint{}, err
+	}
 	// Constants
 
 	// Algorithm
@@ -252,37 +256,33 @@ Description:
 */
 func (v Variable) Multiply(val interface{}, errors ...error) (Expression, error) {
 	// Input Processing
-	// TODO: Finish input processing!
+	if IsVectorExpression(val) {
+		ve, _ := ToVectorExpression(val)
+		if ve.Len() != 1 {
+			return v, DimensionError{
+				Operation: "Multiply",
+				Arg1:      v,
+				Arg2:      ve,
+			}
+		}
+	}
 
 	// Constants
-	switch val.(type) {
+	switch e := val.(type) {
 	case float64:
-		// Cast
-		valAsFloat := val.(float64)
-
-		// Algorithm
-		return v.Multiply(
-			K(valAsFloat),
-		)
+		return v.Multiply(K(e))
 	case K:
-		// Cast
-		valAsK := val.(K)
-
 		// Algorithm
-		return valAsK.Multiply(v)
+		return e.Multiply(v)
 	case Variable:
-		// Cast
-		valAsVar := val.(Variable)
-
-		// Algorithm
 		sqeOut := ScalarQuadraticExpression{
 			X: VarVector{
-				UniqueVars([]Variable{valAsVar, v}),
+				UniqueVars([]Variable{e, v}),
 			},
 			C: 0.0,
 		}
 		sqeOut.L = ZerosVector(sqeOut.X.Len())
-		if valAsVar.ID == v.ID {
+		if e.ID == v.ID {
 			sqeOut.Q = *mat.NewDense(1, 1, []float64{1.0})
 		} else {
 			sqeOut.Q = ZerosMatrix(2, 2)
@@ -292,13 +292,10 @@ func (v Variable) Multiply(val interface{}, errors ...error) (Expression, error)
 		return sqeOut, nil
 
 	case ScalarLinearExpr:
-		// Cast
-		valAsSLE := val.(ScalarLinearExpr)
-
 		// Algorithm
 		sqeOut := ScalarQuadraticExpression{
 			X: VarVector{
-				UniqueVars(append(valAsSLE.X.Elements, v)),
+				UniqueVars(append(e.X.Elements, v)),
 			},
 			C: 0.0,
 		}
@@ -306,36 +303,38 @@ func (v Variable) Multiply(val interface{}, errors ...error) (Expression, error)
 		sqeOut.L = ZerosVector(sqeOut.X.Len())
 
 		// Update Q
-		vIndex, _ := FindInSlice(v, valAsSLE.X.Elements)    // err should be nil
+		vIndex, _ := FindInSlice(v, e.X.Elements)           // err should be nil
 		vIndexInSQE, _ := FindInSlice(v, sqeOut.X.Elements) // err should be nil
-		for xIndex := 0; xIndex < valAsSLE.L.Len(); xIndex++ {
+		for xIndex := 0; xIndex < e.L.Len(); xIndex++ {
 			// Check to make sure index is not the vIndex
 			if vIndex == xIndex {
 				// If v is in the original slice (i.e., we now need to represent v^2)
 
-				sqeOut.Q.Set(vIndexInSQE, vIndexInSQE, valAsSLE.L.AtVec(vIndex))
+				sqeOut.Q.Set(vIndexInSQE, vIndexInSQE, e.L.AtVec(vIndex))
 			} else {
 				// If xIndex is not for v, then create off-diagonal elements
-				xIndexInSQE, _ := FindInSlice(valAsSLE.X.AtVec(xIndex), sqeOut.X.Elements)
+				xIndexInSQE, _ := FindInSlice(e.X.AtVec(xIndex), sqeOut.X.Elements)
 
 				// Create a pair of off-diagonal elements
-				sqeOut.Q.Set(vIndexInSQE, xIndexInSQE, valAsSLE.L.AtVec(xIndex)*0.5)
-				sqeOut.Q.Set(xIndexInSQE, vIndexInSQE, valAsSLE.L.AtVec(xIndex)*0.5)
+				sqeOut.Q.Set(vIndexInSQE, xIndexInSQE, e.L.AtVec(xIndex)*0.5)
+				sqeOut.Q.Set(xIndexInSQE, vIndexInSQE, e.L.AtVec(xIndex)*0.5)
 
 			}
 		}
 
 		// Update L
-		sqeOut.L.SetVec(vIndexInSQE, valAsSLE.C)
+		sqeOut.L.SetVec(vIndexInSQE, e.C)
 
 		return sqeOut, nil
 
 	case ScalarQuadraticExpression:
-		// Cast
-		//valAsSQE := val.(ScalarQuadraticExpression)
-
 		// Return error
 		return ScalarQuadraticExpression{}, fmt.Errorf("Can not multiply Variable with ScalarQuadraticExpression. MatProInterface can not represent polynomials higher than degree 2.")
+
+	case VectorLinearExpressionTranspose:
+		return ScalarQuadraticExpression{}, fmt.Errorf(
+			"cannot currently multiply a variable with a vector to create a quadratic expression; file an issue if you are interested in seeing a feature like this.",
+		)
 
 	default:
 		return v, fmt.Errorf("Unexpected input to v.Multiply(): %T", val)
@@ -361,4 +360,33 @@ func (v Variable) ToScalarLinearExpression() ScalarLinearExpr {
 		L: *mat.NewVecDense(1, coeffs),
 		C: 0,
 	}
+}
+
+/*
+Dims
+Description:
+
+	Returns the dimension of the Variable object (should be scalar).
+*/
+func (v Variable) Dims() []int {
+	return []int{1, 1}
+}
+
+/*
+Check
+Description:
+
+	Checks whether or not the Variable has a sensible initialization.
+*/
+func (v Variable) Check() error {
+	// Check that the lower bound is below is the upper bound
+	if v.Lower > v.Upper {
+		return fmt.Errorf(
+			"lower bound (%v) of variable is above upper bound (%v).",
+			v.Lower, v.Upper,
+		)
+	}
+
+	// If nothing was thrown, then return nil!
+	return nil
 }

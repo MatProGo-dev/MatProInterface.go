@@ -100,9 +100,8 @@ func Multiply(term1, term2 interface{}) (Expression, error) {
 		// Create Constraint
 		return t1.Multiply(term2)
 
-	//case VectorExpression:
-	//	lhsAsVecExpr, _ := lhs.(VectorExpression)
-	//	return lhsAsVecExpr.Multiply(term2)
+	case VectorExpression:
+		return t1.Multiply(term2)
 	default:
 		return nil, fmt.Errorf("Multiply of %T term with %T term is not yet defined!", term1, term2)
 	}

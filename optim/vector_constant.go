@@ -86,11 +86,27 @@ Description:
 
 	Adds the current expression to another and returns the resulting expression
 */
-func (kv KVector) Plus(eIn interface{}, extras ...interface{}) (VectorExpression, error) {
+func (kv KVector) Plus(eIn interface{}, errors ...error) (VectorExpression, error) {
+	// Input Processing
+	err := CheckErrors(errors)
+	if err != nil {
+		return kv, err
+	}
+
+	if IsVectorExpression(eIn) {
+		eAsVE, _ := ToVectorExpression(eIn)
+		if (eAsVE.Len() != kv.Len()) || (eAsVE.Len() == 1) {
+			return kv, fmt.Errorf(
+				"KVector of shape (%v,1) dimension mismatch with %T of shape (%v,1)",
+				kv.Len(),
+				eAsVE,
+				eAsVE.Len(),
+			)
+		}
+	}
+
 	// Constants
 	kvLen := kv.Len()
-
-	// Extras Management
 
 	// Management
 	switch e := eIn.(type) {
@@ -106,13 +122,6 @@ func (kv KVector) Plus(eIn interface{}, extras ...interface{}) (VectorExpression
 		// Return Addition
 		return kv.Plus(float64(e))
 	case mat.VecDense:
-		// Input Checking
-		if kvLen != e.Len() {
-			return kv, fmt.Errorf(
-				"Length of vectors in sum do not match! Vectors have lengths %v and %v!",
-				kv.Len(), e.Len(),
-			)
-		}
 		// Return Sum
 		var result mat.VecDense
 		kv2 := mat.VecDense(kv)
@@ -120,14 +129,6 @@ func (kv KVector) Plus(eIn interface{}, extras ...interface{}) (VectorExpression
 
 		return KVector(result), nil
 	case KVector:
-		// Input Checking
-		if kvLen != e.Len() {
-			return kv, fmt.Errorf(
-				"Length of vectors in sum do not match! Vectors have lengths %v and %v!",
-				kv.Len(), e.Len(),
-			)
-		}
-
 		// Compute Addition
 		var result mat.VecDense
 		kvAsVec := mat.VecDense(kv)
@@ -271,9 +272,130 @@ Description:
 
 	This method is used to compute the multiplication of the input vector constant with another term.
 */
-func (kv KVector) Multiply(term1 interface{}, extras ...interface{}) (Expression, error) {
-	// TODO: Implement this!
-	return K(0), fmt.Errorf("The Multiply() method for KVector has not been implemented yet!")
+func (kv KVector) Multiply(e interface{}, errors ...error) (Expression, error) {
+	// Input Processing
+	err := CheckErrors(errors)
+	if err != nil {
+		return kv, err
+	}
+
+	if IsVectorExpression(e) {
+		// Check dimensions
+		e2, _ := ToVectorExpression(e)
+		if e2.Len() != kv.Len() {
+			return kv, fmt.Errorf(
+				"KVector of length %v can not be multiplied with a %T of different length (%v).",
+				kv.Len(),
+				e2,
+				e2.Len(),
+			)
+		}
+	}
+
+	// Compute Multiplication
+	switch eConverted := e.(type) {
+	case float64:
+		// Use mat.Vector's multiplication method
+		var result mat.VecDense
+		kvAsVec := mat.VecDense(kv)
+		result.ScaleVec(eConverted, &kvAsVec)
+
+		return KVector(result), nil
+	case K:
+		// Convert to float64
+		eAsFloat := float64(eConverted)
+
+		return kv.Multiply(eAsFloat)
+	case Variable:
+		// Create a VectorLinearExpression Output
+		vv := VarVector{[]Variable{eConverted}}
+		L := ZerosMatrix(kv.Len(), 1)
+		for kIndex := 0; kIndex < kv.Len(); kIndex++ {
+			L.Set(kIndex, 0, float64(kv.AtVec(kIndex).(K)))
+		}
+
+		return VectorLinearExpr{
+			L: L,
+			X: vv,
+			C: ZerosVector(kv.Len()),
+		}, nil
+
+	case ScalarLinearExpr:
+		// Create a VectorLinearExpression to Output
+		L := ZerosMatrix(kv.Len(), eConverted.X.Len())
+		for rowIndex := 0; rowIndex < kv.Len(); rowIndex++ {
+			for colIndex := 0; colIndex < eConverted.X.Len(); colIndex++ {
+				L.Set(
+					rowIndex, colIndex,
+					eConverted.L.AtVec(colIndex)*float64(kv.AtVec(rowIndex).(K)),
+				)
+			}
+		}
+		C := ZerosVector(kv.Len())
+		for rowIndex := 0; rowIndex < kv.Len(); rowIndex++ {
+			C.SetVec(
+				rowIndex,
+				eConverted.C*float64(kv.AtVec(rowIndex).(K)),
+			)
+		}
+		return VectorLinearExpr{
+			L: L,
+			C: C,
+			X: eConverted.X.Copy(),
+		}, nil
+
+	case mat.VecDense:
+		// Send warning until we create matrix type.
+		return kv, fmt.Errorf(
+			"MatProInterface does not currently support operations that result in matrices! if you want this feature, create an issue!",
+		)
+
+	case KVector:
+		// Immediately return error.
+		return kv, fmt.Errorf(
+			"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
+			eConverted,
+		)
+
+	case KVectorTranspose:
+		// Send warning until we create matrix type.
+		return kv, fmt.Errorf(
+			"MatProInterface does not currently support operations that result in matrices! if you want this feature, create an issue!",
+		)
+
+	case VarVector:
+		// Immediately return error.
+		return kv, fmt.Errorf(
+			"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
+			eConverted,
+		)
+
+	case VarVectorTranspose:
+		// Send warning until we create matrix type.
+		return kv, fmt.Errorf(
+			"MatProInterface does not currently support operations that result in matrices! if you want this feature, create an issue!",
+		)
+
+	case VectorLinearExpr:
+		// Immediately return error.
+		return kv, fmt.Errorf(
+			"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
+			eConverted,
+		)
+
+	case VectorLinearExpressionTranspose:
+		// Send warning until we create matrix type.
+		return kv, fmt.Errorf(
+			"MatProInterface does not currently support operations that result in matrices! if you want this feature, create an issue!",
+		)
+
+	default:
+		return kv, fmt.Errorf(
+			"The input to KVectorTranspose's Multiply method (%v) has unexpected type: %T",
+			e, e,
+		)
+
+	}
 }
 
 /*
@@ -284,4 +406,14 @@ Description:
 */
 func (kv KVector) Transpose() VectorExpression {
 	return KVectorTranspose(kv)
+}
+
+/*
+Dims
+Description:
+
+	Returns the dimension of the constant vector.
+*/
+func (kv KVector) Dims() []int {
+	return []int{kv.Len(), 1}
 }

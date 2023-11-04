@@ -2,6 +2,7 @@ package optim
 
 import (
 	"fmt"
+	"github.com/MatProGo-dev/MatProInterface.go/symbolic/matrix"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -116,7 +117,7 @@ Description:
 	This member function computes the addition of the receiver vector var with the
 	incoming vector expression ve.
 */
-func (vvt VarVectorTranspose) Plus(eIn interface{}, extras ...interface{}) (VectorExpression, error) {
+func (vvt VarVectorTranspose) Plus(eIn interface{}, errors ...error) (VectorExpression, error) {
 	// Constants
 	vvLen := vvt.Len()
 
@@ -184,14 +185,144 @@ func (vvt VarVectorTranspose) Plus(eIn interface{}, extras ...interface{}) (Vect
 }
 
 /*
-Mult
+Multiply
 Description:
 
-	This member function computest the multiplication of the receiver vector var with some
-	incoming vector expression (may result in quadratic?).
+	Multiplication of a VarVectorTranspose with another expression.
 */
-func (vvt VarVectorTranspose) Mult(c float64) (VectorExpression, error) {
-	return vvt, fmt.Errorf("The Mult() method for VarVectorTranspose is not implemented yet!")
+func (vvt VarVectorTranspose) Multiply(e interface{}, errors ...error) (Expression, error) {
+	// Input Processing
+	err := CheckErrors(errors)
+	if err != nil {
+		return vvt, err
+	}
+
+	if IsVectorExpression(e) {
+		// Check dimensions
+		e2, _ := ToVectorExpression(e)
+		if vvt.Dims()[1] != e2.Dims()[0] {
+			return vvt, DimensionError{
+				Arg1:      vvt,
+				Arg2:      e2,
+				Operation: "Multiply",
+			}
+		}
+	}
+
+	if matrix.IsMatrixExpression(e) {
+		// Check Dimensions
+		e2, _ := matrix.ToMatrixExpression(e)
+		if vvt.Dims()[1] != e2.Dims()[0] {
+			return vvt, DimensionError{
+				Arg1:      vvt,
+				Arg2:      e2,
+				Operation: "Multiply",
+			}
+		}
+	}
+
+	// Multiply Algorithms
+	switch right := e.(type) {
+	case float64:
+		// Create scaled identity matrix
+		I := Identity(vvt.Len())
+		var scaledI mat.Dense
+		scaledI.Scale(right, &I)
+
+		// Copy vvt
+		vvtCopy := vvt.Copy()
+
+		return VectorLinearExpressionTranspose{
+			L: scaledI, X: vvtCopy.Transpose().(VarVector), C: ZerosVector(vvt.Len()),
+		}, nil
+
+	case K:
+		return vvt.Multiply(float64(right))
+
+	case mat.VecDense:
+		// Convert to KVector
+		eAsKVector := KVector(right)
+		return vvt.Multiply(eAsKVector)
+
+	case KVector:
+		// Collect Unique Variables
+		vv := VarVector{UniqueVars(vvt.Elements)}
+
+		// Assemble the vector used in the linear expression.
+		L := ZerosVector(vv.Len())
+		eLen := right.Len()
+		for kvIndex := 0; kvIndex < eLen; kvIndex++ {
+			// Get coefficient and variable at kvIndex
+			kv_i := right.AtVec(kvIndex)
+			vvt_i := vvt.AtVec(kvIndex)
+
+			indexOfvvt_i, _ := FindInSlice(vvt_i.(Variable), vv.Elements)
+			L.SetVec(indexOfvvt_i, float64(kv_i.(K))+L.AtVec(indexOfvvt_i))
+		}
+		return ScalarLinearExpr{L: L, X: vv, C: 0}, nil
+
+	case KVectorTranspose:
+		// This is only valid if vvt is of length 1.
+		kv := right.Transpose().(KVector)
+
+		prod := ScalarLinearExpr{
+			L: mat.VecDense(kv),
+			X: vvt.Copy().Transpose().(VarVector),
+			C: 0.0,
+		}
+
+		return prod, nil
+
+	case VectorLinearExpr:
+		// Collect Unique Variables
+		newVV := VarVector{UniqueVars(append(vvt.Elements, right.X.Elements...))}
+
+		// Rewrite VLE in terms of newVV
+		newVLE := right.RewriteInTermsOf(newVV)
+
+		prod0, _ := vvt.Multiply(newVLE.L)
+		prod1, _ := prod0.(VectorLinearExpressionTranspose).Multiply(vvt.Transpose())
+		prod := prod1
+
+		// Add in Elements for product of vvt with constant C
+		prod, _ = prod.(ScalarQuadraticExpression).Plus(
+			vvt.Multiply(KVector(right.C)),
+		)
+
+		return prod, nil
+
+	case mat.Dense:
+		nr, nc := right.Dims()
+
+		// Create product
+		var prod VectorLinearExpressionTranspose
+		prod.L = ZerosMatrix(nc, nr)
+		for rowIndex := 0; rowIndex < nc; rowIndex++ {
+			for colIndex := 0; colIndex < nr; colIndex++ {
+				prod.L.Set(
+					rowIndex, colIndex,
+					right.At(colIndex, rowIndex),
+				)
+			}
+		}
+
+		// Create X
+		x := vvt.Copy().Transpose()
+		prod.X = x.(VarVector) // Convert to VarVector
+
+		// Create C
+		prod.C = ZerosVector(nc)
+
+		return prod, nil
+
+	case matrix.Constant:
+		return vvt.Multiply(mat.Dense(right))
+	default:
+		return vvt, fmt.Errorf(
+			"The input to VarVectorTranspose's Multiply() method (%v) has unexpected type: %T.",
+			right, e,
+		)
+	}
 }
 
 /*
@@ -265,7 +396,7 @@ func (vvt VarVectorTranspose) Comparison(rhs interface{}, sense ConstrSense) (Ve
 	case VarVector:
 		return VectorConstraint{},
 			fmt.Errorf(
-				"Cannot commpare VarVectorTranspose with a normal vector %v (%T); Try transposing one or the other!",
+				"Cannot compare VarVectorTranspose with a normal vector %v (%T); Try transposing one or the other!",
 				rhs0, rhs0,
 			)
 
@@ -286,7 +417,7 @@ func (vvt VarVectorTranspose) Comparison(rhs interface{}, sense ConstrSense) (Ve
 	case VectorLinearExpr:
 		return VectorConstraint{},
 			fmt.Errorf(
-				"Cannot commpare VarVectorTranspose with a normal vector %v (%T); Try transposing one or the other!",
+				"cannot compare VarVectorTranspose with a normal vector %v (%T); try transposing one or the other!",
 				rhs0, rhs0,
 			)
 
@@ -303,7 +434,7 @@ func (vvt VarVectorTranspose) Copy() VarVectorTranspose {
 	// Constants
 
 	// Algorithm
-	newVarSlice := []Variable{}
+	var newVarSlice []Variable
 	for varIndex := 0; varIndex < vvt.Len(); varIndex++ {
 		// Append to newVar Slice
 		newVarSlice = append(newVarSlice, vvt.Elements[varIndex])
@@ -322,4 +453,14 @@ Description:
 func (vvt VarVectorTranspose) Transpose() VectorExpression {
 	vvtCopy := vvt.Copy()
 	return VarVector{vvtCopy.Elements}
+}
+
+/*
+Dims
+Description:
+
+	This method returns the dimension of the VarVectorTranspose object.
+*/
+func (vvt VarVectorTranspose) Dims() []int {
+	return []int{1, vvt.Len()}
 }

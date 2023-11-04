@@ -113,13 +113,80 @@ func (vle VectorLinearExpr) LessEq(rhs interface{}) (VectorConstraint, error) {
 }
 
 /*
-Mult
+Multiply
 Description:
 
-	Returns an expression which scales every dimension of the vector linear expression by the input.
+	Multiplication of a VarVector with another expression.
 */
-func (vle VectorLinearExpr) Mult(c float64) (VectorExpression, error) {
-	return vle, fmt.Errorf("The multiplication method has not yet been implemented!")
+func (vle VectorLinearExpr) Multiply(e interface{}, errors ...error) (Expression, error) {
+	// Input Processing
+	err := CheckErrors(errors)
+	if err != nil {
+		return vle, err
+	}
+
+	// Check Dimensions of the input vector
+	if IsVectorExpression(e) {
+		eAsVE, _ := ToVectorExpression(e)
+		if eAsVE.Len() != vle.Len() {
+			return vle, fmt.Errorf(
+				"dimension mismatch in multiplication of length %v with %T of length %v",
+				vle.Len(),
+				e,
+				eAsVE.Len(),
+			)
+		}
+	}
+
+	switch rhs := e.(type) {
+	case float64:
+		// Create output
+		out := vle.Copy()
+
+		// Multiply the elements of the matrices
+		out.L.Scale(rhs, &vle.L)
+		out.C.ScaleVec(rhs, &vle.C)
+
+		return out, nil
+
+	case K:
+		return vle.Multiply(float64(rhs))
+
+	case mat.VecDense:
+		// Send warning until we create matrix type.
+		return vle, fmt.Errorf(
+			"MatProInterface does not currently support operations that result in matrices! if you want this feature, create an issue!",
+		)
+
+	case KVector:
+		return vle.Multiply(mat.VecDense(rhs))
+
+	case KVectorTranspose:
+		// Send warning until we create matrix type.
+		return vle, fmt.Errorf(
+			"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
+			rhs,
+		)
+
+	case VectorLinearExpr:
+		// Immediately return error.
+		return vle, fmt.Errorf(
+			"MatProInterface does not currently support operations that result in matrices! if you want this feature, create an issue!",
+		)
+
+	case VectorLinearExpressionTranspose:
+		// Send warning until we create matrix type.
+		return vle, fmt.Errorf(
+			"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
+			rhs,
+		)
+
+	default:
+		return vle, fmt.Errorf(
+			"The input to VectorLinearExpr's Multiply() method (%v) has unexpected type: %T",
+			rhs, e,
+		)
+	}
 }
 
 /*
@@ -128,7 +195,7 @@ Description:
 
 	Returns an expression which adds the expression e to the vector linear expression at hand.
 */
-func (vle VectorLinearExpr) Plus(e interface{}, extras ...interface{}) (VectorExpression, error) {
+func (vle VectorLinearExpr) Plus(e interface{}, errors ...error) (VectorExpression, error) {
 	// Constants
 	vleLen := vle.Len()
 
@@ -449,4 +516,36 @@ func (vle VectorLinearExpr) Transpose() VectorExpression {
 		X: vle.X.Copy(),
 		C: vle.C,
 	}
+}
+
+/*
+Copy
+Description:
+
+	This method copies the contents of a Vector Linear Expression.
+*/
+func (vle VectorLinearExpr) Copy() VectorLinearExpr {
+	// Constants
+	nRows := vle.Len()
+	nX := vle.X.Len()
+
+	// Create output
+	out := VectorLinearExpr{
+		L: ZerosMatrix(nRows, nX),
+		C: ZerosVector(nRows),
+	}
+	out.L.Copy(&vle.L)
+	out.C.CopyVec(&vle.C)
+	out.X = vle.X.Copy()
+	return out
+}
+
+/*
+Dims
+Description:
+
+	This method returns the dimensions of the KVectorTranspose object.
+*/
+func (vle VectorLinearExpr) Dims() []int {
+	return []int{vle.Len(), 1}
 }

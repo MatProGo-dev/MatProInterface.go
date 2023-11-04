@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"gonum.org/v1/gonum/mat"
+	"strings"
 	"testing"
 )
 
@@ -495,6 +496,83 @@ func TestK_Eq1(t *testing.T) {
 }
 
 /*
+TestK_Comparison1
+Description:
+
+	Tests the comparison method's error handling properties.
+*/
+func TestK_Comparison1(t *testing.T) {
+	// Constants
+	k1 := optim.K(2.3)
+	f2 := 2.18
+	err0 := fmt.Errorf("Test")
+
+	// Comparison
+	_, err := k1.Comparison(f2, optim.SenseGreaterThanEqual, err0)
+	if err == nil {
+		t.Errorf("No error was thrown, when it should have been")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			err0.Error(),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestK_Comparison2
+Description:
+
+	Tests the comparison method's error handling properties
+	with nil error.
+*/
+func TestK_Comparison2(t *testing.T) {
+	// Constants
+	k1 := optim.K(2.3)
+	f2 := 2.18
+	var err0 error = nil
+
+	// Comparison
+	_, err := k1.Comparison(f2, optim.SenseGreaterThanEqual, err0)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+}
+
+/*
+TestK_Comparison3
+Description:
+
+	Tests the comparison method's error handling properties.
+*/
+func TestK_Comparison3(t *testing.T) {
+	// Constants
+	k1 := optim.K(2.3)
+	kv1 := optim.KVector(optim.OnesVector(10))
+
+	// Comparison
+	_, err := k1.Comparison(kv1, optim.SenseGreaterThanEqual)
+	if err == nil {
+		t.Errorf("There were no errors, but there should have been!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf(
+				"the input interface is of type %T, which is not recognized as a ScalarExpression.",
+				kv1,
+			),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
 TestK_Multiply1
 Description:
 
@@ -676,5 +754,339 @@ func TestK_Multiply4(t *testing.T) {
 				)
 			}
 		}
+	}
+}
+
+/*
+TestK_Multiply5
+Description:
+
+	Tests the ability to multiply a constant with another constant,
+	but with a bad error.
+*/
+func TestK_Multiply5(t *testing.T) {
+	// Constants
+	c1 := optim.K(3.14)
+	c2 := optim.K(6.86)
+	err0 := fmt.Errorf("Test")
+
+	// Algorithm
+	_, err := c1.Multiply(c2, err0)
+	if err == nil {
+		t.Errorf("There was not an error, but there should have been!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			err0.Error(),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestK_Multiply6
+Description:
+
+	Tests the ability to multiply a constant with a constant vector.
+*/
+func TestK_Multiply6(t *testing.T) {
+	// Constants
+	c1 := optim.K(3.14)
+	kv2 := optim.KVector(optim.OnesVector(21))
+
+	// Algorithm
+	_, err := c1.Multiply(kv2)
+	if err == nil {
+		t.Errorf("There was not an error, but there should have been!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			optim.DimensionError{Operation: "Multiply", Arg1: c1, Arg2: kv2}.Error(),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestK_Multiply7
+Description:
+
+Tests the ability to multiply a constant with a float.
+*/
+func TestK_Multiply7(t *testing.T) {
+	// Constants
+	c1 := optim.K(3.14)
+	f2 := 6.86
+
+	// Algorithm
+	expr1, err := c1.Multiply(f2)
+	if err != nil {
+		t.Errorf("There was an issue multiplying two constants: %v", err)
+	}
+
+	expr1AsK, ok := expr1.(optim.K)
+	if !ok {
+		t.Errorf("There was an issue converting the product to a constant!")
+	}
+
+	if float64(expr1AsK) != 3.14*f2 {
+		t.Errorf(
+			"Expected product to have value %v; received %v",
+			3.14*6.86,
+			expr1AsK,
+		)
+	}
+}
+
+/*
+TestK_Multiply8
+Description:
+
+Tests the ability to multiply a constant with a float.
+*/
+func TestK_Multiply8(t *testing.T) {
+	// Constants
+	c1 := optim.K(3.14)
+	kv2 := optim.KVector(optim.OnesVector(1))
+
+	// Algorithm
+	expr1, err := c1.Multiply(kv2)
+	if err != nil {
+		t.Errorf("There was an issue multiplying two constants: %v", err)
+	}
+
+	expr1AsKV, ok := expr1.(optim.KVector)
+	if !ok {
+		t.Errorf("There was an issue converting the product to a constant!")
+	}
+
+	if float64(expr1AsKV.AtVec(0).(optim.K)) != 3.14*1.0 {
+		t.Errorf(
+			"Expected product to have value %v; received %v",
+			3.14*1.0,
+			expr1AsKV.AtVec(0),
+		)
+	}
+}
+
+/*
+TestK_Multiply9
+Description:
+
+Tests the ability to multiply a constant with a KVectorTranspose.
+*/
+func TestK_Multiply9(t *testing.T) {
+	// Constants
+	N := 3
+	c1 := optim.K(3.14)
+	vd2 := optim.OnesVector(N)
+	vd2.SetVec(1, 2.0)
+
+	kv2 := optim.KVectorTranspose(vd2)
+
+	// Algorithm
+	expr1, err := c1.Multiply(kv2)
+	if err != nil {
+		t.Errorf("There was an issue multiplying two constants: %v", err)
+	}
+
+	expr1AsKV, ok := expr1.(optim.KVectorTranspose)
+	if !ok {
+		t.Errorf("There was an issue converting the product to a constant!")
+	}
+
+	expr1AsVD := mat.VecDense(expr1AsKV)
+	for eltIndex := 0; eltIndex < expr1AsVD.Len(); eltIndex++ {
+		if expr1AsVD.AtVec(eltIndex) != vd2.AtVec(eltIndex)*3.14 {
+			t.Errorf(
+				"Expected prod[%v] = %v; received %v",
+				eltIndex,
+				expr1AsVD.AtVec(eltIndex),
+				vd2.AtVec(eltIndex)*3.14,
+			)
+		}
+	}
+}
+
+/*
+TestK_Multiply10
+Description:
+
+	Tests the ability to multiply a constant with a VarVector
+	of non-unit length.
+*/
+func TestK_Multiply10(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestK_Multiply10")
+	N := 3
+	c1 := optim.K(3.14)
+
+	kv2 := m.AddVariableVector(N)
+
+	// Algorithm
+	_, err := c1.Multiply(kv2)
+	if err == nil {
+		t.Errorf("no error was thrown, but there should have been!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			optim.DimensionError{
+				Operation: "Multiply",
+				Arg1:      c1,
+				Arg2:      kv2,
+			}.Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestK_Multiply11
+Description:
+
+	Tests the ability to multiply a constant with a VarVector
+	of unit length.
+*/
+func TestK_Multiply11(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestK_Multiply10")
+	N := 1
+	c1 := optim.K(3.14)
+
+	kv2 := m.AddVariableVector(N)
+
+	// Algorithm
+	prod, err := c1.Multiply(kv2)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	prodAsSLE, tf := prod.(optim.ScalarLinearExpr)
+	if !tf {
+		t.Errorf("expected product to be of type ScalarLinearExpr; received %T", prod)
+	}
+
+	if prodAsSLE.C != 0.0 {
+		t.Errorf("prod.C = %v =/= 0.0", prodAsSLE.C)
+	}
+}
+
+/*
+TestK_Multiply12
+Description:
+
+	Tests the multiplication of a constant with a
+	non-unit VarVectorTranspose.
+*/
+func TestK_Multiply12(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestK_Multiply11")
+	k1 := optim.K(3.14)
+	vv2 := m.AddVariableVector(21)
+	vvt2 := vv2.Transpose()
+
+	// Check Multiplication result
+	prod, err := k1.Multiply(vvt2)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	prodAsVLET, tf := prod.(optim.VectorLinearExpressionTranspose)
+	if !tf {
+		t.Errorf(
+			"Expected product to be of type %v received type %T",
+			"VectorLinearExpressionTranspose",
+			prod,
+		)
+	}
+
+	// Check all elements of the matrix
+	for rowIndex := 0; rowIndex < vvt2.Len(); rowIndex++ {
+		for colIndex := 0; colIndex < vvt2.Len(); colIndex++ {
+			if (prodAsVLET.L.At(rowIndex, colIndex) != 1.0*float64(k1)) && (rowIndex == colIndex) {
+				t.Errorf(
+					" L[%v,%v] = %v =/= %v",
+					rowIndex, colIndex,
+					prodAsVLET.L.At(rowIndex, colIndex),
+					1.0*float64(k1),
+				)
+			}
+
+			if (prodAsVLET.L.At(rowIndex, colIndex) != 0.0) && (rowIndex != colIndex) {
+				t.Errorf(
+					"L[%v,%v] = %v =/= 0.0",
+					rowIndex, colIndex,
+					prodAsVLET.L.At(rowIndex, colIndex),
+				)
+			}
+		}
+
+	}
+}
+
+/*
+TestK_Multiply13
+Description:
+
+	Tests the multiplication of a constant with a
+	non-unit VarVectorTranspose.
+*/
+func TestK_Multiply13(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestK_Multiply13")
+	k1 := optim.K(3.14)
+	vv2 := m.AddVariableVector(1)
+	vvt2 := vv2.Transpose()
+
+	// Check Multiplication result
+	prod, err := k1.Multiply(vvt2)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	prodAsSLE, tf := prod.(optim.ScalarLinearExpr)
+	if !tf {
+		t.Errorf(
+			"Expected product to be of type %v received type %T",
+			"ScalarLinearExpression",
+			prod,
+		)
+	}
+
+	// Check all elements of the matrix
+	if prodAsSLE.L.AtVec(0) != 1.0*float64(k1) {
+		t.Errorf(
+			"L[0] = %v =/= %v",
+			prodAsSLE.L.AtVec(0),
+			1.0*float64(k1),
+		)
+	}
+
+	if prodAsSLE.C != 0.0 {
+		t.Errorf(
+			"C = %v =/= 0.0",
+			prodAsSLE.C,
+		)
+	}
+}
+
+/*
+TestK_Check1
+Description:
+
+	Tests that the Check() method returns nil as expected.
+*/
+func TestK_Check1(t *testing.T) {
+	// Constants
+	k1 := optim.K(3.14)
+
+	// Algorithm
+	if k1.Check() != nil {
+		t.Errorf("unexpected error: %v", k1.Check())
 	}
 }

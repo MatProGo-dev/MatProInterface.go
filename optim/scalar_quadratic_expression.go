@@ -157,26 +157,25 @@ Description:
 func (qe ScalarQuadraticExpression) Coeffs() []float64 {
 	// Create container for all coefficients
 	var coefficientList []float64
-	var numVars int = qe.NumVars()
 
 	// Consider all pairs of indices in x.
 	var xPairs [][2]uint64
 	for vIIndex, varIndex := range qe.X.IDs() {
-		for vIIndex2 := vIIndex; vIIndex2 < numVars; vIIndex2++ {
-			var2 := qe.X.AtVec(vIIndex2)
-			varIndex2 := var2.(Variable).ID
-
+		for vIIndex2, varIndex2 := range qe.X.IDs() {
 			// Save pairs of indices and the associated coefficients
 			xPairs = append(xPairs, [2]uint64{varIndex, varIndex2})
 
-			if vIIndex == vIIndex2 {
-				coefficientList = append(coefficientList, qe.Q.At(vIIndex, vIIndex2))
-			} else {
-				coefficientList = append(coefficientList, qe.Q.At(vIIndex, vIIndex2)+qe.Q.At(vIIndex2, vIIndex))
-			}
-
+			coefficientList = append(coefficientList, qe.Q.At(vIIndex, vIIndex2))
 		}
 	}
+
+	// Include the elements of L
+	for vIIndex, _ := range qe.X.IDs() {
+		coefficientList = append(coefficientList, qe.L.AtVec(vIIndex))
+	}
+
+	// Include the element of C
+	coefficientList = append(coefficientList, qe.C)
 
 	return coefficientList
 }
@@ -204,43 +203,34 @@ func (qe ScalarQuadraticExpression) Plus(e interface{}, errors ...error) (Scalar
 	// Constants
 
 	// Input Processing
-	if len(errors) > 0 {
-		if errors[0] != nil {
-			return qe, errors[0]
-		}
+	err := CheckErrors(errors)
+	if err != nil {
+		return qe, err
 	}
 
 	// Algorithm depends
-	switch e.(type) {
-	//case float64:
-	//	// Call the version of this function for K
-	//	return qe.Plus(K(eIn), extras...)
+	switch rhs := e.(type) {
+	case float64:
+		// Call the version of this function for K
+		return qe.Plus(K(rhs), errors...)
 	case K:
-		// Convert expression to K type
-		KIn := e.(K)
-
 		// Get copy of qe
 		var newQExpr ScalarQuadraticExpression = qe
 
 		// Add to constant factor
-		newQExpr.C += float64(KIn)
+		newQExpr.C += float64(rhs)
 
 		return newQExpr, nil
 	case Variable:
-		// Convert express to Variable type
-		vIn := e.(Variable)
-
-		return vIn.Plus(qe)
+		return rhs.Plus(qe)
 
 	case ScalarQuadraticExpression:
-
 		var newQExpr ScalarQuadraticExpression = qe // get copy of e
-		quadraticEIn := e.(ScalarQuadraticExpression)
 
 		// Get Combined set of Variables
-		newX := UniqueVars(append(newQExpr.X.Elements, quadraticEIn.X.Elements...))
+		newX := UniqueVars(append(newQExpr.X.Elements, rhs.X.Elements...))
 		newQExprAligned, _ := newQExpr.RewriteInTermsOf(VarVector{newX})
-		quadraticEInAligned, _ := quadraticEIn.RewriteInTermsOf(VarVector{newX})
+		quadraticEInAligned, _ := rhs.RewriteInTermsOf(VarVector{newX})
 
 		// Add matrices together
 		var tempSum mat.Dense
@@ -259,55 +249,23 @@ func (qe ScalarQuadraticExpression) Plus(e interface{}, errors ...error) (Scalar
 	case ScalarLinearExpr:
 		// Collect Expressions
 		var newQExpr ScalarQuadraticExpression = qe // get copy of e
-		linearEIn := e.(ScalarLinearExpr)
 
 		// Get Combined set of Variables
-		newX := UniqueVars(append(newQExpr.X.Elements, linearEIn.X.Elements...))
+		newX := UniqueVars(append(newQExpr.X.Elements, rhs.X.Elements...))
 		newQExprAligned, _ := newQExpr.RewriteInTermsOf(VarVector{newX})
-		linearEInAligned, _ := linearEIn.RewriteInTermsOf(VarVector{newX})
+		linearEInAligned, _ := rhs.RewriteInTermsOf(VarVector{newX})
 
 		// Add linear vector together with the quadratic expression
-		//var vectorSum mat.VecDense
-		//vectorSum.AddVec(newQExprAligned.L, linearEInAligned.L)
 		newQExprAligned.L.AddVec(&newQExprAligned.L, &linearEInAligned.L)
-		//for eltInd, qElt := range linearEInAligned.L {
-		//	newQExprAligned.L[eltInd] += qElt
-		//}
 
 		// Add constants together
-		newQExprAligned.C += linearEIn.C
+		newQExprAligned.C += rhs.C
 		return newQExprAligned, nil
 	default:
 		return ScalarQuadraticExpression{}, fmt.Errorf("Unexpected type (%T) given as argument to Plus: %v.", e, e)
 	}
 
 }
-
-// // Mult multiplies the current expression to another and returns the
-// // resulting expression
-///*
-//Mult
-//Description:
-//	Mult multiplies the current expression to another and returns the
-//	resulting expression
-//*/
-//func (qe ScalarQuadraticExpression) Mult(c float64) (ScalarExpression, error) {
-//	// Create Output
-//	var newQE ScalarQuadraticExpression = ScalarQuadraticExpression{
-//		X: (qe).X,
-//	}
-//
-//	// Iterate through all of the rows and columns of Q
-//	newQE.Q.Scale(c, &qe.Q)
-//
-//	// Iterate through the linear coefficients
-//	newQE.L.ScaleVec(c, &qe.L)
-//
-//	// Update through the constant
-//	qe.C *= c
-//
-//	return qe, nil
-//}
 
 /*
 LessEq
@@ -316,8 +274,9 @@ Description:
 	LessEq returns a less than or equal to (<=) constraint between the
 	current expression and another
 */
-func (qe ScalarQuadraticExpression) LessEq(other ScalarExpression) (ScalarConstraint, error) {
-	return qe.Comparison(other, SenseLessThanEqual)
+func (qe ScalarQuadraticExpression) LessEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+	// Input Processing
+	return qe.Comparison(rhsIn, SenseLessThanEqual, errors...)
 }
 
 /*
@@ -327,8 +286,8 @@ Description:
 	GreaterEq returns a greater than or equal to (>=) constraint between the
 	current expression and another
 */
-func (qe ScalarQuadraticExpression) GreaterEq(other ScalarExpression) (ScalarConstraint, error) {
-	return qe.Comparison(other, SenseGreaterThanEqual)
+func (qe ScalarQuadraticExpression) GreaterEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+	return qe.Comparison(rhsIn, SenseGreaterThanEqual, errors...)
 }
 
 /*
@@ -339,8 +298,8 @@ Description:
 	Eq returns an equality (==) constraint between the current expression
 	and another
 */
-func (qe ScalarQuadraticExpression) Eq(other ScalarExpression) (ScalarConstraint, error) {
-	return qe.Comparison(other, SenseEqual)
+func (qe ScalarQuadraticExpression) Eq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+	return qe.Comparison(rhsIn, SenseEqual, errors...)
 }
 
 /*
@@ -353,7 +312,18 @@ Usage:
 
 	constr, err := qe.Comparison(expr1,SenseGreaterThanEqual)
 */
-func (qe ScalarQuadraticExpression) Comparison(rhs ScalarExpression, sense ConstrSense) (ScalarConstraint, error) {
+func (qe ScalarQuadraticExpression) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (ScalarConstraint, error) {
+	// Input Processing
+	rhs, err := ToScalarExpression(rhsIn)
+	if err != nil {
+		return ScalarConstraint{}, err
+	}
+
+	err = CheckErrors(errors)
+	if err != nil {
+		return ScalarConstraint{}, err
+	}
+
 	return ScalarConstraint{qe, rhs, sense}, nil
 }
 
@@ -392,17 +362,15 @@ func (qe ScalarQuadraticExpression) RewriteInTermsOf(newX VarVector) (ScalarQuad
 			oldQterm := qe.Q.At(oi1Index, oi2Index)
 
 			// Get the new indices corresponding to oi1 and oi2
-			ni1Index, err := FindInSlice(oldElt1, newX.Elements)
-			if err != nil {
+			ni1Index, _ := FindInSlice(oldElt1, newX.Elements)
+			if ni1Index == -1 {
 				return newQE, fmt.Errorf("The element %v was found in the old X indices, but it does not exist in the new ones!", oldElt1)
 			}
-			//newElt1 := newX.Elements[ni1Index]
 
-			ni2Index, err := FindInSlice(oldElt2, newX.Elements)
-			if err != nil {
+			ni2Index, _ := FindInSlice(oldElt2, newX.Elements)
+			if ni2Index == -1 {
 				return newQE, fmt.Errorf("The element %v was found in the old X indices, but it does not exist in the new ones!", oldElt2)
 			}
-			//newElt2 := newX.Elements[ni2Index]
 
 			// Plug the oldQterm into newQ
 			newQE.Q.Set(ni1Index, ni2Index, oldQterm)
@@ -418,11 +386,7 @@ func (qe ScalarQuadraticExpression) RewriteInTermsOf(newX VarVector) (ScalarQuad
 		oldLterm := qe.L.AtVec(oi1Index)
 
 		// Get the new indices corresponding to oi1 and oi2
-		ni1Index, err := FindInSlice(oldElt1, newX.Elements)
-		if err != nil {
-			return newQE, fmt.Errorf("The element %v was found in the old X, but it does not exist in the new ones!", oldElt1)
-		}
-		//newIndex1 := newXIndices[ni1Index]
+		ni1Index, _ := FindInSlice(oldElt1, newX.Elements) // No error handling or bad indexes should happen at this point.
 
 		// Plug the oldQterm into newQ
 		offset := ZerosVector(dimX)
@@ -492,4 +456,8 @@ func (qe ScalarQuadraticExpression) Multiply(val interface{}, errors ...error) (
 	default:
 		return qe, fmt.Errorf("Unexpected type of input to Multiply(): %T", val)
 	}
+}
+
+func (qe ScalarQuadraticExpression) Dims() []int {
+	return []int{1, 1}
 }

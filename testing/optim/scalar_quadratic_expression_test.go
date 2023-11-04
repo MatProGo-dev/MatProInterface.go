@@ -778,6 +778,119 @@ func TestQuadraticExpr_Plus6(t *testing.T) {
 }
 
 /*
+TestQuadraticExpr_Plus7
+Description:
+
+	Tests whether or not the function returns a proper error
+	when an error is provided.
+*/
+func TestQuadraticExpr_Plus7(t *testing.T) {
+	// Constants
+	m := optim.NewModel("SQE_Plus7")
+	N := 10
+	sqe1 := optim.ScalarQuadraticExpression{
+		Q: optim.Identity(N),
+		L: optim.OnesVector(N),
+		X: m.AddVariableVector(N),
+		C: 3.14,
+	}
+
+	v := m.AddVariable()
+	err0 := fmt.Errorf("test")
+
+	// Use plus with a variable vector
+	_, err := sqe1.Plus(v, err0)
+	if err == nil {
+		t.Errorf("Expected error, but received none!")
+	}
+
+	if !strings.Contains(
+		err.Error(),
+		err0.Error(),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+/*
+TestQuadraticExpr_Plus8
+Description:
+
+	Tests whether or not the function returns a proper error when a bad input
+	is given.
+*/
+func TestQuadraticExpr_Plus8(t *testing.T) {
+	// Constants
+	m := optim.NewModel("SQE_Plus8")
+	N := 10
+	sqe1 := optim.ScalarQuadraticExpression{
+		Q: optim.Identity(N),
+		L: optim.OnesVector(N),
+		X: m.AddVariableVector(N),
+		C: 3.14,
+	}
+
+	b1 := false
+
+	// Use plus with a variable vector
+	_, err := sqe1.Plus(b1)
+	if err == nil {
+		t.Errorf("Expected error, but received none!")
+	}
+
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"Unexpected type (%T) given as argument to Plus: %v.", b1, b1,
+		),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+/*
+TestQuadraticExpr_Plus9
+Description:
+
+	Tests the Plus() function with a float.
+*/
+func TestQuadraticExpr_Plus9(t *testing.T) {
+	// Constants
+	m := optim.NewModel("SQE_Plus8")
+	N := 10
+	sqe1 := optim.ScalarQuadraticExpression{
+		Q: optim.Identity(N),
+		L: optim.OnesVector(N),
+		X: m.AddVariableVector(N),
+		C: 3.14,
+	}
+
+	f1 := 2.7
+
+	// Use plus with a variable vector
+	sum1, err := sqe1.Plus(f1)
+	if err != nil {
+		t.Errorf("Received unexpected error during Plus(): %v", err)
+	}
+
+	sumAsSQE1, ok1 := sum1.(optim.ScalarQuadraticExpression)
+	if !ok1 {
+		t.Errorf(
+			"Expected sum to be ScalarQuadraticExpression, but it is %T",
+			sum1,
+		)
+	}
+
+	if sumAsSQE1.C != 3.14+f1 {
+		t.Errorf(
+			"Expected sum to have value %v; received %v",
+			3.14+f1,
+			sumAsSQE1.C,
+		)
+	}
+}
+
+/*
 TestQuadraticExpr_RewriteInTermsOfIndices1
 Description:
 
@@ -1223,6 +1336,392 @@ func TestQuadraticExpr_Multiply7(t *testing.T) {
 		fmt.Sprintf("Unexpected type of input to Multiply(): %T", b1),
 	) {
 		t.Errorf("There was an unexpected error in multiply: %v", err)
+	}
+
+}
+
+/*
+TestScalarQuadraticExpression_Coeffs1
+Description:
+
+	Tests whether or not the scalar quadratic expression's coefficients
+	function works.
+*/
+func TestScalarQuadraticExpression_Coeffs1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("testsqe_coeffs1")
+	N := 10
+	x := m.AddVariableVector(N)
+
+	qe1 := optim.ScalarQuadraticExpression{
+		Q: optim.Identity(N),
+		X: x,
+		L: optim.OnesVector(N),
+		C: 3.14,
+	}
+
+	// Algorithm
+	c := qe1.Coeffs()
+	for rowIndex := 0; rowIndex < N; rowIndex++ {
+		for colIndex := 0; colIndex < N; colIndex++ {
+			if rowIndex == colIndex {
+				if c[rowIndex*N+colIndex] != 1.0 {
+					t.Errorf(
+						"Expected c[%v] = 1.0 (because it refers to Q[%v,%v]).",
+						rowIndex*N+colIndex,
+						rowIndex,
+						colIndex,
+					)
+				}
+			}
+
+		}
+	}
+
+	if len(c) != N*N+N+1 {
+		t.Errorf(
+			"Expected for coefficient vector to contain %v elements for SQE with X of length %v; received %v",
+			N*N+N+1,
+			N,
+			len(c),
+		)
+	}
+}
+
+/*
+TestScalarQuadraticExpression_LessEq1
+Description:
+
+	Tests whether or not the LessEq function works properly
+*/
+func TestScalarQuadraticExpression_LessEq1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("testsqe_LessEq1")
+	N := 10
+	x := m.AddVariableVector(N)
+
+	qe1 := optim.ScalarQuadraticExpression{
+		Q: optim.Identity(N),
+		X: x,
+		L: optim.OnesVector(N),
+		C: 3.14,
+	}
+
+	// Create constraint
+	sc1, err := qe1.LessEq(1.0)
+	if err != nil {
+		t.Errorf("Unexpected error after running LessEq(): %v", err)
+	}
+
+	if sc1.Sense != optim.SenseLessThanEqual {
+		t.Errorf(
+			"Sense of the LessEq comparison is not SenseLessThanEqual; it's %v",
+			sc1.Sense,
+		)
+	}
+}
+
+/*
+TestScalarQuadraticExpression_GreaterEq1
+Description:
+
+	Tests whether or not the GreaterEq function works properly
+*/
+func TestScalarQuadraticExpression_GreaterEq1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("testsqe_GreaterEq1")
+	N := 10
+	x := m.AddVariableVector(N)
+
+	qe1 := optim.ScalarQuadraticExpression{
+		Q: optim.Identity(N),
+		X: x,
+		L: optim.OnesVector(N),
+		C: 3.14,
+	}
+
+	sle1 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(N),
+		X: x,
+		C: 2.86,
+	}
+
+	// Create constraint
+	sc1, err := qe1.GreaterEq(sle1)
+	if err != nil {
+		t.Errorf("Unexpected error after running GreaterEq(): %v", err)
+	}
+
+	if sc1.Sense != optim.SenseGreaterThanEqual {
+		t.Errorf(
+			"Sense of the GreaterEq comparison is not SenseGreaterThanEqual; it's %v",
+			sc1.Sense,
+		)
+	}
+}
+
+/*
+TestScalarQuadraticExpression_Eq1
+Description:
+
+	Tests whether or not the Eq function works properly
+*/
+func TestScalarQuadraticExpression_Eq1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("testsqe_Eq1")
+	N := 10
+	x := m.AddVariableVector(N)
+
+	qe1 := optim.ScalarQuadraticExpression{
+		Q: optim.Identity(N),
+		X: x,
+		L: optim.OnesVector(N),
+		C: 3.14,
+	}
+
+	// Create constraint
+	sc1, err := qe1.Eq(3.14)
+	if err != nil {
+		t.Errorf("Unexpected error after running Eq(): %v", err)
+	}
+
+	if sc1.Sense != optim.SenseEqual {
+		t.Errorf(
+			"Sense of the Eq comparison is not SenseEqual; it's %v",
+			sc1.Sense,
+		)
+	}
+}
+
+/*
+TestScalarQuadraticExpression_Comparison1
+Description:
+
+	Tests whether or not the Comparison function works properly
+*/
+func TestScalarQuadraticExpression_Comparison1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("testsqe_Comparison1")
+	N := 10
+	x := m.AddVariableVector(N)
+
+	qe1 := optim.ScalarQuadraticExpression{
+		Q: optim.Identity(N),
+		X: x,
+		L: optim.OnesVector(N),
+		C: 3.14,
+	}
+
+	// Create constraint
+	sc1, err := qe1.Comparison(3.14, optim.SenseLessThanEqual)
+	if err != nil {
+		t.Errorf("Unexpected error after running Comparison(): %v", err)
+	}
+
+	if sc1.Sense != optim.SenseLessThanEqual {
+		t.Errorf(
+			"Sense of the Comparison comparison is not SenseLessThanEqual; it's %v",
+			sc1.Sense,
+		)
+	}
+}
+
+/*
+TestScalarQuadraticExpression_Comparison2
+Description:
+
+	Tests whether or not the Comparison function works properly
+*/
+func TestScalarQuadraticExpression_Comparison2(t *testing.T) {
+	// Constants
+	m := optim.NewModel("testsqe_Comparison2")
+	N := 10
+	x := m.AddVariableVector(N)
+
+	qe1 := optim.ScalarQuadraticExpression{
+		Q: optim.Identity(N),
+		X: x,
+		L: optim.OnesVector(N),
+		C: 3.14,
+	}
+
+	err0 := fmt.Errorf("test")
+
+	// Create constraint
+	_, err := qe1.Comparison(3.14, optim.SenseLessThanEqual, err0)
+	if err == nil {
+		t.Errorf("An error should have been detected, but none were detected.")
+	}
+
+	if !strings.Contains(
+		err.Error(),
+		err0.Error(),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+/*
+TestScalarQuadraticExpression_Comparison3
+Description:
+
+	Tests whether or not the Comparison function returns error when
+	a bad input type was given.
+*/
+func TestScalarQuadraticExpression_Comparison3(t *testing.T) {
+	// Constants
+	m := optim.NewModel("testsqe_Comparison3")
+	N := 10
+	x := m.AddVariableVector(N)
+
+	qe1 := optim.ScalarQuadraticExpression{
+		Q: optim.Identity(N),
+		X: x,
+		L: optim.OnesVector(N),
+		C: 3.14,
+	}
+
+	err0 := fmt.Errorf("test")
+
+	b1 := false
+
+	// Create constraint
+	_, err := qe1.Comparison(b1, optim.SenseLessThanEqual, err0)
+	if err == nil {
+		t.Errorf("An error should have been detected, but none were detected.")
+	}
+
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"the input interface is of type %T, which is not recognized as a ScalarExpression.",
+			b1,
+		),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+/*
+TestScalarQuadraticExpression_Check1
+Description:
+
+	Tests to see if Check() works when the Q matrix in ScalarQuadraticExpression
+	is not square and doesn't have the right number of columns.
+*/
+func TestScalarQuadraticExpression_Check1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("testsqe_Check1")
+	N := 3
+	x := m.AddVariableVector(N)
+
+	Q1 := mat.NewDense(N, N-1, []float64{3.0, 4.0, 5.0, 6.0, 7.0, 8.0})
+
+	qe1 := optim.ScalarQuadraticExpression{
+		Q: *Q1,
+		X: x,
+		L: optim.OnesVector(N),
+		C: 3.14,
+	}
+
+	// Run check
+	err := qe1.Check()
+	if err == nil {
+		t.Errorf("The check function did not flag an error with this bad Q!")
+	}
+
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"The number of indices was %v which did not match the number of columns in QIn (%v).",
+			qe1.X.Len(),
+			N-1,
+		),
+	) {
+		t.Errorf("Unexpected error occurred: %v", err)
+	}
+}
+
+/*
+TestScalarQuadraticExpression_RewriteInTermsOf1
+Description:
+
+	Making sure RewriteInTermsOf properly catches error.
+*/
+func TestScalarQuadraticExpression_RewriteInTermsOf1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("testsqe_RewriteInTermsOf1")
+	N := 10
+	x := m.AddVariableVector(N)
+
+	qe1 := optim.ScalarQuadraticExpression{
+		Q: optim.Identity(N),
+		X: x,
+		L: optim.OnesVector(N),
+		C: 3.14,
+	}
+
+	x2 := m.AddVariableVector(N)
+
+	// Algorithm
+	_, err := qe1.RewriteInTermsOf(x2)
+	if err == nil {
+		t.Errorf("an error should have been thrown for this bad choice of x2, but none was chosen.")
+	}
+
+	//xIDs = x.AtVec(0)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"The element %v was found in the old X indices, but it does not exist in the new ones!",
+			x.AtVec(0),
+		),
+	) {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+}
+
+/*
+TestScalarQuadraticExpression_RewriteInTermsOf2
+Description:
+
+	Making sure RewriteInTermsOf properly catches error.
+*/
+func TestScalarQuadraticExpression_RewriteInTermsOf2(t *testing.T) {
+	// Constants
+	m := optim.NewModel("testsqe_RewriteInTermsOf2")
+	N := 10
+	x := m.AddVariableVector(N)
+
+	qe1 := optim.ScalarQuadraticExpression{
+		Q: optim.Identity(N),
+		X: x,
+		L: optim.OnesVector(N),
+		C: 3.14,
+	}
+
+	x2_i := m.AddVariable()
+	x2 := optim.VarVector{
+		Elements: append(x.Elements[:8], x2_i),
+	}
+
+	// Algorithm
+	_, err := qe1.RewriteInTermsOf(x2)
+	if err == nil {
+		t.Errorf("an error should have been thrown for this bad choice of x2, but none was chosen.")
+	}
+
+	//xIDs = x.AtVec(0)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"The element %v was found in the old X indices, but it does not exist in the new ones!",
+			x.Elements[9],
+		),
+	) {
+
+		t.Errorf("Unexpected error: %v", err)
 	}
 
 }

@@ -1172,37 +1172,390 @@ func TestVectorLinearExpression_GreaterEq1(t *testing.T) {
 }
 
 /*
-TestVectorLinearExpression_Mult1
+TestVectorLinearExpr_Multiply1
 Description:
 
-	Testing that the multiplication function returns errors for now.
+	Testing that the method properly throws an error when an error is provided.
 */
-func TestVectorLinearExpression_Mult1(t *testing.T) {
+func TestVectorLinearExpr_Multiply1(t *testing.T) {
 	// Constants
+	n := 5
+	m := optim.NewModel("vle_multiply1")
 
-	// Create VLE
-	m := optim.NewModel("VLE-Mult1")
-
-	x := m.AddBinaryVariable()
-	y := m.AddBinaryVariable()
-
-	// Create Vector Variables
-	vv1 := optim.VarVector{
-		Elements: []optim.Variable{x, y},
-	}
-	c := optim.ZerosVector(2)
 	vle1 := optim.VectorLinearExpr{
-		vv1,
-		optim.Identity(2),
-		c,
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.ZerosVector(n),
+	}
+	err0 := fmt.Errorf("test")
+
+	// Multiply
+	_, err := vle1.Multiply(2.1, err0)
+	if err == nil {
+		t.Errorf("There was no error produced by the Multiply() method, when there should have been.")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			err0.Error(),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
 	}
 
-	// Algorithm
-	_, err := vle1.Mult(3.14)
-	if !strings.Contains(
-		err.Error(),
-		"The multiplication method has not yet been implemented!",
-	) {
-		t.Errorf("Unexpected error: %v", err)
+}
+
+/*
+TestVectorLinearExpr_Multiply2
+Description:
+
+	Testing that the method properly throws an error when a dimension mismatch
+	occurs.
+*/
+func TestVectorLinearExpr_Multiply2(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("vle_multiply2")
+
+	vle1 := optim.VectorLinearExpr{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.ZerosVector(n),
 	}
+
+	x2 := m.AddVariableVector(n - 1)
+
+	// Multiply
+	_, err := vle1.Multiply(x2)
+	if err == nil {
+		t.Errorf("There was no error produced by the Multiply() method, when there should have been.")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf(
+				"dimension mismatch in multiplication of length %v with %T of length %v",
+				vle1.Len(),
+				x2,
+				x2.Len(),
+			),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestVectorLinearExpr_Multiply3
+Description:
+
+	Testing that the method properly multiplies vle with float.
+*/
+func TestVectorLinearExpr_Multiply3(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("vle_multiply2")
+
+	vle1 := optim.VectorLinearExpr{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.OnesVector(n),
+	}
+	f2 := 3.14
+
+	// Multiply
+	prod1, err := vle1.Multiply(f2)
+	if err != nil {
+		t.Errorf("Unexpected error during multiply: %v", err)
+	}
+
+	vle2, ok := prod1.(optim.VectorLinearExpr)
+	if !ok {
+		t.Errorf(
+			"Expected product to be of type VectorLinearExpr; received %T",
+			prod1,
+		)
+	}
+
+	// Check L
+	for rowIndex := 0; rowIndex < vle2.Len(); rowIndex++ {
+		for colIndex := 0; colIndex < n; colIndex++ {
+			if rowIndex == colIndex {
+				if vle2.L.At(rowIndex, colIndex) != f2*1.0 {
+					t.Errorf(
+						"Expected vle2.L[%v,%v] = %v =/= %v",
+						rowIndex, colIndex,
+						vle2.L.At(rowIndex, colIndex),
+						f2*1.0,
+					)
+				}
+			} else {
+				if vle2.L.At(rowIndex, colIndex) != 0.0 {
+					t.Errorf(
+						"Expected vle2.L[%v,%v] = %v =/= 0.0",
+						rowIndex, colIndex,
+						vle2.L.At(rowIndex, colIndex),
+					)
+				}
+			}
+		}
+	}
+
+	// Check C
+	for rowIndex := 0; rowIndex < vle2.Len(); rowIndex++ {
+		if vle2.C.AtVec(rowIndex) != f2*1.0 {
+			t.Errorf(
+				"Expected vle2.C[%v] = %v =/= %v",
+				rowIndex,
+				vle2.C.AtVec(rowIndex),
+				f2*1.0,
+			)
+		}
+	}
+
+}
+
+/*
+TestVectorLinearExpr_Multiply4
+Description:
+
+	Testing that the method properly multiplies vle with K.
+*/
+func TestVectorLinearExpr_Multiply4(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("vle_multiply2")
+
+	vle1 := optim.VectorLinearExpr{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.OnesVector(n),
+	}
+	k2 := optim.K(3.14)
+
+	// Multiply
+	prod1, err := vle1.Multiply(k2)
+	if err != nil {
+		t.Errorf("Unexpected error during multiply: %v", err)
+	}
+
+	vle2, ok := prod1.(optim.VectorLinearExpr)
+	if !ok {
+		t.Errorf(
+			"Expected product to be of type VectorLinearExpr; received %T",
+			prod1,
+		)
+	}
+
+	// Check L
+	for rowIndex := 0; rowIndex < vle2.Len(); rowIndex++ {
+		for colIndex := 0; colIndex < n; colIndex++ {
+			if rowIndex == colIndex {
+				if vle2.L.At(rowIndex, colIndex) != float64(k2)*1.0 {
+					t.Errorf(
+						"Expected vle2.L[%v,%v] = %v =/= %v",
+						rowIndex, colIndex,
+						vle2.L.At(rowIndex, colIndex),
+						float64(k2)*1.0,
+					)
+				}
+			} else {
+				if vle2.L.At(rowIndex, colIndex) != 0.0 {
+					t.Errorf(
+						"Expected vle2.L[%v,%v] = %v =/= 0.0",
+						rowIndex, colIndex,
+						vle2.L.At(rowIndex, colIndex),
+					)
+				}
+			}
+		}
+	}
+
+	// Check C
+	for rowIndex := 0; rowIndex < vle2.Len(); rowIndex++ {
+		if vle2.C.AtVec(rowIndex) != float64(k2)*1.0 {
+			t.Errorf(
+				"Expected vle2.C[%v] = %v =/= %v",
+				rowIndex,
+				vle2.C.AtVec(rowIndex),
+				float64(k2)*1.0,
+			)
+		}
+	}
+
+}
+
+/*
+TestVectorLinearExpr_Multiply5
+Description:
+
+	Testing that the Multiply method properly works for
+	mat.VecDense
+*/
+func TestVectorLinearExpr_Multiply5(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("vle_multiply5")
+
+	vle1 := optim.VectorLinearExpr{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.ZerosVector(n),
+	}
+	vd2 := optim.OnesVector(n)
+
+	// Multiply
+	_, err := vle1.Multiply(vd2)
+	if err == nil {
+		t.Errorf("There was no error produced by the Multiply() method, when there should have been.")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			"MatProInterface does not currently support operations that result in matrices! if you want this feature, create an issue!",
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestVectorLinearExpr_Multiply6
+Description:
+
+	Testing that the Multiply method properly works for
+	KVector
+*/
+func TestVectorLinearExpr_Multiply6(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("vle_multiply6")
+
+	vle1 := optim.VectorLinearExpr{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.ZerosVector(n),
+	}
+	vd2 := optim.OnesVector(n)
+
+	// Multiply
+	_, err := vle1.Multiply(optim.KVector(vd2))
+	if err == nil {
+		t.Errorf("There was no error produced by the Multiply() method, when there should have been.")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			"MatProInterface does not currently support operations that result in matrices! if you want this feature, create an issue!",
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestVectorLinearExpr_Multiply7
+Description:
+
+	Testing that the Multiply method properly works for
+	KVectorTranspose
+*/
+func TestVectorLinearExpr_Multiply7(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("vle_multiply7")
+
+	vle1 := optim.VectorLinearExpr{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.ZerosVector(n),
+	}
+	vd2 := optim.OnesVector(n)
+
+	// Multiply
+	_, err := vle1.Multiply(optim.KVector(vd2).Transpose())
+	if err == nil {
+		t.Errorf("There was no error produced by the Multiply() method, when there should have been.")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf(
+				"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
+				optim.KVector(vd2).Transpose(),
+			),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestVectorLinearExpr_Multiply8
+Description:
+
+	Testing that the Multiply method properly works for
+	VectorLinearExpr
+*/
+func TestVectorLinearExpr_Multiply8(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("vle_multiply8")
+
+	vle1 := optim.VectorLinearExpr{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.ZerosVector(n),
+	}
+	vle2 := vle1.Copy()
+
+	// Multiply
+	_, err := vle1.Multiply(vle2)
+	if err == nil {
+		t.Errorf("There was no error produced by the Multiply() method, when there should have been.")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			"MatProInterface does not currently support operations that result in matrices! if you want this feature, create an issue!",
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestVectorLinearExpr_Multiply9
+Description:
+
+	Testing that the Multiply method properly works for
+	KVectorTranspose
+*/
+func TestVectorLinearExpr_Multiply9(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("vle_multiply9")
+
+	vle1 := optim.VectorLinearExpr{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: optim.ZerosVector(n),
+	}
+	vle2 := vle1.Copy()
+
+	// Multiply
+	_, err := vle1.Multiply(vle2.Transpose())
+	if err == nil {
+		t.Errorf("There was no error produced by the Multiply() method, when there should have been.")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf(
+				"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
+				vle2.Transpose(),
+			),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+
 }

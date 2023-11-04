@@ -956,13 +956,218 @@ func TestKVectorTranspose_Multiply1(t *testing.T) {
 	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
 
 	// Algorithm
-	_, err := vec1.Multiply(30.0)
-	if !strings.Contains(
-		err.Error(),
-		fmt.Sprintf("The Multiply() method for KVectorTranspose has not been implemented yet!"),
-	) {
+	vec2, err := vec1.Multiply(30.0)
+	if err != nil {
 		t.Errorf("There was an unexpected error when computing multiply: %v", err)
 	}
+
+	vec2prime, ok := vec2.(optim.KVectorTranspose)
+	if !ok {
+		t.Errorf(
+			"There was a problem converting vec2 to a KVectorTranspose object! Received object of type %T instead!",
+			vec2,
+		)
+	}
+
+	for vec1Index := 0; vec1Index < vec1.Len(); vec1Index++ {
+		if float64(vec2prime.AtVec(vec1Index).(optim.K)) != 30.0*float64(vec1.AtVec(vec1Index).(optim.K)) {
+			t.Errorf(
+				"vec2[%v] = %v =/= %v = %v * vec1[%v]",
+				vec1Index,
+				vec2prime.AtVec(vec1Index),
+				30.0*float64(vec1.AtVec(vec1Index).(optim.K)),
+				30.0,
+				vec1.AtVec(vec1Index),
+			)
+		}
+	}
+}
+
+/*
+TestKVectorTranspose_Multiply2
+Description:
+
+	Tests that the multiplication function works as expected for K input.
+*/
+func TestKVectorTranspose_Multiply2(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
+
+	// Algorithm
+	vec2, err := vec1.Multiply(optim.K(30.0))
+	if err != nil {
+		t.Errorf("There was an unexpected error when computing multiply: %v", err)
+	}
+
+	vec2prime, ok := vec2.(optim.KVectorTranspose)
+	if !ok {
+		t.Errorf(
+			"There was a problem converting vec2 to a KVectorTranspose object! Received object of type %T instead!",
+			vec2,
+		)
+	}
+
+	for vec1Index := 0; vec1Index < vec1.Len(); vec1Index++ {
+		if float64(vec2prime.AtVec(vec1Index).(optim.K)) != 30.0*float64(vec1.AtVec(vec1Index).(optim.K)) {
+			t.Errorf(
+				"vec2[%v] = %v =/= %v = %v * vec1[%v]",
+				vec1Index,
+				vec2prime.AtVec(vec1Index),
+				30.0*float64(vec1.AtVec(vec1Index).(optim.K)),
+				30.0,
+				vec1.AtVec(vec1Index),
+			)
+		}
+	}
+}
+
+/*
+TestKVectorTranspose_Multiply3
+Description:
+
+	Tests that the multiplication function works as expected for mat.VecDense input.
+*/
+func TestKVectorTranspose_Multiply3(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
+	vd1 := optim.OnesVector(desLength)
+
+	// Algorithm
+	vec2, err := vec1.Multiply(vd1)
+	if err != nil {
+		t.Errorf("There was an unexpected error when computing multiply: %v", err)
+	}
+
+	vec2prime, ok := vec2.(optim.K)
+	if !ok {
+		t.Errorf(
+			"There was a problem converting vec2 to a KVectorTranspose object! Received object of type %T instead!",
+			vec2,
+		)
+	}
+
+	if vec2prime != optim.K(desLength) {
+		t.Errorf("The dot product of the two vectors was %v; expected %v", vec2prime, desLength)
+	}
+}
+
+/*
+TestKVectorTranspose_Multiply4
+Description:
+
+	Tests that the multiplication function works as expected for KVector input.
+*/
+func TestKVectorTranspose_Multiply4(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
+	kv1 := optim.KVector(optim.OnesVector(desLength))
+
+	// Algorithm
+	vec2, err := vec1.Multiply(kv1)
+	if err != nil {
+		t.Errorf("There was an unexpected error when computing multiply: %v", err)
+	}
+
+	vec2prime, ok := vec2.(optim.K)
+	if !ok {
+		t.Errorf(
+			"There was a problem converting vec2 to a KVectorTranspose object! Received object of type %T instead!",
+			vec2,
+		)
+	}
+
+	if vec2prime != optim.K(desLength) {
+		t.Errorf("The dot product of the two vectors was %v; expected %v", vec2prime, desLength)
+	}
+}
+
+/*
+TestKVectorTranspose_Multiply5
+Description:
+
+	Tests that the multiplication function works as expected for KVectorTranspose input.
+*/
+func TestKVectorTranspose_Multiply5(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
+	kvt1 := optim.KVector(optim.OnesVector(desLength)).Transpose()
+
+	// Algorithm
+	_, err := vec1.Multiply(kvt1)
+	if !strings.Contains(
+		err.Error(),
+		fmt.Sprintf(
+			"dimension mismatch! Cannot multiply KVectorTranspose with a transposed vector of type %T; Try transposing one or the other!",
+			kvt1,
+		),
+	) {
+		t.Errorf("Unexpected output of err! %v", err)
+	}
+
+}
+
+/*
+TestKVectorTranspose_Multiply6
+Description:
+
+	Tests that the multiplication function works as expected when a bad error is provided.
+*/
+func TestKVectorTranspose_Multiply6(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
+	f2 := 3.1
+	err0 := fmt.Errorf("Test")
+
+	// Algorithm
+	_, err := vec1.Multiply(f2, err0)
+	if err == nil {
+		t.Errorf("Expected an error, but received none!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			err0.Error(),
+		) {
+			t.Errorf("Unexpected output of err! %v", err)
+		}
+	}
+
+}
+
+/*
+TestKVectorTranspose_Multiply7
+Description:
+
+	Tests that the multiplication function works as expected when a vector of the wrong length is provided.
+*/
+func TestKVectorTranspose_Multiply7(t *testing.T) {
+	// Constants
+	desLength := 10
+	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
+	vec2 := optim.KVector(optim.OnesVector(desLength - 1))
+
+	// Algorithm
+	_, err := vec1.Multiply(vec2)
+	if err == nil {
+		t.Errorf("Expected an error, but received none!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf(
+				"KVectorTranspose of length %v can not be multiplied with a %T of different length (%v).",
+				vec1.Len(),
+				vec2,
+				vec2.Len(),
+			),
+		) {
+			t.Errorf("Unexpected output of err! %v", err)
+		}
+	}
+
 }
 
 /*

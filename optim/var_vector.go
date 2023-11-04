@@ -115,7 +115,7 @@ Description:
 	This member function computes the addition of the receiver vector var with the
 	incoming vector expression ve.
 */
-func (vv VarVector) Plus(e interface{}, extras ...interface{}) (VectorExpression, error) {
+func (vv VarVector) Plus(e interface{}, errors ...error) (VectorExpression, error) {
 	// Constants
 	vvLen := vv.Len()
 
@@ -193,6 +193,74 @@ Description:
 */
 func (vv VarVector) Mult(c float64) (VectorExpression, error) {
 	return vv, fmt.Errorf("The Mult() method for VarVector is not implemented yet!")
+}
+
+/*
+Multiply
+Description:
+
+	Multiplication of a VarVector with another expression.
+*/
+func (vv VarVector) Multiply(rightIn interface{}, errors ...error) (Expression, error) {
+	//Input Processing
+	err := vv.Check()
+	if err != nil {
+		return vv, err
+	}
+
+	err = CheckErrors(errors)
+	if err != nil {
+		return vv, err
+	}
+
+	if IsExpression(rightIn) {
+		rightAsE, _ := ToExpression(rightIn)
+		err = CheckDimensionsInMultiplication(vv, rightAsE)
+		if err != nil {
+			return vv, err
+		}
+	}
+
+	switch right := rightIn.(type) {
+	case float64:
+		// Multiply all elements of vector with this.
+		var prod VectorLinearExpr
+		prod.X = vv.Copy()
+
+		prod.L = ZerosMatrix(vv.Len(), vv.Len())
+		tempIdentity := Identity(vv.Len())
+		prod.L.Scale(right, &tempIdentity)
+
+		prod.C = ZerosVector(vv.Len())
+		return prod, nil
+
+	case K:
+		return vv.Multiply(float64(right))
+
+	case KVector:
+		//KVector must be a scalar.
+		rightAsVD := mat.VecDense(right)
+		k0 := rightAsVD.AtVec(0)
+
+		return vv.Multiply(k0)
+
+	case KVectorTranspose:
+		// KVectorTranspose must be a scalar. Do the same thing as for KVector.
+		if right.Len() == 1 {
+			rightAsVD := mat.VecDense(right)
+			k0 := rightAsVD.AtVec(0)
+
+			return vv.Multiply(k0)
+		}
+		// Otherwise, throw this error!
+		return vv, fmt.Errorf("cannot complete multiplication that will create matrix product! Submit an issue if you want this feature!")
+
+	default:
+		return vv, fmt.Errorf(
+			"The input to VarVector's Multiply() method (%v) has unexpected type: %T",
+			right, rightIn,
+		)
+	}
 }
 
 /*
@@ -331,4 +399,36 @@ Description:
 func (vv VarVector) Transpose() VectorExpression {
 	vvCopy := vv.Copy()
 	return VarVectorTranspose(vvCopy)
+}
+
+/*
+Dims
+Description:
+
+	Dimensions of the variable vector.
+*/
+func (vv VarVector) Dims() []int {
+	return []int{vv.Len(), 1}
+}
+
+/*
+Check
+Description:
+
+	Checks whether or not the VarVector has a sensible initialization.
+*/
+func (vv VarVector) Check() error {
+	// Check that each variable is properly defined
+	for ii, element := range vv.Elements {
+		err := element.Check()
+		if err != nil {
+			return fmt.Errorf(
+				"element %v has an issue: %v",
+				ii, err,
+			)
+		}
+	}
+
+	// If nothing was thrown, then return nil!
+	return nil
 }

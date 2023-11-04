@@ -3,6 +3,7 @@ package optim_test
 import (
 	"fmt"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
+	"gonum.org/v1/gonum/mat"
 	"strings"
 	"testing"
 )
@@ -1111,4 +1112,369 @@ func TestVarVector_AtVec1(t *testing.T) {
 			idx1,
 		)
 	}
+}
+
+/*
+TestVarVector_1
+Description:
+
+	Tests that the error catching behavior works when
+	VarVector is malformed.
+*/
+func TestVarVector_Check1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestVarVector_Check1")
+	v1 := m.AddVariable()
+	v2 := m.AddVariable()
+	v2.Lower = 1
+	v2.Upper = 0
+
+	vv3 := optim.VarVector{
+		Elements: []optim.Variable{v1, v2},
+	}
+
+	// Run Check
+	err := vv3.Check()
+	if err == nil {
+		t.Errorf("No error was thrown, but we expected one!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf(
+				"element %v has an issue: %v",
+				1, fmt.Sprintf(
+					"lower bound (%v) of variable is above upper bound (%v).",
+					v2.Lower, v2.Upper,
+				),
+			),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestVarVector_Multiply1
+Description:
+
+	Tests that the error catching behavior works when
+	VarVector is malformed.
+*/
+func TestVarVector_Multiply1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestVarVector_Multiply1")
+	v1 := m.AddVariable()
+	v2 := m.AddVariable()
+	v2.Lower = 1
+	v2.Upper = 0
+
+	vv3 := optim.VarVector{
+		Elements: []optim.Variable{v1, v2},
+	}
+
+	// Run Check
+	_, err := vv3.Multiply(3.0)
+	if err == nil {
+		t.Errorf("No error was thrown, but we expected one!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf(
+				"element %v has an issue: %v",
+				1, fmt.Sprintf(
+					"lower bound (%v) of variable is above upper bound (%v).",
+					v2.Lower, v2.Upper,
+				),
+			),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestVarVector_Multiply2
+Description:
+
+	Tests that the error catching behavior works when
+	a bad error input is given.
+*/
+func TestVarVector_Multiply2(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestVarVector_Multiply2")
+	vv1 := m.AddVariableVector(2)
+	err2 := fmt.Errorf("test")
+
+	// Run Check
+	_, err := vv1.Multiply(3.0, err2)
+	if err == nil {
+		t.Errorf("No error was thrown, but we expected one!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			err2.Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestVarVector_Multiply3
+Description:
+
+	Tests that the error catching behavior works when
+	an input with bad shape is given.
+*/
+func TestVarVector_Multiply3(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestVarVector_Multiply3")
+	vv1 := m.AddVariableVector(2)
+	vv2 := m.AddVariableVector(4)
+
+	// Run Check
+	_, err := vv1.Multiply(vv2)
+	if err == nil {
+		t.Errorf("No error was thrown, but we expected one!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			optim.DimensionError{
+				Operation: "Multiply",
+				Arg1:      vv1,
+				Arg2:      vv2,
+			}.Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestVarVector_Multiply4
+Description:
+
+	Tests that the error catching behavior works when
+	a scalar float is given. Should result in VectorLinearExpression
+*/
+func TestVarVector_Multiply4(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestVarVector_Multiply4")
+	vv1 := m.AddVariableVector(2)
+	f2 := 3.1415
+
+	// Run Check
+	prod, err := vv1.Multiply(f2)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	prodAsVLE, tf := prod.(optim.VectorLinearExpr)
+	if !tf {
+		t.Errorf("expected product to be of type VectorLinearExpr; received %T instead", prod)
+	}
+
+	// Investigate components of VLE
+	for rowIndex := 0; rowIndex < vv1.Len(); rowIndex++ {
+		for colIndex := 0; colIndex < vv1.Len(); colIndex++ {
+			if (rowIndex == colIndex) && (prodAsVLE.L.At(rowIndex, colIndex) != 1.0*f2) {
+				t.Errorf(
+					"prod.L[%v,%v] = %v =/= 1.0 as expected",
+					rowIndex, colIndex,
+					prodAsVLE.L.At(rowIndex, colIndex),
+				)
+			}
+
+			if (rowIndex != colIndex) && (prodAsVLE.L.At(rowIndex, colIndex) != 0.0) {
+				t.Errorf(
+					"prod.L[%v,%v] = %v =/= 0.0 as expected",
+					rowIndex, colIndex,
+					prodAsVLE.L.At(rowIndex, colIndex),
+				)
+			}
+
+		}
+
+	}
+
+}
+
+/*
+TestVarVector_Multiply5
+Description:
+
+	Tests that the error catching behavior works when
+	a scalar K is given. Should result in VectorLinearExpression
+*/
+func TestVarVector_Multiply5(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestVarVector_Multiply5")
+	vv1 := m.AddVariableVector(2)
+	f2 := 3.1415
+
+	// Run Check
+	prod, err := vv1.Multiply(optim.K(f2))
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	prodAsVLE, tf := prod.(optim.VectorLinearExpr)
+	if !tf {
+		t.Errorf("expected product to be of type VectorLinearExpr; received %T instead", prod)
+	}
+
+	// Investigate components of VLE
+	for rowIndex := 0; rowIndex < vv1.Len(); rowIndex++ {
+		for colIndex := 0; colIndex < vv1.Len(); colIndex++ {
+			if (rowIndex == colIndex) && (prodAsVLE.L.At(rowIndex, colIndex) != 1.0*f2) {
+				t.Errorf(
+					"prod.L[%v,%v] = %v =/= 1.0 as expected",
+					rowIndex, colIndex,
+					prodAsVLE.L.At(rowIndex, colIndex),
+				)
+			}
+
+			if (rowIndex != colIndex) && (prodAsVLE.L.At(rowIndex, colIndex) != 0.0) {
+				t.Errorf(
+					"prod.L[%v,%v] = %v =/= 0.0 as expected",
+					rowIndex, colIndex,
+					prodAsVLE.L.At(rowIndex, colIndex),
+				)
+			}
+
+		}
+
+	}
+
+}
+
+/*
+TestVarVector_Multiply6
+Description:
+
+	Tests that the error catching behavior works when
+	a one element KVector is given. Should result in VectorLinearExpression
+*/
+func TestVarVector_Multiply6(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestVarVector_Multiply3")
+	vv1 := m.AddVariableVector(2)
+	f2 := 3.1415
+
+	vd3 := mat.NewVecDense(1, []float64{f2})
+
+	// Run Check
+	prod, err := vv1.Multiply(optim.KVector(*vd3))
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	prodAsVLE, tf := prod.(optim.VectorLinearExpr)
+	if !tf {
+		t.Errorf("expected product to be of type VectorLinearExpr; received %T instead", prod)
+	}
+
+	// Investigate components of VLE
+	for rowIndex := 0; rowIndex < vv1.Len(); rowIndex++ {
+		for colIndex := 0; colIndex < vv1.Len(); colIndex++ {
+			if (rowIndex == colIndex) && (prodAsVLE.L.At(rowIndex, colIndex) != 1.0*f2) {
+				t.Errorf(
+					"prod.L[%v,%v] = %v =/= 1.0 as expected",
+					rowIndex, colIndex,
+					prodAsVLE.L.At(rowIndex, colIndex),
+				)
+			}
+
+			if (rowIndex != colIndex) && (prodAsVLE.L.At(rowIndex, colIndex) != 0.0) {
+				t.Errorf(
+					"prod.L[%v,%v] = %v =/= 0.0 as expected",
+					rowIndex, colIndex,
+					prodAsVLE.L.At(rowIndex, colIndex),
+				)
+			}
+
+		}
+
+	}
+}
+
+/*
+TestVarVector_Multiply7
+Description:
+
+	Tests that the error catching behavior works when
+	a one element KVectorTranspose is given. Should result in VectorLinearExpression
+*/
+func TestVarVector_Multiply7(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestVarVector_Multiply7")
+	vv1 := m.AddVariableVector(2)
+	f2 := 3.1415
+
+	vd3 := mat.NewVecDense(1, []float64{f2})
+
+	// Run Check
+	prod, err := vv1.Multiply(optim.KVectorTranspose(*vd3))
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	prodAsVLE, tf := prod.(optim.VectorLinearExpr)
+	if !tf {
+		t.Errorf("expected product to be of type VectorLinearExpr; received %T instead", prod)
+	}
+
+	// Investigate components of VLE
+	for rowIndex := 0; rowIndex < vv1.Len(); rowIndex++ {
+		for colIndex := 0; colIndex < vv1.Len(); colIndex++ {
+			if (rowIndex == colIndex) && (prodAsVLE.L.At(rowIndex, colIndex) != 1.0*f2) {
+				t.Errorf(
+					"prod.L[%v,%v] = %v =/= 1.0 as expected",
+					rowIndex, colIndex,
+					prodAsVLE.L.At(rowIndex, colIndex),
+				)
+			}
+
+			if (rowIndex != colIndex) && (prodAsVLE.L.At(rowIndex, colIndex) != 0.0) {
+				t.Errorf(
+					"prod.L[%v,%v] = %v =/= 0.0 as expected",
+					rowIndex, colIndex,
+					prodAsVLE.L.At(rowIndex, colIndex),
+				)
+			}
+
+		}
+
+	}
+
+}
+
+/*
+TestVarVector_Multiply8
+Description:
+
+	Tests that the error catching behavior works when
+	a non-single element KVectorTranspose is given. Should result in VectorLinearExpression
+*/
+func TestVarVector_Multiply8(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestVarVector_Multiply8")
+	vv1 := m.AddVariableVector(2)
+	f2 := 3.1415
+
+	vd3 := mat.NewVecDense(2, []float64{f2, f2})
+
+	// Run Check
+	_, err := vv1.Multiply(optim.KVectorTranspose(*vd3))
+	if err == nil {
+		t.Errorf("expected error, but received none!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf("cannot complete multiplication that will create matrix product! Submit an issue if you want this feature!"),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+
 }

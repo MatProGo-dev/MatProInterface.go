@@ -6,7 +6,10 @@ Description:
 	An improvement/successor to the scalar expr interface.
 */
 
-import "gonum.org/v1/gonum/mat"
+import (
+	"fmt"
+	"gonum.org/v1/gonum/mat"
+)
 
 /*
 VectorExpression
@@ -33,11 +36,11 @@ type VectorExpression interface {
 
 	// Plus adds the current expression to another and returns the resulting
 	// expression
-	Plus(e interface{}, extras ...interface{}) (VectorExpression, error)
+	Plus(e interface{}, errors ...error) (VectorExpression, error)
 
 	// Mult multiplies the current expression with another and returns the
 	// resulting expression
-	Mult(c float64) (VectorExpression, error)
+	Multiply(e interface{}, errors ...error) (Expression, error)
 
 	// LessEq returns a less than or equal to (<=) constraint between the
 	// current expression and another
@@ -64,6 +67,9 @@ type VectorExpression interface {
 
 	//Transpose returns the transpose of the given vector expression
 	Transpose() VectorExpression
+
+	// Dims returns the dimensions of the given expression
+	Dims() []int
 }
 
 /*
@@ -94,3 +100,71 @@ func NewVectorExpression(c mat.VecDense) VectorLinearExpr {
 //
 //	return nil
 //}
+
+/*
+IsVectorExpression
+Description:
+
+	Determines whether or not an input object is a valid "VectorExpression" according to MatProInterface.
+*/
+func IsVectorExpression(e interface{}) bool {
+	// Check each type
+	switch e.(type) {
+	case mat.VecDense:
+		return true
+	case KVector:
+		return true
+	case KVectorTranspose:
+		return true
+	case VarVector:
+		return true
+	case VarVectorTranspose:
+		return true
+	case VectorLinearExpr:
+		return true
+	case VectorLinearExpressionTranspose:
+		return true
+	default:
+		return false
+
+	}
+}
+
+/*
+ToVectorExpression
+Description:
+
+	Converts the input expression to a valid type that implements "VectorExpression".
+*/
+func ToVectorExpression(e interface{}) (VectorExpression, error) {
+	// Input Processing
+	if !IsVectorExpression(e) {
+		return KVector(OnesVector(1)), fmt.Errorf(
+			"the input interface is of type %T, which is not recognized as a VectorExpression.",
+			e,
+		)
+	}
+
+	// Convert
+	switch e2 := e.(type) {
+	case KVector:
+		return e2, nil
+	case KVectorTranspose:
+		return e2, nil
+	case VarVector:
+		return e2, nil
+	case VarVectorTranspose:
+		return e2, nil
+	case VectorLinearExpr:
+		return e2, nil
+	case VectorLinearExpressionTranspose:
+		return e2, nil
+	case mat.VecDense:
+		return KVector(e2), nil
+	default:
+		return KVector(OnesVector(1)), fmt.Errorf(
+			"unexpected vector expression conversion requested for type %T!",
+			e,
+		)
+	}
+}

@@ -86,7 +86,7 @@ Description:
 
 	Adds the current expression to another and returns the resulting expression
 */
-func (kvt KVectorTranspose) Plus(eIn interface{}, extras ...interface{}) (VectorExpression, error) {
+func (kvt KVectorTranspose) Plus(eIn interface{}, errors ...error) (VectorExpression, error) {
 	// Constants
 	kvLen := kvt.Len()
 
@@ -276,9 +276,88 @@ Description:
 
 	This method is used to compute the multiplication of the input vector constant with another term.
 */
-func (kvt KVectorTranspose) Multiply(term1 interface{}, extras ...interface{}) (Expression, error) {
-	// TODO: Implement this!
-	return K(0), fmt.Errorf("The Multiply() method for KVectorTranspose has not been implemented yet!")
+func (kvt KVectorTranspose) Multiply(e interface{}, errors ...error) (Expression, error) {
+	// Input Processing
+	err := CheckErrors(errors)
+	if err != nil {
+		return kvt, err
+	}
+
+	if IsVectorExpression(e) {
+		// Check dimensions
+		e2, _ := ToVectorExpression(e)
+		if e2.Len() != kvt.Len() {
+			return kvt, fmt.Errorf(
+				"KVectorTranspose of length %v can not be multiplied with a %T of different length (%v).",
+				kvt.Len(),
+				e2,
+				e2.Len(),
+			)
+		}
+	}
+
+	// Compute Multiplication
+	switch eConverted := e.(type) {
+	case float64:
+		// Use mat.Vector's multiplication method
+		var result mat.VecDense
+		kvAsVec := mat.VecDense(kvt)
+		result.ScaleVec(eConverted, &kvAsVec)
+
+		return KVectorTranspose(result), nil
+	case K:
+		// Convert to float64
+		eAsFloat := float64(eConverted)
+
+		return kvt.Multiply(eAsFloat)
+
+	case mat.VecDense:
+		// Do the dot product
+		var result float64
+		kvtAsVec := mat.VecDense(kvt)
+		result = mat.Dot(&kvtAsVec, &eConverted)
+
+		return K(result), nil
+
+	case KVector:
+		// Convert to mat.VecDense
+		eAsVecDense := mat.VecDense(eConverted)
+
+		return kvt.Multiply(eAsVecDense)
+
+	case KVectorTranspose:
+		// Immediately return error.
+		return kvt, fmt.Errorf(
+			"dimension mismatch! Cannot multiply KVectorTranspose with a transposed vector of type %T; Try transposing one or the other!",
+			eConverted,
+		)
+
+	case VarVector:
+		return eConverted.Transpose().Multiply(kvt.Transpose())
+
+	case VarVectorTranspose:
+		// Immediately return error.
+		return kvt, fmt.Errorf(
+			"dimension mismatch! Cannot multiply KVectorTranspose with a transposed vector of type %T; Try transposing one or the other!",
+			eConverted,
+		)
+	case VectorLinearExpr:
+		return eConverted.Multiply(kvt)
+
+	case VectorLinearExpressionTranspose:
+		// Immediately return error.
+		return kvt, fmt.Errorf(
+			"dimension mismatch! Cannot multiply KVectorTranspose with a transposed vector of type %T; Try transposing one or the other!",
+			eConverted,
+		)
+
+	default:
+		return kvt, fmt.Errorf(
+			"The input to KVectorTranspose's Multiply method (%v) has unexpected type: %T",
+			e, e,
+		)
+
+	}
 }
 
 /*
@@ -289,4 +368,14 @@ Description:
 */
 func (kvt KVectorTranspose) Transpose() VectorExpression {
 	return KVector(kvt)
+}
+
+/*
+Dims
+Description:
+
+	This method returns the dimensions of the KVectorTranspose object.
+*/
+func (kvt KVectorTranspose) Dims() []int {
+	return []int{1, kvt.Len()}
 }

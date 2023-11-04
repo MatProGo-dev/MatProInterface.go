@@ -2,6 +2,7 @@ package optim
 
 import (
 	"fmt"
+	"gonum.org/v1/gonum/mat"
 )
 
 // Integer constants represnting commonly used numbers. Makes for better
@@ -52,21 +53,10 @@ func (c K) Constant() float64 {
 // Plus adds the current expression to another and returns the resulting
 // expression
 func (c K) Plus(e interface{}, errors ...error) (ScalarExpression, error) {
-	// TODO: Create input processing to:
-	// 			- process errors in the extras slice
-	//			- address extra input expressions in extras
-
 	// Input Processing
-	switch {
-	case len(errors) > 2:
-		return K(INFINITY), fmt.Errorf(
-			"We expect for there to be at most one error! Received %v!",
-			len(errors),
-		)
-	case len(errors) == 1:
-		if errors[0] != nil {
-			return K(INFINITY), errors[0]
-		}
+	err := CheckErrors(errors)
+	if err != nil {
+		return c, err
 	}
 
 	// Switching based on input type
@@ -89,20 +79,20 @@ func (c K) Plus(e interface{}, errors ...error) (ScalarExpression, error) {
 
 // LessEq returns a less than or equal to (<=) constraint between the
 // current expression and another
-func (c K) LessEq(other ScalarExpression) (ScalarConstraint, error) {
-	return c.Comparison(other, SenseLessThanEqual)
+func (c K) LessEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+	return c.Comparison(rhsIn, SenseLessThanEqual, errors...)
 }
 
 // GreaterEq returns a greater than or equal to (>=) constraint between the
 // current expression and another
-func (c K) GreaterEq(other ScalarExpression) (ScalarConstraint, error) {
-	return c.Comparison(other, SenseGreaterThanEqual)
+func (c K) GreaterEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+	return c.Comparison(rhsIn, SenseGreaterThanEqual, errors...)
 }
 
 // Eq returns an equality (==) constraint between the current expression
 // and another
-func (c K) Eq(other ScalarExpression) (ScalarConstraint, error) {
-	return c.Comparison(other, SenseEqual)
+func (c K) Eq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+	return c.Comparison(rhsIn, SenseEqual, errors...)
 }
 
 /*
@@ -111,7 +101,18 @@ Description:
 
 	This method compares the receiver with expression rhs in the sense provided by sense.
 */
-func (c K) Comparison(rhs ScalarExpression, sense ConstrSense) (ScalarConstraint, error) {
+func (c K) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (ScalarConstraint, error) {
+	// InputProcessing
+	err := CheckErrors(errors)
+	if err != nil {
+		return ScalarConstraint{}, err
+	}
+
+	rhs, err := ToScalarExpression(rhsIn)
+	if err != nil {
+		return ScalarConstraint{}, err
+	}
+
 	// Constants
 
 	// Algorithm
@@ -128,51 +129,111 @@ func (c K) Multiply(term1 interface{}, errors ...error) (Expression, error) {
 	// Constants
 
 	// Input Processing
-	if len(errors) > 0 {
-		if errors[0] != nil {
-			return c, errors[0]
+	err := CheckErrors(errors)
+	if err != nil {
+		return c, err
+	}
+
+	if IsExpression(term1) {
+		// Check dimensions
+		term1AsE, _ := ToExpression(term1)
+		err = CheckDimensionsInMultiplication(c, term1AsE)
+		if err != nil {
+			return c, err
 		}
 	}
 
 	// Algorithm
-	switch term1.(type) {
+	switch right := term1.(type) {
 	case float64:
-		term1AsFloat, _ := term1.(float64)
-		return c.Multiply(K(term1AsFloat))
+		return c.Multiply(K(right))
 	case K:
-		term1AsK, _ := term1.(K)
-		return c * term1AsK, nil
+		return c * right, nil
 	case Variable:
-		// Cast
-		term1AsV, _ := term1.(Variable)
-
 		// Algorithm
-		term1AsSLE := term1AsV.ToScalarLinearExpression()
+		term1AsSLE := right.ToScalarLinearExpression()
 
 		return c.Multiply(term1AsSLE)
 	case ScalarLinearExpr:
-		// Cast
-		term1AsSLE, _ := term1.(ScalarLinearExpr)
-
 		// Scale all vectors and constants
-		sleOut := term1AsSLE.Copy()
+		sleOut := right.Copy()
 		sleOut.L.ScaleVec(float64(c), &sleOut.L)
-		sleOut.C = term1AsSLE.C * float64(c)
+		sleOut.C = right.C * float64(c)
 
 		return sleOut, nil
 	case ScalarQuadraticExpression:
-		// Cast
-		term1AsSQE, _ := term1.(ScalarQuadraticExpression)
-
 		// Scale all matrices and constants
 		var sqeOut ScalarQuadraticExpression
-		sqeOut.Q.Scale(float64(c), &term1AsSQE.Q)
-		sqeOut.L.ScaleVec(float64(c), &term1AsSQE.L)
-		sqeOut.C = float64(c) * term1AsSQE.C
+		sqeOut.Q.Scale(float64(c), &right.Q)
+		sqeOut.L.ScaleVec(float64(c), &right.L)
+		sqeOut.C = float64(c) * right.C
 
 		return sqeOut, nil
+	case KVector:
+		var prod mat.VecDense = ZerosVector(right.Len())
+		term1AsVecDense := mat.VecDense(right)
+
+		prod.ScaleVec(float64(c), &term1AsVecDense)
+
+		return KVector(prod), nil
+	case KVectorTranspose:
+		var prod mat.VecDense = ZerosVector(right.Len())
+		term1AsVecDense := mat.VecDense(right)
+
+		prod.ScaleVec(float64(c), &term1AsVecDense)
+
+		return KVectorTranspose(prod), nil
+	case VarVector:
+		// VarVector is of unit length.
+		return ScalarLinearExpr{
+			L: OnesVector(1),
+			X: right.Copy(),
+			C: 0.0,
+		}, nil
+	case VarVectorTranspose:
+		if right.Len() == 1 {
+			rightTransposed := right.Transpose().(VarVector)
+			prod := ScalarLinearExpr{
+				L: OnesVector(1),
+				X: rightTransposed.Copy(),
+				C: 0.0,
+			}
+			prod.L.ScaleVec(float64(c), &prod.L)
+
+			return prod, nil
+		} else {
+			var vleOut VectorLinearExpressionTranspose
+			vleOut.X = right.Copy().Transpose().(VarVector)
+			tempIdentity := Identity(right.Len()) // Is this needed?
+			vleOut.L.Scale(float64(c), &tempIdentity)
+			vleOut.C = ZerosVector(right.Len())
+
+			return vleOut, nil
+		}
+	case VectorLinearExpr:
+		var vleOut VectorLinearExpr
+		vleOut.L.Scale(float64(c), &right.L)
+		vleOut.C.ScaleVec(float64(c), &right.C)
+		vleOut.X = right.X.Copy()
+
+		return vleOut, nil
+	case VectorLinearExpressionTranspose:
+		var vletOut VectorLinearExpressionTranspose
+		vletOut.L.Scale(float64(c), &right.L)
+		vletOut.C.ScaleVec(float64(c), &right.C)
+		vletOut.X = right.X.Copy()
+
+		return vletOut, nil
 	default:
 		return K(0), fmt.Errorf("Unexpected type of term1 in the Multiply() method: %T (%v)", term1, term1)
 
 	}
+}
+
+func (c K) Dims() []int {
+	return []int{1, 1} // Signifies scalar
+}
+
+func (c K) Check() error {
+	return nil
 }

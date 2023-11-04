@@ -413,9 +413,45 @@ func TestOperators_Multiply4(t *testing.T) {
 	_, err := optim.Multiply(kv1, v1)
 	if !strings.Contains(
 		err.Error(),
-		fmt.Sprintf("The Multiply() method for KVector has not been implemented yet!"),
+		fmt.Sprintf(
+			"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
+			v1,
+		),
 	) {
 		t.Errorf("Unexpected error value for multiply: %v", err)
+	}
+
+}
+
+/*
+TestOperators_Multiply5
+Description:
+
+	Multiply a KVectorTranspose with a VarVector. Should return a LinearExpression value
+*/
+func TestOperators_Multiply5(t *testing.T) {
+	// Constants
+	m := optim.NewModel("test-operators-multiply3")
+	v1 := m.AddVariableVector(3)
+	kv1 := optim.KVector(optim.OnesVector(v1.Len()))
+
+	// Algorithm
+	prod, err := optim.Multiply(kv1.Transpose(), v1)
+	if err != nil {
+		t.Errorf("Unexpected error during valid multiplication: %v", err)
+	}
+
+	prodAsSLE, ok := prod.(optim.ScalarLinearExpr)
+	if !ok {
+		t.Errorf("Expected product to be a ScalarLinearExpr; received %T", prod)
+	}
+
+	if prodAsSLE.X.Len() != v1.Len() {
+		t.Errorf(
+			"Expected product to contain %v variables; received %v",
+			v1.Len(),
+			prodAsSLE.X.Len(),
+		)
 	}
 
 }

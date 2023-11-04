@@ -57,14 +57,36 @@ func (sle ScalarLinearExpr) Constant() float64 {
 	return sle.C
 }
 
+/*
+Check
+Description:
+*/
+func (sle ScalarLinearExpr) Check() error {
+	// Compare lengths of X and L
+	if sle.L.Len() != sle.X.Len() {
+		return fmt.Errorf(
+			"the length of L (%v) does not match that of X (%v)!",
+			sle.L.Len(),
+			sle.X.Len(),
+		)
+	}
+
+	// All checks passed
+	return nil
+}
+
 // Plus adds the current expression to another and returns the resulting
 // expression
 func (sle ScalarLinearExpr) Plus(e interface{}, errors ...error) (ScalarExpression, error) {
 	// Input Processing
-	if len(errors) > 0 {
-		if errors[0] != nil {
-			return sle, errors[0]
-		}
+	err := sle.Check()
+	if err != nil {
+		return sle, err
+	}
+
+	err = CheckErrors(errors)
+	if err != nil {
+		return sle, err
 	}
 
 	// Algorithm depends on the type of eIn.
@@ -122,37 +144,26 @@ func (sle ScalarLinearExpr) Plus(e interface{}, errors ...error) (ScalarExpressi
 		return eAsType.Plus(sle)
 
 	default:
-		fmt.Println("Unexpected type given to Plus().")
-
-		return ScalarQuadraticExpression{}, fmt.Errorf("Unexpected type (%T) given as first argument to Plus as %v.", e, e)
+		return ScalarQuadraticExpression{}, UnexpectedInputError{InputInQuestion: e, Operation: "Plus"}
 	}
 }
 
-//// Mult multiplies the current expression to another and returns the
-//// resulting expression
-//func (sle ScalarLinearExpr) Mult(c float64) (ScalarExpression, error) {
-//	sle.L.ScaleVec(c, &sle.L)
-//	sle.C *= c
-//
-//	return sle, nil
-//}
-
 // LessEq returns a less than or equal to (<=) constraint between the
 // current expression and another
-func (sle ScalarLinearExpr) LessEq(other ScalarExpression) (ScalarConstraint, error) {
-	return sle.Comparison(other, SenseLessThanEqual)
+func (sle ScalarLinearExpr) LessEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+	return sle.Comparison(rhsIn, SenseLessThanEqual, errors...)
 }
 
 // GreaterEq returns a greater than or equal to (>=) constraint between the
 // current expression and another
-func (sle ScalarLinearExpr) GreaterEq(other ScalarExpression) (ScalarConstraint, error) {
-	return sle.Comparison(other, SenseGreaterThanEqual)
+func (sle ScalarLinearExpr) GreaterEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+	return sle.Comparison(rhsIn, SenseGreaterThanEqual, errors...)
 }
 
 // Eq returns an equality (==) constraint between the current expression
 // and another
-func (sle ScalarLinearExpr) Eq(other ScalarExpression) (ScalarConstraint, error) {
-	return sle.Comparison(other, SenseEqual)
+func (sle ScalarLinearExpr) Eq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+	return sle.Comparison(rhsIn, SenseEqual, errors...)
 }
 
 /*
@@ -165,7 +176,23 @@ Usage:
 
 	constr, err := e.Comparison(expr1,SenseGreaterThanEqual)
 */
-func (sle ScalarLinearExpr) Comparison(rhs ScalarExpression, sense ConstrSense) (ScalarConstraint, error) {
+func (sle ScalarLinearExpr) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (ScalarConstraint, error) {
+	// Input Processing
+	err := sle.Check()
+	if err != nil {
+		return ScalarConstraint{}, err
+	}
+
+	err = CheckErrors(errors)
+	if err != nil {
+		return ScalarConstraint{}, err
+	}
+
+	rhs, err := ToScalarExpression(rhsIn)
+	if err != nil {
+		return ScalarConstraint{}, err
+	}
+
 	return ScalarConstraint{sle, rhs, sense}, nil
 }
 
@@ -228,59 +255,56 @@ Description:
 
 	multiplies the current expression to another and returns the resulting expression
 */
-func (sle ScalarLinearExpr) Multiply(val interface{}, errors ...error) (Expression, error) {
-	// Constants
+func (sle ScalarLinearExpr) Multiply(rightInput interface{}, errors ...error) (Expression, error) {
+	// Input Processing
+	err := sle.Check()
+	if err != nil {
+		return sle, err
+	}
 
-	// TODO[Kwesi]: Build input processing logic here
+	err = CheckErrors(errors)
+	if err != nil {
+		return sle, err
+	}
+
+	if IsExpression(rightInput) {
+		rightInputAsE, _ := ToExpression(rightInput)
+		err = CheckDimensionsInMultiplication(sle, rightInputAsE)
+		if err != nil {
+			return sle, err
+		}
+	}
 
 	// Algorithm
-	switch val.(type) {
+	switch right := rightInput.(type) {
 	case float64:
-		// Cast
-		cAsFloat := val.(float64)
-
-		cAsK := K(cAsFloat)
-		// Compute
-		return cAsK.Multiply(sle)
-
+		rightAsK := K(right)
+		return rightAsK.Multiply(sle)
 	case K:
-		// Cast variable
-		cAsK := val.(K)
-
-		// Compute
-		return cAsK.Multiply(sle)
-
+		return right.Multiply(sle)
 	case Variable:
-		// Cast
-		valAsVar := val.(Variable)
-
-		// Compute
-		return valAsVar.Multiply(sle)
-
+		return right.Multiply(sle)
 	case ScalarLinearExpr:
-		// Cast
-		valAsSLE := val.(ScalarLinearExpr)
-
 		// Algorithm
 		sqeOut := ScalarQuadraticExpression{
 			X: VarVector{
-				UniqueVars(append(valAsSLE.X.Elements, sle.X.Elements...)),
+				UniqueVars(append(right.X.Elements, sle.X.Elements...)),
 			},
-			C: valAsSLE.C * sle.C,
+			C: right.C * sle.C,
 		}
 		sqeOut.Q = ZerosMatrix(sqeOut.X.Len(), sqeOut.X.Len())
 		sqeOut.L = ZerosVector(sqeOut.X.Len())
 
 		// Update Q
 		for xIndex1 := 0; xIndex1 < sle.X.Len(); xIndex1++ {
-			for xIndex2 := 0; xIndex2 < valAsSLE.X.Len(); xIndex2++ {
+			for xIndex2 := 0; xIndex2 < right.X.Len(); xIndex2++ {
 				// Get x1 and x2
 				x1 := sle.X.AtVec(xIndex1)
-				x2 := valAsSLE.X.AtVec(xIndex2)
+				x2 := right.X.AtVec(xIndex2)
 
 				// Find coefficients associated with x1 and x2 in
 				coeff1 := sle.L.AtVec(xIndex1)
-				coeff2 := valAsSLE.L.AtVec(xIndex2)
+				coeff2 := right.L.AtVec(xIndex2)
 
 				// Place product into Q matrix
 				x1LocInSQEOut, _ := FindInSlice(x1, sqeOut.X.Elements)
@@ -311,30 +335,53 @@ func (sle ScalarLinearExpr) Multiply(val interface{}, errors ...error) (Expressi
 			x1LocInSQEOut, _ := FindInSlice(x1, sqeOut.X.Elements)
 			sqeOut.L.SetVec(
 				x1LocInSQEOut,
-				sqeOut.L.AtVec(x1LocInSQEOut)+sle.L.AtVec(xIndex1)*valAsSLE.C,
+				sqeOut.L.AtVec(x1LocInSQEOut)+sle.L.AtVec(xIndex1)*right.C,
 			)
 		}
 		// Second, update according to valAsSLE.L multiplied by val.C
-		for xIndex2 := 0; xIndex2 < valAsSLE.X.Len(); xIndex2++ {
+		for xIndex2 := 0; xIndex2 < right.X.Len(); xIndex2++ {
 			x2 := sle.X.AtVec(xIndex2)
 			x2LocInSQEOut, _ := FindInSlice(x2, sqeOut.X.Elements)
 			sqeOut.L.SetVec(
 				x2LocInSQEOut,
-				sqeOut.L.AtVec(x2LocInSQEOut)+valAsSLE.L.AtVec(xIndex2)*sle.C,
+				sqeOut.L.AtVec(x2LocInSQEOut)+right.L.AtVec(xIndex2)*sle.C,
 			)
 		}
 
 		return sqeOut, nil
 
 	case ScalarQuadraticExpression:
-		// Cast
-		//valAsSQE := val.(ScalarQuadraticExpression)
-
 		// Return error
 		return ScalarQuadraticExpression{}, fmt.Errorf("Can not multiply ScalarLinearExpr with ScalarQuadraticExpression. MatProInterface can not represent polynomials higher than degree 2.")
 
+	case KVector:
+		// This should only be active for KVector of length 1
+		k0 := right.AtVec(0).(K)
+
+		return sle.Multiply(k0)
+
+	case KVectorTranspose:
+		var prodAsVLET VectorLinearExpressionTranspose
+		prodAsVLET.X = sle.X.Copy()
+
+		prodAsVLET.L = ZerosMatrix(right.Len(), sle.X.Len())
+		rightAsVD := mat.VecDense(right)
+		for rowIndex := 0; rowIndex < right.Len(); rowIndex++ {
+			for colIndex := 0; colIndex < sle.X.Len(); colIndex++ {
+				prodAsVLET.L.Set(
+					rowIndex, colIndex,
+					rightAsVD.AtVec(rowIndex)*sle.L.AtVec(colIndex),
+				)
+			}
+		}
+
+		prodAsVLET.C = OnesVector(right.Len())
+		prodAsVLET.C.ScaleVec(sle.C, &rightAsVD)
+
+		return prodAsVLET, nil
+
 	default:
-		return sle, fmt.Errorf("Unexpected type of val: %T", val)
+		return sle, fmt.Errorf("Unexpected type of val: %T", right)
 	}
 }
 
@@ -355,4 +402,14 @@ func (sle ScalarLinearExpr) Copy() ScalarLinearExpr {
 	sleOut.L.CopyVec(&sle.L)
 
 	return sleOut
+}
+
+/*
+Dims
+Description:
+
+	Dimensions of a
+*/
+func (sle ScalarLinearExpr) Dims() []int {
+	return []int{1, 1} // Represents scalar
 }
