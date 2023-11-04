@@ -193,11 +193,14 @@ func (c K) Multiply(term1 interface{}, errors ...error) (Expression, error) {
 	case VarVectorTranspose:
 		if right.Len() == 1 {
 			rightTransposed := right.Transpose().(VarVector)
-			return ScalarLinearExpr{
+			prod := ScalarLinearExpr{
 				L: OnesVector(1),
 				X: rightTransposed.Copy(),
 				C: 0.0,
-			}, nil
+			}
+			prod.L.ScaleVec(float64(c), &prod.L)
+
+			return prod, nil
 		} else {
 			var vleOut VectorLinearExpressionTranspose
 			vleOut.X = right.Copy().Transpose().(VarVector)
