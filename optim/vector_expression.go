@@ -36,7 +36,7 @@ type VectorExpression interface {
 
 	// Plus adds the current expression to another and returns the resulting
 	// expression
-	Plus(e interface{}, errors ...error) (VectorExpression, error)
+	Plus(e interface{}, errors ...error) (Expression, error)
 
 	// Mult multiplies the current expression with another and returns the
 	// resulting expression
@@ -44,20 +44,20 @@ type VectorExpression interface {
 
 	// LessEq returns a less than or equal to (<=) constraint between the
 	// current expression and another
-	LessEq(rhs interface{}) (VectorConstraint, error)
+	LessEq(rhs interface{}, errors ...error) (Constraint, error)
 
 	// GreaterEq returns a greater than or equal to (>=) constraint between the
 	// current expression and another
-	GreaterEq(rhs interface{}) (VectorConstraint, error)
+	GreaterEq(rhs interface{}, errors ...error) (Constraint, error)
 
 	// Comparison
 	// Returns a constraint with respect to the sense (senseIn) between the
 	// current expression and another.
-	Comparison(rhs interface{}, sense ConstrSense) (VectorConstraint, error)
+	Comparison(rhs interface{}, sense ConstrSense, errors ...error) (Constraint, error)
 
 	// Eq returns an equality (==) constraint between the current expression
 	// and another
-	Eq(rhs interface{}) (VectorConstraint, error)
+	Eq(rhs interface{}, errors ...error) (Constraint, error)
 
 	// Len returns the length of the vector expression.
 	Len() int
@@ -66,7 +66,7 @@ type VectorExpression interface {
 	AtVec(idx int) ScalarExpression
 
 	//Transpose returns the transpose of the given vector expression
-	Transpose() VectorExpression
+	Transpose() Expression
 
 	// Dims returns the dimensions of the given expression
 	Dims() []int

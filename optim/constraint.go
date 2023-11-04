@@ -8,9 +8,11 @@ Description:
 */
 
 type Constraint interface {
+	Left() Expression
+	Right() Expression
 }
 
-func IsConstraint(c Constraint) bool {
+func IsConstraint(c interface{}) bool {
 	switch c.(type) {
 	case ScalarConstraint:
 		return true

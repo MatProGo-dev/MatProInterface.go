@@ -9,6 +9,14 @@ type ScalarConstraint struct {
 	Sense         ConstrSense
 }
 
+func (sc ScalarConstraint) Left() Expression {
+	return sc.LeftHandSide
+}
+
+func (sc ScalarConstraint) Right() Expression {
+	return sc.RightHandSide
+}
+
 // ConstrSense represents if the constraint x <= y, x >= y, or x == y. For easy
 // integration with Gurobi, the senses have been encoding using a byte in
 // the same way Gurobi encodes the constraint senses.

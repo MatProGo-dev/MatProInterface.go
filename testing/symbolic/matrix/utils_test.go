@@ -1,6 +1,7 @@
 package matrix_test
 
 import (
+	"github.com/MatProGo-dev/MatProInterface.go/symbolic"
 	"github.com/MatProGo-dev/MatProInterface.go/symbolic/matrix"
 	"testing"
 )
@@ -14,7 +15,7 @@ Description:
 func TestUtils_Zeros1(t *testing.T) {
 	// Constant
 	mat1 := matrix.Zeros(2, 3)
-	mat2 := matrix.Constant(mat1)
+	mat2 := symbolic.MatrixConstant(mat1)
 
 	// Algorithm
 	dims := mat2.Dims()

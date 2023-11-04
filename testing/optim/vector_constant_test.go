@@ -207,10 +207,10 @@ func TestKVector_Comparison1(t *testing.T) {
 		t.Errorf("There was an issue creating equality constraint between vec1 and vec2: %v", err)
 	}
 
-	if constr.LeftHandSide.Len() != vec1.Len() {
+	if constr.(optim.VectorConstraint).LeftHandSide.Len() != vec1.Len() {
 		t.Errorf(
 			"Expected left hand side (length %v) to have same length as vec1 (length %v).",
-			constr.LeftHandSide.Len(),
+			constr.(optim.VectorConstraint).LeftHandSide.Len(),
 			vec1.Len(),
 		)
 	}
@@ -239,10 +239,10 @@ func TestKVector_Comparison2(t *testing.T) {
 		t.Errorf("There was an issue creating equality constraint between vec1 and vec2: %v", err)
 	}
 
-	if constr.LeftHandSide.Len() != vec1.Len() {
+	if constr.(optim.VectorConstraint).LeftHandSide.Len() != vec1.Len() {
 		t.Errorf(
 			"Expected left hand side (length %v) to have same length as vec1 (length %v).",
-			constr.LeftHandSide.Len(),
+			constr.(optim.VectorConstraint).LeftHandSide.Len(),
 			vec1.Len(),
 		)
 	}
@@ -279,10 +279,10 @@ func TestKVector_Comparison3(t *testing.T) {
 		t.Errorf("There was an issue creating equality constraint between vec1 and vec2: %v", err)
 	}
 
-	if constr.LeftHandSide.Len() != vec1.Len() {
+	if constr.(optim.VectorConstraint).LeftHandSide.Len() != vec1.Len() {
 		t.Errorf(
 			"Expected left hand side (length %v) to have same length as vec1 (length %v).",
-			constr.LeftHandSide.Len(),
+			constr.(optim.VectorConstraint).LeftHandSide.Len(),
 			vec1.Len(),
 		)
 	}
@@ -577,12 +577,12 @@ func TestKVector_Plus5(t *testing.T) {
 	_, err := vec1.Plus(vec2)
 	if !strings.Contains(
 		err.Error(),
-		fmt.Sprintf(
-			"KVector of shape (%v,1) dimension mismatch with %T of shape (%v,1)",
-			vec1.Len(),
-			optim.KVector(vec2),
-			vec2.Len(),
-		)) {
+		optim.DimensionError{
+			Operation: "Plus",
+			Arg1:      vec1,
+			Arg2:      optim.KVector(vec2),
+		}.Error(),
+	) {
 		t.Errorf("The wrong error was detected! %v", err)
 	}
 }
@@ -604,12 +604,12 @@ func TestKVector_Plus6(t *testing.T) {
 	_, err := vec1.Plus(vec2)
 	if !strings.Contains(
 		err.Error(),
-		fmt.Sprintf(
-			"KVector of shape (%v,1) dimension mismatch with %T of shape (%v,1)",
-			vec1.Len(),
-			vec2,
-			vec2.Len(),
-		)) {
+		optim.DimensionError{
+			Operation: "Plus",
+			Arg1:      vec1,
+			Arg2:      vec2,
+		}.Error(),
+	) {
 		t.Errorf("The wrong error was detected! %v", err)
 	}
 
@@ -774,10 +774,11 @@ func TestKVector_Plus10(t *testing.T) {
 	_, err := vec1.Plus(vec2)
 	if !strings.Contains(
 		err.Error(),
-		fmt.Sprintf(
-			"Cannot add KVector with a transposed vector %T; Try transposing one or the other!",
-			vec2,
-		),
+		optim.DimensionError{
+			Operation: "Plus",
+			Arg1:      vec1,
+			Arg2:      vec2,
+		}.Error(),
 	) {
 		t.Errorf("Unexpected error when adding kvector with bool! %v", err)
 	}
@@ -800,10 +801,11 @@ func TestKVector_Plus11(t *testing.T) {
 	_, err := vec1.Plus(X1.Transpose())
 	if !strings.Contains(
 		err.Error(),
-		fmt.Sprintf(
-			"Cannot add KVector with a transposed vector %T; Try transposing one or the other!",
-			X1.Transpose(),
-		),
+		optim.DimensionError{
+			Operation: "Plus",
+			Arg1:      vec1,
+			Arg2:      X1.Transpose(),
+		}.Error(),
 	) {
 		t.Errorf("Unexpected error when adding kvector with bool! %v", err)
 	}
@@ -889,10 +891,11 @@ func TestKVector_Plus13(t *testing.T) {
 	_, err := vec1.Plus(vlet1)
 	if !strings.Contains(
 		err.Error(),
-		fmt.Sprintf(
-			"Cannot add KVector with a transposed vector %T; Try transposing one or the other!",
-			vlet1,
-		),
+		optim.DimensionError{
+			Operation: "Plus",
+			Arg1:      vec1,
+			Arg2:      vlet1,
+		}.Error(),
 	) {
 		t.Errorf(
 			"Unexpected error when adding kvector with VectorLinearExpressionTranspose! %v",
@@ -981,12 +984,11 @@ func TestKVector_Multiply3(t *testing.T) {
 	_, err := vec1.Multiply(vec2)
 	if !strings.Contains(
 		err.Error(),
-		fmt.Sprintf(
-			"KVector of length %v can not be multiplied with a %T of different length (%v).",
-			vec1.Len(),
-			vec2,
-			vec2.Len(),
-		),
+		optim.DimensionError{
+			Operation: "Multiply",
+			Arg1:      vec1,
+			Arg2:      vec2,
+		}.Error(),
 	) {
 		t.Errorf(
 			"unexpected error when multiplying KVector with a constant: %v",
@@ -1048,7 +1050,11 @@ func TestKVector_Multiply5(t *testing.T) {
 	_, err := vec1.Multiply(optim.OnesVector(desLength))
 	if !strings.Contains(
 		err.Error(),
-		"MatProInterface does not currently support operations that result in matrices! if you want this feature, create an issue!",
+		optim.DimensionError{
+			Operation: "Multiply",
+			Arg1:      vec1,
+			Arg2:      optim.KVector(optim.OnesVector(desLength)),
+		}.Error(),
 	) {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -1071,10 +1077,11 @@ func TestKVector_Multiply6(t *testing.T) {
 	)
 	if !strings.Contains(
 		err.Error(),
-		fmt.Sprintf(
-			"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
-			optim.KVector(optim.OnesVector(desLength)),
-		),
+		optim.DimensionError{
+			Operation: "Multiply",
+			Arg1:      vec1,
+			Arg2:      optim.KVector(optim.OnesVector(desLength)),
+		}.Error(),
 	) {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -1120,10 +1127,11 @@ func TestKVector_Multiply8(t *testing.T) {
 	_, err := vec1.Multiply(vec2)
 	if !strings.Contains(
 		err.Error(),
-		fmt.Sprintf(
-			"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
-			vec2,
-		),
+		optim.DimensionError{
+			Operation: "Multiply",
+			Arg1:      vec1,
+			Arg2:      vec2,
+		}.Error(),
 	) {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -1170,10 +1178,11 @@ func TestKVector_Multiply10(t *testing.T) {
 	_, err := vec1.Multiply(vle3)
 	if !strings.Contains(
 		err.Error(),
-		fmt.Sprintf(
-			"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
-			vle3,
-		),
+		optim.DimensionError{
+			Operation: "Multiply",
+			Arg1:      vec1,
+			Arg2:      vle3,
+		}.Error(),
 	) {
 		t.Errorf("unexpected error: %v", err)
 	}

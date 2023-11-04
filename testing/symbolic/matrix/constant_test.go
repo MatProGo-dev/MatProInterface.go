@@ -1,6 +1,7 @@
 package matrix_test
 
 import (
+	"github.com/MatProGo-dev/MatProInterface.go/symbolic"
 	"github.com/MatProGo-dev/MatProInterface.go/symbolic/matrix"
 	"testing"
 )
@@ -19,7 +20,7 @@ Description:
 */
 func TestConstant_NumVars1(t *testing.T) {
 	// Constants
-	mat1 := matrix.Constant(matrix.Zeros(2, 3))
+	mat1 := symbolic.MatrixConstant(matrix.Zeros(2, 3))
 
 	// Algorithm
 	if mat1.NumVars() != 0 {
@@ -38,7 +39,7 @@ Description:
 */
 func TestConstant_IDs1(t *testing.T) {
 	// Constants
-	mat1 := matrix.Constant(matrix.Zeros(2, 3))
+	mat1 := symbolic.MatrixConstant(matrix.Zeros(2, 3))
 
 	// Algorithm
 	ids1 := mat1.IDs()

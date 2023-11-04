@@ -115,7 +115,7 @@ Description:
 	This member function computes the addition of the receiver vector var with the
 	incoming vector expression ve.
 */
-func (vv VarVector) Plus(e interface{}, errors ...error) (VectorExpression, error) {
+func (vv VarVector) Plus(e interface{}, errors ...error) (Expression, error) {
 	// Constants
 	vvLen := vv.Len()
 
@@ -270,8 +270,8 @@ Description:
 	This method creates a less than or equal to vector constraint using the receiver as the left hand side and the
 	input rhs as the right hand side if it is valid.
 */
-func (vv VarVector) LessEq(rhs interface{}) (VectorConstraint, error) {
-	return vv.Comparison(rhs, SenseLessThanEqual)
+func (vv VarVector) LessEq(rightIn interface{}, errors ...error) (Constraint, error) {
+	return vv.Comparison(rightIn, SenseLessThanEqual, errors...)
 }
 
 /*
@@ -281,8 +281,8 @@ Description:
 	This method creates a greater than or equal to vector constraint using the receiver as the left hand side and the
 	input rhs as the right hand side if it is valid.
 */
-func (vv VarVector) GreaterEq(rhs interface{}) (VectorConstraint, error) {
-	return vv.Comparison(rhs, SenseGreaterThanEqual)
+func (vv VarVector) GreaterEq(rightIn interface{}, errors ...error) (Constraint, error) {
+	return vv.Comparison(rightIn, SenseGreaterThanEqual, errors...)
 }
 
 /*
@@ -292,11 +292,11 @@ Description:
 	This method creates an equal to vector constraint using the receiver as the left hand side and the
 	input rhs as the right hand side if it is valid.
 */
-func (vv VarVector) Eq(rhs interface{}) (VectorConstraint, error) {
+func (vv VarVector) Eq(rightIn interface{}, errors ...error) (Constraint, error) {
 	// Constants
 
 	// Algorithm
-	return vv.Comparison(rhs, SenseEqual)
+	return vv.Comparison(rightIn, SenseEqual, errors...)
 
 }
 
@@ -307,7 +307,7 @@ Description:
 	This method creates a constraint of type sense between
 	the receiver (as left hand side) and rhs (as right hand side) if both are valid.
 */
-func (vv VarVector) Comparison(rhs interface{}, sense ConstrSense) (VectorConstraint, error) {
+func (vv VarVector) Comparison(rhs interface{}, sense ConstrSense, errors ...error) (Constraint, error) {
 	// Constants
 
 	// Algorithm
@@ -396,7 +396,7 @@ Description:
 
 	This method creates the transpose of the current vector and returns it.
 */
-func (vv VarVector) Transpose() VectorExpression {
+func (vv VarVector) Transpose() Expression {
 	vvCopy := vv.Copy()
 	return VarVectorTranspose(vvCopy)
 }

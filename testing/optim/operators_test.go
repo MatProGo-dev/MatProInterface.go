@@ -413,10 +413,11 @@ func TestOperators_Multiply4(t *testing.T) {
 	_, err := optim.Multiply(kv1, v1)
 	if !strings.Contains(
 		err.Error(),
-		fmt.Sprintf(
-			"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
-			v1,
-		),
+		optim.DimensionError{
+			Operation: "Multiply",
+			Arg1:      optim.KVector(kv1),
+			Arg2:      v1,
+		}.Error(),
 	) {
 		t.Errorf("Unexpected error value for multiply: %v", err)
 	}

@@ -1,6 +1,7 @@
-package matrix
+package symbolic
 
 import (
+	"github.com/MatProGo-dev/MatProInterface.go/symbolic/matrix"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -8,7 +9,7 @@ import (
 // Type Definition
 //================
 
-type Expression interface {
+type MatrixExpression interface {
 	Dims() []int // Computes the dimensions of the input matrix
 
 	// IDs
@@ -29,7 +30,7 @@ func IsMatrixExpression(e interface{}) bool {
 	switch e.(type) {
 	case mat.Dense:
 		return true
-	case Constant:
+	case MatrixConstant:
 		return true
 	default:
 		return false
@@ -46,16 +47,16 @@ Description:
 func ToMatrixExpression(e interface{}) (Expression, error) {
 	// Input Processing
 	if !IsMatrixExpression(e) {
-		return Constant(Zeros(1, 1)), TypeError{e}
+		return MatrixConstant(matrix.Zeros(1, 1)), matrix.TypeError{e}
 	}
 
 	// Convert
 	switch candidate := e.(type) {
 	case mat.Dense:
-		return Constant(candidate), nil
-	case Constant:
+		return MatrixConstant(candidate), nil
+	case MatrixConstant:
 		return candidate, nil
 	default:
-		return Constant(Zeros(1, 1)), TypeError{e}
+		return MatrixConstant(matrix.Zeros(1, 1)), matrix.TypeError{e}
 	}
 }

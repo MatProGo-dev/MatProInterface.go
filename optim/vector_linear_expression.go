@@ -98,8 +98,8 @@ Description:
 
 	Creates a VectorConstraint that declares vle is greater than or equal to the value to the right hand side rhs.
 */
-func (vle VectorLinearExpr) GreaterEq(rhs interface{}) (VectorConstraint, error) {
-	return vle.Comparison(rhs, SenseGreaterThanEqual)
+func (vle VectorLinearExpr) GreaterEq(rightIn interface{}, errors ...error) (Constraint, error) {
+	return vle.Comparison(rightIn, SenseGreaterThanEqual, errors...)
 }
 
 /*
@@ -108,8 +108,8 @@ Description:
 
 	Creates a VectorConstraint that declares vle is less than or equal to the value to the right hand side rhs.
 */
-func (vle VectorLinearExpr) LessEq(rhs interface{}) (VectorConstraint, error) {
-	return vle.Comparison(rhs, SenseLessThanEqual)
+func (vle VectorLinearExpr) LessEq(rightIn interface{}, errors ...error) (Constraint, error) {
+	return vle.Comparison(rightIn, SenseLessThanEqual, errors...)
 }
 
 /*
@@ -118,7 +118,7 @@ Description:
 
 	Multiplication of a VarVector with another expression.
 */
-func (vle VectorLinearExpr) Multiply(e interface{}, errors ...error) (Expression, error) {
+func (vle VectorLinearExpr) Multiply(rightIn interface{}, errors ...error) (Expression, error) {
 	// Input Processing
 	err := CheckErrors(errors)
 	if err != nil {
@@ -126,31 +126,27 @@ func (vle VectorLinearExpr) Multiply(e interface{}, errors ...error) (Expression
 	}
 
 	// Check Dimensions of the input vector
-	if IsVectorExpression(e) {
-		eAsVE, _ := ToVectorExpression(e)
-		if eAsVE.Len() != vle.Len() {
-			return vle, fmt.Errorf(
-				"dimension mismatch in multiplication of length %v with %T of length %v",
-				vle.Len(),
-				e,
-				eAsVE.Len(),
-			)
+	if IsVectorExpression(rightIn) {
+		rightAsE, _ := ToVectorExpression(rightIn)
+		err = CheckDimensionsInMultiplication(vle, rightAsE)
+		if err != nil {
+			return vle, err
 		}
 	}
 
-	switch rhs := e.(type) {
+	switch right := rightIn.(type) {
 	case float64:
 		// Create output
 		out := vle.Copy()
 
 		// Multiply the elements of the matrices
-		out.L.Scale(rhs, &vle.L)
-		out.C.ScaleVec(rhs, &vle.C)
+		out.L.Scale(right, &vle.L)
+		out.C.ScaleVec(right, &vle.C)
 
 		return out, nil
 
 	case K:
-		return vle.Multiply(float64(rhs))
+		return vle.Multiply(float64(right))
 
 	case mat.VecDense:
 		// Send warning until we create matrix type.
@@ -159,13 +155,13 @@ func (vle VectorLinearExpr) Multiply(e interface{}, errors ...error) (Expression
 		)
 
 	case KVector:
-		return vle.Multiply(mat.VecDense(rhs))
+		return vle.Multiply(mat.VecDense(right))
 
 	case KVectorTranspose:
 		// Send warning until we create matrix type.
 		return vle, fmt.Errorf(
 			"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
-			rhs,
+			right,
 		)
 
 	case VectorLinearExpr:
@@ -178,13 +174,13 @@ func (vle VectorLinearExpr) Multiply(e interface{}, errors ...error) (Expression
 		// Send warning until we create matrix type.
 		return vle, fmt.Errorf(
 			"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
-			rhs,
+			right,
 		)
 
 	default:
 		return vle, fmt.Errorf(
 			"The input to VectorLinearExpr's Multiply() method (%v) has unexpected type: %T",
-			rhs, e,
+			right, right,
 		)
 	}
 }
@@ -195,27 +191,44 @@ Description:
 
 	Returns an expression which adds the expression e to the vector linear expression at hand.
 */
-func (vle VectorLinearExpr) Plus(e interface{}, errors ...error) (VectorExpression, error) {
+func (vle VectorLinearExpr) Plus(rightIn interface{}, errors ...error) (Expression, error) {
 	// Constants
 	vleLen := vle.Len()
 
 	// Input Processing
+	err := vle.Check()
+	if err != nil {
+		return vle, err
+	}
+
+	err = CheckErrors(errors)
+	if err != nil {
+		return vle, err
+	}
+
+	if IsExpression(rightIn) {
+		rightAsE, _ := ToExpression(rightIn)
+		err = CheckDimensionsInAddition(vle, rightAsE)
+		if err != nil {
+			return vle, err
+		}
+	}
 
 	// Algorithm
-	switch eConverted := e.(type) {
+	switch right := rightIn.(type) {
 	case KVector:
 		// Check Length
-		if eConverted.Len() != vleLen {
+		if right.Len() != vleLen {
 			return vle, fmt.Errorf(
 				"The length of input KVector (%v) did not match the length of the VectorLinearExpr (%v).",
-				eConverted.Len(),
+				right.Len(),
 				vleLen,
 			)
 		}
 
 		// Algorithm
 		vleOut := vle
-		tempSum, _ := KVector(vle.C).Plus(eConverted)
+		tempSum, _ := KVector(vle.C).Plus(right)
 		//if err != nil {
 		//	return vle,
 		//		fmt.Errorf(
@@ -230,46 +243,46 @@ func (vle VectorLinearExpr) Plus(e interface{}, errors ...error) (VectorExpressi
 		return vleOut, nil
 
 	case KVectorTranspose:
-		return eConverted,
+		return right,
 			fmt.Errorf(
 				"Cannot add VectorLinearExpr with a transposed vector %v (%T); Try transposing one or the other!",
-				eConverted, eConverted,
+				right, right,
 			)
 
 	case VarVector:
 		eAsVLE := VectorLinearExpr{
-			L: Identity(eConverted.Len()),
-			X: eConverted,
-			C: ZerosVector(eConverted.Len()),
+			L: Identity(right.Len()),
+			X: right,
+			C: ZerosVector(right.Len()),
 		}
 
 		return vle.Plus(eAsVLE)
 
 	case VarVectorTranspose:
-		return eConverted,
+		return right,
 			fmt.Errorf(
 				"Cannot add VectorLinearExpr with a transposed vector %v (%T); Try transposing one or the other!",
-				eConverted, eConverted,
+				right, right,
 			)
 
 	case VectorLinearExpr:
 		// Check Lengths
-		if eConverted.Len() != vleLen {
+		if right.Len() != vleLen {
 			return vle,
 				fmt.Errorf(
 					"The length of input VectorLinearExpr (%v) did not match the length of the VectorLinearExpr (%v).",
-					eConverted.Len(),
+					right.Len(),
 					vleLen,
 				)
 		}
 
 		// Collect VarVectors from expression and vv
-		combinedVV := VarVector{append(vle.X.Elements, eConverted.X.Elements...)}
+		combinedVV := VarVector{append(vle.X.Elements, right.X.Elements...)}
 		uniqueVV := VarVector{UniqueVars(combinedVV.Elements)}
 
 		// Create Placeholder vle
 		vleOut := vle.RewriteInTermsOf(uniqueVV)
-		eRewrittenVLE := eConverted.RewriteInTermsOf(uniqueVV)
+		eRewrittenVLE := right.RewriteInTermsOf(uniqueVV)
 
 		// Add elements of eRewrittenVLE.L to vleOut.L
 		nR, nC := vleOut.L.Dims()
@@ -293,10 +306,10 @@ func (vle VectorLinearExpr) Plus(e interface{}, errors ...error) (VectorExpressi
 		return vleOut, nil
 
 	case VectorLinearExpressionTranspose:
-		return eConverted,
+		return right,
 			fmt.Errorf(
 				"Cannot add VectorLinearExpr with a transposed vector %v (%T); Try transposing one or the other!",
-				eConverted, eConverted,
+				right, right,
 			)
 	default:
 		return vle, fmt.Errorf("The addition method has not yet been implemented!")
@@ -341,8 +354,8 @@ Description:
 	Creates a constraint between the current vector linear expression v and the
 	rhs given by rhs.
 */
-func (vle VectorLinearExpr) Eq(rhs interface{}) (VectorConstraint, error) {
-	return vle.Comparison(rhs, SenseEqual)
+func (vle VectorLinearExpr) Eq(rightIn interface{}, errors ...error) (Constraint, error) {
+	return vle.Comparison(rightIn, SenseEqual, errors...)
 }
 
 /*
@@ -365,7 +378,7 @@ Description:
 	Compares the input vector linear expression with respect to the expression rhsIn and the sense
 	senseIn.
 */
-func (vle VectorLinearExpr) Comparison(rhs interface{}, sense ConstrSense) (VectorConstraint, error) {
+func (vle VectorLinearExpr) Comparison(rightIn interface{}, sense ConstrSense, errors ...error) (Constraint, error) {
 	// Constants
 
 	// Check Input
@@ -378,7 +391,7 @@ func (vle VectorLinearExpr) Comparison(rhs interface{}, sense ConstrSense) (Vect
 	}
 
 	// Algorithm
-	switch rhsConverted := rhs.(type) {
+	switch rhsConverted := rightIn.(type) {
 	case KVector:
 		// Check length of input and output.
 		if rhsConverted.Len() != vle.Len() {
@@ -439,7 +452,11 @@ func (vle VectorLinearExpr) Comparison(rhs interface{}, sense ConstrSense) (Vect
 			)
 
 	default:
-		return VectorConstraint{}, fmt.Errorf("The comparison of vector linear expression %v with object of type %T is not currently supported.", vle, rhs)
+		return VectorConstraint{},
+			fmt.Errorf(
+				"The comparison of vector linear expression %v with object of type %T is not currently supported.",
+				vle, rightIn,
+			)
 	}
 }
 
@@ -510,7 +527,7 @@ Description:
 
 	This method creates the transpose of the current vector and returns it.
 */
-func (vle VectorLinearExpr) Transpose() VectorExpression {
+func (vle VectorLinearExpr) Transpose() Expression {
 	return VectorLinearExpressionTranspose{
 		L: vle.L,
 		X: vle.X.Copy(),

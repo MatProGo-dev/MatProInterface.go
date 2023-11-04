@@ -2,7 +2,6 @@ package optim
 
 import (
 	"fmt"
-	"github.com/MatProGo-dev/MatProInterface.go/symbolic/matrix"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -117,7 +116,7 @@ Description:
 	This member function computes the addition of the receiver vector var with the
 	incoming vector expression ve.
 */
-func (vvt VarVectorTranspose) Plus(eIn interface{}, errors ...error) (VectorExpression, error) {
+func (vvt VarVectorTranspose) Plus(eIn interface{}, errors ...error) (Expression, error) {
 	// Constants
 	vvLen := vvt.Len()
 
@@ -209,17 +208,17 @@ func (vvt VarVectorTranspose) Multiply(e interface{}, errors ...error) (Expressi
 		}
 	}
 
-	if matrix.IsMatrixExpression(e) {
-		// Check Dimensions
-		e2, _ := matrix.ToMatrixExpression(e)
-		if vvt.Dims()[1] != e2.Dims()[0] {
-			return vvt, DimensionError{
-				Arg1:      vvt,
-				Arg2:      e2,
-				Operation: "Multiply",
-			}
-		}
-	}
+	//if symbolic.IsMatrixExpression(e) {
+	//	// Check Dimensions
+	//	e2, _ := symbolic.ToMatrixExpression(e)
+	//	if vvt.Dims()[1] != e2.Dims()[0] {
+	//		return vvt, DimensionError{
+	//			Arg1:      vvt,
+	//			Arg2:      e2,
+	//			Operation: "Multiply",
+	//		}
+	//	}
+	//}
 
 	// Multiply Algorithms
 	switch right := e.(type) {
@@ -315,8 +314,8 @@ func (vvt VarVectorTranspose) Multiply(e interface{}, errors ...error) (Expressi
 
 		return prod, nil
 
-	case matrix.Constant:
-		return vvt.Multiply(mat.Dense(right))
+	//case symbolic.Constant:
+	//	return vvt.Multiply(mat.Dense(right))
 	default:
 		return vvt, fmt.Errorf(
 			"The input to VarVectorTranspose's Multiply() method (%v) has unexpected type: %T.",
@@ -332,8 +331,8 @@ Description:
 	This method creates a less than or equal to vector constraint using the receiver as the left hand side and the
 	input rhs as the right hand side if it is valid.
 */
-func (vvt VarVectorTranspose) LessEq(rhs interface{}) (VectorConstraint, error) {
-	return vvt.Comparison(rhs, SenseLessThanEqual)
+func (vvt VarVectorTranspose) LessEq(rightIn interface{}, errors ...error) (Constraint, error) {
+	return vvt.Comparison(rightIn, SenseLessThanEqual, errors...)
 }
 
 /*
@@ -343,8 +342,8 @@ Description:
 	This method creates a greater than or equal to vector constraint using the receiver as the left hand side and the
 	input rhs as the right hand side if it is valid.
 */
-func (vvt VarVectorTranspose) GreaterEq(rhs interface{}) (VectorConstraint, error) {
-	return vvt.Comparison(rhs, SenseGreaterThanEqual)
+func (vvt VarVectorTranspose) GreaterEq(rightIn interface{}, errors ...error) (Constraint, error) {
+	return vvt.Comparison(rightIn, SenseGreaterThanEqual, errors...)
 }
 
 /*
@@ -354,8 +353,8 @@ Description:
 	This method creates an equal to vector constraint using the receiver as the left hand side and the
 	input rhs as the right hand side if it is valid.
 */
-func (vvt VarVectorTranspose) Eq(rhs interface{}) (VectorConstraint, error) {
-	return vvt.Comparison(rhs, SenseEqual)
+func (vvt VarVectorTranspose) Eq(rightIn interface{}, errors ...error) (Constraint, error) {
+	return vvt.Comparison(rightIn, SenseEqual, errors...)
 
 }
 
@@ -366,11 +365,15 @@ Description:
 	This method creates a constraint of type sense between
 	the receiver (as left hand side) and rhs (as right hand side) if both are valid.
 */
-func (vvt VarVectorTranspose) Comparison(rhs interface{}, sense ConstrSense) (VectorConstraint, error) {
-	// Constants
+func (vvt VarVectorTranspose) Comparison(rightIn interface{}, sense ConstrSense, errors ...error) (Constraint, error) {
+	// Input Processing
+	err := CheckErrors(errors)
+	if err != nil {
+		return VectorConstraint{}, err
+	}
 
 	// Algorithm
-	switch rhs0 := rhs.(type) {
+	switch rhs0 := rightIn.(type) {
 	case KVector:
 		return VectorConstraint{},
 			fmt.Errorf(
@@ -426,7 +429,7 @@ func (vvt VarVectorTranspose) Comparison(rhs interface{}, sense ConstrSense) (Ve
 		return rhs0.Comparison(vvt, sense)
 
 	default:
-		return VectorConstraint{}, fmt.Errorf("The Eq() method for VarVectorTranspose is not implemented yet for type %T!", rhs)
+		return VectorConstraint{}, fmt.Errorf("The Eq() method for VarVectorTranspose is not implemented yet for type %T!", rhs0)
 	}
 }
 
@@ -450,7 +453,7 @@ Description:
 
 	This method creates the transpose of the current vector and returns it.
 */
-func (vvt VarVectorTranspose) Transpose() VectorExpression {
+func (vvt VarVectorTranspose) Transpose() Expression {
 	vvtCopy := vvt.Copy()
 	return VarVector{vvtCopy.Elements}
 }

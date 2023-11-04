@@ -301,7 +301,7 @@ Description:
 func TestExpression_ToExpression10(t *testing.T) {
 	// Constant
 	m := optim.NewModel("ToExpression10")
-	vv1 := m.AddVariableVector(10).Transpose()
+	vv1 := m.AddVariableVector(10).Transpose().(optim.VarVectorTranspose)
 	sum1, _ := vv1.Plus(optim.KVector(optim.OnesVector(vv1.Len())).Transpose())
 
 	var e1 interface{} = sum1

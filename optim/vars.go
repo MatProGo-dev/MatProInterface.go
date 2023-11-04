@@ -50,9 +50,14 @@ func (v Variable) Constant() float64 {
 
 // Plus adds the current expression to another and returns the resulting
 // expression.
-func (v Variable) Plus(e interface{}, errors ...error) (ScalarExpression, error) {
-	// Input Processing??
-	err := CheckErrors(errors)
+func (v Variable) Plus(e interface{}, errors ...error) (Expression, error) {
+	// Input Processing
+	err := v.Check()
+	if err != nil {
+		return v, err
+	}
+
+	err = CheckErrors(errors)
 	if err != nil {
 		return v, err
 	}
@@ -154,19 +159,19 @@ func (v Variable) Plus(e interface{}, errors ...error) (ScalarExpression, error)
 
 // LessEq returns a less than or equal to (<=) constraint between the
 // current expression and another
-func (v Variable) LessEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+func (v Variable) LessEq(rhsIn interface{}, errors ...error) (Constraint, error) {
 	return v.Comparison(rhsIn, SenseLessThanEqual, errors...)
 }
 
 // GreaterEq returns a greater than or equal to (>=) constraint between the
 // current expression and another
-func (v Variable) GreaterEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+func (v Variable) GreaterEq(rhsIn interface{}, errors ...error) (Constraint, error) {
 	return v.Comparison(rhsIn, SenseGreaterThanEqual, errors...)
 }
 
 // Eq returns an equality (==) constraint between the current expression
 // and another
-func (v Variable) Eq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
+func (v Variable) Eq(rhsIn interface{}, errors ...error) (Constraint, error) {
 	return v.Comparison(rhsIn, SenseEqual, errors...)
 }
 
@@ -180,8 +185,13 @@ Usage:
 
 	constr, err := v.Comparison(expr1,SenseGreaterThanEqual)
 */
-func (v Variable) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (ScalarConstraint, error) {
+func (v Variable) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (Constraint, error) {
 	// Input Processing
+	err := CheckErrors(errors)
+	if err != nil {
+		return ScalarConstraint{}, err
+	}
+
 	rhs, err := ToScalarExpression(rhsIn)
 	if err != nil {
 		return ScalarConstraint{}, err
@@ -256,14 +266,21 @@ Description:
 */
 func (v Variable) Multiply(val interface{}, errors ...error) (Expression, error) {
 	// Input Processing
-	if IsVectorExpression(val) {
-		ve, _ := ToVectorExpression(val)
-		if ve.Len() != 1 {
-			return v, DimensionError{
-				Operation: "Multiply",
-				Arg1:      v,
-				Arg2:      ve,
-			}
+	err := v.Check()
+	if err != nil {
+		return v, err
+	}
+
+	err = CheckErrors(errors)
+	if err != nil {
+		return v, err
+	}
+
+	if IsExpression(val) {
+		rightAsE, _ := ToExpression(val)
+		err = CheckDimensionsInMultiplication(v, rightAsE)
+		if err != nil {
+			return v, err
 		}
 	}
 
@@ -389,4 +406,8 @@ func (v Variable) Check() error {
 
 	// If nothing was thrown, then return nil!
 	return nil
+}
+
+func (v Variable) Transpose() Expression {
+	return v
 }

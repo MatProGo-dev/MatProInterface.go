@@ -369,11 +369,11 @@ func TestVectorLinearExpressionTranspose_LessEq1(t *testing.T) {
 		t.Errorf("There was an error computing the constraint ve1 <= 2.0: %v", err)
 	}
 
-	if len(constr1.LeftHandSide.IDs()) != len(vv1.IDs()) {
+	if len(constr1.(optim.VectorConstraint).LeftHandSide.IDs()) != len(vv1.IDs()) {
 		t.Errorf("Left Hand")
 	}
 
-	if constr1.Sense != optim.SenseLessThanEqual {
+	if constr1.(optim.VectorConstraint).Sense != optim.SenseLessThanEqual {
 		t.Errorf("Expected constraint's sense to be SenseLessThanEqual; received %v", optim.SenseGreaterThanEqual)
 	}
 
@@ -417,11 +417,11 @@ func TestVectorLinearExpressionTranspose_GreaterEq1(t *testing.T) {
 		t.Errorf("There was an error computing the constraint ve1 <= 2.0: %v", err)
 	}
 
-	if len(constr1.LeftHandSide.IDs()) != len(vv1.IDs()) {
+	if len(constr1.(optim.VectorConstraint).LeftHandSide.IDs()) != len(vv1.IDs()) {
 		t.Errorf("Left Hand")
 	}
 
-	if constr1.Sense != optim.SenseGreaterThanEqual {
+	if constr1.(optim.VectorConstraint).Sense != optim.SenseGreaterThanEqual {
 		t.Errorf("Expected constraint's sense to be SenseLessThanEqual; received %v", optim.SenseGreaterThanEqual)
 	}
 
@@ -501,7 +501,7 @@ func TestVectorLinearExpressionTranspose_Eq1(t *testing.T) {
 
 	n_R := 2
 	for rowIndex := 0; rowIndex < n_R; rowIndex++ {
-		lhsConstant := constr.LeftHandSide.Constant()
+		lhsConstant := constr.(optim.VectorConstraint).LeftHandSide.Constant()
 		vleConstant := vle1.Constant()
 		if lhsConstant.AtVec(rowIndex) != vleConstant.AtVec(rowIndex) {
 			t.Errorf(
@@ -585,7 +585,7 @@ func TestVectorLinearExpressionTranspose_Eq3(t *testing.T) {
 	}
 
 	onesVec1 := optim.OnesVector(2)
-	onesVec2 := optim.KVector(onesVec1).Transpose()
+	onesVec2 := optim.KVector(onesVec1).Transpose().(optim.KVectorTranspose)
 
 	// Create Constraint
 	vectorConstraint, err := vle1.Eq(onesVec2)
@@ -598,7 +598,7 @@ func TestVectorLinearExpressionTranspose_Eq3(t *testing.T) {
 		)
 	}
 
-	if vectorConstraint.LeftHandSide.Len() != onesVec2.Len() {
+	if vectorConstraint.(optim.VectorConstraint).LeftHandSide.Len() != onesVec2.Len() {
 		t.Errorf("The length of lhs (%v) and rhs (%v) should be the same!", vle1.Len(), onesVec2.Len())
 	}
 
@@ -874,7 +874,7 @@ func TestVectorLinearExpressionTranspose_Plus2(t *testing.T) {
 
 	kv1 := optim.KVector(
 		optim.OnesVector(n + 1),
-	).Transpose()
+	).Transpose().(optim.KVectorTranspose)
 	vle2 := optim.VectorLinearExpressionTranspose{
 		L: optim.Identity(n),
 		X: m.AddVariableVector(n),
@@ -885,10 +885,17 @@ func TestVectorLinearExpressionTranspose_Plus2(t *testing.T) {
 	_, err := vle2.Plus(kv1)
 	if err == nil {
 		t.Errorf("There should have been an issue adding together these two vector expressions of different dimension, but none was received!")
-	}
-
-	if !strings.Contains(err.Error(), fmt.Sprintf("The length of input KVector (%v) did not match the length of the VectorLinearExpressionTranspose (%v).", kv1.Len(), vle2.Len())) {
-		t.Errorf("Unexpected error: %v", err)
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			optim.DimensionError{
+				Operation: "Plus",
+				Arg1:      vle2,
+				Arg2:      kv1,
+			}.Error(),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
 	}
 
 }
@@ -1229,10 +1236,11 @@ func TestVectorLinearExpressionTranspose_Plus7(t *testing.T) {
 
 	if !strings.Contains(
 		err.Error(),
-		fmt.Sprintf(
-			"Cannot add VectorLinearExpressioinTranspose with a normal vector %v (%T); Try transposing one or the other!",
-			kv1, kv1,
-		),
+		optim.DimensionError{
+			Operation: "Plus",
+			Arg1:      vle2,
+			Arg2:      kv1,
+		}.Error(),
 	) {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -1264,10 +1272,11 @@ func TestVectorLinearExpressionTranspose_Plus8(t *testing.T) {
 
 	if !strings.Contains(
 		err.Error(),
-		fmt.Sprintf(
-			"Cannot add VectorLinearExpressioinTranspose with a normal vector %v (%T); Try transposing one or the other!",
-			vle2.X, vle2.X,
-		),
+		optim.DimensionError{
+			Operation: "Plus",
+			Arg1:      vle2,
+			Arg2:      vle2.X,
+		}.Error(),
 	) {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -1330,16 +1339,17 @@ func TestVectorLinearExpressionTranspose_Plus10(t *testing.T) {
 	_, err := vle2.Plus(vle2.Transpose())
 	if err == nil {
 		t.Errorf("There should have been an issue adding together these two vector expressions of different dimension, but none was received!")
-	}
-
-	if !strings.Contains(
-		err.Error(),
-		fmt.Sprintf(
-			"Cannot add VectorLinearExpressioinTranspose with a normal vector %v (%T); Try transposing one or the other!",
-			vle2.Transpose(), vle2.Transpose(),
-		),
-	) {
-		t.Errorf("Unexpected error: %v", err)
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			optim.DimensionError{
+				Operation: "Plus",
+				Arg1:      vle2,
+				Arg2:      vle2.Transpose(),
+			}.Error(),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
 	}
 
 }
@@ -1372,17 +1382,17 @@ func TestVectorLinearExpressionTranspose_Plus11(t *testing.T) {
 	_, err := vle1.Plus(vle2)
 	if err == nil {
 		t.Errorf("There should have been an issue adding together these two vector expressions of different dimension, but none was received!")
-	}
-
-	if !strings.Contains(
-		err.Error(),
-		fmt.Sprintf(
-			"The length of input VectorLinearExpressionTranspose (%v) did not match the length of the VectorLinearExpressionTranspose (%v).",
-			vle2.Len(),
-			vle1.Len(),
-		),
-	) {
-		t.Errorf("Unexpected error: %v", err)
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			optim.DimensionError{
+				Operation: "Plus",
+				Arg1:      vle1,
+				Arg2:      vle2,
+			}.Error(),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
 	}
 
 }

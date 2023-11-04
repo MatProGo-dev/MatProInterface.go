@@ -158,3 +158,8 @@ code. Hopefully, this is avoided using this format.
 * [ ] Write changes to all AtVec() methods to output both elements AND errors (so we can detect out of length calls)
 * [ ] Determine whether or not to keep the Solution and Solver() interfaces in this module. It seems like they can be solver-specific.
 * [ ] Introduce MatrixVar object
+* [ ] Add The Following to the Expression Interface
+  * [ ] Comparison
+  * [ ] LessEq
+  * [ ] GreaterEq
+  * [ ] Eq
