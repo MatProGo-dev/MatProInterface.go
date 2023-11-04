@@ -390,14 +390,20 @@ func TestK_LessEq1(t *testing.T) {
 		t.Errorf("There was an issue comparing c1 and v1: %v", err)
 	}
 
-	_, ok1 := constr1.LeftHandSide.(optim.K)
+	_, ok1 := constr1.Left().(optim.K)
 	if !ok1 {
-		t.Errorf("LHS is expected to be of type optim.K; received %T", constr1.LeftHandSide)
+		t.Errorf(
+			"LHS is expected to be of type optim.K; received %T",
+			constr1.Left(),
+		)
 	}
 
-	_, ok2 := constr1.RightHandSide.(optim.Variable)
+	_, ok2 := constr1.Right().(optim.Variable)
 	if !ok2 {
-		t.Errorf("RHS is expected to be of type optim.Variable; received %T", constr1.RightHandSide)
+		t.Errorf(
+			"RHS is expected to be of type optim.Variable; received %T",
+			constr1.Right(),
+		)
 	}
 }
 
@@ -427,23 +433,25 @@ func TestK_GreaterEq1(t *testing.T) {
 		t.Errorf("There was an issue comparing c1 and v1: %v", err)
 	}
 
-	_, ok1 := constr1.LeftHandSide.(optim.K)
+	constr1AsSC, _ := constr1.(optim.ScalarConstraint)
+
+	_, ok1 := constr1AsSC.Left().(optim.K)
 	if !ok1 {
-		t.Errorf("LHS is expected to be of type optim.K; received %T", constr1.LeftHandSide)
+		t.Errorf("LHS is expected to be of type optim.K; received %T", constr1.Left())
 	}
 
-	_, ok2 := constr1.RightHandSide.(optim.ScalarLinearExpr)
+	_, ok2 := constr1.Right().(optim.ScalarLinearExpr)
 	if !ok2 {
 		t.Errorf(
 			"RHS is expected to be of type optim.ScalarLinearExpr; received %T",
-			constr1.RightHandSide,
+			constr1.Right(),
 		)
 	}
 
-	if constr1.Sense != optim.SenseGreaterThanEqual {
+	if constr1AsSC.Sense != optim.SenseGreaterThanEqual {
 		t.Errorf(
 			"Comparison sense is expected to be optim.SenseGreaterThanEqual; received %v",
-			constr1.Sense,
+			constr1AsSC.Sense,
 		)
 	}
 }
@@ -474,23 +482,24 @@ func TestK_Eq1(t *testing.T) {
 		t.Errorf("There was an issue comparing c1 and v1: %v", err)
 	}
 
-	_, ok1 := constr1.LeftHandSide.(optim.K)
+	_, ok1 := constr1.Left().(optim.K)
 	if !ok1 {
-		t.Errorf("LHS is expected to be of type optim.K; received %T", constr1.LeftHandSide)
+		t.Errorf("LHS is expected to be of type optim.K; received %T", constr1.Left())
 	}
 
-	_, ok2 := constr1.RightHandSide.(optim.ScalarLinearExpr)
+	_, ok2 := constr1.Right().(optim.ScalarLinearExpr)
 	if !ok2 {
 		t.Errorf(
 			"RHS is expected to be of type optim.ScalarLinearExpr; received %T",
-			constr1.RightHandSide,
+			constr1.Right(),
 		)
 	}
 
-	if constr1.Sense != optim.SenseEqual {
+	constr1AsSE, _ := constr1.(optim.ScalarConstraint)
+	if constr1AsSE.Sense != optim.SenseEqual {
 		t.Errorf(
 			"Comparison sense is expected to be optim.SenseEqual; received %v",
-			constr1.Sense,
+			constr1AsSE.Sense,
 		)
 	}
 }
@@ -988,7 +997,7 @@ func TestK_Multiply12(t *testing.T) {
 	m := optim.NewModel("TestK_Multiply11")
 	k1 := optim.K(3.14)
 	vv2 := m.AddVariableVector(21)
-	vvt2 := vv2.Transpose()
+	vvt2 := vv2.Transpose().(optim.VarVectorTranspose)
 
 	// Check Multiplication result
 	prod, err := k1.Multiply(vvt2)

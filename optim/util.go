@@ -15,7 +15,8 @@ const INFINITY = 1e100
 func SumVars(vs ...Variable) ScalarExpression {
 	newExpr := NewScalarExpression(0)
 	for _, v := range vs {
-		newExpr, _ = newExpr.Plus(v)
+		sum, _ := newExpr.Plus(v)
+		newExpr, _ = ToScalarExpression(sum)
 	}
 	return newExpr
 }
@@ -25,7 +26,8 @@ func SumVars(vs ...Variable) ScalarExpression {
 func SumRow(vs [][]Variable, row int) ScalarExpression {
 	newExpr := NewScalarExpression(0)
 	for col := 0; col < len(vs[0]); col++ {
-		newExpr, _ = newExpr.Plus(vs[row][col])
+		sum, _ := newExpr.Plus(vs[row][col])
+		newExpr, _ = ToScalarExpression(sum)
 	}
 	return newExpr
 }
@@ -35,7 +37,8 @@ func SumRow(vs [][]Variable, row int) ScalarExpression {
 func SumCol(vs [][]Variable, col int) ScalarExpression {
 	newExpr := NewScalarExpression(0)
 	for row := 0; row < len(vs); row++ {
-		newExpr, _ = newExpr.Plus(vs[row][col])
+		sum, _ := newExpr.Plus(vs[row][col])
+		newExpr, _ = ToScalarExpression(sum)
 	}
 	return newExpr
 }

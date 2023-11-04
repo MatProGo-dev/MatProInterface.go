@@ -1413,10 +1413,10 @@ func TestScalarQuadraticExpression_LessEq1(t *testing.T) {
 		t.Errorf("Unexpected error after running LessEq(): %v", err)
 	}
 
-	if sc1.Sense != optim.SenseLessThanEqual {
+	if sc1.(optim.ScalarConstraint).Sense != optim.SenseLessThanEqual {
 		t.Errorf(
 			"Sense of the LessEq comparison is not SenseLessThanEqual; it's %v",
-			sc1.Sense,
+			sc1.(optim.ScalarConstraint).Sense,
 		)
 	}
 }
@@ -1452,10 +1452,10 @@ func TestScalarQuadraticExpression_GreaterEq1(t *testing.T) {
 		t.Errorf("Unexpected error after running GreaterEq(): %v", err)
 	}
 
-	if sc1.Sense != optim.SenseGreaterThanEqual {
+	if sc1.(optim.ScalarConstraint).Sense != optim.SenseGreaterThanEqual {
 		t.Errorf(
 			"Sense of the GreaterEq comparison is not SenseGreaterThanEqual; it's %v",
-			sc1.Sense,
+			sc1.(optim.ScalarConstraint).Sense,
 		)
 	}
 }
@@ -1485,10 +1485,10 @@ func TestScalarQuadraticExpression_Eq1(t *testing.T) {
 		t.Errorf("Unexpected error after running Eq(): %v", err)
 	}
 
-	if sc1.Sense != optim.SenseEqual {
+	if sc1.(optim.ScalarConstraint).Sense != optim.SenseEqual {
 		t.Errorf(
 			"Sense of the Eq comparison is not SenseEqual; it's %v",
-			sc1.Sense,
+			sc1.(optim.ScalarConstraint).Sense,
 		)
 	}
 }
@@ -1518,10 +1518,10 @@ func TestScalarQuadraticExpression_Comparison1(t *testing.T) {
 		t.Errorf("Unexpected error after running Comparison(): %v", err)
 	}
 
-	if sc1.Sense != optim.SenseLessThanEqual {
+	if sc1.(optim.ScalarConstraint).Sense != optim.SenseLessThanEqual {
 		t.Errorf(
 			"Sense of the Comparison comparison is not SenseLessThanEqual; it's %v",
-			sc1.Sense,
+			sc1.(optim.ScalarConstraint).Sense,
 		)
 	}
 }

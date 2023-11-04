@@ -27,7 +27,7 @@ func LessEq(lhs, rhs interface{}) (Constraint, error) {
 }
 
 // GreaterEq returns a constraint representing lhs >= rhs
-func GreaterEq(lhs, rhs ScalarExpression) (Constraint, error) {
+func GreaterEq(lhs, rhs interface{}) (Constraint, error) {
 	return Comparison(lhs, rhs, SenseGreaterThanEqual)
 }
 
@@ -42,31 +42,24 @@ Usage:
 	constr, err := Comparison(expr1, expr2, SenseGreaterThanEqual)
 */
 func Comparison(lhs, rhs interface{}, sense ConstrSense) (Constraint, error) {
-	// Constants
+	// Input Processing
+	var err error
+	left0, err := ToExpression(lhs)
+	if err != nil {
+		return ScalarConstraint{}, fmt.Errorf("lhs is not a valid expression: %v", err)
+	}
 
 	// Algorithm
-	switch lhs0 := lhs.(type) {
-	case float64:
-		// Convert lhs to K
-		lhsAsK := K(lhs0)
-
-		// Create constraint
-		return Comparison(lhsAsK, rhs, sense)
-	case mat.VecDense:
-		// Convert lhs to KVector.
-		lhsAsKVector := KVector(lhs0)
-
-		// Create constraint
-		return lhsAsKVector.Comparison(rhs, sense)
+	switch left := left0.(type) {
 	case ScalarExpression:
 		rhsAsScalarExpression, _ := rhs.(ScalarExpression)
 		return ScalarConstraint{
-			lhs0,
+			left,
 			rhsAsScalarExpression,
 			sense,
 		}, nil
 	case VectorExpression:
-		return lhs0.Comparison(rhs, sense)
+		return left.Comparison(rhs, sense)
 	default:
 		return nil, fmt.Errorf("Comparison in sense '%v' is not defined for lhs type %T and rhs type %T!", sense, lhs, rhs)
 	}

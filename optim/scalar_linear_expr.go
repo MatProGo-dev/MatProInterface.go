@@ -77,7 +77,7 @@ func (sle ScalarLinearExpr) Check() error {
 
 // Plus adds the current expression to another and returns the resulting
 // expression
-func (sle ScalarLinearExpr) Plus(e interface{}, errors ...error) (ScalarExpression, error) {
+func (sle ScalarLinearExpr) Plus(e interface{}, errors ...error) (Expression, error) {
 	// Input Processing
 	err := sle.Check()
 	if err != nil {
@@ -150,20 +150,20 @@ func (sle ScalarLinearExpr) Plus(e interface{}, errors ...error) (ScalarExpressi
 
 // LessEq returns a less than or equal to (<=) constraint between the
 // current expression and another
-func (sle ScalarLinearExpr) LessEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
-	return sle.Comparison(rhsIn, SenseLessThanEqual, errors...)
+func (sle ScalarLinearExpr) LessEq(rightIn interface{}, errors ...error) (Constraint, error) {
+	return sle.Comparison(rightIn, SenseLessThanEqual, errors...)
 }
 
 // GreaterEq returns a greater than or equal to (>=) constraint between the
 // current expression and another
-func (sle ScalarLinearExpr) GreaterEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
-	return sle.Comparison(rhsIn, SenseGreaterThanEqual, errors...)
+func (sle ScalarLinearExpr) GreaterEq(rightIn interface{}, errors ...error) (Constraint, error) {
+	return sle.Comparison(rightIn, SenseGreaterThanEqual, errors...)
 }
 
 // Eq returns an equality (==) constraint between the current expression
 // and another
-func (sle ScalarLinearExpr) Eq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
-	return sle.Comparison(rhsIn, SenseEqual, errors...)
+func (sle ScalarLinearExpr) Eq(rightIn interface{}, errors ...error) (Constraint, error) {
+	return sle.Comparison(rightIn, SenseEqual, errors...)
 }
 
 /*
@@ -176,7 +176,7 @@ Usage:
 
 	constr, err := e.Comparison(expr1,SenseGreaterThanEqual)
 */
-func (sle ScalarLinearExpr) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (ScalarConstraint, error) {
+func (sle ScalarLinearExpr) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (Constraint, error) {
 	// Input Processing
 	err := sle.Check()
 	if err != nil {
@@ -412,4 +412,12 @@ Description:
 */
 func (sle ScalarLinearExpr) Dims() []int {
 	return []int{1, 1} // Represents scalar
+}
+
+/*
+Transpose
+Description:
+*/
+func (sle ScalarLinearExpr) Transpose() Expression {
+	return sle
 }

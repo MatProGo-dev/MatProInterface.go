@@ -1,6 +1,7 @@
 package matrix_test
 
 import (
+	"github.com/MatProGo-dev/MatProInterface.go/symbolic"
 	"github.com/MatProGo-dev/MatProInterface.go/symbolic/matrix"
 	"strings"
 	"testing"
@@ -24,7 +25,7 @@ func TestExpression_ToMatrixExpression1(t *testing.T) {
 	b1 := false
 
 	// Algorithm
-	_, err := matrix.ToMatrixExpression(b1)
+	_, err := symbolic.ToMatrixExpression(b1)
 	if err == nil {
 		t.Errorf("no error was thrown, but there should have been!")
 	} else {

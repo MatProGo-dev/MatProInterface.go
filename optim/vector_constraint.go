@@ -63,3 +63,11 @@ func (vc VectorConstraint) Check() error {
 	// All Checks Passed!
 	return nil
 }
+
+func (vc VectorConstraint) Left() Expression {
+	return vc.LeftHandSide
+}
+
+func (vc VectorConstraint) Right() Expression {
+	return vc.RightHandSide
+}

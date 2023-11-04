@@ -86,22 +86,18 @@ Description:
 
 	Adds the current expression to another and returns the resulting expression
 */
-func (kv KVector) Plus(eIn interface{}, errors ...error) (VectorExpression, error) {
+func (kv KVector) Plus(rightIn interface{}, errors ...error) (Expression, error) {
 	// Input Processing
 	err := CheckErrors(errors)
 	if err != nil {
 		return kv, err
 	}
 
-	if IsVectorExpression(eIn) {
-		eAsVE, _ := ToVectorExpression(eIn)
-		if (eAsVE.Len() != kv.Len()) || (eAsVE.Len() == 1) {
-			return kv, fmt.Errorf(
-				"KVector of shape (%v,1) dimension mismatch with %T of shape (%v,1)",
-				kv.Len(),
-				eAsVE,
-				eAsVE.Len(),
-			)
+	if IsExpression(rightIn) {
+		rightAsE, _ := ToExpression(rightIn)
+		err = CheckDimensionsInAddition(kv, rightAsE)
+		if err != nil {
+			return kv, err
 		}
 	}
 
@@ -109,30 +105,30 @@ func (kv KVector) Plus(eIn interface{}, errors ...error) (VectorExpression, erro
 	kvLen := kv.Len()
 
 	// Management
-	switch e := eIn.(type) {
+	switch right := rightIn.(type) {
 	case float64:
 		// Create vector
 		tempOnes := OnesVector(kvLen)
 		var eAsVec mat.VecDense
-		eAsVec.ScaleVec(e, &tempOnes)
+		eAsVec.ScaleVec(right, &tempOnes)
 
 		// Add the values
 		return kv.Plus(KVector(eAsVec))
 	case K:
 		// Return Addition
-		return kv.Plus(float64(e))
+		return kv.Plus(float64(right))
 	case mat.VecDense:
 		// Return Sum
 		var result mat.VecDense
 		kv2 := mat.VecDense(kv)
-		result.AddVec(&kv2, &e)
+		result.AddVec(&kv2, &right)
 
 		return KVector(result), nil
 	case KVector:
 		// Compute Addition
 		var result mat.VecDense
 		kvAsVec := mat.VecDense(kv)
-		eAsVec := mat.VecDense(e)
+		eAsVec := mat.VecDense(right)
 		result.AddVec(&kvAsVec, &eAsVec)
 
 		return KVector(result), nil
@@ -141,31 +137,31 @@ func (kv KVector) Plus(eIn interface{}, errors ...error) (VectorExpression, erro
 		return kv,
 			fmt.Errorf(
 				"Cannot add KVector with a transposed vector %T; Try transposing one or the other!",
-				e,
+				right,
 			)
 
 	case VarVector:
-		return e.Plus(kv)
+		return right.Plus(kv)
 
 	case VarVectorTranspose:
 		return kv,
 			fmt.Errorf(
 				"Cannot add KVector with a transposed vector %T; Try transposing one or the other!",
-				e,
+				right,
 			)
 
 	case VectorLinearExpr:
-		return e.Plus(kv)
+		return right.Plus(kv)
 
 	case VectorLinearExpressionTranspose:
 		return kv,
 			fmt.Errorf(
 				"Cannot add KVector with a transposed vector %T; Try transposing one or the other!",
-				e,
+				right,
 			)
 
 	default:
-		errString := fmt.Sprintf("Unrecognized expression type %T for addition of KVector kv.Plus(%v)!", e, e)
+		errString := fmt.Sprintf("Unrecognized expression type %T for addition of KVector kv.Plus(%v)!", right, right)
 		return KVector{}, fmt.Errorf(errString)
 	}
 }
@@ -192,8 +188,8 @@ Description:
 
 	Returns a less than or equal to (<=) constraint between the current expression and another
 */
-func (kv KVector) LessEq(rhsIn interface{}) (VectorConstraint, error) {
-	return kv.Comparison(rhsIn, SenseLessThanEqual)
+func (kv KVector) LessEq(rightIn interface{}, errors ...error) (Constraint, error) {
+	return kv.Comparison(rightIn, SenseLessThanEqual, errors...)
 }
 
 /*
@@ -202,8 +198,8 @@ Description:
 
 	This method returns a greater than or equal to (>=) constraint between the current expression and another
 */
-func (kv KVector) GreaterEq(rhsIn interface{}) (VectorConstraint, error) {
-	return kv.Comparison(rhsIn, SenseGreaterThanEqual)
+func (kv KVector) GreaterEq(rightIn interface{}, errors ...error) (Constraint, error) {
+	return kv.Comparison(rightIn, SenseGreaterThanEqual, errors...)
 }
 
 /*
@@ -212,12 +208,12 @@ Description:
 
 	This method returns an equality (==) constraint between the current expression and another
 */
-func (kv KVector) Eq(rhsIn interface{}) (VectorConstraint, error) {
-	return kv.Comparison(rhsIn, SenseEqual)
+func (kv KVector) Eq(rightIn interface{}, errors ...error) (Constraint, error) {
+	return kv.Comparison(rightIn, SenseEqual, errors...)
 }
 
-func (kv KVector) Comparison(rhs interface{}, sense ConstrSense) (VectorConstraint, error) {
-	switch rhsConverted := rhs.(type) {
+func (kv KVector) Comparison(rightIn interface{}, sense ConstrSense, errors ...error) (Constraint, error) {
+	switch rhsConverted := rightIn.(type) {
 	case KVector:
 		// Check Lengths
 		if kv.Len() != rhsConverted.Len() {
@@ -261,7 +257,11 @@ func (kv KVector) Comparison(rhs interface{}, sense ConstrSense) (VectorConstrai
 			)
 	default:
 		// Return an error
-		return VectorConstraint{}, fmt.Errorf("The input to KVector's '%v' comparison (%v) has unexpected type: %T", sense, rhs, rhs)
+		return VectorConstraint{},
+			fmt.Errorf(
+				"The input to KVector's '%v' comparison (%v) has unexpected type: %T",
+				sense, rightIn, rightIn,
+			)
 
 	}
 }
@@ -272,43 +272,39 @@ Description:
 
 	This method is used to compute the multiplication of the input vector constant with another term.
 */
-func (kv KVector) Multiply(e interface{}, errors ...error) (Expression, error) {
+func (kv KVector) Multiply(rightIn interface{}, errors ...error) (Expression, error) {
 	// Input Processing
 	err := CheckErrors(errors)
 	if err != nil {
 		return kv, err
 	}
 
-	if IsVectorExpression(e) {
+	if IsExpression(rightIn) {
 		// Check dimensions
-		e2, _ := ToVectorExpression(e)
-		if e2.Len() != kv.Len() {
-			return kv, fmt.Errorf(
-				"KVector of length %v can not be multiplied with a %T of different length (%v).",
-				kv.Len(),
-				e2,
-				e2.Len(),
-			)
+		rightAsE, _ := ToExpression(rightIn)
+		err = CheckDimensionsInMultiplication(kv, rightAsE)
+		if err != nil {
+			return kv, err
 		}
 	}
 
 	// Compute Multiplication
-	switch eConverted := e.(type) {
+	switch right := rightIn.(type) {
 	case float64:
 		// Use mat.Vector's multiplication method
 		var result mat.VecDense
 		kvAsVec := mat.VecDense(kv)
-		result.ScaleVec(eConverted, &kvAsVec)
+		result.ScaleVec(right, &kvAsVec)
 
 		return KVector(result), nil
 	case K:
 		// Convert to float64
-		eAsFloat := float64(eConverted)
+		eAsFloat := float64(right)
 
 		return kv.Multiply(eAsFloat)
 	case Variable:
 		// Create a VectorLinearExpression Output
-		vv := VarVector{[]Variable{eConverted}}
+		vv := VarVector{[]Variable{right}}
 		L := ZerosMatrix(kv.Len(), 1)
 		for kIndex := 0; kIndex < kv.Len(); kIndex++ {
 			L.Set(kIndex, 0, float64(kv.AtVec(kIndex).(K)))
@@ -322,12 +318,12 @@ func (kv KVector) Multiply(e interface{}, errors ...error) (Expression, error) {
 
 	case ScalarLinearExpr:
 		// Create a VectorLinearExpression to Output
-		L := ZerosMatrix(kv.Len(), eConverted.X.Len())
+		L := ZerosMatrix(kv.Len(), right.X.Len())
 		for rowIndex := 0; rowIndex < kv.Len(); rowIndex++ {
-			for colIndex := 0; colIndex < eConverted.X.Len(); colIndex++ {
+			for colIndex := 0; colIndex < right.X.Len(); colIndex++ {
 				L.Set(
 					rowIndex, colIndex,
-					eConverted.L.AtVec(colIndex)*float64(kv.AtVec(rowIndex).(K)),
+					right.L.AtVec(colIndex)*float64(kv.AtVec(rowIndex).(K)),
 				)
 			}
 		}
@@ -335,13 +331,13 @@ func (kv KVector) Multiply(e interface{}, errors ...error) (Expression, error) {
 		for rowIndex := 0; rowIndex < kv.Len(); rowIndex++ {
 			C.SetVec(
 				rowIndex,
-				eConverted.C*float64(kv.AtVec(rowIndex).(K)),
+				right.C*float64(kv.AtVec(rowIndex).(K)),
 			)
 		}
 		return VectorLinearExpr{
 			L: L,
 			C: C,
-			X: eConverted.X.Copy(),
+			X: right.X.Copy(),
 		}, nil
 
 	case mat.VecDense:
@@ -354,7 +350,7 @@ func (kv KVector) Multiply(e interface{}, errors ...error) (Expression, error) {
 		// Immediately return error.
 		return kv, fmt.Errorf(
 			"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
-			eConverted,
+			right,
 		)
 
 	case KVectorTranspose:
@@ -367,7 +363,7 @@ func (kv KVector) Multiply(e interface{}, errors ...error) (Expression, error) {
 		// Immediately return error.
 		return kv, fmt.Errorf(
 			"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
-			eConverted,
+			right,
 		)
 
 	case VarVectorTranspose:
@@ -380,7 +376,7 @@ func (kv KVector) Multiply(e interface{}, errors ...error) (Expression, error) {
 		// Immediately return error.
 		return kv, fmt.Errorf(
 			"dimension mismatch! Cannot multiply KVector with a vector of type %T; Try transposing one or the other!",
-			eConverted,
+			right,
 		)
 
 	case VectorLinearExpressionTranspose:
@@ -392,7 +388,7 @@ func (kv KVector) Multiply(e interface{}, errors ...error) (Expression, error) {
 	default:
 		return kv, fmt.Errorf(
 			"The input to KVectorTranspose's Multiply method (%v) has unexpected type: %T",
-			e, e,
+			right, right,
 		)
 
 	}
@@ -404,7 +400,7 @@ Description:
 
 	This method creates the transpose of the current vector and returns it.
 */
-func (kv KVector) Transpose() VectorExpression {
+func (kv KVector) Transpose() Expression {
 	return KVectorTranspose(kv)
 }
 

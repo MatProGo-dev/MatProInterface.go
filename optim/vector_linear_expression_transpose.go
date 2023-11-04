@@ -55,8 +55,8 @@ Description:
 
 	Returns the MatProInterface ID of each variable in the current vector linear expression.
 */
-func (vle VectorLinearExpressionTranspose) IDs() []uint64 {
-	return vle.X.IDs()
+func (vlet VectorLinearExpressionTranspose) IDs() []uint64 {
+	return vlet.X.IDs()
 }
 
 /*
@@ -65,8 +65,8 @@ Description:
 
 	Returns the goop2 ID of each variable in the current vector linear expression.
 */
-func (vle VectorLinearExpressionTranspose) NumVars() int {
-	return len(vle.IDs())
+func (vlet VectorLinearExpressionTranspose) NumVars() int {
+	return len(vlet.IDs())
 }
 
 /*
@@ -75,8 +75,8 @@ Description:
 
 	Returns the matrix which is applied as a coefficient to the vector X in our expression.
 */
-func (vle VectorLinearExpressionTranspose) LinearCoeff() mat.Dense {
-	return vle.L
+func (vlet VectorLinearExpressionTranspose) LinearCoeff() mat.Dense {
+	return vlet.L
 }
 
 /*
@@ -86,9 +86,9 @@ Description:
 	Returns the vector which is given as an offset vector in the linear expression represented by v
 	(the c in the above expression).
 */
-func (vle VectorLinearExpressionTranspose) Constant() mat.VecDense {
+func (vlet VectorLinearExpressionTranspose) Constant() mat.VecDense {
 
-	return vle.C
+	return vlet.C
 }
 
 /*
@@ -97,8 +97,8 @@ Description:
 
 	Creates a VectorConstraint that declares vle is greater than or equal to the value to the right hand side rhs.
 */
-func (vle VectorLinearExpressionTranspose) GreaterEq(rhs interface{}) (VectorConstraint, error) {
-	return vle.Comparison(rhs, SenseGreaterThanEqual)
+func (vlet VectorLinearExpressionTranspose) GreaterEq(rightIn interface{}, errors ...error) (Constraint, error) {
+	return vlet.Comparison(rightIn, SenseGreaterThanEqual, errors...)
 }
 
 /*
@@ -107,8 +107,8 @@ Description:
 
 	Creates a VectorConstraint that declares vle is less than or equal to the value to the right hand side rhs.
 */
-func (vle VectorLinearExpressionTranspose) LessEq(rhs interface{}) (VectorConstraint, error) {
-	return vle.Comparison(rhs, SenseLessThanEqual)
+func (vlet VectorLinearExpressionTranspose) LessEq(rightIn interface{}, errors ...error) (Constraint, error) {
+	return vlet.Comparison(rightIn, SenseLessThanEqual, errors...)
 }
 
 /*
@@ -218,79 +218,74 @@ Description:
 
 	Returns an expression which adds the expression e to the vector linear expression at hand.
 */
-func (vle VectorLinearExpressionTranspose) Plus(e interface{}, errors ...error) (VectorExpression, error) {
-	// Constants
-	vleLen := vle.Len()
-
+func (vlet VectorLinearExpressionTranspose) Plus(rightIn interface{}, errors ...error) (Expression, error) {
 	// Input Processing
+	err := vlet.Check()
+	if err != nil {
+		return vlet, err
+	}
+
+	err = CheckErrors(errors)
+	if err != nil {
+		return vlet, err
+	}
+
+	if IsExpression(rightIn) {
+		rightAsE, _ := ToExpression(rightIn)
+		err = CheckDimensionsInAddition(vlet, rightAsE)
+		if err != nil {
+			return vlet, err
+		}
+	}
 
 	// Algorithm
-	switch eConverted := e.(type) {
+	switch right := rightIn.(type) {
 	case KVector:
-		return eConverted,
+		return right,
 			fmt.Errorf(
 				"Cannot add VectorLinearExpressioinTranspose with a normal vector %v (%T); Try transposing one or the other!",
-				eConverted, eConverted,
+				right, right,
 			)
 	case KVectorTranspose:
-		// Check Length
-		if eConverted.Len() != vleLen {
-			return vle, fmt.Errorf(
-				"The length of input KVector (%v) did not match the length of the VectorLinearExpressionTranspose (%v).",
-				eConverted.Len(),
-				vleLen,
-			)
-		}
-
 		// Algorithm
-		vleOut := vle
-		tempSum, _ := KVectorTranspose(vle.C).Plus(eConverted)
+		vleOut := vlet
+		tempSum, _ := KVectorTranspose(vlet.C).Plus(right)
 		KSum, _ := tempSum.(KVectorTranspose)
 		vleOut.C = mat.VecDense(KSum)
 
 		// Return
 		return vleOut, nil
 	case VarVector:
-		return eConverted,
+		return right,
 			fmt.Errorf(
 				"Cannot add VectorLinearExpressioinTranspose with a normal vector %v (%T); Try transposing one or the other!",
-				eConverted, eConverted,
+				right, right,
 			)
 
 	case VarVectorTranspose:
 		eAsVLE := VectorLinearExpressionTranspose{
-			L: Identity(eConverted.Len()),
-			X: eConverted.Transpose().(VarVector),
-			C: ZerosVector(eConverted.Len()),
+			L: Identity(right.Len()),
+			X: right.Transpose().(VarVector),
+			C: ZerosVector(right.Len()),
 		}
 
-		return vle.Plus(eAsVLE)
+		return vlet.Plus(eAsVLE)
 
 	case VectorLinearExpr:
-		return eConverted,
+		return right,
 			fmt.Errorf(
 				"Cannot add VectorLinearExpressioinTranspose with a normal vector %v (%T); Try transposing one or the other!",
-				eConverted, eConverted,
+				right, right,
 			)
 
 	case VectorLinearExpressionTranspose:
-		// Check Lengths
-		if eConverted.Len() != vleLen {
-			return vle,
-				fmt.Errorf(
-					"The length of input VectorLinearExpressionTranspose (%v) did not match the length of the VectorLinearExpressionTranspose (%v).",
-					eConverted.Len(),
-					vleLen,
-				)
-		}
-
 		// Collect VarVectors from expression and vv
-		combinedVV := VarVector{append(vle.X.Elements, eConverted.X.Elements...)}
+		combinedVV := VarVector{append(vlet.X.Elements, right.X.Elements...)}
 		uniqueVV := VarVector{UniqueVars(combinedVV.Elements)}
 
 		// Create Placeholder vle
-		vleOut := vle.RewriteInTermsOf(uniqueVV)
-		eRewrittenVLE := eConverted.RewriteInTermsOf(uniqueVV)
+		vleOut := vlet.RewriteInTermsOf(uniqueVV)
+		eRewrittenVLE := right.RewriteInTermsOf(uniqueVV)
 
 		// Add elements of eRewrittenVLE.L to vleOut.L
 		nR, nC := vleOut.L.Dims()
@@ -313,9 +308,9 @@ func (vle VectorLinearExpressionTranspose) Plus(e interface{}, errors ...error) 
 
 		return vleOut, nil
 	default:
-		return vle, fmt.Errorf(
+		return vlet, fmt.Errorf(
 			"The VectorLinearExpressionTranspose.Plus method has not yet been implemented for type %T!",
-			eConverted,
+			right,
 		)
 	}
 }
@@ -358,8 +353,8 @@ Description:
 	Creates a constraint between the current vector linear expression v and the
 	rhs given by rhs.
 */
-func (vlet VectorLinearExpressionTranspose) Eq(rhs interface{}) (VectorConstraint, error) {
-	return vlet.Comparison(rhs, SenseEqual)
+func (vlet VectorLinearExpressionTranspose) Eq(rightIn interface{}, errors ...error) (Constraint, error) {
+	return vlet.Comparison(rightIn, SenseEqual, errors...)
 }
 
 /*
@@ -382,7 +377,7 @@ Description:
 	Compares the input vector linear expression with respect to the expression rhsIn and the sense
 	senseIn.
 */
-func (vlet VectorLinearExpressionTranspose) Comparison(rhs interface{}, sense ConstrSense) (VectorConstraint, error) {
+func (vlet VectorLinearExpressionTranspose) Comparison(rightIn interface{}, sense ConstrSense, errors ...error) (Constraint, error) {
 	// Constants
 
 	// Check Input
@@ -394,8 +389,13 @@ func (vlet VectorLinearExpressionTranspose) Comparison(rhs interface{}, sense Co
 		)
 	}
 
+	err = CheckErrors(errors)
+	if err != nil {
+		return VectorConstraint{}, err
+	}
+
 	// Algorithm
-	switch rhsConverted := rhs.(type) {
+	switch rhsConverted := rightIn.(type) {
 	case KVector:
 		return VectorConstraint{},
 			fmt.Errorf(
@@ -455,7 +455,11 @@ func (vlet VectorLinearExpressionTranspose) Comparison(rhs interface{}, sense Co
 		return VectorConstraint{vlet, rhsConverted, sense}, nil
 
 	default:
-		return VectorConstraint{}, fmt.Errorf("The comparison of vector linear expression %v with object of type %T is not currently supported.", vlet, rhs)
+		return VectorConstraint{},
+			fmt.Errorf(
+				"The comparison of vector linear expression %v with object of type %T is not currently supported.",
+				vlet, rightIn,
+			)
 	}
 }
 
@@ -526,7 +530,7 @@ Description:
 
 	This method creates the transpose of the current vector and returns it.
 */
-func (vlet VectorLinearExpressionTranspose) Transpose() VectorExpression {
+func (vlet VectorLinearExpressionTranspose) Transpose() Expression {
 	return VectorLinearExpr{
 		L: vlet.L,
 		X: vlet.X.Copy(),

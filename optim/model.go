@@ -132,48 +132,40 @@ func (m *Model) AddBinaryVariableMatrix(rows, cols int) [][]Variable {
 }
 
 // AddConstr adds the given constraint to the model.
-func (m *Model) AddConstraint(constr Constraint, extras ...interface{}) error {
+func (m *Model) AddConstraint(constr Constraint, errors ...error) error {
 	// Constants
-	nExtraArguments := len(extras)
 
 	// Input Processing
-	switch {
-	case nExtraArguments > 1:
-		// Do nothing, but report an error
-		return fmt.Errorf(
-			"The optimizer tried to add a constraint using a bad call to AddConstr! Skipping this constraint: %v , because of extra inputs %v",
-			constr,
-			extras,
-		)
-	case nExtraArguments == 1:
-		switch extra0 := extras[0].(type) {
-		case error:
-			if extra0 != nil {
-				return fmt.Errorf(
-					"There was an error computing constraint %v: %v",
-					constr, extra0,
-				)
-			}
-		case nil:
-			// Do nothing
-		default:
-			return fmt.Errorf(
-				"There was an unexpected type input to AddConstraint(): %T (%v)",
-				extra0, extra0,
-			)
-		}
+	err := CheckErrors(errors)
+	if err != nil {
+		return err
 	}
-	// If no extras are given, then move on to last part.
 
 	// Algorithm
 	m.Constraints = append(m.Constraints, constr)
 	return nil
 }
 
-// SetObjective sets the objective of the model given an expression and
-// objective sense.
-func (m *Model) SetObjective(e ScalarExpression, sense ObjSense) {
-	m.Obj = NewObjective(e, sense)
+/*
+SetObjective
+Description:
+	sets the objective of the model given an expression and
+	objective sense.
+Notes:
+	To make this function easier to parse, we will assume an expression
+	is given, even though objectives are normally scalars.
+*/
+
+func (m *Model) SetObjective(e Expression, sense ObjSense) error {
+	// Input Processing
+	se, err := ToScalarExpression(e)
+	if err != nil {
+		return fmt.Errorf("trouble parsing input expression: %v", err)
+	}
+
+	// Return
+	m.Obj = NewObjective(se, sense)
+	return nil
 }
 
 //// Optimize optimizes the model using the given solver type and returns the

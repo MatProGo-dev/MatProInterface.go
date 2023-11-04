@@ -111,11 +111,11 @@ func TestScalarLinearExpr_GreaterEq1(t *testing.T) {
 		t.Errorf("unexpected error: %v", err)
 	}
 
-	lhs, tf := constr2.LeftHandSide.(optim.ScalarLinearExpr)
+	lhs, tf := constr2.(optim.ScalarConstraint).LeftHandSide.(optim.ScalarLinearExpr)
 	if !tf {
 		t.Errorf(
 			"the left hand side was not identified as a ScalarLinearExpr but instead %T",
-			constr2.LeftHandSide,
+			constr2.(optim.ScalarConstraint).LeftHandSide,
 		)
 	}
 
@@ -157,11 +157,11 @@ func TestScalarLinearExpr_Eq1(t *testing.T) {
 		t.Errorf("unexpected error: %v", err)
 	}
 
-	lhs, tf := constr2.LeftHandSide.(optim.ScalarLinearExpr)
+	lhs, tf := constr2.(optim.ScalarConstraint).LeftHandSide.(optim.ScalarLinearExpr)
 	if !tf {
 		t.Errorf(
 			"the left hand side was not identified as a ScalarLinearExpr but instead %T",
-			constr2.LeftHandSide,
+			constr2.(optim.ScalarConstraint).LeftHandSide,
 		)
 	}
 
@@ -173,11 +173,11 @@ func TestScalarLinearExpr_Eq1(t *testing.T) {
 		)
 	}
 
-	rhs, tf := constr2.RightHandSide.(optim.Variable)
+	rhs, tf := constr2.(optim.ScalarConstraint).RightHandSide.(optim.Variable)
 	if !tf {
 		t.Errorf(
 			"the right hand side was not identified as a variable; it is instead a %T",
-			constr2.RightHandSide,
+			constr2.(optim.ScalarConstraint).RightHandSide,
 		)
 	}
 

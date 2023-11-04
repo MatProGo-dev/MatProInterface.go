@@ -128,8 +128,8 @@ func TestConstraint_IsConstraint5(t *testing.T) {
 		t.Errorf("An error occurred constructing the equality constraint: %v", err)
 	}
 
-	if !optim.IsConstraint(&vectorConstr0) {
-		t.Errorf("The scalar constraint is not implementing a Constraint() interface!")
+	if !optim.IsConstraint(vectorConstr0) {
+		t.Errorf("The vector constraint is not implementing a Constraint() interface!")
 	}
 }
 

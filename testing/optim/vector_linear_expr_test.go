@@ -374,7 +374,7 @@ func TestVectorLinearExpression_Eq1(t *testing.T) {
 
 	n_R := 2
 	for rowIndex := 0; rowIndex < n_R; rowIndex++ {
-		lhsConstant := constr.LeftHandSide.Constant()
+		lhsConstant := constr.(optim.VectorConstraint).LeftHandSide.Constant()
 		vleConstant := vle1.Constant()
 		if lhsConstant.AtVec(rowIndex) != vleConstant.AtVec(rowIndex) {
 			t.Errorf(
@@ -471,7 +471,7 @@ func TestVectorLinearExpression_Eq3(t *testing.T) {
 		)
 	}
 
-	if vectorConstraint.LeftHandSide.Len() != onesVec2.Len() {
+	if vectorConstraint.(optim.VectorConstraint).LeftHandSide.Len() != onesVec2.Len() {
 		t.Errorf("The length of lhs (%v) and rhs (%v) should be the same!", vle1.Len(), onesVec2.Len())
 	}
 
@@ -715,10 +715,17 @@ func TestVectorLinearExpr_Plus2(t *testing.T) {
 	_, err := vle2.Plus(kv1)
 	if err == nil {
 		t.Errorf("There should have been an issue adding together these two vector expressions of different dimension, but none was received!")
-	}
-
-	if !strings.Contains(err.Error(), fmt.Sprintf("The length of input KVector (%v) did not match the length of the VectorLinearExpr (%v).", kv1.Len(), vle2.Len())) {
-		t.Errorf("Unexpected error: %v", err)
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			optim.DimensionError{
+				Operation: "Plus",
+				Arg1:      vle2,
+				Arg2:      kv1,
+			}.Error(),
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
 	}
 
 }
@@ -1053,14 +1060,19 @@ func TestVectorLinearExpr_Plus7(t *testing.T) {
 
 	// Compute Sum
 	_, err := vle2.Plus(kv1.Transpose())
-	if !strings.Contains(
-		err.Error(),
-		fmt.Sprintf(
-			"Cannot add VectorLinearExpr with a transposed vector %v (%T); Try transposing one or the other!",
-			kv1.Transpose(), kv1.Transpose(),
-		),
-	) {
-		t.Errorf("There was an issue computing this good addition: %v", err)
+	if err == nil {
+		t.Errorf("no error was thrown, but there should have been!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			optim.DimensionError{
+				Operation: "Plus",
+				Arg1:      vle2,
+				Arg2:      kv1.Transpose(),
+			}.Error(),
+		) {
+			t.Errorf("There was an issue computing this good addition: %v", err)
+		}
 	}
 
 }
@@ -1085,16 +1097,20 @@ func TestVectorLinearExpr_Plus8(t *testing.T) {
 
 	// Compute Sum
 	_, err := vle2.Plus(vv1.Transpose())
-	if !strings.Contains(
-		err.Error(),
-		fmt.Sprintf(
-			"Cannot add VectorLinearExpr with a transposed vector %v (%T); Try transposing one or the other!",
-			vv1.Transpose(), vv1.Transpose(),
-		),
-	) {
-		t.Errorf("There was an issue computing this good addition: %v", err)
+	if err == nil {
+		t.Errorf("expected an error to be thrown but none were.")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			optim.DimensionError{
+				Operation: "Plus",
+				Arg1:      vle2,
+				Arg2:      vv1.Transpose(),
+			}.Error(),
+		) {
+			t.Errorf("There was an issue computing this good addition: %v", err)
+		}
 	}
-
 }
 
 /*
@@ -1116,14 +1132,19 @@ func TestVectorLinearExpr_Plus9(t *testing.T) {
 
 	// Compute Sum
 	_, err := vle2.Plus(vle2.Transpose())
-	if !strings.Contains(
-		err.Error(),
-		fmt.Sprintf(
-			"Cannot add VectorLinearExpr with a transposed vector %v (%T); Try transposing one or the other!",
-			vle2.Transpose(), vle2.Transpose(),
-		),
-	) {
-		t.Errorf("There was an issue computing this good addition: %v", err)
+	if err == nil {
+		t.Errorf("no errors were thrown, when there should have been!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			optim.DimensionError{
+				Operation: "Plus",
+				Arg1:      vle2,
+				Arg2:      vle2.Transpose(),
+			}.Error(),
+		) {
+			t.Errorf("There was an issue computing this good addition: %v", err)
+		}
 	}
 
 }
@@ -1231,12 +1252,11 @@ func TestVectorLinearExpr_Multiply2(t *testing.T) {
 	} else {
 		if !strings.Contains(
 			err.Error(),
-			fmt.Sprintf(
-				"dimension mismatch in multiplication of length %v with %T of length %v",
-				vle1.Len(),
-				x2,
-				x2.Len(),
-			),
+			optim.DimensionError{
+				Operation: "Multiply",
+				Arg1:      vle1,
+				Arg2:      x2,
+			}.Error(),
 		) {
 			t.Errorf("Unexpected error: %v", err)
 		}
@@ -1410,7 +1430,11 @@ func TestVectorLinearExpr_Multiply5(t *testing.T) {
 	} else {
 		if !strings.Contains(
 			err.Error(),
-			"MatProInterface does not currently support operations that result in matrices! if you want this feature, create an issue!",
+			optim.DimensionError{
+				Operation: "Multiply",
+				Arg1:      vle1,
+				Arg2:      optim.KVector(vd2),
+			}.Error(),
 		) {
 			t.Errorf("Unexpected error: %v", err)
 		}
@@ -1444,7 +1468,11 @@ func TestVectorLinearExpr_Multiply6(t *testing.T) {
 	} else {
 		if !strings.Contains(
 			err.Error(),
-			"MatProInterface does not currently support operations that result in matrices! if you want this feature, create an issue!",
+			optim.DimensionError{
+				Operation: "Multiply",
+				Arg1:      vle1,
+				Arg2:      optim.KVector(vd2),
+			}.Error(),
 		) {
 			t.Errorf("Unexpected error: %v", err)
 		}
@@ -1515,7 +1543,11 @@ func TestVectorLinearExpr_Multiply8(t *testing.T) {
 	} else {
 		if !strings.Contains(
 			err.Error(),
-			"MatProInterface does not currently support operations that result in matrices! if you want this feature, create an issue!",
+			optim.DimensionError{
+				Operation: "Multiply",
+				Arg1:      vle1,
+				Arg2:      vle2,
+			}.Error(),
 		) {
 			t.Errorf("Unexpected error: %v", err)
 		}

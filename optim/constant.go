@@ -52,47 +52,52 @@ func (c K) Constant() float64 {
 
 // Plus adds the current expression to another and returns the resulting
 // expression
-func (c K) Plus(e interface{}, errors ...error) (ScalarExpression, error) {
+func (c K) Plus(rightIn interface{}, errors ...error) (Expression, error) {
 	// Input Processing
 	err := CheckErrors(errors)
 	if err != nil {
 		return c, err
 	}
 
+	if IsExpression(rightIn) {
+		rightAsE, _ := ToExpression(rightIn)
+		err = CheckDimensionsInAddition(c, rightAsE)
+		if err != nil {
+			return c, err
+		}
+	}
+
 	// Switching based on input type
-	switch e.(type) {
+	switch right := rightIn.(type) {
 	case K:
-		eAsK, _ := e.(K)
-		return K(c.Constant() + eAsK.Constant()), nil
+		return K(c.Constant() + right.Constant()), nil
 	case Variable:
-		eAsVar := e.(Variable)
-		return eAsVar.Plus(c)
+		return right.Plus(c)
 	case ScalarLinearExpr:
-		eAsSLE := e.(ScalarLinearExpr)
-		return eAsSLE.Plus(c)
+		return right.Plus(c)
 	case ScalarQuadraticExpression:
-		return e.(ScalarQuadraticExpression).Plus(c) // Very compact, but potentially confusing to read?
+		return right.Plus(c) // Very compact, but potentially confusing to read?
 	default:
-		return c, fmt.Errorf("Unexpected type in K.Plus() for constant %v: %T", e, e)
+		return c, fmt.Errorf("Unexpected type in K.Plus() for constant %v: %T", right, right)
 	}
 }
 
 // LessEq returns a less than or equal to (<=) constraint between the
 // current expression and another
-func (c K) LessEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
-	return c.Comparison(rhsIn, SenseLessThanEqual, errors...)
+func (c K) LessEq(rightIn interface{}, errors ...error) (Constraint, error) {
+	return c.Comparison(rightIn, SenseLessThanEqual, errors...)
 }
 
 // GreaterEq returns a greater than or equal to (>=) constraint between the
 // current expression and another
-func (c K) GreaterEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
-	return c.Comparison(rhsIn, SenseGreaterThanEqual, errors...)
+func (c K) GreaterEq(rightIn interface{}, errors ...error) (Constraint, error) {
+	return c.Comparison(rightIn, SenseGreaterThanEqual, errors...)
 }
 
 // Eq returns an equality (==) constraint between the current expression
 // and another
-func (c K) Eq(rhsIn interface{}, errors ...error) (ScalarConstraint, error) {
-	return c.Comparison(rhsIn, SenseEqual, errors...)
+func (c K) Eq(rightIn interface{}, errors ...error) (Constraint, error) {
+	return c.Comparison(rightIn, SenseEqual, errors...)
 }
 
 /*
@@ -101,7 +106,7 @@ Description:
 
 	This method compares the receiver with expression rhs in the sense provided by sense.
 */
-func (c K) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (ScalarConstraint, error) {
+func (c K) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (Constraint, error) {
 	// InputProcessing
 	err := CheckErrors(errors)
 	if err != nil {
@@ -236,4 +241,8 @@ func (c K) Dims() []int {
 
 func (c K) Check() error {
 	return nil
+}
+
+func (c K) Transpose() Expression {
+	return c
 }

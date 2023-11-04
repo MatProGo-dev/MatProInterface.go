@@ -26,7 +26,7 @@ type ScalarExpression interface {
 
 	// Plus adds the current expression to another and returns the resulting
 	// expression
-	Plus(e interface{}, errors ...error) (ScalarExpression, error)
+	Plus(rightIn interface{}, errors ...error) (Expression, error)
 
 	// Mult multiplies the current expression to another and returns the
 	// resulting expression
@@ -34,27 +34,30 @@ type ScalarExpression interface {
 
 	// LessEq returns a less than or equal to (<=) constraint between the
 	// current expression and another
-	LessEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error)
+	LessEq(rhsIn interface{}, errors ...error) (Constraint, error)
 
 	// GreaterEq returns a greater than or equal to (>=) constraint between the
 	// current expression and another
-	GreaterEq(rhsIn interface{}, errors ...error) (ScalarConstraint, error)
+	GreaterEq(rhsIn interface{}, errors ...error) (Constraint, error)
 
 	// Eq returns an equality (==) constraint between the current expression
 	// and another
-	Eq(rhsIn interface{}, errors ...error) (ScalarConstraint, error)
+	Eq(rhsIn interface{}, errors ...error) (Constraint, error)
 
 	//Comparison
 	// Compares the receiver expression rhs with the expression rhs in the sense of sense.
-	Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (ScalarConstraint, error)
+	Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (Constraint, error)
 
 	//Multiply
 	// Multiplies the given scalar expression with another expression
-	Multiply(term1 interface{}, errors ...error) (Expression, error)
+	Multiply(rightIn interface{}, errors ...error) (Expression, error)
 
 	//Dims
 	// Returns the dimensions of the scalar expression (should always be 1,1)
 	Dims() []int
+
+	//Transpose returns the transpose of the given vector expression
+	Transpose() Expression
 }
 
 // NewExpr returns a new expression with a single additive constant value, c,
