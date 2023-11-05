@@ -98,3 +98,43 @@ func TestScalarConstraint_IsLinear2(t *testing.T) {
 	}
 
 }
+
+/*
+TestScalarConstraint_Simplify1
+Description:
+
+	Attempts to simplify the constraint between
+	a scalar linear epression and a scalar linear expression.
+*/
+func TestScalarConstraint_Simplify1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("scalar-constraint-test1")
+	vv1 := m.AddVariableVector(3)
+	sle2 := optim.ScalarLinearExpr{
+		L: optim.OnesVector(vv1.Len()),
+		X: vv1,
+		C: 2.0,
+	}
+	sle3 := optim.ScalarLinearExpr{
+		L: *mat.NewVecDense(vv1.Len(), []float64{1.0, 2.0, 3.0}),
+		X: vv1,
+		C: 1.0,
+	}
+
+	// Create sles
+	sc1 := optim.ScalarConstraint{
+		LeftHandSide:  sle2,
+		RightHandSide: sle3,
+		Sense:         optim.SenseEqual,
+	}
+
+	// Attempt to simplify
+	sc2, err := sc1.Simplify()
+	if err != nil {
+		t.Errorf("unexpected error during simplify(): %v", err)
+	}
+
+	if float64(sc2.RightHandSide.(optim.K)) != 1.0 {
+		t.Errorf("Remainder on LHS was not contained properly")
+	}
+}
