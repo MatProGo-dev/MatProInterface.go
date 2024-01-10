@@ -3,7 +3,7 @@ package optim_test
 import (
 	"fmt"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
-	"github.com/MatProGo-dev/MatProInterface.go/symbolic/matrix"
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
 	"strings"
 	"testing"
@@ -1694,7 +1694,7 @@ func TestVarVectorTranspose_Multiply12(t *testing.T) {
 	vv0 := m.AddVariableVector(N)
 	vvt0 := vv0.Transpose()
 
-	mat1 := matrix.Identity(N)
+	mat1 := symbolic.Identity(N)
 	mat1.Set(1, 1, 3.0)
 
 	// Attempt Multiplication
@@ -1844,7 +1844,7 @@ func TestVarVectorTranspose_Multiply14(t *testing.T) {
 	vv0 := m.AddVariableVector(N)
 	vvt0 := vv0.Transpose()
 
-	mat1 := matrix.Zeros(N, N)
+	mat1 := symbolic.ZerosMatrix(N, N)
 	mat1.Set(1, 1, 4.0)
 	vle2 := optim.VectorLinearExpr{
 		L: mat1,
