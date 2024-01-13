@@ -14,13 +14,3 @@ type Objective struct {
 func NewObjective(e symbolic.Expression, sense ObjSense) *Objective {
 	return &Objective{e, sense}
 }
-
-// ObjSense represents whether an optimization objective is to be maximized or
-// minimized. This implementation conforms to the Gurobi encoding
-type ObjSense int
-
-// Objective senses (minimize and maximize) encoding using Gurobi's standard
-const (
-	SenseMinimize ObjSense = 1
-	SenseMaximize          = -1
-)
