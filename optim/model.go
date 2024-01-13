@@ -21,11 +21,6 @@ func NewModel(name string) *Model {
 	return &Model{Name: name}
 }
 
-//// ShowLog instructs the solver to show the log or not.
-//func (m *Model) ShowLog(shouldShow bool) {
-//	m.ShowLog = shouldShow
-//}
-
 /*
 AddVariable
 Description:
@@ -157,5 +152,27 @@ func (m *Model) SetObjective(e Expression, sense ObjSense) error {
 
 	// Return
 	m.Obj = NewObjective(se, sense)
+	return nil
+}
+
+/*
+Check
+Description:
+
+	Checks the model for errors.
+*/
+func (m *Model) Check() error {
+	// Constants
+
+	// Verifiy that there is at least one variable in the model.
+	if len(m.Variables) == 0 {
+		return fmt.Errorf("the model has no variables!")
+	}
+
+	// It's okay if there are no constraints.
+
+	// It's okay if there is not an objective.
+
+	// All Checks have passed.
 	return nil
 }

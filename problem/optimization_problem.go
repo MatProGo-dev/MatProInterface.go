@@ -156,3 +156,87 @@ func (m *OptimizationProblem) SetObjective(e symbolic.Expression, sense ObjSense
 	m.Objective = NewObjective(se, sense)
 	return nil
 }
+
+/*
+ToScalarConstraint
+Description:
+
+	Converts a constraint in the form of a optim.ScalarConstraint
+	object into a symbolic.ScalarConstraint object.
+*/
+func ToScalarConstraint(inputConstraint optim.ScalarConstraint) (symbolic.ScalarConstraint, error) {
+	// Input Processing
+	err := inputConstraint.Check()
+	if err != nil {
+		return symbolic.ScalarConstraint{}, err
+	}
+
+	// Convert LHS to symbolic expression
+
+	switch inputConstraint.Sense() {
+	case optim.EQ:
+		return ToScalarEq(inputConstraint)
+	case optim.LE:
+		return ToScalarLessEq(inputConstraint)
+	case optim.GE:
+		return ToScalarGreaterEq(inputConstraint)
+	default:
+		return nil, fmt.Errorf("the input constraint sense is not recognized.")
+	}
+}
+
+/*
+ToSymbolicConstraint
+Description:
+
+	Converts a constraint in the form of a optim.Constraint object into a symbolic.Constraint object.
+*/
+func ToSymbolicConstraint(inputConstraint optim.Constraint) (symbolic.Constraint, error) {
+	// Input Processing
+	err := inputConstraint.Check()
+	if err != nil {
+		return nil, err
+	}
+
+	// Algorithm
+	switch {
+	case inputConstraint.IsScalar():
+		return ToScalarConstraint(inputConstraint)
+	case inputConstraint.IsVector():
+		return ToVectorConstraint(inputConstraint)
+	default:
+		return nil, fmt.Errorf("the input constraint is not recognized as a scalar or vector constraint.")
+	}
+}
+
+/*
+ToOptimizationProblem
+Description:
+
+	Converts the given input into an optimization problem.
+*/
+func ToOptimizationProblem(inputModel optim.Model) (*OptimizationProblem, error) {
+	// Create a new optimization problem
+	newOptimProblem := NewProblem(inputModel.Name)
+
+	// Input Processing
+	err := inputModel.Check()
+	if err != nil {
+		return nil, err
+	}
+
+	// Collect All Variables from Model and copy them into the new optimization
+	// problem object.
+	for ii, variable := range inputModel.Variables {
+		newOptimProblem.Variables = append(newOptimProblem.Variables, symbolic.Variable{
+			ID:    uint64(ii),
+			Lower: variable.Lower,
+			Upper: variable.Upper,
+			Type:  symbolic.VarType(variable.Vtype),
+		})
+	}
+
+	// Collect All Constraints from Model and copy them into the new optimization
+	// problem object.
+
+}
