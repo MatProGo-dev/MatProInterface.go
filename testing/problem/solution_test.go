@@ -1,7 +1,8 @@
-package optim
+package problem
 
 import (
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
+	"github.com/MatProGo-dev/MatProInterface.go/problem"
 	"strings"
 	"testing"
 )
@@ -15,13 +16,13 @@ Description:
 
 func TestSolution_ToMessage1(t *testing.T) {
 	// Constants
-	tempSol := optim.Solution{
+	tempSol := problem.Solution{
 		Values: map[uint64]float64{
 			0: 2.1,
 			1: 3.14,
 		},
 		Objective: 2.3,
-		Status:    optim.OptimizationStatus_NODE_LIMIT,
+		Status:    problem.OptimizationStatus_NODE_LIMIT,
 	}
 
 	// Test the ToMessage() Call on this solution.
@@ -44,7 +45,7 @@ func TestSolution_ToMessage2(t *testing.T) {
 
 	// Test
 	for statusIndex := 1; statusIndex < statusMax; statusIndex++ {
-		tempStatus := optim.OptimizationStatus(statusIndex)
+		tempStatus := problem.OptimizationStatus(statusIndex)
 
 		msg, err := tempStatus.ToMessage()
 		if err != nil {
@@ -93,13 +94,13 @@ Description:
 */
 func TestSolution_Value1(t *testing.T) {
 	// Constants
-	tempSol := optim.Solution{
+	tempSol := problem.Solution{
 		Values: map[uint64]float64{
 			0: 2.1,
 			1: 3.14,
 		},
 		Objective: 2.3,
-		Status:    optim.OptimizationStatus_NODE_LIMIT,
+		Status:    problem.OptimizationStatus_NODE_LIMIT,
 	}
 	v1 := optim.Variable{
 		ID: 0, Lower: -optim.INFINITY, Upper: optim.INFINITY, Vtype: optim.Continuous,

@@ -1,6 +1,9 @@
-package optim
+package problem
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/MatProGo-dev/MatProInterface.go/optim"
+)
 
 const (
 	tinyNum float64 = 0.01
@@ -102,7 +105,7 @@ func (os OptimizationStatus) ToMessage() (string, error) {
 // }
 
 // Value returns the value assigned to the variable in the solution
-func (s *Solution) Value(v Variable) float64 {
+func (s *Solution) Value(v optim.Variable) float64 {
 	return s.Values[v.ID]
 }
 
