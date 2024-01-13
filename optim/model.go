@@ -2,7 +2,6 @@ package optim
 
 import (
 	"fmt"
-	"time"
 )
 
 // Model represents the overall constrained linear optimization model to be
@@ -14,25 +13,18 @@ type Model struct {
 	Variables   []Variable
 	Constraints []Constraint
 	Obj         *Objective
-	ShowLog     bool
-	TimeLimit   time.Duration
 }
 
 // NewModel returns a new model with some default arguments such as not to show
-// the log and no time limit.
+// the log.
 func NewModel(name string) *Model {
-	return &Model{Name: name, ShowLog: false}
+	return &Model{Name: name}
 }
 
 //// ShowLog instructs the solver to show the log or not.
 //func (m *Model) ShowLog(shouldShow bool) {
 //	m.ShowLog = shouldShow
 //}
-
-// SetTimeLimit sets the solver time limit for the model.
-func (m *Model) SetTimeLimit(dur time.Duration) {
-	m.TimeLimit = dur
-}
 
 /*
 AddVariable
@@ -167,48 +159,3 @@ func (m *Model) SetObjective(e Expression, sense ObjSense) error {
 	m.Obj = NewObjective(se, sense)
 	return nil
 }
-
-//// Optimize optimizes the model using the given solver type and returns the
-//// solution or an error.
-//func (m *Model) Optimize(solver Solver) (*Solution, error) {
-//	// Variables
-//	var err error
-//
-//	// Input Processing
-//	if len(m.Variables) == 0 {
-//		return nil, errors.New("no variables in model")
-//	}
-//
-//	solver.ShowLog(m.ShowLog)
-//
-//	if m.TimeLimit > 0 {
-//		solver.SetTimeLimit(m.TimeLimit.Seconds())
-//	}
-//
-//	solver.AddVariables(m.Variables)
-//
-//	for _, constr := range m.Constraints {
-//		solver.AddConstraint(constr)
-//	}
-//
-//	mipSol, err := solver.Optimize()
-//	defer solver.DeleteSolver()
-//
-//	if err != nil {
-//		return nil, fmt.Errorf("There was an issue while trying to optimize the model: %v", err)
-//	}
-//
-//	if mipSol.Status != OptimizationStatus_OPTIMAL {
-//		errorMessage, err := mipSol.Status.ToMessage()
-//		if err != nil {
-//			return nil, fmt.Errorf("There was an issue converting optimization status to a message: %v", err)
-//		}
-//		return nil, fmt.Errorf(
-//			"[Code = %d] %s",
-//			mipSol.Status,
-//			errorMessage,
-//		)
-//	}
-//
-//	return &mipSol, nil
-//}
