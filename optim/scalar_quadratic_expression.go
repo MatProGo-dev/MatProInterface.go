@@ -2,6 +2,7 @@ package optim
 
 import (
 	"fmt"
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -469,4 +470,39 @@ Description:
 */
 func (qe ScalarQuadraticExpression) Transpose() Expression {
 	return qe
+}
+
+/*
+ToSymbolic
+Description:
+
+	This function converts the quadratic expression into a symbolic expression.
+	(i.e., one that uses the symbolic math toolbox).
+*/
+func (qe ScalarQuadraticExpression) ToSymbolic() (symbolic.Expression, error) {
+	// Constants
+	var err error
+
+	// Convert Q, L and C to symbolic
+	symQ := symbolic.KMatrix(qe.Q)
+	symL := symbolic.KVector(qe.L)
+	symC := symbolic.K(qe.C)
+
+	// Comvert X to symbolic
+	symXExpr, err := qe.X.ToSymbolic()
+	if err != nil {
+		return nil, err
+	}
+
+	symX, ok := symXExpr.(symbolic.VariableVector)
+	if !ok {
+		return nil, fmt.Errorf("Could not convert X to symbolic.VariableVector.")
+	}
+
+	// Perform Multplications in Symbolic
+	quadraticTerm := symX.Transpose().Multiply(symQ).Multiply(symX)
+	linearTerm := symL.Transpose().Multiply(symX)
+
+	// Sum all terms together and return it
+	return quadraticTerm.Plus(linearTerm).Plus(symC), nil
 }

@@ -2,6 +2,7 @@ package optim
 
 import (
 	"fmt"
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 )
 
 // ScalarExpression represents a linear general expression of the form
@@ -58,6 +59,10 @@ type ScalarExpression interface {
 
 	//Transpose returns the transpose of the given vector expression
 	Transpose() Expression
+
+	//ToSymbolic Returns the symbolic version of the scalar expression
+	// (i.e., the expression when declared using the symbolic math toolbox).
+	ToSymbolic() (symbolic.Expression, error)
 }
 
 // NewExpr returns a new expression with a single additive constant value, c,

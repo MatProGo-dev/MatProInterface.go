@@ -2,6 +2,7 @@ package optim
 
 import (
 	"fmt"
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -410,4 +411,26 @@ func (v Variable) Check() error {
 
 func (v Variable) Transpose() Expression {
 	return v
+}
+
+/*
+ToSymbolic
+Description:
+
+	Converts the variable into a symbolic variable
+	(from the symbolic math toolbox).
+*/
+func (v Variable) ToSymbolic() (symbolic.Expression, error) {
+	// Constants
+
+	// Create base variable and fill its elements
+	symVar := symbolic.Variable{
+		ID:    v.ID,
+		Lower: v.Lower,
+		Upper: v.Upper,
+		Type:  symbolic.VarType(v.Vtype),
+	}
+
+	// Algorithm
+	return symVar, nil
 }

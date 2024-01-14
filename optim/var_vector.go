@@ -2,6 +2,7 @@ package optim
 
 import (
 	"fmt"
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -431,4 +432,41 @@ func (vv VarVector) Check() error {
 
 	// If nothing was thrown, then return nil!
 	return nil
+}
+
+/*
+ToSymbolic
+Description:
+
+	Converts the variable vector to a symbolic expression.
+	(i.e., one that uses the symbolic math toolbox).
+*/
+func (vv VarVector) ToSymbolic() (symbolic.Expression, error) {
+	// Constants
+
+	// Algorithm
+	// Create the symbolic vector
+	symVVec := symbolic.VariableVector{}
+
+	// Add each variable to the vector
+	for _, elt := range vv.Elements {
+		eltAsSymExpr, err := elt.ToSymbolic()
+		if err != nil {
+			return nil, fmt.Errorf(
+				"could not convert variable %v to symbolic variable",
+				elt,
+			)
+		}
+		eltAsSymVar, ok := eltAsSymExpr.(symbolic.Variable)
+		if !ok {
+			return nil, fmt.Errorf(
+				"could not convert variable %v to symbolic variable",
+				elt,
+			)
+		}
+		symVVec.Elements = append(symVVec.Elements, eltAsSymVar)
+	}
+
+	// Return the symbolic vector
+	return symVVec, nil
 }
