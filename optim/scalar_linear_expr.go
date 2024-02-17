@@ -437,7 +437,7 @@ func (sle ScalarLinearExpr) ToSymbolic() (symbolic.Expression, error) {
 		return nil, err
 	}
 
-	tempProduct := symbolic.KVector(sle.L).Transpose().Multiply(symX)
+	tempProduct := symbolic.VecDenseToKVector(sle.L).Transpose().Multiply(symX)
 
 	// Add C
 	return tempProduct.Plus(symbolic.K(sle.C)), nil

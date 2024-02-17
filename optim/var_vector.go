@@ -464,7 +464,7 @@ func (vv VarVector) ToSymbolic() (symbolic.Expression, error) {
 				elt,
 			)
 		}
-		symVVec.Elements = append(symVVec.Elements, eltAsSymVar)
+		symVVec = append(symVVec, eltAsSymVar)
 	}
 
 	// Return the symbolic vector

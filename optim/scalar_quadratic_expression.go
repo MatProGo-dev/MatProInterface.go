@@ -484,8 +484,8 @@ func (qe ScalarQuadraticExpression) ToSymbolic() (symbolic.Expression, error) {
 	var err error
 
 	// Convert Q, L and C to symbolic
-	symQ := symbolic.KMatrix(qe.Q)
-	symL := symbolic.KVector(qe.L)
+	symQ := symbolic.DenseToKMatrix(qe.Q)
+	symL := symbolic.VecDenseToKVector(qe.L)
 	symC := symbolic.K(qe.C)
 
 	// Comvert X to symbolic

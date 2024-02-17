@@ -19,7 +19,7 @@ type OptimizationProblem struct {
 
 // NewProblem returns a new model with some default arguments such as not to show
 // the log and no time limit.
-func NewProblem(name string) *OptimizationProblem {
+func New(name string) *OptimizationProblem {
 	return &OptimizationProblem{Name: name}
 }
 
@@ -47,7 +47,13 @@ func (m *OptimizationProblem) AddRealVariable() symbolic.Variable {
 // and upper value limits. This variable is returned.
 func (m *OptimizationProblem) AddVariableClassic(lower, upper float64, vtype symbolic.VarType) symbolic.Variable {
 	id := uint64(len(m.Variables))
-	newVar := symbolic.Variable{id, lower, upper, vtype}
+	newVar := symbolic.Variable{
+		ID:    id,
+		Lower: lower,
+		Upper: upper,
+		Type:  vtype,
+		Name:  fmt.Sprintf("x_%v", id),
+	}
 	m.Variables = append(m.Variables, newVar)
 	return newVar
 }
@@ -72,7 +78,7 @@ func (m *OptimizationProblem) AddVariableVector(dim int) symbolic.VariableVector
 	for eltIndex := 0; eltIndex < dim; eltIndex++ {
 		varSlice[eltIndex] = m.AddVariable()
 	}
-	return symbolic.VariableVector{Elements: varSlice}
+	return varSlice
 }
 
 /*
@@ -87,11 +93,17 @@ func (m *OptimizationProblem) AddVariableVectorClassic(
 	stID := uint64(len(m.Variables))
 	vs := make([]symbolic.Variable, num)
 	for i := range vs {
-		vs[i] = symbolic.Variable{stID + uint64(i), lower, upper, vtype}
+		vs[i] = symbolic.Variable{
+			ID:    stID + uint64(i),
+			Lower: lower,
+			Upper: upper,
+			Type:  vtype,
+			Name:  fmt.Sprintf("x_%v", stID+uint64(i)),
+		}
 	}
 
 	m.Variables = append(m.Variables, vs...)
-	return symbolic.VariableVector{Elements: vs}
+	return vs
 }
 
 // AddBinaryVariableVector adds a vector of binary variables to the model and
@@ -104,14 +116,10 @@ func (m *OptimizationProblem) AddBinaryVariableVector(num int) symbolic.Variable
 // lower and upper value limits and returns the resulting slice.
 func (m *OptimizationProblem) AddVariableMatrix(
 	rows, cols int, lower, upper float64, vtype symbolic.VarType,
-) [][]symbolic.Variable {
-	vs := make([][]symbolic.Variable, rows)
-	for i := range vs {
-		tempVV := m.AddVariableVectorClassic(cols, lower, upper, vtype)
-		vs[i] = tempVV.Elements
-	}
-
-	return vs
+) symbolic.VariableMatrix {
+	// TODO: Add support for adding a variable matrix with a given
+	// environment as well as upper and lower bounds.
+	return symbolic.NewVariableMatrix(rows, cols)
 }
 
 // AddBinaryVariableMatrix adds a matrix of binary variables to the model and returns
@@ -121,14 +129,14 @@ func (m *OptimizationProblem) AddBinaryVariableMatrix(rows, cols int) [][]symbol
 }
 
 // AddConstr adds the given constraint to the model.
-func (m *OptimizationProblem) AddConstraint(constr symbolic.Constraint, errors ...error) error {
+func (m *OptimizationProblem) AddConstraint(constr symbolic.Constraint) error {
 	// Constants
 
 	// Input Processing
-	err := symbolic.CheckErrors(errors)
-	if err != nil {
-		return err
-	}
+	//err := constr.Check()
+	//if err != nil {
+	//	return err
+	//}
 
 	// Algorithm
 	m.Constraints = append(m.Constraints, constr)
@@ -158,56 +166,54 @@ func (m *OptimizationProblem) SetObjective(e symbolic.Expression, sense ObjSense
 }
 
 /*
-ToScalarConstraint
-Description:
-
-	Converts a constraint in the form of a optim.ScalarConstraint
-	object into a symbolic.ScalarConstraint object.
-*/
-//func ToScalarConstraint(inputConstraint optim.ScalarConstraint) (symbolic.ScalarConstraint, error) {
-//	// Input Processing
-//	err := inputConstraint.Check()
-//	if err != nil {
-//		return symbolic.ScalarConstraint{}, err
-//	}
-//
-//	// Convert LHS to symbolic expression
-//
-//	switch inputConstraint.Sense() {
-//	case optim.EQ:
-//		return ToScalarEq(inputConstraint)
-//	case optim.LE:
-//		return ToScalarLessEq(inputConstraint)
-//	case optim.GE:
-//		return ToScalarGreaterEq(inputConstraint)
-//	default:
-//		return nil, fmt.Errorf("the input constraint sense is not recognized.")
-//	}
-//}
-
-/*
 ToSymbolicConstraint
 Description:
 
 	Converts a constraint in the form of a optim.Constraint object into a symbolic.Constraint object.
 */
-//func ToSymbolicConstraint(inputConstraint optim.Constraint) (symbolic.Constraint, error) {
-//	// Input Processing
-//	err := inputConstraint.Check()
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	// Algorithm
-//	switch {
-//	case inputConstraint.IsScalar():
-//		return ToScalarConstraint(inputConstraint)
-//	case inputConstraint.IsVector():
-//		return ToVectorConstraint(inputConstraint)
-//	default:
-//		return nil, fmt.Errorf("the input constraint is not recognized as a scalar or vector constraint.")
-//	}
-//}
+func ToSymbolicConstraint(inputConstraint optim.Constraint) (symbolic.Constraint, error) {
+	// Input Processing
+
+	// Input Processing
+	err := inputConstraint.Check()
+	if err != nil {
+		return symbolic.ScalarConstraint{}, err
+	}
+
+	// Convert LHS to symbolic expression
+	lhs, err := inputConstraint.Left().ToSymbolic()
+	if err != nil {
+		return symbolic.ScalarConstraint{}, err
+	}
+
+	// Convert RHS to symbolic expression
+	rhs, err := inputConstraint.Right().ToSymbolic()
+	if err != nil {
+		return symbolic.ScalarConstraint{}, err
+	}
+
+	// Get Sense
+	sense := inputConstraint.ConstrSense().ToSymbolic()
+
+	// Convert
+	switch {
+	case optim.IsScalarExpression(lhs):
+		return symbolic.ScalarConstraint{
+			LeftHandSide:  lhs.(symbolic.ScalarExpression),
+			RightHandSide: rhs.(symbolic.ScalarExpression),
+			Sense:         sense,
+		}, nil
+	case optim.IsVectorExpression(lhs):
+		return symbolic.VectorConstraint{
+			LeftHandSide:  lhs.(symbolic.VectorExpression),
+			RightHandSide: rhs.(symbolic.VectorExpression),
+			Sense:         sense,
+		}, nil
+	default:
+		return nil, fmt.Errorf("the left hand side of the input (%T) constraint is not recognized.", lhs)
+	}
+
+}
 
 /*
 ToOptimizationProblem
@@ -238,6 +244,23 @@ func ToOptimizationProblem(inputModel optim.Model) (*OptimizationProblem, error)
 
 	// Collect All Constraints from Model and copy them into the new optimization
 	// problem object.
+	for ii, constraint := range inputModel.Constraints {
+		newConstraint, err := ToSymbolicConstraint(constraint)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"there was a problem creating the %v-th constraint: %v",
+				ii,
+				err,
+			)
+		}
+		newOptimProblem.Constraints = append(newOptimProblem.Constraints, newConstraint)
+	}
+
+	// Convert Objective
+	newOptimProblem.Objective, err = inputModel.Obj.ToSymbolic()
+	if err != nil {
+		return nil, err
+	}
 
 	// Done
 	return newOptimProblem, nil

@@ -1,6 +1,9 @@
 package optim
 
-import "gonum.org/v1/gonum/mat"
+import (
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
+	"gonum.org/v1/gonum/mat"
+)
 
 /*
 vector_constant_test.go
@@ -412,4 +415,18 @@ Description:
 */
 func (kv KVector) Dims() []int {
 	return []int{kv.Len(), 1}
+}
+
+/*
+ToSymbolic
+Description:
+
+	This method returns the symbolic version of the constant vector.
+*/
+func (kv KVector) ToSymbolic() (symbolic.Expression, error) {
+	// Constants
+	kvAsVec := mat.VecDense(kv)
+
+	// Create the symbolic vector
+	return symbolic.VecDenseToKVector(kvAsVec), nil
 }

@@ -8,6 +8,7 @@ Description:
 
 import (
 	"fmt"
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -70,6 +71,10 @@ type VectorExpression interface {
 
 	// Dims returns the dimensions of the given expression
 	Dims() []int
+
+	//ToSymbolic
+	// Converts the expression to a symbolic expression (in SymbolicMath.go)
+	ToSymbolic() (symbolic.Expression, error)
 }
 
 /*

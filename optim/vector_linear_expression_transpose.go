@@ -8,6 +8,7 @@ Description:
 
 import (
 	"fmt"
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -570,4 +571,32 @@ func (vlet VectorLinearExpressionTranspose) ToScalarLinearExpression() (ScalarLi
 	// Convert C to a scalar
 	C := vlet.C.AtVec(0)
 	return ScalarLinearExpr{L: L, X: vlet.X.Copy(), C: C}, nil
+}
+
+/*
+ToSymbolic
+Description:
+
+	Returns the symbolic version of the vector linear expression
+	transpose.
+*/
+func (vlet VectorLinearExpressionTranspose) ToSymbolic() (symbolic.Expression, error) {
+	// Check
+	err := vlet.Check()
+	if err != nil {
+		return nil, err
+	}
+
+	// Constants
+	L := symbolic.DenseToKMatrix(vlet.L)
+	C := symbolic.VecDenseToKVector(vlet.C)
+	X, err := vlet.X.ToSymbolic()
+	if err != nil {
+		return nil, err
+	}
+
+	// Create symbolic expression
+	return X.Transpose().Multiply(
+		L.Transpose(),
+	).Plus(C.Transpose()), nil
 }

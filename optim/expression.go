@@ -2,6 +2,7 @@ package optim
 
 import (
 	"fmt"
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 )
 
 /*
@@ -52,6 +53,10 @@ type Expression interface {
 
 	// Comparison
 	Comparison(rightIn interface{}, sense ConstrSense, errors ...error) (Constraint, error)
+
+	//ToSymbolic
+	// Converts the expression to a symbolic expression (in SymbolicMath.go)
+	ToSymbolic() (symbolic.Expression, error)
 }
 
 /*

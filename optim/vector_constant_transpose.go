@@ -1,6 +1,9 @@
 package optim
 
-import "gonum.org/v1/gonum/mat"
+import (
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
+	"gonum.org/v1/gonum/mat"
+)
 
 /*
 vector_constant_test.go
@@ -382,4 +385,27 @@ Description:
 */
 func (kvt KVectorTranspose) Dims() []int {
 	return []int{1, kvt.Len()}
+}
+
+/*
+ToSymbolic
+Description:
+
+	This method returns the symbolic version of the KVectorTranspose expression.
+*/
+func (kvt KVectorTranspose) ToSymbolic() (symbolic.Expression, error) {
+	// Constants
+	kvLen := kvt.Len()
+
+	// Create the symbolic expression
+	km := symbolic.KMatrix{}
+
+	// Add the constant values
+	km = append(km, make([]symbolic.K, kvLen))
+	for i := 0; i < kvLen; i++ {
+		kvtAsVD := mat.VecDense(kvt)
+		km[0][i] = symbolic.K(kvtAsVD.AtVec(i))
+	}
+
+	return km, nil
 }
