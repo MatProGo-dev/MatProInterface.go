@@ -19,7 +19,7 @@ type OptimizationProblem struct {
 
 // NewProblem returns a new model with some default arguments such as not to show
 // the log and no time limit.
-func New(name string) *OptimizationProblem {
+func NewProblem(name string) *OptimizationProblem {
 	return &OptimizationProblem{Name: name}
 }
 
