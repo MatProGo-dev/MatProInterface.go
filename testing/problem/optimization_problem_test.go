@@ -23,7 +23,7 @@ Description:
 */
 func TestOptimizationProblem_NewProblem1(t *testing.T) {
 	// Constants
-	name := "TestProblem"
+	name := "TestProblem1"
 
 	// New Problem
 	problem := problem.NewProblem(name)
