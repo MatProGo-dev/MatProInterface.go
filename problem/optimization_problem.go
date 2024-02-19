@@ -216,12 +216,12 @@ func ToSymbolicConstraint(inputConstraint optim.Constraint) (symbolic.Constraint
 }
 
 /*
-ToOptimizationProblem
+From
 Description:
 
 	Converts the given input into an optimization problem.
 */
-func ToOptimizationProblem(inputModel optim.Model) (*OptimizationProblem, error) {
+func From(inputModel optim.Model) (*OptimizationProblem, error) {
 	// Create a new optimization problem
 	newOptimProblem := NewProblem(inputModel.Name)
 
