@@ -231,6 +231,10 @@ func From(inputModel optim.Model) (*OptimizationProblem, error) {
 		return nil, err
 	}
 
+	if inputModel.Obj == nil {
+		return nil, fmt.Errorf("the input model has no objective function!")
+	}
+
 	// Collect All Variables from Model and copy them into the new optimization
 	// problem object.
 	for ii, variable := range inputModel.Variables {

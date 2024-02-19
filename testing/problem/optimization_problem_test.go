@@ -11,6 +11,7 @@ import (
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"github.com/MatProGo-dev/MatProInterface.go/problem"
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
+	"strings"
 	"testing"
 )
 
@@ -216,7 +217,7 @@ TestOptimizationProblem_From1
 Description:
 
 	Tests the From function with a simple
-	model.
+	model that doesn't have an objective.
 */
 func TestOptimizationProblem_From1(t *testing.T) {
 	// Constants
@@ -228,6 +229,41 @@ func TestOptimizationProblem_From1(t *testing.T) {
 	for ii := 0; ii < N; ii++ {
 		model.AddVariable()
 	}
+
+	// Algorithm
+	_, err := problem.From(*model)
+	if err == nil {
+		t.Errorf("expected an error; received nil")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			"the input model has no objective function!",
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestOptimizationProblem_From2
+Description:
+
+	Tests the From function with a simple
+	model that doesn't have an objective.
+*/
+func TestOptimizationProblem_From2(t *testing.T) {
+	// Constants
+	model := optim.NewModel(
+		"TestOptimizationProblem_From2",
+	)
+
+	N := 5
+	var tempVar optim.Variable
+	for ii := 0; ii < N; ii++ {
+		tempVar = model.AddVariable()
+	}
+
+	model.SetObjective(tempVar, optim.SenseMaximize)
 
 	// Algorithm
 	problem1, err := problem.From(*model)
@@ -244,8 +280,11 @@ func TestOptimizationProblem_From1(t *testing.T) {
 	// Verify that the type of the variables is as expected.
 	for _, v := range problem1.Variables {
 		if v.Type != symbolic.Continuous {
-			t.Errorf("expected the type of the variable to be %v; received %v",
-				symbolic.Continuous, v.Type)
+			t.Errorf(
+				"expected the type of the variable to be %v; received %v",
+				symbolic.Continuous,
+				v.Type,
+			)
 		}
 	}
 }
