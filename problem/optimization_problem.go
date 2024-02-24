@@ -29,8 +29,8 @@ Description:
 
 	This method adds an "unbounded" continuous variable to the model.
 */
-func (m *OptimizationProblem) AddVariable() symbolic.Variable {
-	return m.AddRealVariable()
+func (op *OptimizationProblem) AddVariable() symbolic.Variable {
+	return op.AddRealVariable()
 }
 
 /*
@@ -39,14 +39,14 @@ Description:
 
 	Adds a Real variable to the model and returns said variable.
 */
-func (m *OptimizationProblem) AddRealVariable() symbolic.Variable {
-	return m.AddVariableClassic(-optim.INFINITY, optim.INFINITY, symbolic.Continuous)
+func (op *OptimizationProblem) AddRealVariable() symbolic.Variable {
+	return op.AddVariableClassic(-optim.INFINITY, optim.INFINITY, symbolic.Continuous)
 }
 
 // AddVariable adds a variable of a given variable type to the model given the lower
 // and upper value limits. This variable is returned.
-func (m *OptimizationProblem) AddVariableClassic(lower, upper float64, vtype symbolic.VarType) symbolic.Variable {
-	id := uint64(len(m.Variables))
+func (op *OptimizationProblem) AddVariableClassic(lower, upper float64, vtype symbolic.VarType) symbolic.Variable {
+	id := uint64(len(op.Variables))
 	newVar := symbolic.Variable{
 		ID:    id,
 		Lower: lower,
@@ -54,13 +54,13 @@ func (m *OptimizationProblem) AddVariableClassic(lower, upper float64, vtype sym
 		Type:  vtype,
 		Name:  fmt.Sprintf("x_%v", id),
 	}
-	m.Variables = append(m.Variables, newVar)
+	op.Variables = append(op.Variables, newVar)
 	return newVar
 }
 
 // AddBinaryVar adds a binary variable to the model and returns said variable.
-func (m *OptimizationProblem) AddBinaryVariable() symbolic.Variable {
-	return m.AddVariableClassic(0, 1, symbolic.Binary)
+func (op *OptimizationProblem) AddBinaryVariable() symbolic.Variable {
+	return op.AddVariableClassic(0, 1, symbolic.Binary)
 }
 
 /*
@@ -70,13 +70,13 @@ Description:
 	Creates a VarVector object using a constructor that assumes you want an "unbounded" vector of real optimization
 	variables.
 */
-func (m *OptimizationProblem) AddVariableVector(dim int) symbolic.VariableVector {
+func (op *OptimizationProblem) AddVariableVector(dim int) symbolic.VariableVector {
 	// Constants
 
 	// Algorithm
 	varSlice := make([]symbolic.Variable, dim)
 	for eltIndex := 0; eltIndex < dim; eltIndex++ {
-		varSlice[eltIndex] = m.AddVariable()
+		varSlice[eltIndex] = op.AddVariable()
 	}
 	return varSlice
 }
@@ -87,10 +87,10 @@ Description:
 
 	The classic version of AddVariableVector defined in the original goop.
 */
-func (m *OptimizationProblem) AddVariableVectorClassic(
+func (op *OptimizationProblem) AddVariableVectorClassic(
 	num int, lower, upper float64, vtype symbolic.VarType,
 ) symbolic.VariableVector {
-	stID := uint64(len(m.Variables))
+	stID := uint64(len(op.Variables))
 	vs := make([]symbolic.Variable, num)
 	for i := range vs {
 		vs[i] = symbolic.Variable{
@@ -102,34 +102,45 @@ func (m *OptimizationProblem) AddVariableVectorClassic(
 		}
 	}
 
-	m.Variables = append(m.Variables, vs...)
+	op.Variables = append(op.Variables, vs...)
 	return vs
 }
 
 // AddBinaryVariableVector adds a vector of binary variables to the model and
 // returns the slice.
-func (m *OptimizationProblem) AddBinaryVariableVector(num int) symbolic.VariableVector {
-	return m.AddVariableVectorClassic(num, 0, 1, symbolic.Binary)
+func (op *OptimizationProblem) AddBinaryVariableVector(num int) symbolic.VariableVector {
+	return op.AddVariableVectorClassic(num, 0, 1, symbolic.Binary)
 }
 
 // AddVariableMatrix adds a matrix of variables of a given type to the model with
 // lower and upper value limits and returns the resulting slice.
-func (m *OptimizationProblem) AddVariableMatrix(
+func (op *OptimizationProblem) AddVariableMatrix(
 	rows, cols int, lower, upper float64, vtype symbolic.VarType,
 ) symbolic.VariableMatrix {
 	// TODO: Add support for adding a variable matrix with a given
 	// environment as well as upper and lower bounds.
-	return symbolic.NewVariableMatrix(rows, cols)
+
+	// Create variables
+	vmOut := symbolic.NewVariableMatrix(rows, cols)
+
+	// Add variables to the problem
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
+			op.Variables = append(op.Variables, vmOut[i][j])
+		}
+	}
+
+	return vmOut
 }
 
 // AddBinaryVariableMatrix adds a matrix of binary variables to the model and returns
 // the resulting slice.
-func (m *OptimizationProblem) AddBinaryVariableMatrix(rows, cols int) [][]symbolic.Variable {
-	return m.AddVariableMatrix(rows, cols, 0, 1, symbolic.Binary)
+func (op *OptimizationProblem) AddBinaryVariableMatrix(rows, cols int) [][]symbolic.Variable {
+	return op.AddVariableMatrix(rows, cols, 0, 1, symbolic.Binary)
 }
 
 // AddConstr adds the given constraint to the model.
-func (m *OptimizationProblem) AddConstraint(constr symbolic.Constraint) error {
+func (op *OptimizationProblem) AddConstraint(constr symbolic.Constraint) error {
 	// Constants
 
 	// Input Processing
@@ -139,7 +150,7 @@ func (m *OptimizationProblem) AddConstraint(constr symbolic.Constraint) error {
 	//}
 
 	// Algorithm
-	m.Constraints = append(m.Constraints, constr)
+	op.Constraints = append(op.Constraints, constr)
 	return nil
 }
 
@@ -153,7 +164,7 @@ Notes:
 	is given, even though objectives are normally scalars.
 */
 
-func (m *OptimizationProblem) SetObjective(e symbolic.Expression, sense ObjSense) error {
+func (op *OptimizationProblem) SetObjective(e symbolic.Expression, sense ObjSense) error {
 	// Input Processing
 	se, err := symbolic.ToScalarExpression(e)
 	if err != nil {
@@ -161,7 +172,7 @@ func (m *OptimizationProblem) SetObjective(e symbolic.Expression, sense ObjSense
 	}
 
 	// Return
-	m.Objective = NewObjective(se, sense)
+	op.Objective = NewObjective(se, sense)
 	return nil
 }
 
@@ -197,13 +208,13 @@ func ToSymbolicConstraint(inputConstraint optim.Constraint) (symbolic.Constraint
 
 	// Convert
 	switch {
-	case optim.IsScalarExpression(lhs):
+	case symbolic.IsScalarExpression(lhs):
 		return symbolic.ScalarConstraint{
 			LeftHandSide:  lhs.(symbolic.ScalarExpression),
 			RightHandSide: rhs.(symbolic.ScalarExpression),
 			Sense:         sense,
 		}, nil
-	case optim.IsVectorExpression(lhs):
+	case symbolic.IsVectorExpression(lhs):
 		return symbolic.VectorConstraint{
 			LeftHandSide:  lhs.(symbolic.VectorExpression),
 			RightHandSide: rhs.(symbolic.VectorExpression),

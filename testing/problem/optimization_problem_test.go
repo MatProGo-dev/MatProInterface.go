@@ -213,6 +213,111 @@ func TestOptimizationProblem_AddVariableVectorClassic1(t *testing.T) {
 }
 
 /*
+TestOptimizationProblem_AddBinaryVariableVector1
+Description:
+
+	Tests the AddBinaryVariableVector function with a simple problem.
+*/
+func TestOptimizationProblem_AddBinaryVariableVector1(t *testing.T) {
+	// Constants
+	problem := problem.NewProblem("TestProblem1")
+	dim := 5
+
+	// Algorithm
+	problem.AddBinaryVariableVector(dim)
+
+	// Check that the number of variables is as expected.
+	if len(problem.Variables) != dim {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			dim, len(problem.Variables))
+	}
+
+	// Verify that the type of the variables is as expected.
+	for _, v := range problem.Variables {
+		if v.Type != symbolic.Binary {
+			t.Errorf("expected the type of the variable to be %v; received %v",
+				symbolic.Binary, v.Type)
+		}
+	}
+}
+
+/*
+TestOptimizationProblem_AddVariableMatrix1
+Description:
+
+	Tests the AddVariableMatrix function with a simple problem.
+*/
+func TestOptimizationProblem_AddVariableMatrix1(t *testing.T) {
+	// Constants
+	problem := problem.NewProblem("TestProblem1")
+	rows := 5
+	cols := 5
+
+	// Algorithm
+	problem.AddVariableMatrix(rows, cols, 0, 1, symbolic.Binary)
+
+	// Check that the number of variables is as expected.
+	if len(problem.Variables) != rows*cols {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			rows*cols, len(problem.Variables))
+	}
+
+	// Verify that the type of the variables is as expected.
+	for _, v := range problem.Variables {
+		if v.Type != symbolic.Continuous {
+			t.Errorf("expected the type of the variable to be %v; received %v",
+				symbolic.Binary, v.Type)
+		}
+	}
+}
+
+/*
+TestOptimizationProblem_ToSymbolicConstraint1
+Description:
+
+	Tests the ToSymbolicConstraint function with a simple problem.
+*/
+func TestOptimizationProblem_ToSymbolicConstraint1(t *testing.T) {
+	// Constants
+	model1 := optim.NewModel("TestModel1")
+	v1 := model1.AddVariable()
+	v2 := model1.AddVariable()
+	v3 := model1.AddVariable()
+
+	// Algorithm
+	sum, err := v1.Plus(v2)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	constr1, err := sum.LessEq(v3)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	constr1prime, err := problem.ToSymbolicConstraint(constr1)
+
+	// Check that constr1prime is a VectorConstraint
+	if _, ok := constr1prime.(symbolic.ScalarConstraint); !ok {
+		t.Errorf("expected the type of constr1prime to be %T; received %T",
+			symbolic.VectorConstraint{}, constr1prime)
+	}
+
+}
+
+/*
+TestOptimizationProblem_ToSymbolicConstraint2
+Description:
+
+	Tests the ToSymbolicConstraint function with a simple problem
+	that has a vector constraint. This vector constraint
+	will be a GreaterThanEqual vector constraint between
+	a vector variable and a scalar variable.
+*/
+func TestOptimizationProblem_ToSymbolicConstraint2(t *testing.T) {
+
+}
+
+/*
 TestOptimizationProblem_From1
 Description:
 
@@ -286,5 +391,69 @@ func TestOptimizationProblem_From2(t *testing.T) {
 				v.Type,
 			)
 		}
+	}
+}
+
+/*
+TestOptimizationProblem_From3
+Description:
+
+	Tests the From function with a convex optimization
+	model that has a quadratic objective and
+	at least two constraints.
+*/
+func TestOptimizationProblem_From3(t *testing.T) {
+	// Constants
+	model := optim.NewModel(
+		"TestOptimizationProblem_From3",
+	)
+
+	N := 5
+	var tempVar optim.Variable
+	for ii := 0; ii < N; ii++ {
+		tempVar = model.AddVariable()
+	}
+
+	// Add a quadratic objective
+	obj, err := tempVar.Multiply(tempVar)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	model.SetObjective(obj, optim.SenseMaximize)
+
+	// Add a constraint
+	constr1, err := tempVar.LessEq(1.0)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	model.AddConstraint(constr1)
+
+	// Algorithm
+	problem1, err := problem.From(*model)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of variables is as expected.
+	if len(problem1.Variables) != N {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			N, len(problem1.Variables))
+	}
+
+	// Verify that the type of the variables is as expected.
+	for _, v := range problem1.Variables {
+		if v.Type != symbolic.Continuous {
+			t.Errorf(
+				"expected the type of the variable to be %v; received %v",
+				symbolic.Continuous,
+				v.Type,
+			)
+		}
+	}
+
+	// Check that the number of constraints is as expected.
+	if len(problem1.Constraints) != 1 {
+		t.Errorf("expected the number of constraints to be %v; received %v",
+			1, len(problem1.Constraints))
 	}
 }
