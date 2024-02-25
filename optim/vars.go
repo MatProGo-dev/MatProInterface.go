@@ -421,7 +421,11 @@ Description:
 	(from the symbolic math toolbox).
 */
 func (v Variable) ToSymbolic() (symbolic.Expression, error) {
-	// Constants
+	// Input Checking
+	err := v.Check()
+	if err != nil {
+		return nil, err
+	}
 
 	// Create base variable and fill its elements
 	symVar := symbolic.Variable{

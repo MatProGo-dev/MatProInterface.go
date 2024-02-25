@@ -442,7 +442,11 @@ Description:
 	(i.e., one that uses the symbolic math toolbox).
 */
 func (vv VarVector) ToSymbolic() (symbolic.Expression, error) {
-	// Constants
+	// Input Checking
+	err := vv.Check()
+	if err != nil {
+		return nil, err
+	}
 
 	// Algorithm
 	// Create the symbolic vector

@@ -480,8 +480,11 @@ Description:
 	(i.e., one that uses the symbolic math toolbox).
 */
 func (qe ScalarQuadraticExpression) ToSymbolic() (symbolic.Expression, error) {
-	// Constants
-	var err error
+	// Input Checking
+	err := qe.Check()
+	if err != nil {
+		return nil, err
+	}
 
 	// Convert Q, L and C to symbolic
 	symQ := symbolic.DenseToKMatrix(qe.Q)

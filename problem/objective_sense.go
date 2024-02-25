@@ -10,6 +10,7 @@ type ObjSense int
 const (
 	SenseMinimize ObjSense = 1
 	SenseMaximize          = -1
+	SenseFind     ObjSense = 0
 )
 
 /*

@@ -431,6 +431,12 @@ Description:
 	symbolic math toolbox).
 */
 func (sle ScalarLinearExpr) ToSymbolic() (symbolic.Expression, error) {
+	// Check for errors
+	err := sle.Check()
+	if err != nil {
+		return nil, err
+	}
+
 	// Compute product of L and X
 	symX, err := sle.X.ToSymbolic()
 	if err != nil {

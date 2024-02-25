@@ -14,7 +14,7 @@ type OptimizationProblem struct {
 	Name        string
 	Variables   []symbolic.Variable
 	Constraints []symbolic.Constraint
-	Objective   symbolic.Expression
+	Objective   Objective
 }
 
 // NewProblem returns a new model with some default arguments such as not to show
@@ -139,21 +139,6 @@ func (op *OptimizationProblem) AddBinaryVariableMatrix(rows, cols int) [][]symbo
 	return op.AddVariableMatrix(rows, cols, 0, 1, symbolic.Binary)
 }
 
-// AddConstr adds the given constraint to the model.
-func (op *OptimizationProblem) AddConstraint(constr symbolic.Constraint) error {
-	// Constants
-
-	// Input Processing
-	//err := constr.Check()
-	//if err != nil {
-	//	return err
-	//}
-
-	// Algorithm
-	op.Constraints = append(op.Constraints, constr)
-	return nil
-}
-
 /*
 SetObjective
 Description:
@@ -172,7 +157,7 @@ func (op *OptimizationProblem) SetObjective(e symbolic.Expression, sense ObjSens
 	}
 
 	// Return
-	op.Objective = NewObjective(se, sense)
+	op.Objective = *NewObjective(se, sense)
 	return nil
 }
 
@@ -272,7 +257,15 @@ func From(inputModel optim.Model) (*OptimizationProblem, error) {
 	}
 
 	// Convert Objective
-	newOptimProblem.Objective, err = inputModel.Obj.ToSymbolic()
+	objectiveExpr, err := inputModel.Obj.ToSymbolic()
+	if err != nil {
+		return nil, err
+	}
+
+	err = newOptimProblem.SetObjective(
+		objectiveExpr,
+		ObjSense(inputModel.Obj.Sense),
+	)
 	if err != nil {
 		return nil, err
 	}
