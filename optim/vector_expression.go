@@ -75,6 +75,10 @@ type VectorExpression interface {
 	//ToSymbolic
 	// Converts the expression to a symbolic expression (in SymbolicMath.go)
 	ToSymbolic() (symbolic.Expression, error)
+
+	//Check
+	// Checks the expression for any errors
+	Check() error
 }
 
 /*

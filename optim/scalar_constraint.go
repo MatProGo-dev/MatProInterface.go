@@ -130,7 +130,17 @@ func (sc ScalarConstraint) Check() error {
 		return fmt.Errorf("the constraint sense is not recognized.")
 	}
 
-	// Check left and right hand sides?
+	// Check left and right hand sides
+	err := sc.LeftHandSide.Check()
+	if err != nil {
+		return fmt.Errorf("left hand side of the constraint is not valid: %v", err)
+	}
+
+	// Check right hand side
+	err = sc.RightHandSide.Check()
+	if err != nil {
+		return fmt.Errorf("right hand side of the constraint is not valid: %v", err)
+	}
 
 	// Return
 	return nil

@@ -8,6 +8,7 @@ Description:
 */
 
 import (
+	"fmt"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"github.com/MatProGo-dev/MatProInterface.go/problem"
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
@@ -273,6 +274,36 @@ func TestOptimizationProblem_AddVariableMatrix1(t *testing.T) {
 }
 
 /*
+TestOptimizationProblem_AddBinaryVariableMatrix1
+Description:
+
+	Tests the AddBinaryVariableMatrix function with a simple problem.
+*/
+func TestOptimizationProblem_AddBinaryVariableMatrix1(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestProblem1")
+	rows := 5
+	cols := 5
+
+	// Algorithm
+	p1.AddBinaryVariableMatrix(rows, cols)
+
+	// Check that the number of variables is as expected.
+	if len(p1.Variables) != rows*cols {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			rows*cols, len(p1.Variables))
+	}
+
+	// Verify that the type of the variables is as expected.
+	for _, v := range p1.Variables {
+		if v.Type != symbolic.Continuous {
+			t.Errorf("expected the type of the variable to be %v; received %v",
+				symbolic.Binary, v.Type)
+		}
+	}
+}
+
+/*
 TestOptimizationProblem_SetObjective1
 Description:
 
@@ -294,6 +325,32 @@ func TestOptimizationProblem_SetObjective1(t *testing.T) {
 	if p1.Objective.Sense != problem.SenseMaximize {
 		t.Errorf("expected the sense of the objective to be %v; received %v",
 			problem.SenseMaximize, p1.Objective.Sense)
+	}
+}
+
+/*
+TestOptimizationProblem_SetObjective2
+Description:
+
+	Tests the SetObjective function with a vector objective
+	which should cause an error.
+*/
+func TestOptimizationProblem_SetObjective2(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_SetObjective2")
+	v1 := p1.AddVariableVector(5)
+
+	// Algorithm
+	err := p1.SetObjective(v1, problem.SenseMaximize)
+	if err == nil {
+		t.Errorf("expected an error; received nil")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			"trouble parsing input expression:",
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
 	}
 }
 
@@ -337,10 +394,94 @@ Description:
 	Tests the ToSymbolicConstraint function with a simple problem
 	that has a vector constraint. This vector constraint
 	will be a GreaterThanEqual vector constraint between
-	a vector variable and a scalar variable.
+	a vector variable and a vector variable.
 */
 func TestOptimizationProblem_ToSymbolicConstraint2(t *testing.T) {
+	// Constants
+	model1 := optim.NewModel("TestModel1")
+	v1 := model1.AddVariableVector(5)
+	v2 := model1.AddVariableVector(5)
 
+	// Algorithm
+	constr1, err := v1.GreaterEq(v2)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	constr1prime, err := problem.ToSymbolicConstraint(constr1)
+
+	// Check that constr1prime is a VectorConstraint
+	if _, ok := constr1prime.(symbolic.VectorConstraint); !ok {
+		t.Errorf("expected the type of constr1prime to be %T; received %T",
+			symbolic.VectorConstraint{}, constr1prime)
+	}
+}
+
+/*
+TestOptimizationProblem_ToSymbolicConstraint3
+Description:
+
+	Tests the ToSymbolicConstraint function with a simple problem
+	that has a LeftHandSide that is not well-defined (in this case,
+	a variable). This should cause an error.
+*/
+func TestOptimizationProblem_ToSymbolicConstraint3(t *testing.T) {
+	// Constants
+	model1 := optim.NewModel("TestModel1")
+	v1 := model1.AddVariable()
+	v2 := optim.Variable{Lower: 0, Upper: -1}
+
+	// Algorithm
+	constr1 := optim.ScalarConstraint{
+		LeftHandSide:  v2,
+		RightHandSide: v1,
+		Sense:         optim.SenseLessThanEqual,
+	}
+	_, err := problem.ToSymbolicConstraint(constr1)
+
+	if err == nil {
+		t.Errorf("expected an error; received nil")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			v2.Check().Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestOptimizationProblem_ToSymbolicConstraint4
+Description:
+
+	Tests the ToSymbolicConstraint function with a simple constraint
+	that has a RightHandSide that is not well-defined (in this case,
+	a variable). This should cause an error.
+*/
+func TestOptimizationProblem_ToSymbolicConstraint4(t *testing.T) {
+	// Constants
+	model1 := optim.NewModel("TestModel1")
+	v1 := optim.Variable{Lower: 0, Upper: -1}
+	v2 := model1.AddVariable()
+
+	// Algorithm
+	constr1 := optim.ScalarConstraint{
+		LeftHandSide:  v2,
+		RightHandSide: v1,
+		Sense:         optim.SenseLessThanEqual,
+	}
+	_, err := problem.ToSymbolicConstraint(constr1)
+
+	if err == nil {
+		t.Errorf("expected an error; received nil")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			v1.Check().Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
 }
 
 /*
@@ -719,6 +860,86 @@ func TestOptimizationProblem_From8(t *testing.T) {
 		if !strings.Contains(
 			err.Error(),
 			"the length of L",
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestOptimizationProblem_From9
+Description:
+
+	Tests that the From function properly produces an error
+	when a constraint has been added to the problem that is not well-defined.
+*/
+func TestOptimizationProblem_From9(t *testing.T) {
+	// Constants
+	model := optim.NewModel(
+		"TestOptimizationProblem_From9",
+	)
+
+	// Add a variable
+	v1 := model.AddVariable()
+
+	// Add an objective
+	model.SetObjective(v1, optim.SenseMaximize)
+
+	// Add a constraint
+	model.AddConstraint(optim.ScalarConstraint{
+		LeftHandSide:  v1,
+		RightHandSide: optim.Variable{Lower: 1, Upper: 0},
+		Sense:         optim.SenseLessThanEqual,
+	})
+
+	// Algorithm
+	_, err := problem.From(*model)
+	if err == nil {
+		t.Errorf("expected an error, received none!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf("there was a problem creating the %v-th constraint", 0),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestOptimizationProblem_From10
+Description:
+
+	Tests that the From function properly produces an error
+	when the objective is not well-formed.
+*/
+func TestOptimizationProblem_From10(t *testing.T) {
+	// Constants
+	model := optim.NewModel(
+		"TestOptimizationProblem_From10",
+	)
+
+	// Add a variable
+	v1 := model.AddVariable()
+
+	// Add an objective
+	model.SetObjective(optim.Variable{Lower: 0, Upper: -1}, optim.SenseMaximize)
+
+	// Add a constraint
+	model.AddConstraint(optim.ScalarConstraint{
+		LeftHandSide:  v1,
+		RightHandSide: optim.K(1.2),
+		Sense:         optim.SenseLessThanEqual,
+	})
+
+	// Algorithm
+	_, err := problem.From(*model)
+	if err == nil {
+		t.Errorf("expected an error, received none!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			model.Obj.Check().Error(),
 		) {
 			t.Errorf("unexpected error: %v", err)
 		}

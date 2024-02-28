@@ -24,6 +24,17 @@ KVector
 type KVector mat.VecDense // Inherit all methods from mat.VecDense
 
 /*
+Check
+Description:
+
+	This method checks for errors in the KVector type.
+	There should never be any.
+*/
+func (kv KVector) Check() error {
+	return nil
+}
+
+/*
 Len
 
 	Computes the length of the KVector given.

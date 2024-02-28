@@ -24,6 +24,17 @@ KVectorTranspose
 type KVectorTranspose mat.VecDense // Inherit all methods from mat.VecDense
 
 /*
+Check
+Description:
+
+	This method checks for errors in the KVectorTranspose type.
+	There should never be any.
+*/
+func (kvt KVectorTranspose) Check() error {
+	return nil
+}
+
+/*
 Len
 
 	Computes the length of the KVector given.

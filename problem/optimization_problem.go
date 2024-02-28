@@ -177,16 +177,10 @@ func ToSymbolicConstraint(inputConstraint optim.Constraint) (symbolic.Constraint
 	}
 
 	// Convert LHS to symbolic expression
-	lhs, err := inputConstraint.Left().ToSymbolic()
-	if err != nil {
-		return symbolic.ScalarConstraint{}, err
-	}
+	lhs, _ := inputConstraint.Left().ToSymbolic()
 
 	// Convert RHS to symbolic expression
-	rhs, err := inputConstraint.Right().ToSymbolic()
-	if err != nil {
-		return symbolic.ScalarConstraint{}, err
-	}
+	rhs, _ := inputConstraint.Right().ToSymbolic()
 
 	// Get Sense
 	sense := inputConstraint.ConstrSense().ToSymbolic()

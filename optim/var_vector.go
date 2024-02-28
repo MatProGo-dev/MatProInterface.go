@@ -294,9 +294,6 @@ Description:
 	input rhs as the right hand side if it is valid.
 */
 func (vv VarVector) Eq(rightIn interface{}, errors ...error) (Constraint, error) {
-	// Constants
-
-	// Algorithm
 	return vv.Comparison(rightIn, SenseEqual, errors...)
 
 }
@@ -373,7 +370,11 @@ func (vv VarVector) Comparison(rhs interface{}, sense ConstrSense, errors ...err
 			)
 
 	default:
-		return VectorConstraint{}, fmt.Errorf("The Eq() method for VarVector is not implemented yet for type %T!", rhs)
+		return VectorConstraint{}, fmt.Errorf(
+			"The VarVector.Comparison (%v) method is not implemented yet for type %T!",
+			sense,
+			rhs,
+		)
 	}
 }
 

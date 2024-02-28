@@ -32,3 +32,21 @@ func (cs ConstrSense) ToSymbolic() symbolic.ConstrSense {
 	}
 	return '1'
 }
+
+/*
+String
+Description:
+
+	Returns the string representation of the constraint sense.
+*/
+func (cs ConstrSense) String() string {
+	switch cs {
+	case SenseEqual:
+		return "=="
+	case SenseLessThanEqual:
+		return "<="
+	case SenseGreaterThanEqual:
+		return ">="
+	}
+	return "UNRECOGNIZED ConstrSense"
+}
