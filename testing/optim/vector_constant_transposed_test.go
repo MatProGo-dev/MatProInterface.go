@@ -3,6 +3,7 @@ package optim_test
 import (
 	"fmt"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
 	"strings"
 	"testing"
@@ -13,6 +14,23 @@ vector_constant_transposed_test.go
 Description:
 	Tests the new type KVectorTranspose which represents a constant vector.
 */
+
+/*
+TestKVectorTranspose_Check1
+Description:
+
+	Tests that the Check() method returns nil.
+*/
+func TestKVectorTranspose_Check1(t *testing.T) {
+	// Create a KVectorTranspose
+	desLength := 4
+	var vec1 = optim.KVectorTranspose(optim.OnesVector(desLength))
+
+	// Check
+	if vec1.Check() != nil {
+		t.Errorf("The Check() method should return nil; received %v", vec1.Check())
+	}
+}
 
 /*
 TestKVectorTranspose_At1
@@ -1185,5 +1203,30 @@ func TestKVectorTranspose_Transpose1(t *testing.T) {
 			vec1.Len(),
 			vec1T.Len(),
 		)
+	}
+}
+
+/*
+TestKVectorTranspose_ToSymbolic1
+Description:
+
+	Tests that the ToSymbolic function works as expected.
+	Expects for the error to be nil and for the result to be a symbolic.KMatrix
+*/
+func TestKVectorTranspose_ToSymbolic1(t *testing.T) {
+	// Constants
+	desLength := 10
+
+	// Algorithm
+	vec1 := optim.KVectorTranspose(optim.OnesVector(desLength))
+	symVec, err := vec1.ToSymbolic()
+	if err != nil {
+		t.Errorf("Unexpected error in ToSymbolic: %v", err)
+	}
+
+	// Check type
+	_, ok := symVec.(symbolic.KMatrix)
+	if !ok {
+		t.Errorf("Expected symVec to be of type symbolic.KVector; received %T", symVec)
 	}
 }
