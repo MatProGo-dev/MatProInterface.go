@@ -3,6 +3,7 @@ package optim_test
 import (
 	"fmt"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
 	"strings"
 	"testing"
@@ -2034,4 +2035,86 @@ func TestVectorLinearExpressionTranspose_ToScalarExpression4(t *testing.T) {
 		t.Errorf("C = %v =/= %v", sle.C, 2.71)
 	}
 
+}
+
+/*
+TestVectorLinearExpressionTranspose_ToSymbolic1
+Description:
+
+	ToSymbolic() should throw an error when the vlet1
+	is not well-defined.
+*/
+func TestVectorLinearExpressionTranspose_ToSymbolic1(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("VLET ToSymbolic 1")
+
+	// Create arguments
+	C2 := optim.OnesVector(n - 1)
+	C2.SetVec(0, 2.71)
+	vlet1 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: C2,
+	}
+
+	// Try to run ToSymbolic
+	_, err := vlet1.ToSymbolic()
+	if err == nil {
+		t.Errorf("there was no error thrown, when there should have been.")
+	} else {
+		nL, mL := vlet1.L.Dims()
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf(
+				"Dimension of L (%v x %v) and C (length %v) do not match!",
+				nL, mL,
+				vlet1.C.Len(),
+			),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestVectorLinearExpressionTranspose_ToSymbolic2
+Description:
+
+	ToSymbolic() should produce a VectorPolynomialExpression
+	when the vlet1 is well-defined.
+*/
+func TestVectorLinearExpressionTranspose_ToSymbolic2(t *testing.T) {
+	// Constants
+	n := 5
+	m := optim.NewModel("VLET ToSymbolic 2")
+
+	// Create arguments
+	C2 := optim.OnesVector(n)
+	C2.SetVec(0, 2.71)
+	vlet1 := optim.VectorLinearExpressionTranspose{
+		L: optim.Identity(n),
+		X: m.AddVariableVector(n),
+		C: C2,
+	}
+
+	// Try to run ToSymbolic
+	vpe, err := vlet1.ToSymbolic()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	if _, ok := vpe.(symbolic.PolynomialMatrix); !ok {
+		t.Errorf("expected for the output to be a VectorPolynomialExpression; received %T", vpe)
+	}
+
+	// Check the dimensions of vpe
+	nR, nC := vpe.Dims()[0], vpe.Dims()[1]
+	if nR != 1 {
+		t.Errorf("expected for the number of rows to be 1; received %v", nR)
+	}
+
+	if nC != n {
+		t.Errorf("expected for the number of columns to be %v; received %v", n, nC)
+	}
 }
