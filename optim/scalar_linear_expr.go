@@ -2,6 +2,7 @@ package optim
 
 import (
 	"fmt"
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -420,4 +421,31 @@ Description:
 */
 func (sle ScalarLinearExpr) Transpose() Expression {
 	return sle
+}
+
+/*
+ToSymbolic
+Description:
+
+	Converts the constant to a symbolic expression (i.e., one that uses the
+	symbolic math toolbox).
+*/
+func (sle ScalarLinearExpr) ToSymbolic() (symbolic.Expression, error) {
+	// Check for errors
+	err := sle.Check()
+	if err != nil {
+		return nil, err
+	}
+
+	// Compute product of L and X
+	symX, err := sle.X.ToSymbolic()
+	if err != nil {
+		return nil, err
+	}
+
+	tempProduct := symbolic.VecDenseToKVector(sle.L).Transpose().Multiply(symX)
+
+	// Add C
+	return tempProduct.Plus(symbolic.K(sle.C)), nil
+
 }

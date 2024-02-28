@@ -19,6 +19,10 @@ func (sc ScalarConstraint) Right() Expression {
 	return sc.RightHandSide
 }
 
+func (sc ScalarConstraint) ConstrSense() ConstrSense {
+	return sc.Sense
+}
+
 /*
 IsLinear
 Description:
@@ -106,14 +110,38 @@ func (sc ScalarConstraint) Simplify() (ScalarConstraint, error) {
 
 }
 
-// ConstrSense represents if the constraint x <= y, x >= y, or x == y. For easy
-// integration with Gurobi, the senses have been encoding using a byte in
-// the same way Gurobi encodes the constraint senses.
-type ConstrSense byte
+/*
+Check
+Description:
 
-// Different constraint senses conforming to Gurobi's encoding.
-const (
-	SenseEqual            ConstrSense = '='
-	SenseLessThanEqual                = '<'
-	SenseGreaterThanEqual             = '>'
-)
+	Checks the validity of the ScalarConstraint, this makes sure that:
+	- The Sense if either SenseEqual, SenseLessThanEqual, or SenseGreaterThanEqual
+*/
+func (sc ScalarConstraint) Check() error {
+	// Check sense
+	switch sc.Sense {
+	case SenseEqual:
+		break
+	case SenseLessThanEqual:
+		break
+	case SenseGreaterThanEqual:
+		break
+	default:
+		return fmt.Errorf("the constraint sense is not recognized.")
+	}
+
+	// Check left and right hand sides
+	err := sc.LeftHandSide.Check()
+	if err != nil {
+		return fmt.Errorf("left hand side of the constraint is not valid: %v", err)
+	}
+
+	// Check right hand side
+	err = sc.RightHandSide.Check()
+	if err != nil {
+		return fmt.Errorf("right hand side of the constraint is not valid: %v", err)
+	}
+
+	// Return
+	return nil
+}

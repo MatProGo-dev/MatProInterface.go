@@ -3,7 +3,7 @@ package optim_test
 import (
 	"fmt"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
-	"github.com/MatProGo-dev/MatProInterface.go/symbolic/matrix"
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
 	"strings"
 	"testing"
@@ -530,7 +530,7 @@ func TestVarVectorTranspose_Comparison5(t *testing.T) {
 		err.Error(),
 		fmt.Sprintf(
 			"The two inputs to comparison '%v' must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
-			optim.SenseGreaterThanEqual,
+			optim.ConstrSense(optim.SenseGreaterThanEqual),
 			vec1.Len(),
 			vec2.Len(),
 		),
@@ -1137,7 +1137,7 @@ func TestVarVectorTranspose_LessEq1(t *testing.T) {
 		err.Error(),
 		fmt.Sprintf(
 			"The two inputs to comparison '%v' must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
-			optim.SenseLessThanEqual,
+			optim.ConstrSense(optim.SenseLessThanEqual),
 			vec1.Len(),
 			kv2.Len(),
 		),
@@ -1694,7 +1694,7 @@ func TestVarVectorTranspose_Multiply12(t *testing.T) {
 	vv0 := m.AddVariableVector(N)
 	vvt0 := vv0.Transpose()
 
-	mat1 := matrix.Identity(N)
+	mat1 := symbolic.Identity(N)
 	mat1.Set(1, 1, 3.0)
 
 	// Attempt Multiplication
@@ -1844,7 +1844,7 @@ func TestVarVectorTranspose_Multiply14(t *testing.T) {
 	vv0 := m.AddVariableVector(N)
 	vvt0 := vv0.Transpose()
 
-	mat1 := matrix.Zeros(N, N)
+	mat1 := symbolic.ZerosMatrix(N, N)
 	mat1.Set(1, 1, 4.0)
 	vle2 := optim.VectorLinearExpr{
 		L: mat1,
@@ -1906,4 +1906,128 @@ func TestVarVectorTranspose_Multiply14(t *testing.T) {
 		)
 	}
 
+}
+
+/*
+TestVarVectorTranspose_Check1
+Description:
+
+	Tests the Check method for a VarVectorTranspose.
+	When there is an incorrectly initialized variable in one of the elements,
+	then this should throw an error.
+*/
+func TestVarVectorTranspose_Check1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("VarVectorTranspose_Check1")
+	N := 4
+
+	// Create VarVector
+	vv0 := optim.VarVectorTranspose{}
+	for ii := 0; ii < N; ii++ {
+		if ii == 2 {
+			vv0.Elements = append(vv0.Elements, optim.Variable{Lower: -1.0, Upper: -2.0})
+		} else {
+			vv0.Elements = append(vv0.Elements, m.AddVariable())
+		}
+	}
+
+	// Check
+	err := vv0.Check()
+	if err == nil {
+		t.Errorf("No error was thrown, but we expected one!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			"element 2 has an issue:",
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestVarVectorTranspose_Check2
+Description:
+
+	Tests the Check method for a VarVectorTranspose.
+	For a properly initialized VarVectorTranspose, this should not throw an error.
+*/
+func TestVarVectorTranspose_Check2(t *testing.T) {
+	// Constants
+	m := optim.NewModel("VarVectorTranspose_Check2")
+	N := 4
+
+	// Create VarVector
+	vvt0 := m.AddVariableVector(N).Transpose().(optim.VarVectorTranspose)
+
+	// Check
+	err := vvt0.Check()
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+}
+
+/*
+TestVarVectorTranspose_ToSymbolic1
+Description:
+
+	Tests the ToSymbolic method for a VarVectorTranspose
+	that is not well-defined. This should throw an error.
+*/
+func TestVarVectorTranspose_ToSymbolic1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("VarVectorTranspose_ToSymbolic1")
+	N := 4
+
+	// Create VarVector
+	vv0 := optim.VarVectorTranspose{}
+	for ii := 0; ii < N; ii++ {
+		if ii == 2 {
+			vv0.Elements = append(vv0.Elements, optim.Variable{Lower: -1.0, Upper: -2.0})
+		} else {
+			vv0.Elements = append(vv0.Elements, m.AddVariable())
+		}
+	}
+
+	// Check
+	_, err := vv0.ToSymbolic()
+	if err == nil {
+		t.Errorf("No error was thrown, but we expected one!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			"element 2 has an issue:",
+		) {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestVarVectorTranspose_ToSymbolic2
+Description:
+
+	Tests the ToSymbolic method for a VarVectorTranspose
+	that is well-defined. The result should not produce
+	an error and should be of the type symbolic.VariableMatrix.
+*/
+func TestVarVectorTranspose_ToSymbolic2(t *testing.T) {
+	// Constants
+	m := optim.NewModel("VarVectorTranspose_ToSymbolic2")
+	N := 4
+
+	// Create VarVector
+	vvt0 := m.AddVariableVector(N).Transpose().(optim.VarVectorTranspose)
+
+	// Check
+	sym1, err := vvt0.ToSymbolic()
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	_, tf := sym1.(symbolic.VariableMatrix)
+	if !tf {
+		t.Errorf("Expected type symbolic.VariableMatrix; received type %T", sym1)
+	}
 }

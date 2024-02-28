@@ -2,6 +2,7 @@ package optim
 
 import (
 	"fmt"
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -293,9 +294,6 @@ Description:
 	input rhs as the right hand side if it is valid.
 */
 func (vv VarVector) Eq(rightIn interface{}, errors ...error) (Constraint, error) {
-	// Constants
-
-	// Algorithm
 	return vv.Comparison(rightIn, SenseEqual, errors...)
 
 }
@@ -372,7 +370,11 @@ func (vv VarVector) Comparison(rhs interface{}, sense ConstrSense, errors ...err
 			)
 
 	default:
-		return VectorConstraint{}, fmt.Errorf("The Eq() method for VarVector is not implemented yet for type %T!", rhs)
+		return VectorConstraint{}, fmt.Errorf(
+			"The VarVector.Comparison (%v) method is not implemented yet for type %T!",
+			sense,
+			rhs,
+		)
 	}
 }
 
@@ -431,4 +433,33 @@ func (vv VarVector) Check() error {
 
 	// If nothing was thrown, then return nil!
 	return nil
+}
+
+/*
+ToSymbolic
+Description:
+
+	Converts the variable vector to a symbolic expression.
+	(i.e., one that uses the symbolic math toolbox).
+*/
+func (vv VarVector) ToSymbolic() (symbolic.Expression, error) {
+	// Input Checking
+	err := vv.Check()
+	if err != nil {
+		return nil, err
+	}
+
+	// Algorithm
+	// Create the symbolic vector
+	symVVec := symbolic.VariableVector{}
+
+	// Add each variable to the vector
+	for _, elt := range vv.Elements {
+		eltAsSymExpr, _ := elt.ToSymbolic()                // No errors should occur because elts were checked above
+		eltAsSymVar, _ := eltAsSymExpr.(symbolic.Variable) // No errors should occur because elt must be a variable
+		symVVec = append(symVVec, eltAsSymVar)
+	}
+
+	// Return the symbolic vector
+	return symVVec, nil
 }

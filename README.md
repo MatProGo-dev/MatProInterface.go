@@ -140,8 +140,8 @@ code. Hopefully, this is avoided using this format.
 * [ ] Decide whether or not we really need the Coeffs() method (What is it doing?)
 * [ ] Write changes to all AtVec() methods to output both elements AND errors (so we can detect out of length calls)
 * [ ] Determine whether or not to keep the Solution and Solver() interfaces in this module. It seems like they can be solver-specific.
-* [ ] Introduce MatrixVar object
 * [ ] Add Check() to:
   * [ ] Expression
   * [ ] ScalarExpression
   * [ ] VectorExpression interfaces
+* [ ] Add ToSymbolic() Method for ALL expressions

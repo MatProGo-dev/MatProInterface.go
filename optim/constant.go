@@ -2,6 +2,7 @@ package optim
 
 import (
 	"fmt"
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -245,4 +246,15 @@ func (c K) Check() error {
 
 func (c K) Transpose() Expression {
 	return c
+}
+
+/*
+ToSymbolic
+Description:
+
+	Converts the constant to a symbolic expression (i.e., one that uses the
+	symbolic math toolbox).
+*/
+func (c K) ToSymbolic() (symbolic.Expression, error) {
+	return symbolic.K(c), nil
 }

@@ -2,6 +2,7 @@ package optim
 
 import (
 	"fmt"
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -466,4 +467,59 @@ Description:
 */
 func (vvt VarVectorTranspose) Dims() []int {
 	return []int{1, vvt.Len()}
+}
+
+/*
+Check
+Description:
+
+	Checks whether or not the VarVector has a sensible initialization.
+*/
+func (vvt VarVectorTranspose) Check() error {
+	// Check that each variable is properly defined
+	for ii, element := range vvt.Elements {
+		err := element.Check()
+		if err != nil {
+			return fmt.Errorf(
+				"element %v has an issue: %v",
+				ii, err,
+			)
+		}
+	}
+
+	// If nothing was thrown, then return nil!
+	return nil
+}
+
+/*
+ToSymbolic
+Description:
+
+	This method converts the VarVectorTranspose to a symbolic expression
+	(i.e., an expression made using SymbolicMath.go).
+*/
+func (vvt VarVectorTranspose) ToSymbolic() (symbolic.Expression, error) {
+	// Input Processing
+	err := vvt.Check()
+	if err != nil {
+		return nil, err
+	}
+
+	// Constants
+	vm := symbolic.VariableMatrix{}
+
+	// Algorithm
+	vm = append(vm, make([]symbolic.Variable, vvt.Len()))
+	for ii, v := range vvt.Elements {
+		// Convert to symbolic
+		tempV, err := v.ToSymbolic()
+		if err != nil {
+			return nil, err
+		}
+		vm[0][ii] = tempV.(symbolic.Variable)
+	}
+
+	// Return
+	return vm, nil
+
 }

@@ -8,6 +8,7 @@ Description:
 
 import (
 	"fmt"
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -565,4 +566,30 @@ Description:
 */
 func (vle VectorLinearExpr) Dims() []int {
 	return []int{vle.Len(), 1}
+}
+
+/*
+ToSymbolic
+Description:
+
+	This method returns the symbolic version of the KVectorTranspose expression.
+*/
+func (vle VectorLinearExpr) ToSymbolic() (symbolic.Expression, error) {
+	// Input Processing
+	err := vle.Check()
+	if err != nil {
+		return nil, err
+	}
+
+	// Constants
+	L := symbolic.DenseToKMatrix(vle.L)
+	C := symbolic.VecDenseToKVector(vle.C)
+	X, err := vle.X.ToSymbolic()
+	if err != nil {
+		return nil, err
+	}
+
+	// Create the symbolic expression
+	return L.Multiply(X).Plus(C), nil
+
 }

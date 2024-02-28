@@ -60,6 +60,17 @@ func (vc VectorConstraint) Check() error {
 		)
 	}
 
+	// Check that the left and right hand sides are well-defined
+	err := vc.LeftHandSide.Check()
+	if err != nil {
+		return fmt.Errorf("left hand side of the constraint is not valid: %v", err)
+	}
+
+	err = vc.RightHandSide.Check()
+	if err != nil {
+		return fmt.Errorf("right hand side of the constraint is not valid: %v", err)
+	}
+
 	// All Checks Passed!
 	return nil
 }
@@ -70,4 +81,14 @@ func (vc VectorConstraint) Left() Expression {
 
 func (vc VectorConstraint) Right() Expression {
 	return vc.RightHandSide
+}
+
+/*
+ConstrSense
+Description:
+
+	Returns the sense of the constraint.
+*/
+func (vc VectorConstraint) ConstrSense() ConstrSense {
+	return vc.Sense
 }

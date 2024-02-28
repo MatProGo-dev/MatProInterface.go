@@ -9,7 +9,6 @@ Description:
 import (
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"testing"
-	"time"
 )
 
 /*
@@ -23,39 +22,9 @@ func TestModel_NewModel1(t *testing.T) {
 	m := optim.NewModel("test")
 
 	// Algorithm
-	if m.ShowLog {
-		t.Errorf("ShowLog should be initialized as false.")
-	}
-
 	if m.Name != "test" {
 		t.Errorf("Expected model's name to be %v; received %v", "test", m.Name)
 	}
-}
-
-/*
-TestModel_SetTimeLimit1
-Description:
-
-	Tests the ability of this function to set the time limit for the model solution.
-*/
-func TestModel_SetTimeLimit1(t *testing.T) {
-	// Constants
-	t1 := time.Now()
-	dur1 := time.Since(t1)
-
-	m := optim.NewModel("test-settimelimit1")
-
-	// Algorithm
-	m.SetTimeLimit(dur1)
-
-	if m.TimeLimit != dur1 {
-		t.Errorf(
-			"Expected time limit to be %v; received %v",
-			m.TimeLimit,
-			dur1,
-		)
-	}
-
 }
 
 /*
