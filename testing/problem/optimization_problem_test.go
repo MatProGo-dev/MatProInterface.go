@@ -445,7 +445,11 @@ func TestOptimizationProblem_From3(t *testing.T) {
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
-	model.SetObjective(obj, optim.SenseMaximize)
+
+	err = model.SetObjective(obj, optim.SenseMaximize)
+	if err != nil {
+		t.Errorf("error while setting objective! %v", err)
+	}
 
 	// Add a constraint
 	constr1, err := tempVar.LessEq(1.0)

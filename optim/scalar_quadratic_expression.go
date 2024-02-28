@@ -504,7 +504,10 @@ func (qe ScalarQuadraticExpression) ToSymbolic() (symbolic.Expression, error) {
 
 	// Perform Multplications in Symbolic
 	quadraticTerm := symX.Transpose().Multiply(symQ).Multiply(symX)
+	fmt.Println(quadraticTerm)
+	fmt.Println(symX.Transpose().Multiply(symQ))
 	linearTerm := symL.Transpose().Multiply(symX)
+	fmt.Println(linearTerm)
 
 	// Sum all terms together and return it
 	return quadraticTerm.Plus(linearTerm).Plus(symC), nil

@@ -433,6 +433,7 @@ func (v Variable) ToSymbolic() (symbolic.Expression, error) {
 		Lower: v.Lower,
 		Upper: v.Upper,
 		Type:  symbolic.VarType(v.Vtype),
+		Name:  fmt.Sprintf("x_{%v}", v.ID),
 	}
 
 	// Algorithm
