@@ -3,6 +3,7 @@ package optim_test
 import (
 	"fmt"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
 	"strings"
 	"testing"
@@ -1477,4 +1478,66 @@ func TestVarVector_Multiply8(t *testing.T) {
 		}
 	}
 
+}
+
+/*
+TestVarVector_ToSymbolic1
+Description:
+
+	Tests that the ToSymbolic() produces an error when the VarVector has one
+	variable that is not well-defined.
+*/
+func TestVarVector_ToSymbolic1(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestVarVector_ToSymbolic1")
+	v1 := m.AddVariable()
+
+	vv2 := optim.VarVector{}
+	for i := 0; i < 10; i++ {
+		if i == 5 {
+			vv2.Elements = append(vv2.Elements, optim.Variable{Lower: -1, Upper: -2})
+		} else {
+			vv2.Elements = append(vv2.Elements, v1)
+		}
+	}
+
+	// Run ToSymbolic
+	_, err := vv2.ToSymbolic()
+	if err == nil {
+		t.Errorf("expected error, but received none!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			fmt.Sprintf("element %v has an issue: %v", 5, "lower bound (-1) of variable is above upper bound (-2)."),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+
+}
+
+/*
+TestVarVector_ToSymbolic2
+Description:
+
+	Tests that the ToSymbolic() does not produce an error when the VarVector
+	is well-defined. In addition, the output should be of type symbolic.VariableVector
+*/
+func TestVarVector_ToSymbolic2(t *testing.T) {
+	// Constants
+	m := optim.NewModel("TestVarVector_ToSymbolic2")
+	N := 10
+
+	vv2 := m.AddVariableVector(N)
+
+	// Run ToSymbolic
+	symVv2, err := vv2.ToSymbolic()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	_, tf := symVv2.(symbolic.VariableVector)
+	if !tf {
+		t.Errorf("expected output to be of type symbolic.VariableVector; received %T instead", symVv2)
+	}
 }

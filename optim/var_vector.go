@@ -454,20 +454,8 @@ func (vv VarVector) ToSymbolic() (symbolic.Expression, error) {
 
 	// Add each variable to the vector
 	for _, elt := range vv.Elements {
-		eltAsSymExpr, err := elt.ToSymbolic()
-		if err != nil {
-			return nil, fmt.Errorf(
-				"could not convert variable %v to symbolic variable",
-				elt,
-			)
-		}
-		eltAsSymVar, ok := eltAsSymExpr.(symbolic.Variable)
-		if !ok {
-			return nil, fmt.Errorf(
-				"could not convert variable %v to symbolic variable",
-				elt,
-			)
-		}
+		eltAsSymExpr, _ := elt.ToSymbolic()                // No errors should occur because elts were checked above
+		eltAsSymVar, _ := eltAsSymExpr.(symbolic.Variable) // No errors should occur because elt must be a variable
 		symVVec = append(symVVec, eltAsSymVar)
 	}
 
