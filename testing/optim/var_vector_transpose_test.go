@@ -530,7 +530,7 @@ func TestVarVectorTranspose_Comparison5(t *testing.T) {
 		err.Error(),
 		fmt.Sprintf(
 			"The two inputs to comparison '%v' must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
-			optim.SenseGreaterThanEqual,
+			optim.ConstrSense(optim.SenseGreaterThanEqual),
 			vec1.Len(),
 			vec2.Len(),
 		),
@@ -1137,7 +1137,7 @@ func TestVarVectorTranspose_LessEq1(t *testing.T) {
 		err.Error(),
 		fmt.Sprintf(
 			"The two inputs to comparison '%v' must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
-			optim.SenseLessThanEqual,
+			optim.ConstrSense(optim.SenseLessThanEqual),
 			vec1.Len(),
 			kv2.Len(),
 		),

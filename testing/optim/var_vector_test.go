@@ -336,7 +336,11 @@ func TestVarVector_Eq2(t *testing.T) {
 
 	// Verify that constraint can be created with no issues.
 	_, err := vv1.Eq(badRHS)
-	expectedError := fmt.Sprintf("The Eq() method for VarVector is not implemented yet for type %T!", badRHS)
+	expectedError := fmt.Sprintf(
+		"The VarVector.Comparison (%v) method is not implemented yet for type %T!",
+		optim.SenseEqual,
+		badRHS,
+	)
 	if !strings.Contains(err.Error(), expectedError) {
 		t.Errorf("Expected error \"%v\"; received \"%v\"", expectedError, err)
 	}
@@ -1066,16 +1070,22 @@ func TestVarVector_GreaterEq1(t *testing.T) {
 
 	// Compare
 	_, err := vec1.GreaterEq(kv1)
-	if !strings.Contains(
-		err.Error(),
-		fmt.Sprintf(
-			"The two inputs to comparison '%v' must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
-			optim.SenseGreaterThanEqual,
-			vec1.Len(),
-			kv1.Len(),
-		),
-	) {
-		t.Errorf("Unexpected error when comparing two vectors: %v", err)
+	expectedError := fmt.Sprintf(
+		"The two inputs to comparison '%v' must have the same dimension, but #1 has dimension %v and #2 has dimension %v!",
+		optim.ConstrSense(optim.SenseGreaterThanEqual),
+		vec1.Len(),
+		kv1.Len(),
+	)
+	if err == nil {
+		t.Errorf("No error was thrown, but we expected one!")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			expectedError,
+		) {
+			t.Errorf("Unexpected error when comparing two vectors: %v \n expected %v", err, expectedError)
+		}
+
 	}
 
 }
