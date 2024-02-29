@@ -268,3 +268,36 @@ func From(inputModel optim.Model) (*OptimizationProblem, error) {
 	return newOptimProblem, nil
 
 }
+
+/*
+Check
+Description:
+
+	Checks that the OptimizationProblem is valid.
+*/
+func (op *OptimizationProblem) Check() error {
+	// Check Objective
+	err := op.Objective.Check()
+	if err != nil {
+		return fmt.Errorf("the objective is not valid: %v", err)
+	}
+
+	// Check Variables
+	for _, variable := range op.Variables {
+		err = variable.Check()
+		if err != nil {
+			return fmt.Errorf("the variable is not valid: %v", err)
+		}
+	}
+
+	// Check Constraints
+	for _, constraint := range op.Constraints {
+		err = constraint.Check()
+		if err != nil {
+			return fmt.Errorf("the constraint is not valid: %v", err)
+		}
+	}
+
+	// All Checks Passed!
+	return nil
+}

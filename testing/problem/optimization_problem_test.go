@@ -945,3 +945,77 @@ func TestOptimizationProblem_From10(t *testing.T) {
 		}
 	}
 }
+
+/*
+TestOptimizationProblem_Check1
+Description:
+
+	Tests the Check function with a simple problem
+	that has one variable, one constraint and an objective
+	that is not well-defined.
+*/
+func TestOptimizationProblem_Check1(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_Check1")
+	v1 := p1.AddVariable()
+	c1 := v1.LessEq(1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create bad objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.Variable{}, problem.SenseMaximize,
+	)
+
+	// Algorithm
+	err := p1.Check()
+	if err == nil {
+		t.Errorf("expected an error; received nil")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			p1.Objective.Check().Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestOptimizationProblem_Check2
+Description:
+
+	Tests the Check function with a simple problem
+	that has one variable, one well-defined objective
+	and a set of constraints containing one bad constraint.
+*/
+func TestOptimizationProblem_Check2(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_Check2")
+	v1 := p1.AddVariable()
+	c1 := symbolic.ScalarConstraint{
+		LeftHandSide:  v1,
+		RightHandSide: symbolic.Variable{},
+		Sense:         symbolic.SenseLessThanEqual,
+	}
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		v1, problem.SenseMaximize,
+	)
+
+	// Algorithm
+	err := p1.Check()
+	if err == nil {
+		t.Errorf("expected an error; received nil")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			c1.Check().Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
