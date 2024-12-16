@@ -3,6 +3,7 @@ package problem
 import (
 	"fmt"
 
+	"github.com/MatProGo-dev/MatProInterface.go/mpiErrors"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 )
@@ -278,6 +279,10 @@ Description:
 */
 func (op *OptimizationProblem) Check() error {
 	// Check Objective
+	if op.Objective == (Objective{}) {
+		return mpiErrors.NoObjectiveDefinedError{}
+	}
+
 	err := op.Objective.Check()
 	if err != nil {
 		return fmt.Errorf("the objective is not valid: %v", err)
@@ -313,6 +318,13 @@ Description:
 	2. All constraints are linear (i.e., an affine combination of variables in an inequality or equality).
 */
 func (op *OptimizationProblem) IsLinear() bool {
+	// Input Processing
+	// Verify that the problem is well-formed
+	err := op.Check()
+	if err != nil {
+		panic(fmt.Errorf("the optimization problem is not well-formed: %v", err))
+	}
+
 	// Check Objective
 	if !op.Objective.IsLinear() {
 		return false

@@ -12,6 +12,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/MatProGo-dev/MatProInterface.go/mpiErrors"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"github.com/MatProGo-dev/MatProInterface.go/problem"
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
@@ -1022,6 +1023,74 @@ func TestOptimizationProblem_Check2(t *testing.T) {
 }
 
 /*
+TestOptimizationProblem_Check3
+Description:
+
+	Tests the Check function with a simple problem
+	that has one variable and no objective defined.
+	The mpiErrors.NoObjectiveDefinedError should be created.
+*/
+func TestOptimizationProblem_Check3(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_Check3")
+	v1 := p1.AddVariable()
+
+	// Add variable to problem
+	p1.Variables = append(p1.Variables, v1)
+
+	// Algorithm
+	err := p1.Check()
+	if err == nil {
+		t.Errorf("expected an error; received nil")
+	} else {
+		expectedError := mpiErrors.NoObjectiveDefinedError{}
+		if err.Error() != expectedError.Error() {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestOptimizationProblem_Check4
+Description:
+
+	Tests the Check function with a simple problem
+	that has:
+	- objective defined
+	- two variables (one is NOT well-defined)
+	- and no constraints defined.
+	The result should throw an error relating to the bad variable.
+*/
+func TestOptimizationProblem_Check4(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_Check4")
+	v1 := p1.AddVariable()
+	v2 := symbolic.Variable{}
+
+	// Add variables to problem
+	// p1.Variables = append(p1.Variables, v1) // Already added
+	p1.Variables = append(p1.Variables, v2)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		v1, problem.SenseMaximize,
+	)
+
+	// Algorithm
+	err := p1.Check()
+	if err == nil {
+		t.Errorf("expected an error; received nil")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			v2.Check().Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
 TestOptimizationProblem_IsLinear1
 Description:
 
@@ -1103,6 +1172,38 @@ func TestOptimizationProblem_IsLinear3(t *testing.T) {
 	// Create good objective
 	p1.Objective = *problem.NewObjective(
 		vv1.Transpose().Multiply(vv1),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	isLinear := p1.IsLinear()
+	if isLinear {
+		t.Errorf("expected the problem to be non-linear; received linear")
+	}
+}
+
+/*
+TestOptimizationProblem_IsLinear4
+Description:
+
+	Tests the IsLinear function with a simple problem
+	that has a constant objective and a single, quadratic constraint.
+	The problem should be non-linear.
+*/
+func TestOptimizationProblem_IsLinear4(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_IsLinear4")
+	vv1 := p1.AddVariableVector(3)
+
+	// Add constraints
+	p1.Constraints = append(
+		p1.Constraints,
+		vv1.Transpose().Multiply(vv1).Plus(vv1).LessEq(1.0),
+	)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
 		problem.SenseMaximize,
 	)
 
