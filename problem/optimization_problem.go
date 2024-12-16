@@ -2,6 +2,8 @@ package problem
 
 import (
 	"fmt"
+
+	"github.com/MatProGo-dev/MatProInterface.go/mpiErrors"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 )
@@ -267,4 +269,74 @@ func From(inputModel optim.Model) (*OptimizationProblem, error) {
 	// Done
 	return newOptimProblem, nil
 
+}
+
+/*
+Check
+Description:
+
+	Checks that the OptimizationProblem is valid.
+*/
+func (op *OptimizationProblem) Check() error {
+	// Check Objective
+	if op.Objective == (Objective{}) {
+		return mpiErrors.NoObjectiveDefinedError{}
+	}
+
+	err := op.Objective.Check()
+	if err != nil {
+		return fmt.Errorf("the objective is not valid: %v", err)
+	}
+
+	// Check Variables
+	for _, variable := range op.Variables {
+		err = variable.Check()
+		if err != nil {
+			return fmt.Errorf("the variable is not valid: %v", err)
+		}
+	}
+
+	// Check Constraints
+	for _, constraint := range op.Constraints {
+		err = constraint.Check()
+		if err != nil {
+			return fmt.Errorf("the constraint is not valid: %v", err)
+		}
+	}
+
+	// All Checks Passed!
+	return nil
+}
+
+/*
+IsLinear
+Description:
+
+	Checks if the optimization problem is linear.
+	Per the definition of a linear optimization problem, the problem is linear if and only if:
+	1. The objective function is linear (i.e., a constant or an affine combination of variables).
+	2. All constraints are linear (i.e., an affine combination of variables in an inequality or equality).
+*/
+func (op *OptimizationProblem) IsLinear() bool {
+	// Input Processing
+	// Verify that the problem is well-formed
+	err := op.Check()
+	if err != nil {
+		panic(fmt.Errorf("the optimization problem is not well-formed: %v", err))
+	}
+
+	// Check Objective
+	if !op.Objective.IsLinear() {
+		return false
+	}
+
+	// Check Constraints
+	for _, constraint := range op.Constraints {
+		if !constraint.IsLinear() {
+			return false
+		}
+	}
+
+	// All Checks Passed!
+	return true
 }
