@@ -9,12 +9,13 @@ Description:
 
 import (
 	"fmt"
+	"strings"
+	"testing"
+
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"github.com/MatProGo-dev/MatProInterface.go/problem"
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
-	"strings"
-	"testing"
 )
 
 /*
@@ -1017,5 +1018,97 @@ func TestOptimizationProblem_Check2(t *testing.T) {
 		) {
 			t.Errorf("unexpected error: %v", err)
 		}
+	}
+}
+
+/*
+TestOptimizationProblem_IsLinear1
+Description:
+
+	Tests the IsLinear function with a simple problem
+	that has a constant objective and a single, linear constraint.
+*/
+func TestOptimizationProblem_IsLinear1(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_IsLinear1")
+	v1 := p1.AddVariable()
+	c1 := v1.LessEq(1.0)
+	k1 := symbolic.K(1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		k1, problem.SenseFind,
+	)
+
+	// Algorithm
+	isLinear := p1.IsLinear()
+	if !isLinear {
+		t.Errorf("expected the problem to be linear; received non-linear")
+	}
+}
+
+/*
+TestOptimizationProblem_IsLinear2
+Description:
+
+	Tests the IsLinear function with a simple problem
+	that has a linear objective containing 3 variables and two lienar constraints,
+	each containing one variable.
+*/
+func TestOptimizationProblem_IsLinear2(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_IsLinear2")
+	vv1 := p1.AddVariableVector(3)
+	c1 := vv1.AtVec(0).LessEq(1.0)
+	c2 := vv1.AtVec(1).LessEq(1.0)
+
+	// Add constraints
+	p1.Constraints = append(p1.Constraints, c1)
+	p1.Constraints = append(p1.Constraints, c2)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		vv1.Transpose().Multiply(symbolic.OnesVector(3)),
+		problem.SenseMinimize,
+	)
+
+	// Algorithm
+	isLinear := p1.IsLinear()
+	if !isLinear {
+		t.Errorf("expected the problem to be linear; received non-linear")
+	}
+}
+
+/*
+TestOptimizationProblem_IsLinear3
+Description:
+
+	Tests the IsLinear function with a simple problem
+	that has a quadratic objective containing 3 variables and two lienar constraints,
+	each containing one variable.
+*/
+func TestOptimizationProblem_IsLinear3(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_IsLinear3")
+	vv1 := p1.AddVariableVector(3)
+	c1 := vv1.AtVec(0).LessEq(1.0)
+	c2 := vv1.AtVec(1).LessEq(1.0)
+
+	// Add constraints
+	p1.Constraints = append(p1.Constraints, c1)
+	p1.Constraints = append(p1.Constraints, c2)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		vv1.Transpose().Multiply(vv1),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	isLinear := p1.IsLinear()
+	if isLinear {
+		t.Errorf("expected the problem to be non-linear; received linear")
 	}
 }

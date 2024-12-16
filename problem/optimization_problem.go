@@ -2,6 +2,7 @@ package problem
 
 import (
 	"fmt"
+
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 )
@@ -300,4 +301,30 @@ func (op *OptimizationProblem) Check() error {
 
 	// All Checks Passed!
 	return nil
+}
+
+/*
+IsLinear
+Description:
+
+	Checks if the optimization problem is linear.
+	Per the definition of a linear optimization problem, the problem is linear if and only if:
+	1. The objective function is linear (i.e., a constant or an affine combination of variables).
+	2. All constraints are linear (i.e., an affine combination of variables in an inequality or equality).
+*/
+func (op *OptimizationProblem) IsLinear() bool {
+	// Check Objective
+	if !op.Objective.IsLinear() {
+		return false
+	}
+
+	// Check Constraints
+	for _, constraint := range op.Constraints {
+		if !constraint.IsLinear() {
+			return false
+		}
+	}
+
+	// All Checks Passed!
+	return true
 }

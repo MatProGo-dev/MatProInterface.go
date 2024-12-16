@@ -14,3 +14,13 @@ type Objective struct {
 func NewObjective(e symbolic.Expression, sense ObjSense) *Objective {
 	return &Objective{e, sense}
 }
+
+/*
+IsLinear
+Description:
+
+	This method returns true if the objective is linear, false otherwise.
+*/
+func (o *Objective) IsLinear() bool {
+	return symbolic.IsLinear(o.Expression)
+}
