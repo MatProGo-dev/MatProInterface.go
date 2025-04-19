@@ -26,59 +26,40 @@ by your model.
 ## Modeling the Mathematical Program Above
 For example, to model the program above one would write the following code:
 ```
+
+import (
+	...
+    "github.com/MatProGo-dev/MatProInterface.go/problem"
+	getKVector "github.com/MatProGo-dev/SymbolicMath.go/get/KVector"
+    ...
+)
+
 // Constants
-modelName := "mpg-qp1"
-m := optim.NewModel(modelName)
-x := m.AddVariableVector(2)
+problemName := "mpg-qp1"
+p1 := problem.NewProblem(problemName)
+x := p1.AddVariableVector(2)
 
 // Create Vector Constants
-c1 := optim.KVector(
-    *mat.NewVecDense(2, []float64{0.0, 1.0}),
-)
-
-c2 := optim.KVector(
-    *mat.NewVecDense(2, []float64{2.0, 3.0}),
-)
+c1 := getKVector.From([]float64{0.0, 1.0})
+c2 := getKVector.From([]float64{2.0, 3.0})
 
 // Use these to create constraints.
+vc1 := x.LessEq(c2)
+vc2 := x.GreaterEq(c1)
 
-vc1, err := x.LessEq(c2)
-if err != nil {
-    t.Errorf("There was an issue creating the proper vector constraint: %v", err)
-}
-
-vc2, err := x.GreaterEq(c1)
-if err != nil {
-    t.Errorf("There was an issue creating the proper vector constraint: %v", err)
-}
+p1.Constraints = append(p1.Constraints, vc1)
+p1.Constraints = append(p1.Constraints, vc2)
 
 // Create objective
-Q1 := optim.Identity(x.Len())
+Q1 := symbolic.Identity(x.Len())
 Q1.Set(0, 1, 0.25)
 Q1.Set(1, 0, 0.25)
 Q1.Set(1, 1, 0.25)
 
-obj := optim.ScalarQuadraticExpression{
-    Q: Q1,
-    X: x,
-    L: *mat.NewVecDense(x.Len(), []float64{0, -0.97}),
-    C: 2.0,
-}
-
-// Add Constraints
-constraints := []optim.Constraint{vc1, vc2}
-for _, constr := range constraints {
-    err = m.AddConstraint(constr)
-    if err != nil {
-        t.Errorf("There was an issue adding the vector constraint to the model: %v", err)
-    }
-}
-
-// Add objective
-err = m.SetObjective(optim.Objective{obj, optim.SenseMinimize})
-if err != nil {
-    t.Errorf("There was an issue setting the objective of the Gurobi solver model: %v", err)
-}
+p1.Objective = *problem.NewObjective(
+    x.Transpose().Multiply(Q).Multiply(x),
+    problem.SenseMinimize,
+)
 
 // Solve using the solver of your choice!
 ```

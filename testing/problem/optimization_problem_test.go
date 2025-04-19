@@ -1213,3 +1213,595 @@ func TestOptimizationProblem_IsLinear4(t *testing.T) {
 		t.Errorf("expected the problem to be non-linear; received linear")
 	}
 }
+
+/*
+TestOptimizationProblem_LinearInequalityConstraintMatrices1
+Description:
+
+	Tests the LinearInequalityConstraintMatrices function with a simple problem.
+	The problem will have:
+	- a constant objective
+	- 2 variables,
+	- and a single linear inequality constraint.
+	The result should be a matrix with 1 row and 2 columns.
+*/
+func TestOptimizationProblem_LinearInequalityConstraintMatrices1(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_LinearInequalityConstraintMatrices1")
+	v1 := p1.AddVariable()
+	p1.AddVariable()
+	c1 := v1.LessEq(1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	A, b := p1.LinearInequalityConstraintMatrices()
+
+	// Check that the number of rows is as expected.
+	if A.Dims()[0] != 1 {
+		t.Errorf("expected the number of rows to be %v; received %v",
+			1, A.Dims()[0])
+	}
+
+	// Check that the number of columns is as expected.
+	if A.Dims()[1] != 2 {
+		t.Errorf("expected the number of columns to be %v; received %v",
+			2, A.Dims()[1])
+	}
+
+	// Check that the number of elements in b is as expected.
+	if len(b) != 1 {
+		t.Errorf("expected the number of elements in b to be %v; received %v",
+			1, len(b))
+	}
+}
+
+/*
+TestOptimizationProblem_LinearInequalityConstraintMatrices2
+Description:
+
+	Tests the LinearInequalityConstraintMatrices function with a simple problem.
+	The problem will have:
+	- a constant objective
+	- 2 variables,
+	- and two scalar linear inequality constraints.
+	The result should be a matrix with 2 rows and 2 columns.
+*/
+func TestOptimizationProblem_LinearInequalityConstraintMatrices2(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_LinearInequalityConstraintMatrices2")
+	vv1 := p1.AddVariableVector(2)
+	c1 := vv1.AtVec(0).LessEq(1.0)
+	c2 := vv1.AtVec(1).LessEq(2.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+	p1.Constraints = append(p1.Constraints, c2)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	A, b := p1.LinearInequalityConstraintMatrices()
+
+	// Check that the number of rows is as expected.
+	if A.Dims()[0] != 2 {
+		t.Errorf("expected the number of rows to be %v; received %v",
+			2, A.Dims()[0])
+	}
+
+	// Check that the number of columns is as expected.
+	if A.Dims()[1] != 2 {
+		t.Errorf("expected the number of columns to be %v; received %v",
+			2, A.Dims()[1])
+	}
+
+	// Check that the number of elements in b is as expected.
+	if len(b) != 2 {
+		t.Errorf("expected the number of elements in b to be %v; received %v",
+			2, len(b))
+	}
+}
+
+/*
+TestOptimizationProblem_LinearInequalityConstraintMatrices3
+Description:
+
+	Tests the LinearInequalityConstraintMatrices function with a simple problem.
+	The problem will have:
+	- a constant objective
+	- 3 variables,
+	- and a single vector linear inequality constraint.
+	The result should be a matrix with 3 rows and 3 columns.
+*/
+func TestOptimizationProblem_LinearInequalityConstraintMatrices3(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_LinearInequalityConstraintMatrices3")
+	vv1 := p1.AddVariableVector(3)
+	c1 := vv1.LessEq(symbolic.OnesVector(3))
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	A, b := p1.LinearInequalityConstraintMatrices()
+
+	// Check that the number of rows is as expected.
+	if A.Dims()[0] != 3 {
+		t.Errorf("expected the number of rows to be %v; received %v",
+			3, A.Dims()[0])
+	}
+
+	// Check that the number of columns is as expected.
+	if A.Dims()[1] != 3 {
+		t.Errorf("expected the number of columns to be %v; received %v",
+			3, A.Dims()[1])
+	}
+
+	// Check that the number of elements in b is as expected.
+	if len(b) != 3 {
+		t.Errorf("expected the number of elements in b to be %v; received %v",
+			3, len(b))
+	}
+}
+
+/*
+TestOptimizationProblem_LinearInequalityConstraintMatrices4
+Description:
+
+	Tests the LinearInequalityConstraintMatrices function with a simple problem.
+	The problem will have:
+	- a constant objective
+	- 3 variables,
+	- and two vector linear inequality constraints.
+	The result should be a matrix with 6 rows and 3 columns.
+*/
+func TestOptimizationProblem_LinearInequalityConstraintMatrices4(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_LinearInequalityConstraintMatrices4")
+	vv1 := p1.AddVariableVector(3)
+	c1 := vv1.AtVec(0).Plus(symbolic.OnesVector(3)).LessEq(symbolic.OnesVector(3))
+	c2 := vv1.AtVec(1).Plus(symbolic.OnesVector(3)).GreaterEq(symbolic.OnesVector(3))
+
+	p1.Constraints = append(p1.Constraints, c1)
+	p1.Constraints = append(p1.Constraints, c2)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	A, b := p1.LinearInequalityConstraintMatrices()
+
+	// Check that the number of rows is as expected.
+	if A.Dims()[0] != 6 {
+		t.Errorf("expected the number of rows to be %v; received %v",
+			6, A.Dims()[0])
+	}
+
+	// Check that the number of columns is as expected.
+	if A.Dims()[1] != 3 {
+		t.Errorf("expected the number of columns to be %v; received %v",
+			3, A.Dims()[1])
+	}
+
+	// Check that the number of elements in b is as expected.
+	if len(b) != 6 {
+		t.Errorf("expected the number of elements in b to be %v; received %v",
+			6, len(b))
+	}
+}
+
+/*
+TestOptimizationProblem_LinearInequalityConstraintMatrices5
+Description:
+
+	Tests the LinearInequalityConstraintMatrices function with a simple problem
+	that looks like the one in TestOptimizationProblem_LinearInequalityConstraintMatrices1.
+	The problem will have:
+	- a constant objective
+	- 2 variables,
+	- a single linear inequality constraint,
+	- and a single linear equality constraint.
+	The result should be a matrix with 1 row and 2 columns.
+*/
+func TestOptimizationProblem_LinearInequalityConstraintMatrices5(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_LinearInequalityConstraintMatrices5")
+	v1 := p1.AddVariable()
+	p1.AddVariable()
+	c1 := v1.LessEq(1.0)
+	c2 := v1.Eq(2.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+	p1.Constraints = append(p1.Constraints, c2)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	A, b := p1.LinearInequalityConstraintMatrices()
+
+	// Check that the number of rows is as expected.
+	if A.Dims()[0] != 1 {
+		t.Errorf("expected the number of rows to be %v; received %v",
+			1, A.Dims()[0])
+	}
+
+	// Check that the number of columns is as expected.
+	if A.Dims()[1] != 2 {
+		t.Errorf("expected the number of columns to be %v; received %v",
+			2, A.Dims()[1])
+	}
+
+	// Check that the number of elements in b is as expected.
+	if len(b) != 1 {
+		t.Errorf("expected the number of elements in b to be %v; received %v",
+			1, len(b))
+	}
+}
+
+/*
+TestOptimizationProblem_LinearInequalityConstraintMatrices6
+Description:
+
+	Tests the LinearInequalityConstraintMatrices function with a simple problem
+	that contains a mixture of scalar and vector inequality constraints.
+	The problem will have:
+	- a constant objective
+	- 3 variables,
+	- a single vector linear inequality constraint,
+	- and a single scalar linear inequality constraint.
+	The result should be a matrix with 4 rows and 3 columns.
+*/
+func TestOptimizationProblem_LinearInequalityConstraintMatrices6(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_LinearInequalityConstraintMatrices6")
+	vv1 := p1.AddVariableVector(3)
+	c1 := vv1.LessEq(symbolic.OnesVector(3))
+	c2 := vv1.AtVec(0).LessEq(1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+	p1.Constraints = append(p1.Constraints, c2)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	A, b := p1.LinearInequalityConstraintMatrices()
+
+	// Check that the number of rows is as expected.
+	if A.Dims()[0] != 4 {
+		t.Errorf("expected the number of rows to be %v; received %v",
+			4, A.Dims()[0])
+	}
+
+	// Check that the number of columns is as expected.
+	if A.Dims()[1] != 3 {
+		t.Errorf("expected the number of columns to be %v; received %v",
+			3, A.Dims()[1])
+	}
+
+	// Check that the number of elements in b is as expected.
+	if len(b) != 4 {
+		t.Errorf("expected the number of elements in b to be %v; received %v",
+			4, len(b))
+	}
+}
+
+/*
+TestOptimizationProblem_LinearEqualityConstraintMatrices1
+Description:
+
+	Tests the LinearEqualityConstraintMatrices function with a simple problem.
+	The problem will have:
+	- a constant objective
+	- 2 variables,
+	- and a single linear equality constraint.
+	The result should be a matrix with 1 row and 2 columns.
+*/
+func TestOptimizationProblem_LinearEqualityConstraintMatrices1(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_LinearEqualityConstraintMatrices1")
+	v1 := p1.AddVariable()
+	p1.AddVariable()
+	c1 := v1.Eq(1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	A, b := p1.LinearEqualityConstraintMatrices()
+
+	// Check that the number of rows is as expected.
+	if A.Dims()[0] != 1 {
+		t.Errorf("expected the number of rows to be %v; received %v",
+			1, A.Dims()[0])
+	}
+
+	// Check that the number of columns is as expected.
+	if A.Dims()[1] != 2 {
+		t.Errorf("expected the number of columns to be %v; received %v",
+			2, A.Dims()[1])
+	}
+
+	// Check that the number of elements in b is as expected.
+	if len(b) != 1 {
+		t.Errorf("expected the number of elements in b to be %v; received %v",
+			1, len(b))
+	}
+}
+
+/*
+TestOptimizationProblem_LinearEqualityConstraintMatrices2
+Description:
+
+	Tests the LinearEqualityConstraintMatrices function with a simple problem.
+	The problem will have:
+	- a constant objective
+	- 2 variables,
+	- and two scalar linear equality constraints.
+	The result should be a matrix with 2 rows and 2 columns.
+*/
+func TestOptimizationProblem_LinearEqualityConstraintMatrices2(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_LinearEqualityConstraintMatrices2")
+	vv1 := p1.AddVariableVector(2)
+	c1 := vv1.AtVec(0).Eq(1.0)
+	c2 := vv1.AtVec(1).Eq(2.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+	p1.Constraints = append(p1.Constraints, c2)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	A, b := p1.LinearEqualityConstraintMatrices()
+
+	// Check that the number of rows is as expected.
+	if A.Dims()[0] != 2 {
+		t.Errorf("expected the number of rows to be %v; received %v",
+			2, A.Dims()[0])
+	}
+
+	// Check that the number of columns is as expected.
+	if A.Dims()[1] != 2 {
+		t.Errorf("expected the number of columns to be %v; received %v",
+			2, A.Dims()[1])
+	}
+
+	// Check that the number of elements in b is as expected.
+	if len(b) != 2 {
+		t.Errorf("expected the number of elements in b to be %v; received %v",
+			2, len(b))
+	}
+}
+
+/*
+TestOptimizationProblem_LinearEqualityConstraintMatrices3
+Description:
+
+	Tests the LinearEqualityConstraintMatrices function with a simple problem.
+	The problem will have:
+	- a constant objective
+	- 3 variables,
+	- and a single vector linear equality constraint.
+	The result should be a matrix with 3 rows and 3 columns.
+*/
+func TestOptimizationProblem_LinearEqualityConstraintMatrices3(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_LinearEqualityConstraintMatrices3")
+	vv1 := p1.AddVariableVector(3)
+	c1 := vv1.Eq(symbolic.OnesVector(3))
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	A, b := p1.LinearEqualityConstraintMatrices()
+
+	// Check that the number of rows is as expected.
+	if A.Dims()[0] != 3 {
+		t.Errorf("expected the number of rows to be %v; received %v",
+			3, A.Dims()[0])
+	}
+
+	// Check that the number of columns is as expected.
+	if A.Dims()[1] != 3 {
+		t.Errorf("expected the number of columns to be %v; received %v",
+			3, A.Dims()[1])
+	}
+
+	// Check that the number of elements in b is as expected.
+	if len(b) != 3 {
+		t.Errorf("expected the number of elements in b to be %v; received %v",
+			3, len(b))
+	}
+}
+
+/*
+TestOptimizationProblem_LinearEqualityConstraintMatrices4
+Description:
+
+	Tests the LinearEqualityConstraintMatrices function with a simple problem.
+	The problem will have:
+	- a constant objective
+	- 3 variables,
+	- and two vector linear equality constraints.
+	The result should be a matrix with 6 rows and 3 columns.
+*/
+func TestOptimizationProblem_LinearEqualityConstraintMatrices4(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_LinearEqualityConstraintMatrices4")
+	vv1 := p1.AddVariableVector(3)
+	c1 := vv1.AtVec(0).Plus(symbolic.OnesVector(3)).Eq(symbolic.OnesVector(3))
+	c2 := vv1.AtVec(1).Plus(symbolic.OnesVector(3)).Eq(symbolic.OnesVector(3))
+
+	p1.Constraints = append(p1.Constraints, c1)
+	p1.Constraints = append(p1.Constraints, c2)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	A, b := p1.LinearEqualityConstraintMatrices()
+
+	// Check that the number of rows is as expected.
+	if A.Dims()[0] != 6 {
+		t.Errorf("expected the number of rows to be %v; received %v",
+			6, A.Dims()[0])
+	}
+
+	// Check that the number of columns is as expected.
+	if A.Dims()[1] != 3 {
+		t.Errorf("expected the number of columns to be %v; received %v",
+			3, A.Dims()[1])
+	}
+
+	// Check that the number of elements in b is as expected.
+	if len(b) != 6 {
+		t.Errorf("expected the number of elements in b to be %v; received %v",
+			6, len(b))
+	}
+}
+
+/*
+TestOptimizationProblem_LinearEqualityConstraintMatrices5
+Description:
+
+	Tests the LinearEqualityConstraintMatrices function with a simple problem
+	that looks like the one in TestOptimizationProblem_LinearEqualityConstraintMatrices1.
+	The problem will have:
+	- a constant objective
+	- 2 variables,
+	- a single linear equality constraint,
+	- and a single linear inequality constraint.
+	The result should be a matrix with 1 row and 2 columns.
+*/
+func TestOptimizationProblem_LinearEqualityConstraintMatrices5(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_LinearEqualityConstraintMatrices5")
+	v1 := p1.AddVariable()
+	p1.AddVariable()
+	c1 := v1.Eq(1.0)
+	c2 := v1.LessEq(2.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+	p1.Constraints = append(p1.Constraints, c2)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	A, b := p1.LinearEqualityConstraintMatrices()
+
+	// Check that the number of rows is as expected.
+	if A.Dims()[0] != 1 {
+		t.Errorf("expected the number of rows to be %v; received %v",
+			1, A.Dims()[0])
+	}
+
+	// Check that the number of columns is as expected.
+	if A.Dims()[1] != 2 {
+		t.Errorf("expected the number of columns to be %v; received %v",
+			2, A.Dims()[1])
+	}
+
+	// Check that the number of elements in b is as expected.
+	if len(b) != 1 {
+		t.Errorf("expected the number of elements in b to be %v; received %v",
+			1, len(b))
+	}
+}
+
+/*
+TestOptimizationProblem_LinearEqualityConstraintMatrices6
+Description:
+
+	Tests the LinearEqualityConstraintMatrices function with a simple problem
+	that contains a mixture of scalar and vector equality constraints.
+	The problem will have:
+	- a constant objective
+	- 3 variables,
+	- a single vector linear equality constraint,
+	- and a single scalar linear equality constraint.
+	The result should be a matrix with 4 rows and 3 columns.
+*/
+func TestOptimizationProblem_LinearEqualityConstraintMatrices6(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_LinearEqualityConstraintMatrices6")
+	vv1 := p1.AddVariableVector(3)
+	c1 := vv1.Eq(symbolic.OnesVector(3))
+	c2 := vv1.AtVec(0).Eq(1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+	p1.Constraints = append(p1.Constraints, c2)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	A, b := p1.LinearEqualityConstraintMatrices()
+
+	// Check that the number of rows is as expected.
+	if A.Dims()[0] != 4 {
+		t.Errorf("expected the number of rows to be %v; received %v",
+			4, A.Dims()[0])
+	}
+
+	// Check that the number of columns is as expected.
+	if A.Dims()[1] != 3 {
+		t.Errorf("expected the number of columns to be %v; received %v",
+			3, A.Dims()[1])
+	}
+
+	// Check that the number of elements in b is as expected.
+	if len(b) != 4 {
+		t.Errorf("expected the number of elements in b to be %v; received %v",
+			4, len(b))
+	}
+}

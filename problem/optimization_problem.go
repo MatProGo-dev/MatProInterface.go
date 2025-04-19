@@ -5,7 +5,9 @@ import (
 
 	"github.com/MatProGo-dev/MatProInterface.go/mpiErrors"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
+	getKVector "github.com/MatProGo-dev/SymbolicMath.go/get/KVector"
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
+	"gonum.org/v1/gonum/mat"
 )
 
 // OptimizationProblem represents the overall constrained linear optimization model to be
@@ -339,4 +341,197 @@ func (op *OptimizationProblem) IsLinear() bool {
 
 	// All Checks Passed!
 	return true
+}
+
+/*
+LinearInequalityConstraintMatrices
+Description:
+
+	Returns the linear INEQUALITY constraint matrices and vectors.
+	For all linear inequality constraints, we assemble them into the form:
+		Ax <= b
+	Where A is the matrix of coefficients, x is the vector of variables, and b is the vector of constants.
+	We return A and b.
+*/
+func (op *OptimizationProblem) LinearInequalityConstraintMatrices() (symbolic.KMatrix, symbolic.KVector) {
+	// Setup
+
+	// Collect the Variables of this Problem
+	x := op.Variables
+
+	// Iterate through all constraints and collect the linear constraints
+	// into a matrix and vector.
+	scalar_constraints := make([]symbolic.ScalarConstraint, 0)
+	vector_constraints := make([]symbolic.VectorConstraint, 0)
+	for _, constraint := range op.Constraints {
+		// Skip this constraint if it is not linear
+		if !constraint.IsLinear() {
+			continue
+		}
+		// Skip this constraint if it is not an inequality
+		if constraint.ConstrSense() == symbolic.SenseEqual {
+			continue
+		}
+		switch c := constraint.(type) {
+		case symbolic.ScalarConstraint:
+			scalar_constraints = append(scalar_constraints, c)
+		case symbolic.VectorConstraint:
+			vector_constraints = append(vector_constraints, c)
+		}
+	}
+
+	// Create the matrix and vector elements from the scalar constraints
+	A_components_scalar := make([]mat.VecDense, len(scalar_constraints))
+	b_components_scalar := make([]float64, len(scalar_constraints))
+	for ii, constraint := range scalar_constraints {
+		A_components_scalar[ii], b_components_scalar[ii] = constraint.LinearInequalityConstraintRepresentation(x)
+	}
+
+	// Create the matrix and vector elements from the vector constraints
+	A_components_vector := make([]mat.Dense, len(vector_constraints))
+	b_components_vector := make([]mat.VecDense, len(vector_constraints))
+	for ii, constraint := range vector_constraints {
+		A_components_vector[ii], b_components_vector[ii] = constraint.LinearInequalityConstraintRepresentation(x)
+	}
+
+	// Assemble the matrix and vector components
+	var AOut symbolic.Expression
+	var bOut symbolic.Expression
+	scalar_constraint_matrices_exist := len(A_components_scalar) > 0
+	if scalar_constraint_matrices_exist {
+		AOut = symbolic.VecDenseToKVector(A_components_scalar[0]).Transpose()
+		for ii := 1; ii < len(A_components_scalar); ii++ {
+			AOut = symbolic.VStack(
+				AOut,
+				symbolic.VecDenseToKVector(A_components_scalar[ii]).Transpose(),
+			)
+		}
+		bOut = getKVector.From(b_components_scalar)
+	}
+
+	vector_constraint_matrices_exist := len(A_components_vector) > 0
+	if vector_constraint_matrices_exist {
+		// Create the matrix, if it doesn't already exist
+		if !scalar_constraint_matrices_exist {
+			AOut = symbolic.DenseToKMatrix(A_components_vector[0])
+			bOut = symbolic.VecDenseToKVector(b_components_vector[0])
+		} else {
+			AOut = symbolic.VStack(
+				AOut,
+				symbolic.DenseToKMatrix(A_components_vector[0]),
+			)
+			bOut = symbolic.VStack(
+				bOut,
+				symbolic.VecDenseToKVector(b_components_vector[0]),
+			)
+		}
+		for ii := 1; ii < len(A_components_vector); ii++ {
+			AOut = symbolic.VStack(
+				AOut,
+				symbolic.DenseToKMatrix(A_components_vector[ii]),
+			)
+			bOut = symbolic.VStack(
+				bOut,
+				symbolic.VecDenseToKVector(b_components_vector[ii]),
+			)
+		}
+	}
+
+	return AOut.(symbolic.KMatrix), bOut.(symbolic.KVector)
+}
+
+/*
+LinearEqualityConstraintMatrices
+Description:
+
+	Returns the linear EQUALITY constraint matrices and vectors.
+	For all linear equality constraints, we assemble them into the form:
+		Cx = d
+	Where C is the matrix of coefficients, x is the vector of variables, and d is the vector of constants.
+	We return C and d.
+*/
+func (op *OptimizationProblem) LinearEqualityConstraintMatrices() (symbolic.KMatrix, symbolic.KVector) {
+	// Setup
+
+	// Collect the Variables of this Problem
+	x := op.Variables
+
+	// Iterate through all constraints and collect the linear constraints
+	// into a matrix and vector.
+	scalar_constraints := make([]symbolic.ScalarConstraint, 0)
+	vector_constraints := make([]symbolic.VectorConstraint, 0)
+	for _, constraint := range op.Constraints {
+		// Skip this constraint if it is not linear
+		if !constraint.IsLinear() {
+			continue
+		}
+		// Skip this constraint if it is not an equality
+		if constraint.ConstrSense() != symbolic.SenseEqual {
+			continue
+		}
+		switch c := constraint.(type) {
+		case symbolic.ScalarConstraint:
+			scalar_constraints = append(scalar_constraints, c)
+		case symbolic.VectorConstraint:
+			vector_constraints = append(vector_constraints, c)
+		}
+	}
+
+	// Create the matrix and vector elements from the scalar constraints
+	C_components_scalar := make([]mat.VecDense, len(scalar_constraints))
+	d_components_scalar := make([]float64, len(scalar_constraints))
+	for ii, constraint := range scalar_constraints {
+		C_components_scalar[ii], d_components_scalar[ii] = constraint.LinearEqualityConstraintRepresentation(x)
+	}
+
+	// Create the matrix and vector elements from the vector constraints
+	C_components_vector := make([]mat.Dense, len(vector_constraints))
+	d_components_vector := make([]mat.VecDense, len(vector_constraints))
+	for ii, constraint := range vector_constraints {
+		C_components_vector[ii], d_components_vector[ii] = constraint.LinearEqualityConstraintRepresentation(x)
+	}
+
+	// Assemble the matrix and vector components
+	var COut symbolic.Expression
+	var dOut symbolic.Expression
+	scalar_constraint_matrices_exist := len(C_components_scalar) > 0
+	if scalar_constraint_matrices_exist {
+		COut = symbolic.VecDenseToKVector(C_components_scalar[0]).Transpose()
+		for ii := 1; ii < len(C_components_scalar); ii++ {
+			COut = symbolic.VStack(
+				COut,
+				symbolic.VecDenseToKVector(C_components_scalar[ii]).Transpose(),
+			)
+		}
+		dOut = getKVector.From(d_components_scalar)
+	}
+	vector_constraint_matrices_exist := len(C_components_vector) > 0
+
+	if vector_constraint_matrices_exist {
+		// Create the matrix, if it doesn't already exist
+		if !scalar_constraint_matrices_exist {
+			COut = symbolic.DenseToKMatrix(C_components_vector[0])
+			dOut = symbolic.VecDenseToKVector(d_components_vector[0])
+		} else {
+			COut = symbolic.VStack(
+				COut,
+				symbolic.DenseToKMatrix(C_components_vector[0]),
+			)
+			dOut = symbolic.VStack(
+				dOut,
+				symbolic.VecDenseToKVector(d_components_vector[0]),
+			)
+		}
+		for ii := 1; ii < len(C_components_vector); ii++ {
+			COut = symbolic.VStack(
+				COut,
+				symbolic.DenseToKMatrix(C_components_vector[ii]),
+			)
+			dOut = symbolic.VStack(
+				dOut,
+				symbolic.VecDenseToKVector(d_components_vector[ii]),
+			)
+		}
+	}
+	return COut.(symbolic.KMatrix), dOut.(symbolic.KVector)
 }
