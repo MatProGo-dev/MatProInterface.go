@@ -369,7 +369,7 @@ func (op *OptimizationProblem) LinearInequalityConstraintMatrices() (symbolic.KM
 			continue
 		}
 		// Skip this constraint if it is not an inequality
-		if constraint.Sense == symbolic.SenseEqual {
+		if constraint.ConstrSense() == symbolic.SenseEqual {
 			continue
 		}
 		switch c := constraint.(type) {
@@ -466,7 +466,7 @@ func (op *OptimizationProblem) LinearEqualityConstraintMatrices() (symbolic.KMat
 			continue
 		}
 		// Skip this constraint if it is not an equality
-		if constraint.Sense != symbolic.SenseEqual {
+		if constraint.ConstrSense() != symbolic.SenseEqual {
 			continue
 		}
 		switch c := constraint.(type) {
