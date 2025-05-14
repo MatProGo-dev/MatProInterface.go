@@ -353,7 +353,7 @@ Description:
 	Where A is the matrix of coefficients, x is the vector of variables, and b is the vector of constants.
 	We return A and b.
 */
-func (op *OptimizationProblem) LinearInequalityConstraintMatrices() (symbolic.KMatrix, symbolic.KVector) {
+func (op *OptimizationProblem) LinearInequalityConstraintMatrices() (symbolic.KMatrix, symbolic.KVector, error) {
 	// Setup
 
 	// Collect the Variables of this Problem
@@ -377,7 +377,16 @@ func (op *OptimizationProblem) LinearInequalityConstraintMatrices() (symbolic.KM
 			scalar_constraints = append(scalar_constraints, c)
 		case symbolic.VectorConstraint:
 			vector_constraints = append(vector_constraints, c)
+		default:
+			return nil, nil, fmt.Errorf(
+				"the constraint is not a scalar or vector constraint: %T. Please create a GitHub Issue to address this!", c,
+			)
 		}
+	}
+
+	// Check if there are no inequality constraints
+	if len(scalar_constraints) == 0 && len(vector_constraints) == 0 {
+		return nil, nil, mpiErrors.NoInequalityConstraintsFoundError{}
 	}
 
 	// Create the matrix and vector elements from the scalar constraints
@@ -450,7 +459,7 @@ Description:
 	Where C is the matrix of coefficients, x is the vector of variables, and d is the vector of constants.
 	We return C and d.
 */
-func (op *OptimizationProblem) LinearEqualityConstraintMatrices() (symbolic.KMatrix, symbolic.KVector) {
+func (op *OptimizationProblem) LinearEqualityConstraintMatrices() (symbolic.KMatrix, symbolic.KVector, error) {
 	// Setup
 
 	// Collect the Variables of this Problem
@@ -475,6 +484,11 @@ func (op *OptimizationProblem) LinearEqualityConstraintMatrices() (symbolic.KMat
 		case symbolic.VectorConstraint:
 			vector_constraints = append(vector_constraints, c)
 		}
+	}
+
+	// Check if there are no equality constraints
+	if len(scalar_constraints) == 0 && len(vector_constraints) == 0 {
+		return nil, nil, mpiErrors.NoEqualityConstraintsFoundError{}
 	}
 
 	// Create the matrix and vector elements from the scalar constraints
@@ -506,7 +520,8 @@ func (op *OptimizationProblem) LinearEqualityConstraintMatrices() (symbolic.KMat
 		dOut = getKVector.From(d_components_scalar)
 	}
 	vector_constraint_matrices_exist := len(C_components_vector) > 0
-
+	// fmt.Printf("vector_constraint_matrices_exist: %v\n", vector_constraint_matrices_exist)
+	// fmt.Printf("len(C_components_vector): %v\n", len(C_components_vector))
 	if vector_constraint_matrices_exist {
 		// Create the matrix, if it doesn't already exist
 		if !scalar_constraint_matrices_exist {
@@ -533,7 +548,81 @@ func (op *OptimizationProblem) LinearEqualityConstraintMatrices() (symbolic.KMat
 			)
 		}
 	}
-	return COut.(symbolic.KMatrix), dOut.(symbolic.KVector)
+
+	// Extract the KMatrix and KVector from the symbolic expressions
+	COut2, ok := COut.(symbolic.KMatrix)
+	if !ok {
+		return nil, nil, fmt.Errorf("the output C is not a KMatrix: %T", COut)
+	}
+
+	dOut2, ok := dOut.(symbolic.KVector)
+	if !ok {
+		return nil, nil, fmt.Errorf("the output d is not a KVector: %T", dOut)
+	}
+
+	// Return the KMatrix and KVector
+	return COut2, dOut2, nil
+}
+
+/*
+ToProblemWithAllPositiveVariables
+Description:
+
+	Transforms the given optimization problem into a new optimization problem
+	that only contains positive variables.
+	In math, this means that we will create two new variables (x_+ and x_-) for each
+	original variable (x), one for the positive part and one for the negative part.
+	Then, we replace every instance of the original variable with the difference
+	of the two new variables (x = x_+ - x_-).
+*/
+func (op *OptimizationProblem) ToProblemWithAllPositiveVariables() (*OptimizationProblem, error) {
+	// Setup
+	newProblem := NewProblem(op.Name + " (All Positive Variables)")
+
+	// For each variable, let's create two new variables
+	// and set the original variable to be the difference of the two
+	mapFromOriginalVariablesToNewExpressions := make(map[symbolic.Variable]symbolic.Expression)
+	for ii := 0; ii < len(op.Variables); ii++ {
+		// Setup
+		xII := op.Variables[ii]
+
+		// Create the two new variables
+		newProblem.AddVariableClassic(0.0, symbolic.Infinity.Constant(), symbolic.Continuous)
+		nVariables := len(newProblem.Variables)
+		newProblem.Variables[nVariables-1].Name = xII.Name + " (+)"
+		variablePositivePart := newProblem.Variables[nVariables-1]
+
+		newProblem.AddVariableClassic(0.0, symbolic.Infinity.Constant(), symbolic.Continuous)
+		nVariables = len(newProblem.Variables)
+		newProblem.Variables[nVariables-1].Name = xII.Name + " (-)"
+		variableNegativePart := newProblem.Variables[nVariables-1]
+
+		// Set the original variable to be the difference of the two new variables
+		mapFromOriginalVariablesToNewExpressions[xII] =
+			variablePositivePart.Minus(variableNegativePart)
+	}
+
+	// Now, let's create the new constraints by replacing the variables in the
+	// original constraints with the new expressions
+	for _, constraint := range op.Constraints {
+		// Add the new constraint to the problem
+		newProblem.Constraints = append(
+			newProblem.Constraints,
+			constraint.SubstituteAccordingTo(mapFromOriginalVariablesToNewExpressions),
+		)
+	}
+
+	// Now, let's create the new objective function by substituting the variables
+	// according to the map we created above
+	newObjectiveExpression := op.Objective.Expression.SubstituteAccordingTo(
+		mapFromOriginalVariablesToNewExpressions,
+	)
+	newProblem.SetObjective(
+		newObjectiveExpression,
+		op.Objective.Sense,
+	)
+
+	return newProblem, nil
 }
 
 /*
@@ -552,7 +641,7 @@ Description:
 	for the objective function. This method also returns the slack variables (i.e., the variables that
 	are added to the problem to convert the inequalities into equalities).
 */
-func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem, []symbolic.Variable) {
+func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem, []symbolic.Variable, error) {
 	// Input Processing
 	err := problemIn.Check()
 	if err != nil {
@@ -565,15 +654,21 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 	}
 
 	// Setup
+	problemWithAllPositiveVariables, err := problemIn.ToProblemWithAllPositiveVariables()
+	if err != nil {
+		return nil, nil, err
+	}
 
 	// Create a new problem
 	problemInStandardForm := NewProblem(
 		problemIn.Name + " (In Standard Form)",
 	)
 
+	// Copy over each of the
+
 	// Add all variables to the new problem
 	mapFromInToNewVariables := make(map[symbolic.Variable]symbolic.Expression)
-	for _, varII := range problemIn.Variables {
+	for _, varII := range problemWithAllPositiveVariables.Variables {
 		problemInStandardForm.AddVariable()
 		nVariables := len(problemInStandardForm.Variables)
 		mapFromInToNewVariables[varII] = problemInStandardForm.Variables[nVariables-1]
@@ -581,7 +676,7 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 
 	// Add all constraints to the new problem
 	slackVariables := []symbolic.Variable{}
-	for _, constraint := range problemIn.Constraints {
+	for _, constraint := range problemWithAllPositiveVariables.Constraints {
 		// Create a new expression by substituting the variables according
 		// to the map we created above
 		oldLHS := constraint.Left()
@@ -631,12 +726,10 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 					symbolic.VariableVector(problemInStandardForm.Variables[nVariables-1-nRows : nVariables-1]),
 				)
 			default:
-				panic(
-					fmt.Sprintf(
-						"Unexpected constraint type: %T for \"ToStandardFormWithSlackVariables\" with %v sense",
-						constraint,
-						constraint.ConstrSense(),
-					),
+				return nil, nil, fmt.Errorf(
+					"Unexpected constraint type: %T for \"ToStandardFormWithSlackVariables\" with %v sense",
+					constraint,
+					constraint.ConstrSense(),
 				)
 
 			}
@@ -704,16 +797,16 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 
 	// Now, let's create the new objective function by substituting the variables
 	// according to the map we created above
-	newObjectiveExpression := problemIn.Objective.Expression.SubstituteAccordingTo(
+	newObjectiveExpression := problemWithAllPositiveVariables.Objective.Expression.SubstituteAccordingTo(
 		mapFromInToNewVariables,
 	)
 	problemInStandardForm.SetObjective(
 		newObjectiveExpression,
-		problemIn.Objective.Sense,
+		problemWithAllPositiveVariables.Objective.Sense,
 	)
 
-	fmt.Printf("The slack variables are: %v\n", slackVariables)
+	// fmt.Printf("The slack variables are: %v\n", slackVariables)
 
 	// Return the new problem and the slack variables
-	return problemInStandardForm, slackVariables
+	return problemInStandardForm, slackVariables, nil
 }

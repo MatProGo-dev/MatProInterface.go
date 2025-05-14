@@ -1823,7 +1823,10 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices7(t *testing.T) {
 	p1 := problem.GetExampleProblem3()
 
 	// Transform p1 into the standard form
-	p1Standard, _ := p1.ToLPStandardForm1()
+	p1Standard, _, err := p1.ToLPStandardForm1()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Attempt to Call LinearEqualityConstraintMatrices
 	A, b := p1Standard.LinearEqualityConstraintMatrices()
@@ -1835,14 +1838,67 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices7(t *testing.T) {
 	}
 
 	// Check that the number of columns is as expected.
-	if A.Dims()[1] != 6 {
+	nVariables1 := len(p1.Variables)
+	nInequalityConstraints1 := p1.Constraints[0].Left().Dims()[0]
+	if A.Dims()[1] != 2*nVariables1+nInequalityConstraints1 {
 		t.Errorf("expected the number of columns to be %v; received %v",
-			6, A.Dims()[1])
+			2*nVariables1+nInequalityConstraints1, A.Dims()[1])
 	}
 
 	// Check that the number of elements in b is as expected.
 	if len(b) != 3 {
 		t.Errorf("expected the number of elements in b to be %v; received %v",
 			3, len(b))
+	}
+}
+
+/*
+TestOptimizationProblem_ToProblemWithAllPositiveVariables1
+Description:
+
+	Tests the ToProblemWithAllPositiveVariables function with a simple problem
+	that has:
+	- a constant objective
+	- 2 variables,
+	- and a single linear inequality constraint.
+	The result should be a problem with 4 variables and 1 constraint.
+*/
+func TestOptimizationProblem_ToProblemWithAllPositiveVariables1(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToProblemWithAllPositiveVariables1")
+	v1 := p1.AddVariable()
+	p1.AddVariable()
+	c1 := v1.LessEq(1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	p2, err := p1.ToProblemWithAllPositiveVariables()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of variables is as expected.
+	if len(p2.Variables) != 4 {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			4, len(p2.Variables))
+	}
+
+	// Check that the number of constraints is as expected.
+	if len(p2.Constraints) != 1 {
+		t.Errorf("expected the number of constraints to be %v; received %v",
+			1, len(p2.Constraints))
+	}
+
+	// Verify that the new constraint contains two variables in the left hand side
+	if len(p2.Constraints[0].Left().Variables()) != 2 {
+		t.Errorf("expected the number of variables in the left hand side to be %v; received %v",
+			2, len(p2.Constraints[0].Left().Variables()))
 	}
 }
