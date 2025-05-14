@@ -1241,7 +1241,10 @@ func TestOptimizationProblem_LinearInequalityConstraintMatrices1(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearInequalityConstraintMatrices()
+	A, b, err := p1.LinearInequalityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 1 {
@@ -1290,7 +1293,10 @@ func TestOptimizationProblem_LinearInequalityConstraintMatrices2(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearInequalityConstraintMatrices()
+	A, b, err := p1.LinearInequalityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 2 {
@@ -1337,7 +1343,10 @@ func TestOptimizationProblem_LinearInequalityConstraintMatrices3(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearInequalityConstraintMatrices()
+	A, b, err := p1.LinearInequalityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 3 {
@@ -1386,7 +1395,10 @@ func TestOptimizationProblem_LinearInequalityConstraintMatrices4(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearInequalityConstraintMatrices()
+	A, b, err := p1.LinearInequalityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 6 {
@@ -1438,7 +1450,10 @@ func TestOptimizationProblem_LinearInequalityConstraintMatrices5(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearInequalityConstraintMatrices()
+	A, b, err := p1.LinearInequalityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 1 {
@@ -1489,7 +1504,10 @@ func TestOptimizationProblem_LinearInequalityConstraintMatrices6(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearInequalityConstraintMatrices()
+	A, b, err := p1.LinearInequalityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 4 {
@@ -1537,7 +1555,10 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices1(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearEqualityConstraintMatrices()
+	A, b, err := p1.LinearEqualityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 1 {
@@ -1586,7 +1607,10 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices2(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearEqualityConstraintMatrices()
+	A, b, err := p1.LinearEqualityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 2 {
@@ -1633,7 +1657,10 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices3(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearEqualityConstraintMatrices()
+	A, b, err := p1.LinearEqualityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 3 {
@@ -1682,7 +1709,10 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices4(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearEqualityConstraintMatrices()
+	A, b, err := p1.LinearEqualityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 6 {
@@ -1734,7 +1764,10 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices5(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearEqualityConstraintMatrices()
+	A, b, err := p1.LinearEqualityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 1 {
@@ -1785,7 +1818,10 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices6(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearEqualityConstraintMatrices()
+	A, b, err := p1.LinearEqualityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 4 {
@@ -1829,7 +1865,10 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices7(t *testing.T) {
 	}
 
 	// Attempt to Call LinearEqualityConstraintMatrices
-	A, b := p1Standard.LinearEqualityConstraintMatrices()
+	A, b, err := p1Standard.LinearEqualityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 3 {

@@ -446,7 +446,7 @@ func (op *OptimizationProblem) LinearInequalityConstraintMatrices() (symbolic.KM
 		}
 	}
 
-	return AOut.(symbolic.KMatrix), bOut.(symbolic.KVector)
+	return AOut.(symbolic.KMatrix), bOut.(symbolic.KVector), nil
 }
 
 /*
