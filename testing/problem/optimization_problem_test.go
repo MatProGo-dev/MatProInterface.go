@@ -1805,3 +1805,44 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices6(t *testing.T) {
 			4, len(b))
 	}
 }
+
+/*
+TestOptimizationProblem_LinearEqualityConstraintMatrices7
+Description:
+
+	Tests the LinearEqualityConstraintMatrices function with a problem
+	that led to panics in the field.
+	The problem is Problem3 from our examples file.
+	The problem will have:
+	- a linear objective
+	- 3 variables,
+	- and a single linear VECTORE equality constraint.
+*/
+func TestOptimizationProblem_LinearEqualityConstraintMatrices7(t *testing.T) {
+	// Constants
+	p1 := problem.GetExampleProblem3()
+
+	// Transform p1 into the standard form
+	p1Standard, _ := p1.ToLPStandardForm1()
+
+	// Attempt to Call LinearEqualityConstraintMatrices
+	A, b := p1Standard.LinearEqualityConstraintMatrices()
+
+	// Check that the number of rows is as expected.
+	if A.Dims()[0] != 3 {
+		t.Errorf("expected the number of rows to be %v; received %v",
+			3, A.Dims()[0])
+	}
+
+	// Check that the number of columns is as expected.
+	if A.Dims()[1] != 6 {
+		t.Errorf("expected the number of columns to be %v; received %v",
+			6, A.Dims()[1])
+	}
+
+	// Check that the number of elements in b is as expected.
+	if len(b) != 3 {
+		t.Errorf("expected the number of elements in b to be %v; received %v",
+			3, len(b))
+	}
+}
