@@ -2,7 +2,7 @@ name: Testing  # The name of the workflow that will appear on Github
 
 on:
   push:
-    branches: [ main , kr-feature-problem1 ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
   # Allows you to run this workflow manually from the Actions tab
@@ -40,7 +40,8 @@ jobs:
           go tool cover -func coverage.out -o coverage2.out  
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage.out
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage.out
