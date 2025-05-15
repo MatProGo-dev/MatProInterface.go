@@ -1529,6 +1529,42 @@ func TestOptimizationProblem_LinearInequalityConstraintMatrices6(t *testing.T) {
 }
 
 /*
+TestOptimizationProblem_LinearInequalityConstraintMatrices7
+Description:
+
+	Tests that the LinearInequalityConstraintMatrices function
+	properly produces an error when the problem has NO inequality constraints.
+*/
+func TestOptimizationProblem_LinearInequalityConstraintMatrices7(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_LinearInequalityConstraintMatrices7")
+	v1 := p1.AddVariable()
+	v2 := p1.AddVariable()
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		v1.Plus(v2.Multiply(0.5)),
+		problem.SenseMaximize,
+	)
+
+	// Create a linear equality constraint
+	p1.Constraints = append(p1.Constraints, v1.Plus(v2).Eq(1.0))
+
+	// Algorithm
+	_, _, err := p1.LinearInequalityConstraintMatrices()
+	if err == nil {
+		t.Errorf("expected an error; received nil")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			mpiErrors.NoInequalityConstraintsFoundError{}.Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
 TestOptimizationProblem_LinearEqualityConstraintMatrices1
 Description:
 
@@ -1888,6 +1924,42 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices7(t *testing.T) {
 	if len(b) != 3 {
 		t.Errorf("expected the number of elements in b to be %v; received %v",
 			3, len(b))
+	}
+}
+
+/*
+TestOptimizationProblem_LinearEqualityConstraintMatrices8
+Description:
+
+	Tests the LinearEqualityConstraintMatrices function properly produces
+	an NoEqualityConstraintsFoundError when the problem has NO equality constraints.
+*/
+func TestOptimizationProblem_LinearEqualityConstraintMatrices8(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_LinearEqualityConstraintMatrices8")
+	v1 := p1.AddVariable()
+	v2 := p1.AddVariable()
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		v1.Plus(v2.Multiply(0.5)),
+		problem.SenseMaximize,
+	)
+
+	// Create a linear inequality constraint
+	p1.Constraints = append(p1.Constraints, v1.Plus(v2).LessEq(1.0))
+
+	// Algorithm
+	_, _, err := p1.LinearEqualityConstraintMatrices()
+	if err == nil {
+		t.Errorf("expected an error; received nil")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			mpiErrors.NoEqualityConstraintsFoundError{}.Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
 	}
 }
 
