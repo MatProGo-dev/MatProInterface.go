@@ -727,7 +727,7 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 
 				// Add the slack variable to the right hand side
 				newRHS = newRHS.Plus(
-					symbolic.VariableVector(problemInStandardForm.Variables[nVariables-1-nRows : nVariables-1]),
+					symbolic.VariableVector(problemInStandardForm.Variables[nVariables-nRows : nVariables]),
 				)
 			default:
 				return nil, nil, fmt.Errorf(
@@ -772,7 +772,7 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 				}
 				// Add the slack variable to the left hand side
 				newLHS = newLHS.Plus(
-					symbolic.VariableVector(problemInStandardForm.Variables[nVariables-1-nRows : nVariables-1]),
+					symbolic.VariableVector(problemInStandardForm.Variables[nVariables-nRows : nVariables]),
 				)
 			default:
 				return nil, nil, fmt.Errorf(
