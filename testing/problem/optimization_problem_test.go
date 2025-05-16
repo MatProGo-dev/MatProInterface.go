@@ -2299,3 +2299,116 @@ func TestOptimizationProblem_ToLPStandardForm5(t *testing.T) {
 		}
 	}
 }
+
+/*
+TestOptimizationProblem_ToLPStandardForm6
+Description:
+
+	This test verifies that the ToLPStandardForm function properly handles
+	a simple problem with a single, scalar linear inequality constraint.
+	The problem will have:
+	- a constant objective
+	- 2 variables,
+	- and a single scalar linear inequality constraint (SenseLessThanEqual).
+	The result should be a problem with 2*2+1 = 5 variables and 1 constraint.
+*/
+func TestOptimizationProblem_ToLPStandardForm6(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm6")
+	v1 := p1.AddVariable()
+	p1.AddVariable()
+	c1 := v1.LessEq(1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	p2, _, err := p1.ToLPStandardForm1()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of variables is as expected.
+	expectedNumVariables := 0
+	expectedNumVariables += 2 * len(p1.Variables) // original variables (positive and negative halfs)
+	expectedNumVariables += len(p1.Constraints)   // slack variables
+	if len(p2.Variables) != expectedNumVariables {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			expectedNumVariables, len(p2.Variables))
+	}
+
+	// Check that the number of constraints is as expected.
+	if len(p2.Constraints) != 1 {
+		t.Errorf("expected the number of constraints to be %v; received %v",
+			expectedNumVariables, len(p2.Constraints))
+	}
+
+	// Verify that all constraints are equality constraints
+	for _, c := range p2.Constraints {
+		if c.ConstrSense() != symbolic.SenseEqual {
+			t.Errorf("expected the constraint to be an equality constraint; received %v",
+				c.ConstrSense())
+		}
+	}
+}
+
+/*
+TestOptimizationProblem_ToLPStandardForm7
+Description:
+
+	This test verifies that the ToLPStandardForm function properly handles
+	a simple problem with a single, scalar equality constraint.
+	The problem will have:
+	- a constant objective
+	- 2 variables,
+	- and a single scalar linear equality constraint (SenseEqual).
+	The result should be a problem with 2*2 = 4 variables and 1 constraint.
+*/
+func TestOptimizationProblem_ToLPStandardForm7(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm7")
+	v1 := p1.AddVariable()
+	p1.AddVariable()
+	c1 := v1.Eq(1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	p2, _, err := p1.ToLPStandardForm1()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of variables is as expected.
+	expectedNumVariables := 0
+	expectedNumVariables += 2 * len(p1.Variables) // original variables (positive and negative halfs)
+	if len(p2.Variables) != expectedNumVariables {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			expectedNumVariables, len(p2.Variables))
+	}
+
+	// Check that the number of constraints is as expected.
+	if len(p2.Constraints) != 1 {
+		t.Errorf("expected the number of constraints to be %v; received %v",
+			expectedNumVariables, len(p2.Constraints))
+	}
+
+	// Verify that all constraints are equality constraints
+	for _, c := range p2.Constraints {
+		if c.ConstrSense() != symbolic.SenseEqual {
+			t.Errorf("expected the constraint to be an equality constraint; received %v",
+				c.ConstrSense())
+		}
+	}
+}
