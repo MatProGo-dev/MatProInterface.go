@@ -2415,6 +2415,168 @@ func TestOptimizationProblem_ToLPStandardForm1_7(t *testing.T) {
 }
 
 /*
+TestOptimizationProblem_ToLPStandardForm1_8
+Description:
+
+	Tests the LinearEqualityConstraintMatrices function properly produces
+	a matrix:
+		[ 1 -1 0 0  0 0  1 0 0 ]
+	C = [ 0 0  1 -1 0 0  0 1 0 ]
+		[ 0 0  0 0  1 -1 0 0 1 ]
+	and
+		b = [ 1 2 3 ]
+	By creating a problem with 3 variables and 3 linear inequality constraints.
+	The results should produce equality constraint matrix C
+	with 3 rows and 6 columns and a vector b with 3 elements.
+*/
+func TestOptimizationProblem_ToLPStandardForm1_8(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_8")
+	vv1 := p1.AddVariableVector(3)
+	c1 := vv1.AtVec(0).LessEq(1.0)
+	c2 := vv1.AtVec(1).LessEq(2.0)
+	c3 := vv1.AtVec(2).LessEq(3.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+	p1.Constraints = append(p1.Constraints, c2)
+	p1.Constraints = append(p1.Constraints, c3)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	p1Prime, _, err := p1.ToLPStandardForm1()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	A, b, err := p1Prime.LinearEqualityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of rows is as expected.
+	if A.Dims()[0] != 3 {
+		t.Errorf("expected the number of rows to be %v; received %v",
+			3, A.Dims()[0])
+	}
+
+	// Check that the number of columns is as expected.
+	if A.Dims()[1] != 9 {
+		t.Errorf("expected the number of columns to be %v; received %v",
+			6, A.Dims()[1])
+	}
+
+	// Check that each of the entries in A is as expected.
+	expectedA := getKMatrix.From([][]float64{
+		{1.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0},
+		{0.0, 0.0, 1.0, -1.0, 0.0, 0.0, 0.0, 1.0, 0.0},
+		{0.0, 0.0, 0.0, 0.0, 1.0, -1.0, 0.0, 0.0, 1.0},
+	})
+	AAsDense := A.ToDense()
+	expectedAAsDense := expectedA.ToDense()
+	if !mat.EqualApprox(
+		&AAsDense,
+		&expectedAAsDense,
+		1e-10,
+	) {
+		t.Errorf("expected A to be %v; received %v", expectedA, A)
+		t.Errorf("Variables in A: %v", p1Prime.Variables)
+		t.Errorf("Linear coefficient for constraint 1: %v", p1Prime.Constraints[0].Left().(symbolic.ScalarExpression).LinearCoeff(p1Prime.Variables))
+	}
+
+	// Check that the number of elements in b is as expected.
+	if len(b) != 3 {
+		t.Errorf("expected the number of elements in b to be %v; received %v",
+			3, len(b))
+	}
+}
+
+/*
+TestOptimizationProblem_ToLPStandardForm1_9
+Description:
+
+	Tests the LinearEqualityConstraintMatrices function properly produces
+	a matrix:
+		[ 1 -1 0 0  0 0  -1 0  0 ]
+	C = [ 0 0  1 -1 0 0  0  -1 0 ]
+		[ 0 0  0 0  1 -1 0  0  -1 ]
+	and
+		b = [ 1 2 3 ]
+	By creating a problem with 3 variables and 3 linear inequality constraints.
+	The results should produce equality constraint matrix C
+	with 3 rows and 6 columns and a vector b with 3 elements.
+*/
+func TestOptimizationProblem_ToLPStandardForm1_9(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_9")
+	vv1 := p1.AddVariableVector(3)
+	c1 := vv1.AtVec(0).GreaterEq(1.0)
+	c2 := vv1.AtVec(1).GreaterEq(2.0)
+	c3 := vv1.AtVec(2).GreaterEq(3.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+	p1.Constraints = append(p1.Constraints, c2)
+	p1.Constraints = append(p1.Constraints, c3)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	p1Prime, _, err := p1.ToLPStandardForm1()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	A, b, err := p1Prime.LinearEqualityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of rows is as expected.
+	if A.Dims()[0] != 3 {
+		t.Errorf("expected the number of rows to be %v; received %v",
+			3, A.Dims()[0])
+	}
+
+	// Check that the number of columns is as expected.
+	if A.Dims()[1] != 9 {
+		t.Errorf("expected the number of columns to be %v; received %v",
+			6, A.Dims()[1])
+	}
+
+	// Check that each of the entries in A is as expected.
+	expectedA := getKMatrix.From([][]float64{
+		{1.0, -1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0},
+		{0.0, 0.0, 1.0, -1.0, 0.0, 0.0, 0.0, -1.0, 0.0},
+		{0.0, 0.0, 0.0, 0.0, 1.0, -1.0, 0.0, 0.0, -1.0},
+	})
+	AAsDense := A.ToDense()
+	expectedAAsDense := expectedA.ToDense()
+	if !mat.EqualApprox(
+		&AAsDense,
+		&expectedAAsDense,
+		1e-10,
+	) {
+		t.Errorf("expected A to be %v; received %v", expectedA, A)
+		t.Errorf("Variables in A: %v", p1Prime.Variables)
+		t.Errorf("Linear coefficient for constraint 1: %v", p1Prime.Constraints[0].Left().(symbolic.ScalarExpression).LinearCoeff(p1Prime.Variables))
+	}
+
+	// Check that the number of elements in b is as expected.
+	if len(b) != 3 {
+		t.Errorf("expected the number of elements in b to be %v; received %v",
+			3, len(b))
+	}
+}
+
+/*
 TestOptimizationProblem_CheckIfLinear1
 Description:
 
