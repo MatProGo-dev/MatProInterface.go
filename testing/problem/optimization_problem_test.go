@@ -17,6 +17,7 @@ import (
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"github.com/MatProGo-dev/MatProInterface.go/problem"
 	getKMatrix "github.com/MatProGo-dev/SymbolicMath.go/get/KMatrix"
+	getKVector "github.com/MatProGo-dev/SymbolicMath.go/get/KVector"
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
 )
@@ -2409,6 +2410,55 @@ func TestOptimizationProblem_ToLPStandardForm1_7(t *testing.T) {
 		if c.ConstrSense() != symbolic.SenseEqual {
 			t.Errorf("expected the constraint to be an equality constraint; received %v",
 				c.ConstrSense())
+		}
+	}
+}
+
+/*
+TestOptimizationProblem_CheckIfLinear1
+Description:
+
+	This test verifies that the CheckIfLinear function properly identifies
+	a NOT well-defined problem is not linear.
+	The problem will have a vector constraint with mismatched dimensions.
+*/
+func TestOptimizationProblem_CheckIfLinear1(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_CheckIfLinear1")
+	vv1 := p1.AddVariableVector(3)
+	A2 := getKMatrix.From([][]float64{
+		{1.0, 2.0, 3.0},
+		{4.0, 5.0, 6.0},
+	})
+	c1 := symbolic.VectorConstraint{
+		LeftHandSide:  A2.Multiply(vv1).(symbolic.VectorExpression),
+		RightHandSide: getKVector.From(symbolic.OnesVector(5)),
+		Sense:         symbolic.SenseLessThanEqual,
+	}
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	err := p1.CheckIfLinear()
+	if err == nil {
+		t.Errorf("expected an error; received nil")
+	} else {
+		expectedError := mpiErrors.ProblemNotLinearError{
+			ProblemName:     p1.Name,
+			Cause:           causeOfProblemNonlinearity.NotWellDefined,
+			ConstraintIndex: -1,
+		}
+		if !strings.Contains(
+			err.Error(),
+			expectedError.Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
 		}
 	}
 }
