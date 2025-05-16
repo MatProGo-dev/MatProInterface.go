@@ -2017,7 +2017,7 @@ func TestOptimizationProblem_ToProblemWithAllPositiveVariables1(t *testing.T) {
 }
 
 /*
-TestOptimizationProblem_ToLPStandardForm1
+TestOptimizationProblem_ToLPStandardForm1_1
 Description:
 
 	Tests the ToLPStandardForm function with a simple problem
@@ -2027,9 +2027,9 @@ Description:
 	- and a single linear inequality constraint (SenseGreaterThanEqual).
 	The result should be a problem with 2 variables and 1 constraint.
 */
-func TestOptimizationProblem_ToLPStandardForm1(t *testing.T) {
+func TestOptimizationProblem_ToLPStandardForm1_1(t *testing.T) {
 	// Constants
-	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1")
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_1")
 	v1 := p1.AddVariable()
 	p1.AddVariable()
 	c1 := v1.GreaterEq(1.0)
@@ -2073,7 +2073,7 @@ func TestOptimizationProblem_ToLPStandardForm1(t *testing.T) {
 }
 
 /*
-TestOptimizationProblem_ToLPStandardForm2
+TestOptimizationProblem_ToLPStandardForm1_2
 Description:
 
 	Tests the ToLPStandardForm function with a simple problem
@@ -2083,9 +2083,9 @@ Description:
 	- and a single vector linear inequality constraint (SenseGreaterThanEqual) of 5 dimensions.
 	The result should be a problem with 3*2+5 = 11 variables and 1 constraint.
 */
-func TestOptimizationProblem_ToLPStandardForm2(t *testing.T) {
+func TestOptimizationProblem_ToLPStandardForm1_2(t *testing.T) {
 	// Constants
-	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm2")
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_2")
 	vv1 := p1.AddVariableVector(3)
 	A2 := getKMatrix.From([][]float64{
 		{1.0, 2.0, 3.0},
@@ -2140,7 +2140,7 @@ func TestOptimizationProblem_ToLPStandardForm2(t *testing.T) {
 }
 
 /*
-TestOptimizationProblem_ToLPStandardForm3
+TestOptimizationProblem_ToLPStandardForm1_3
 Description:
 
 	Tests the ToLPStandardForm function with a simple problem
@@ -2150,9 +2150,9 @@ Description:
 	- and a single vector linear inequality constraint (SenseLessThanEqual) of 5 dimensions.
 	The result should be a problem with 3*2+5 = 11 variables and 1 constraint.
 */
-func TestOptimizationProblem_ToLPStandardForm3(t *testing.T) {
+func TestOptimizationProblem_ToLPStandardForm1_3(t *testing.T) {
 	// Constants
-	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm3")
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_3")
 	vv1 := p1.AddVariableVector(3)
 	A2 := getKMatrix.From([][]float64{
 		{1.0, 2.0, 3.0},
@@ -2209,7 +2209,7 @@ func TestOptimizationProblem_ToLPStandardForm3(t *testing.T) {
 }
 
 /*
-TestOptimizationProblem_ToLPStandardForm4
+TestOptimizationProblem_ToLPStandardForm1_4
 Description:
 
 	This test verifies that the ToLPStandardForm function throws an error
@@ -2220,9 +2220,9 @@ Description:
 	- 2 variables,
 	- and a single linear inequality constraint.
 */
-func TestOptimizationProblem_ToLPStandardForm4(t *testing.T) {
+func TestOptimizationProblem_ToLPStandardForm1_4(t *testing.T) {
 	// Constants
-	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm4")
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_4")
 	v1 := p1.AddVariable()
 	p1.AddVariable()
 	c1 := v1.LessEq(1.0)
@@ -2255,7 +2255,7 @@ func TestOptimizationProblem_ToLPStandardForm4(t *testing.T) {
 }
 
 /*
-TestOptimizationProblem_ToLPStandardForm5
+TestOptimizationProblem_ToLPStandardForm1_5
 Description:
 
 	This test verifies that the ToLPStandardForm function throws an error
@@ -2266,9 +2266,9 @@ Description:
 	- 2 variables,
 	- and a single quadratic inequality constraint.
 */
-func TestOptimizationProblem_ToLPStandardForm5(t *testing.T) {
+func TestOptimizationProblem_ToLPStandardForm1_5(t *testing.T) {
 	// Constants
-	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm5")
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_5")
 	v1 := p1.AddVariable()
 	p1.AddVariable()
 	c1 := v1.Multiply(v1).LessEq(1.0)
@@ -2301,7 +2301,7 @@ func TestOptimizationProblem_ToLPStandardForm5(t *testing.T) {
 }
 
 /*
-TestOptimizationProblem_ToLPStandardForm6
+TestOptimizationProblem_ToLPStandardForm1_6
 Description:
 
 	This test verifies that the ToLPStandardForm function properly handles
@@ -2312,9 +2312,9 @@ Description:
 	- and a single scalar linear inequality constraint (SenseLessThanEqual).
 	The result should be a problem with 2*2+1 = 5 variables and 1 constraint.
 */
-func TestOptimizationProblem_ToLPStandardForm6(t *testing.T) {
+func TestOptimizationProblem_ToLPStandardForm1_6(t *testing.T) {
 	// Constants
-	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm6")
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_6")
 	v1 := p1.AddVariable()
 	p1.AddVariable()
 	c1 := v1.LessEq(1.0)
@@ -2358,7 +2358,7 @@ func TestOptimizationProblem_ToLPStandardForm6(t *testing.T) {
 }
 
 /*
-TestOptimizationProblem_ToLPStandardForm7
+TestOptimizationProblem_ToLPStandardForm1_7
 Description:
 
 	This test verifies that the ToLPStandardForm function properly handles
@@ -2369,9 +2369,9 @@ Description:
 	- and a single scalar linear equality constraint (SenseEqual).
 	The result should be a problem with 2*2 = 4 variables and 1 constraint.
 */
-func TestOptimizationProblem_ToLPStandardForm7(t *testing.T) {
+func TestOptimizationProblem_ToLPStandardForm1_7(t *testing.T) {
 	// Constants
-	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm7")
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_7")
 	v1 := p1.AddVariable()
 	p1.AddVariable()
 	c1 := v1.Eq(1.0)
