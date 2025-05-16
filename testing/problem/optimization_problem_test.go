@@ -15,6 +15,7 @@ import (
 	"github.com/MatProGo-dev/MatProInterface.go/mpiErrors"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"github.com/MatProGo-dev/MatProInterface.go/problem"
+	getKMatrix "github.com/MatProGo-dev/SymbolicMath.go/get/KMatrix"
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
 )
@@ -2012,4 +2013,196 @@ func TestOptimizationProblem_ToProblemWithAllPositiveVariables1(t *testing.T) {
 		t.Errorf("expected the number of variables in the left hand side to be %v; received %v",
 			2, len(p2.Constraints[0].Left().Variables()))
 	}
+}
+
+/*
+TestOptimizationProblem_ToLPStandardForm1
+Description:
+
+	Tests the ToLPStandardForm function with a simple problem
+	that contains:
+	- a constant objective
+	- 1 variable,
+	- and a single linear inequality constraint (SenseGreaterThanEqual).
+	The result should be a problem with 2 variables and 1 constraint.
+*/
+func TestOptimizationProblem_ToLPStandardForm1(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1")
+	v1 := p1.AddVariable()
+	p1.AddVariable()
+	c1 := v1.GreaterEq(1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	p2, _, err := p1.ToLPStandardForm1()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of variables is as expected.
+	expectedNumVariables := 0
+	expectedNumVariables += 2 * len(p1.Variables) // original variables (positive and negative halfs)
+	expectedNumVariables += len(p1.Constraints)   // slack variables
+	if len(p2.Variables) != expectedNumVariables {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			2, len(p2.Variables))
+	}
+
+	// Check that the number of constraints is as expected.
+	if len(p2.Constraints) != 1 {
+		t.Errorf("expected the number of constraints to be %v; received %v",
+			1, len(p2.Constraints))
+	}
+
+	// Verify that all constraints are equality constraints
+	for _, c := range p2.Constraints {
+		if c.ConstrSense() != symbolic.SenseEqual {
+			t.Errorf("expected the constraint to be an equality constraint; received %v",
+				c.ConstrSense())
+		}
+	}
+}
+
+/*
+TestOptimizationProblem_ToLPStandardForm2
+Description:
+
+	Tests the ToLPStandardForm function with a simple problem
+	that contains:
+	- a constant objective
+	- 3 variables,
+	- and a single vector linear inequality constraint (SenseGreaterThanEqual) of 5 dimensions.
+	The result should be a problem with 3*2+5 = 11 variables and 1 constraint.
+*/
+func TestOptimizationProblem_ToLPStandardForm2(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm2")
+	vv1 := p1.AddVariableVector(3)
+	A2 := getKMatrix.From([][]float64{
+		{1.0, 2.0, 3.0},
+		{4.0, 5.0, 6.0},
+		{7.0, 8.0, 9.0},
+		{10.0, 11.0, 12.0},
+		{13.0, 14.0, 15.0},
+	})
+	c1 := A2.Multiply(vv1).GreaterEq(symbolic.OnesVector(5))
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	p2, _, err := p1.ToLPStandardForm1()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of variables is as expected.
+	expectedNumVariables := 0
+	expectedNumVariables += 2 * len(p1.Variables) // original variables (positive and negative halfs)
+	p1FirstConstraint := p1.Constraints[0]
+	p1FirstConstraintAsVC, ok := p1FirstConstraint.(symbolic.VectorConstraint)
+	if !ok {
+		t.Errorf("expected the first constraint to be a vector constraint; received %T", p1FirstConstraint)
+	}
+	expectedNumVariables += p1FirstConstraintAsVC.Dims()[0] // slack variables
+	if len(p2.Variables) != expectedNumVariables {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			expectedNumVariables, len(p2.Variables))
+	}
+
+	// Check that the number of constraints is as expected.
+	if len(p2.Constraints) != 1 {
+		t.Errorf("expected the number of constraints to be %v; received %v",
+			5, len(p2.Constraints))
+	}
+
+	// Verify that all constraints are equality constraints
+	for _, c := range p2.Constraints {
+		if c.ConstrSense() != symbolic.SenseEqual {
+			t.Errorf("expected the constraint to be an equality constraint; received %v",
+				c.ConstrSense())
+		}
+	}
+}
+
+/*
+TestOptimizationProblem_ToLPStandardForm3
+Description:
+
+	Tests the ToLPStandardForm function with a simple problem
+	that contains:
+	- a constant objective
+	- 3 variables,
+	- and a single vector linear inequality constraint (SenseLessThanEqual) of 5 dimensions.
+	The result should be a problem with 3*2+5 = 11 variables and 1 constraint.
+*/
+func TestOptimizationProblem_ToLPStandardForm3(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm3")
+	vv1 := p1.AddVariableVector(3)
+	A2 := getKMatrix.From([][]float64{
+		{1.0, 2.0, 3.0},
+		{4.0, 5.0, 6.0},
+		{7.0, 8.0, 9.0},
+		{10.0, 11.0, 12.0},
+		{13.0, 14.0, 15.0},
+	})
+	c1 := A2.Multiply(vv1).LessEq(symbolic.OnesVector(5))
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	p2, _, err := p1.ToLPStandardForm1()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of variables is as expected.
+	expectedNumVariables := 0
+	expectedNumVariables += 2 * len(p1.Variables) // original variables (positive and negative halfs)
+	p1FirstConstraint := p1.Constraints[0]
+	p1FirstConstraintAsVC, ok := p1FirstConstraint.(symbolic.VectorConstraint)
+	if !ok {
+		t.Errorf("expected the first constraint to be a vector constraint; received %T", p1FirstConstraint)
+	}
+	expectedNumVariables += p1FirstConstraintAsVC.Dims()[0] // slack variables
+	if len(p2.Variables) != expectedNumVariables {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			expectedNumVariables, len(p2.Variables))
+	}
+
+	// Check that the number of constraints is as expected.
+	if len(p2.Constraints) != 1 {
+		t.Errorf("expected the number of constraints to be %v; received %v",
+			expectedNumVariables, len(p2.Constraints))
+	}
+
+	// Verify that all constraints are equality constraints
+	for _, c := range p2.Constraints {
+		if c.ConstrSense() != symbolic.SenseEqual {
+			t.Errorf(
+				"expected the constraint to be an equality constraint; received %v",
+				c.ConstrSense())
+		}
+	}
+
 }
