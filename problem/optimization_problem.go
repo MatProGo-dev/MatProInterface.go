@@ -771,16 +771,16 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 					symbolic.VariableVector(problemInStandardForm.Variables[nVariables-1-nRows : nVariables-1]),
 				)
 			default:
-				panic(
-					fmt.Sprintf(
-						"Unexpected constraint type %T for \"ToStandardFormWithSlackVariables\" with %v sense",
-						constraint,
-						constraint.ConstrSense(),
-					),
+				return nil, nil, fmt.Errorf(
+					"Unexpected constraint type %T for \"ToStandardFormWithSlackVariables\" with %v sense",
+					constraint,
+					constraint.ConstrSense(),
 				)
 			}
 		default:
-			panic("Unknown constraint sense: " + constraint.ConstrSense().String())
+			return nil, nil, fmt.Errorf(
+				"Unknown constraint sense: " + constraint.ConstrSense().String(),
+			)
 		}
 
 		newConstraint := newLHS.Comparison(
