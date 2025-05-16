@@ -717,7 +717,7 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 					symbolic.Continuous,
 				)
 				nVariables := len(problemInStandardForm.Variables)
-				for jj := nRows - 1; jj >= nRows; jj-- {
+				for jj := nRows - 1; jj >= 0; jj-- {
 					problemInStandardForm.Variables[nVariables-1-jj].Name = problemInStandardForm.Variables[nVariables-1-jj].Name + " (slack)"
 					slackVariables = append(
 						slackVariables,
