@@ -12,6 +12,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/MatProGo-dev/MatProInterface.go/causeOfProblemNonlinearity"
 	"github.com/MatProGo-dev/MatProInterface.go/mpiErrors"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"github.com/MatProGo-dev/MatProInterface.go/problem"
@@ -2205,4 +2206,96 @@ func TestOptimizationProblem_ToLPStandardForm3(t *testing.T) {
 		}
 	}
 
+}
+
+/*
+TestOptimizationProblem_ToLPStandardForm4
+Description:
+
+	This test verifies that the ToLPStandardForm function throws an error
+	when called on a problem that is not linear.
+	In this case, we will define a problem with a quadratic objective function.
+	The problem will have:
+	- a quadratic objective
+	- 2 variables,
+	- and a single linear inequality constraint.
+*/
+func TestOptimizationProblem_ToLPStandardForm4(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm4")
+	v1 := p1.AddVariable()
+	p1.AddVariable()
+	c1 := v1.LessEq(1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create a quadratic objective
+	p1.Objective = *problem.NewObjective(
+		v1.Multiply(v1),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	_, _, err := p1.ToLPStandardForm1()
+	if err == nil {
+		t.Errorf("expected an error; received nil")
+	} else {
+		expectedError := mpiErrors.ProblemNotLinearError{
+			ProblemName:     p1.Name,
+			Cause:           causeOfProblemNonlinearity.Objective,
+			ConstraintIndex: -2,
+		}
+		if !strings.Contains(
+			err.Error(),
+			expectedError.Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestOptimizationProblem_ToLPStandardForm5
+Description:
+
+	This test verifies that the ToLPStandardForm function throws an error
+	when called on a problem that is not linear.
+	In this case, we will define a problem with a quadratic constraint.
+	The problem will have:
+	- a constant objective
+	- 2 variables,
+	- and a single quadratic inequality constraint.
+*/
+func TestOptimizationProblem_ToLPStandardForm5(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm5")
+	v1 := p1.AddVariable()
+	p1.AddVariable()
+	c1 := v1.Multiply(v1).LessEq(1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	_, _, err := p1.ToLPStandardForm1()
+	if err == nil {
+		t.Errorf("expected an error; received nil")
+	} else {
+		expectedError := mpiErrors.ProblemNotLinearError{
+			ProblemName:     p1.Name,
+			Cause:           causeOfProblemNonlinearity.Constraint,
+			ConstraintIndex: 0,
+		}
+		if !strings.Contains(
+			err.Error(),
+			expectedError.Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
 }

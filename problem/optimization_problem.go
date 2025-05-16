@@ -3,6 +3,7 @@ package problem
 import (
 	"fmt"
 
+	"github.com/MatProGo-dev/MatProInterface.go/causeOfProblemNonlinearity"
 	"github.com/MatProGo-dev/MatProInterface.go/mpiErrors"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	getKVector "github.com/MatProGo-dev/SymbolicMath.go/get/KVector"
@@ -320,23 +321,26 @@ Description:
 	2. All constraints are linear (i.e., an affine combination of variables in an inequality or equality).
 */
 func (op *OptimizationProblem) IsLinear() bool {
-	// Input Processing
-	// Verify that the problem is well-formed
-	err := op.Check()
+	// Run the check method
+	err := op.CheckIfLinear()
 	if err != nil {
-		panic(fmt.Errorf("the optimization problem is not well-formed: %v", err))
-	}
-
-	// Check Objective
-	if !op.Objective.IsLinear() {
-		return false
-	}
-
-	// Check Constraints
-	for _, constraint := range op.Constraints {
-		if !constraint.IsLinear() {
-			return false
+		// If the check method returns a NotWellDefinedError, then the problem is not well defined
+		// and we should panic.
+		notWellDefinedError := mpiErrors.ProblemNotLinearError{
+			ProblemName:     op.Name,
+			Cause:           causeOfProblemNonlinearity.NotWellDefined,
+			ConstraintIndex: -1,
 		}
+		if err.Error() == notWellDefinedError.Error() {
+			panic(
+				fmt.Errorf(
+					"the optimization problem is not well defined; %v",
+					op.Check(),
+				))
+		}
+
+		// If the check returns any other error, then the problem is not linear
+		return false
 	}
 
 	// All Checks Passed!
@@ -645,12 +649,12 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 	// Input Processing
 	err := problemIn.Check()
 	if err != nil {
-		panic(fmt.Errorf("the optimization problem is not well-formed: %v", err))
+		return nil, nil, fmt.Errorf("the optimization problem is not well-formed: %v", err)
 	}
 
 	// Check if the problem is linear
 	if !problemIn.IsLinear() {
-		panic(fmt.Errorf("the optimization problem is not linear: %v", err))
+		return nil, nil, problemIn.CheckIfLinear()
 	}
 
 	// Setup
@@ -809,4 +813,47 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 
 	// Return the new problem and the slack variables
 	return problemInStandardForm, slackVariables, nil
+}
+
+/*
+CheckIfLinear
+Description:
+
+	Checks the current optimization problem to see if it is linear.
+	Returns an error if the problem is not linear.
+*/
+func (op *OptimizationProblem) CheckIfLinear() error {
+	// Input Processing
+	// Verify that the problem is well-formed
+	err := op.Check()
+	if err != nil {
+		return mpiErrors.ProblemNotLinearError{
+			ProblemName:     op.Name,
+			Cause:           causeOfProblemNonlinearity.NotWellDefined,
+			ConstraintIndex: -1,
+		}
+	}
+
+	// Check Objective
+	if !op.Objective.IsLinear() {
+		return mpiErrors.ProblemNotLinearError{
+			ProblemName:     op.Name,
+			Cause:           causeOfProblemNonlinearity.Objective,
+			ConstraintIndex: -2,
+		}
+	}
+
+	// Check Constraints
+	for ii, constraint := range op.Constraints {
+		if !constraint.IsLinear() {
+			return mpiErrors.ProblemNotLinearError{
+				ProblemName:     op.Name,
+				Cause:           causeOfProblemNonlinearity.Constraint,
+				ConstraintIndex: ii,
+			}
+		}
+	}
+
+	// All Checks Passed!
+	return nil
 }
