@@ -12,9 +12,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/MatProGo-dev/MatProInterface.go/causeOfProblemNonlinearity"
 	"github.com/MatProGo-dev/MatProInterface.go/mpiErrors"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"github.com/MatProGo-dev/MatProInterface.go/problem"
+	getKMatrix "github.com/MatProGo-dev/SymbolicMath.go/get/KMatrix"
+	getKVector "github.com/MatProGo-dev/SymbolicMath.go/get/KVector"
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
 )
@@ -1241,7 +1244,10 @@ func TestOptimizationProblem_LinearInequalityConstraintMatrices1(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearInequalityConstraintMatrices()
+	A, b, err := p1.LinearInequalityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 1 {
@@ -1290,7 +1296,10 @@ func TestOptimizationProblem_LinearInequalityConstraintMatrices2(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearInequalityConstraintMatrices()
+	A, b, err := p1.LinearInequalityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 2 {
@@ -1337,7 +1346,10 @@ func TestOptimizationProblem_LinearInequalityConstraintMatrices3(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearInequalityConstraintMatrices()
+	A, b, err := p1.LinearInequalityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 3 {
@@ -1386,7 +1398,10 @@ func TestOptimizationProblem_LinearInequalityConstraintMatrices4(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearInequalityConstraintMatrices()
+	A, b, err := p1.LinearInequalityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 6 {
@@ -1438,7 +1453,10 @@ func TestOptimizationProblem_LinearInequalityConstraintMatrices5(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearInequalityConstraintMatrices()
+	A, b, err := p1.LinearInequalityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 1 {
@@ -1489,7 +1507,10 @@ func TestOptimizationProblem_LinearInequalityConstraintMatrices6(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearInequalityConstraintMatrices()
+	A, b, err := p1.LinearInequalityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 4 {
@@ -1507,6 +1528,42 @@ func TestOptimizationProblem_LinearInequalityConstraintMatrices6(t *testing.T) {
 	if len(b) != 4 {
 		t.Errorf("expected the number of elements in b to be %v; received %v",
 			4, len(b))
+	}
+}
+
+/*
+TestOptimizationProblem_LinearInequalityConstraintMatrices7
+Description:
+
+	Tests that the LinearInequalityConstraintMatrices function
+	properly produces an error when the problem has NO inequality constraints.
+*/
+func TestOptimizationProblem_LinearInequalityConstraintMatrices7(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_LinearInequalityConstraintMatrices7")
+	v1 := p1.AddVariable()
+	v2 := p1.AddVariable()
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		v1.Plus(v2.Multiply(0.5)),
+		problem.SenseMaximize,
+	)
+
+	// Create a linear equality constraint
+	p1.Constraints = append(p1.Constraints, v1.Plus(v2).Eq(1.0))
+
+	// Algorithm
+	_, _, err := p1.LinearInequalityConstraintMatrices()
+	if err == nil {
+		t.Errorf("expected an error; received nil")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			mpiErrors.NoInequalityConstraintsFoundError{}.Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
 	}
 }
 
@@ -1537,7 +1594,10 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices1(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearEqualityConstraintMatrices()
+	A, b, err := p1.LinearEqualityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 1 {
@@ -1586,7 +1646,10 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices2(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearEqualityConstraintMatrices()
+	A, b, err := p1.LinearEqualityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 2 {
@@ -1633,7 +1696,10 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices3(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearEqualityConstraintMatrices()
+	A, b, err := p1.LinearEqualityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 3 {
@@ -1682,7 +1748,10 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices4(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearEqualityConstraintMatrices()
+	A, b, err := p1.LinearEqualityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 6 {
@@ -1734,7 +1803,10 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices5(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearEqualityConstraintMatrices()
+	A, b, err := p1.LinearEqualityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 1 {
@@ -1785,7 +1857,10 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices6(t *testing.T) {
 	)
 
 	// Algorithm
-	A, b := p1.LinearEqualityConstraintMatrices()
+	A, b, err := p1.LinearEqualityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	// Check that the number of rows is as expected.
 	if A.Dims()[0] != 4 {
@@ -1803,5 +1878,587 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices6(t *testing.T) {
 	if len(b) != 4 {
 		t.Errorf("expected the number of elements in b to be %v; received %v",
 			4, len(b))
+	}
+}
+
+/*
+TestOptimizationProblem_LinearEqualityConstraintMatrices7
+Description:
+
+	Tests the LinearEqualityConstraintMatrices function with a problem
+	that led to panics in the field.
+	The problem is Problem3 from our examples file.
+	The problem will have:
+	- a linear objective
+	- 3 variables,
+	- and a single linear VECTORE equality constraint.
+*/
+func TestOptimizationProblem_LinearEqualityConstraintMatrices7(t *testing.T) {
+	// Constants
+	p1 := problem.GetExampleProblem3()
+
+	// Transform p1 into the standard form
+	p1Standard, _, err := p1.ToLPStandardForm1()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Attempt to Call LinearEqualityConstraintMatrices
+	A, b, err := p1Standard.LinearEqualityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of rows is as expected.
+	if A.Dims()[0] != 3 {
+		t.Errorf("expected the number of rows to be %v; received %v",
+			3, A.Dims()[0])
+	}
+
+	// Check that the number of columns is as expected.
+	nVariables1 := len(p1.Variables)
+	nInequalityConstraints1 := p1.Constraints[0].Left().Dims()[0]
+	if A.Dims()[1] != 2*nVariables1+nInequalityConstraints1 {
+		t.Errorf("expected the number of columns to be %v; received %v",
+			2*nVariables1+nInequalityConstraints1, A.Dims()[1])
+	}
+
+	// Check that the number of elements in b is as expected.
+	if len(b) != 3 {
+		t.Errorf("expected the number of elements in b to be %v; received %v",
+			3, len(b))
+	}
+}
+
+/*
+TestOptimizationProblem_LinearEqualityConstraintMatrices8
+Description:
+
+	Tests the LinearEqualityConstraintMatrices function properly produces
+	an NoEqualityConstraintsFoundError when the problem has NO equality constraints.
+*/
+func TestOptimizationProblem_LinearEqualityConstraintMatrices8(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_LinearEqualityConstraintMatrices8")
+	v1 := p1.AddVariable()
+	v2 := p1.AddVariable()
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		v1.Plus(v2.Multiply(0.5)),
+		problem.SenseMaximize,
+	)
+
+	// Create a linear inequality constraint
+	p1.Constraints = append(p1.Constraints, v1.Plus(v2).LessEq(1.0))
+
+	// Algorithm
+	_, _, err := p1.LinearEqualityConstraintMatrices()
+	if err == nil {
+		t.Errorf("expected an error; received nil")
+	} else {
+		if !strings.Contains(
+			err.Error(),
+			mpiErrors.NoEqualityConstraintsFoundError{}.Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestOptimizationProblem_ToProblemWithAllPositiveVariables1
+Description:
+
+	Tests the ToProblemWithAllPositiveVariables function with a simple problem
+	that has:
+	- a constant objective
+	- 2 variables,
+	- and a single linear inequality constraint.
+	The result should be a problem with 4 variables and 1 constraint.
+*/
+func TestOptimizationProblem_ToProblemWithAllPositiveVariables1(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToProblemWithAllPositiveVariables1")
+	v1 := p1.AddVariable()
+	p1.AddVariable()
+	c1 := v1.LessEq(1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	p2, err := p1.ToProblemWithAllPositiveVariables()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of variables is as expected.
+	if len(p2.Variables) != 4 {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			4, len(p2.Variables))
+	}
+
+	// Check that the number of constraints is as expected.
+	if len(p2.Constraints) != 1 {
+		t.Errorf("expected the number of constraints to be %v; received %v",
+			1, len(p2.Constraints))
+	}
+
+	// Verify that the new constraint contains two variables in the left hand side
+	if len(p2.Constraints[0].Left().Variables()) != 2 {
+		t.Errorf("expected the number of variables in the left hand side to be %v; received %v",
+			2, len(p2.Constraints[0].Left().Variables()))
+	}
+}
+
+/*
+TestOptimizationProblem_ToLPStandardForm1_1
+Description:
+
+	Tests the ToLPStandardForm function with a simple problem
+	that contains:
+	- a constant objective
+	- 1 variable,
+	- and a single linear inequality constraint (SenseGreaterThanEqual).
+	The result should be a problem with 2 variables and 1 constraint.
+*/
+func TestOptimizationProblem_ToLPStandardForm1_1(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_1")
+	v1 := p1.AddVariable()
+	p1.AddVariable()
+	c1 := v1.GreaterEq(1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	p2, _, err := p1.ToLPStandardForm1()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of variables is as expected.
+	expectedNumVariables := 0
+	expectedNumVariables += 2 * len(p1.Variables) // original variables (positive and negative halfs)
+	expectedNumVariables += len(p1.Constraints)   // slack variables
+	if len(p2.Variables) != expectedNumVariables {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			2, len(p2.Variables))
+	}
+
+	// Check that the number of constraints is as expected.
+	if len(p2.Constraints) != 1 {
+		t.Errorf("expected the number of constraints to be %v; received %v",
+			1, len(p2.Constraints))
+	}
+
+	// Verify that all constraints are equality constraints
+	for _, c := range p2.Constraints {
+		if c.ConstrSense() != symbolic.SenseEqual {
+			t.Errorf("expected the constraint to be an equality constraint; received %v",
+				c.ConstrSense())
+		}
+	}
+}
+
+/*
+TestOptimizationProblem_ToLPStandardForm1_2
+Description:
+
+	Tests the ToLPStandardForm function with a simple problem
+	that contains:
+	- a constant objective
+	- 3 variables,
+	- and a single vector linear inequality constraint (SenseGreaterThanEqual) of 5 dimensions.
+	The result should be a problem with 3*2+5 = 11 variables and 1 constraint.
+*/
+func TestOptimizationProblem_ToLPStandardForm1_2(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_2")
+	vv1 := p1.AddVariableVector(3)
+	A2 := getKMatrix.From([][]float64{
+		{1.0, 2.0, 3.0},
+		{4.0, 5.0, 6.0},
+		{7.0, 8.0, 9.0},
+		{10.0, 11.0, 12.0},
+		{13.0, 14.0, 15.0},
+	})
+	c1 := A2.Multiply(vv1).GreaterEq(symbolic.OnesVector(5))
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	p2, _, err := p1.ToLPStandardForm1()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of variables is as expected.
+	expectedNumVariables := 0
+	expectedNumVariables += 2 * len(p1.Variables) // original variables (positive and negative halfs)
+	p1FirstConstraint := p1.Constraints[0]
+	p1FirstConstraintAsVC, ok := p1FirstConstraint.(symbolic.VectorConstraint)
+	if !ok {
+		t.Errorf("expected the first constraint to be a vector constraint; received %T", p1FirstConstraint)
+	}
+	expectedNumVariables += p1FirstConstraintAsVC.Dims()[0] // slack variables
+	if len(p2.Variables) != expectedNumVariables {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			expectedNumVariables, len(p2.Variables))
+	}
+
+	// Check that the number of constraints is as expected.
+	if len(p2.Constraints) != 1 {
+		t.Errorf("expected the number of constraints to be %v; received %v",
+			5, len(p2.Constraints))
+	}
+
+	// Verify that all constraints are equality constraints
+	for _, c := range p2.Constraints {
+		if c.ConstrSense() != symbolic.SenseEqual {
+			t.Errorf("expected the constraint to be an equality constraint; received %v",
+				c.ConstrSense())
+		}
+	}
+}
+
+/*
+TestOptimizationProblem_ToLPStandardForm1_3
+Description:
+
+	Tests the ToLPStandardForm function with a simple problem
+	that contains:
+	- a constant objective
+	- 3 variables,
+	- and a single vector linear inequality constraint (SenseLessThanEqual) of 5 dimensions.
+	The result should be a problem with 3*2+5 = 11 variables and 1 constraint.
+*/
+func TestOptimizationProblem_ToLPStandardForm1_3(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_3")
+	vv1 := p1.AddVariableVector(3)
+	A2 := getKMatrix.From([][]float64{
+		{1.0, 2.0, 3.0},
+		{4.0, 5.0, 6.0},
+		{7.0, 8.0, 9.0},
+		{10.0, 11.0, 12.0},
+		{13.0, 14.0, 15.0},
+	})
+	c1 := A2.Multiply(vv1).LessEq(symbolic.OnesVector(5))
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	p2, _, err := p1.ToLPStandardForm1()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of variables is as expected.
+	expectedNumVariables := 0
+	expectedNumVariables += 2 * len(p1.Variables) // original variables (positive and negative halfs)
+	p1FirstConstraint := p1.Constraints[0]
+	p1FirstConstraintAsVC, ok := p1FirstConstraint.(symbolic.VectorConstraint)
+	if !ok {
+		t.Errorf("expected the first constraint to be a vector constraint; received %T", p1FirstConstraint)
+	}
+	expectedNumVariables += p1FirstConstraintAsVC.Dims()[0] // slack variables
+	if len(p2.Variables) != expectedNumVariables {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			expectedNumVariables, len(p2.Variables))
+	}
+
+	// Check that the number of constraints is as expected.
+	if len(p2.Constraints) != 1 {
+		t.Errorf("expected the number of constraints to be %v; received %v",
+			expectedNumVariables, len(p2.Constraints))
+	}
+
+	// Verify that all constraints are equality constraints
+	for _, c := range p2.Constraints {
+		if c.ConstrSense() != symbolic.SenseEqual {
+			t.Errorf(
+				"expected the constraint to be an equality constraint; received %v",
+				c.ConstrSense())
+		}
+	}
+
+}
+
+/*
+TestOptimizationProblem_ToLPStandardForm1_4
+Description:
+
+	This test verifies that the ToLPStandardForm function throws an error
+	when called on a problem that is not linear.
+	In this case, we will define a problem with a quadratic objective function.
+	The problem will have:
+	- a quadratic objective
+	- 2 variables,
+	- and a single linear inequality constraint.
+*/
+func TestOptimizationProblem_ToLPStandardForm1_4(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_4")
+	v1 := p1.AddVariable()
+	p1.AddVariable()
+	c1 := v1.LessEq(1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create a quadratic objective
+	p1.Objective = *problem.NewObjective(
+		v1.Multiply(v1),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	_, _, err := p1.ToLPStandardForm1()
+	if err == nil {
+		t.Errorf("expected an error; received nil")
+	} else {
+		expectedError := mpiErrors.ProblemNotLinearError{
+			ProblemName:     p1.Name,
+			Cause:           causeOfProblemNonlinearity.Objective,
+			ConstraintIndex: -2,
+		}
+		if !strings.Contains(
+			err.Error(),
+			expectedError.Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestOptimizationProblem_ToLPStandardForm1_5
+Description:
+
+	This test verifies that the ToLPStandardForm function throws an error
+	when called on a problem that is not linear.
+	In this case, we will define a problem with a quadratic constraint.
+	The problem will have:
+	- a constant objective
+	- 2 variables,
+	- and a single quadratic inequality constraint.
+*/
+func TestOptimizationProblem_ToLPStandardForm1_5(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_5")
+	v1 := p1.AddVariable()
+	p1.AddVariable()
+	c1 := v1.Multiply(v1).LessEq(1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	_, _, err := p1.ToLPStandardForm1()
+	if err == nil {
+		t.Errorf("expected an error; received nil")
+	} else {
+		expectedError := mpiErrors.ProblemNotLinearError{
+			ProblemName:     p1.Name,
+			Cause:           causeOfProblemNonlinearity.Constraint,
+			ConstraintIndex: 0,
+		}
+		if !strings.Contains(
+			err.Error(),
+			expectedError.Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
+}
+
+/*
+TestOptimizationProblem_ToLPStandardForm1_6
+Description:
+
+	This test verifies that the ToLPStandardForm function properly handles
+	a simple problem with a single, scalar linear inequality constraint.
+	The problem will have:
+	- a constant objective
+	- 2 variables,
+	- and a single scalar linear inequality constraint (SenseLessThanEqual).
+	The result should be a problem with 2*2+1 = 5 variables and 1 constraint.
+*/
+func TestOptimizationProblem_ToLPStandardForm1_6(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_6")
+	v1 := p1.AddVariable()
+	p1.AddVariable()
+	c1 := v1.LessEq(1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	p2, _, err := p1.ToLPStandardForm1()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of variables is as expected.
+	expectedNumVariables := 0
+	expectedNumVariables += 2 * len(p1.Variables) // original variables (positive and negative halfs)
+	expectedNumVariables += len(p1.Constraints)   // slack variables
+	if len(p2.Variables) != expectedNumVariables {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			expectedNumVariables, len(p2.Variables))
+	}
+
+	// Check that the number of constraints is as expected.
+	if len(p2.Constraints) != 1 {
+		t.Errorf("expected the number of constraints to be %v; received %v",
+			expectedNumVariables, len(p2.Constraints))
+	}
+
+	// Verify that all constraints are equality constraints
+	for _, c := range p2.Constraints {
+		if c.ConstrSense() != symbolic.SenseEqual {
+			t.Errorf("expected the constraint to be an equality constraint; received %v",
+				c.ConstrSense())
+		}
+	}
+}
+
+/*
+TestOptimizationProblem_ToLPStandardForm1_7
+Description:
+
+	This test verifies that the ToLPStandardForm function properly handles
+	a simple problem with a single, scalar equality constraint.
+	The problem will have:
+	- a constant objective
+	- 2 variables,
+	- and a single scalar linear equality constraint (SenseEqual).
+	The result should be a problem with 2*2 = 4 variables and 1 constraint.
+*/
+func TestOptimizationProblem_ToLPStandardForm1_7(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_7")
+	v1 := p1.AddVariable()
+	p1.AddVariable()
+	c1 := v1.Eq(1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	p2, _, err := p1.ToLPStandardForm1()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of variables is as expected.
+	expectedNumVariables := 0
+	expectedNumVariables += 2 * len(p1.Variables) // original variables (positive and negative halfs)
+	if len(p2.Variables) != expectedNumVariables {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			expectedNumVariables, len(p2.Variables))
+	}
+
+	// Check that the number of constraints is as expected.
+	if len(p2.Constraints) != 1 {
+		t.Errorf("expected the number of constraints to be %v; received %v",
+			expectedNumVariables, len(p2.Constraints))
+	}
+
+	// Verify that all constraints are equality constraints
+	for _, c := range p2.Constraints {
+		if c.ConstrSense() != symbolic.SenseEqual {
+			t.Errorf("expected the constraint to be an equality constraint; received %v",
+				c.ConstrSense())
+		}
+	}
+}
+
+/*
+TestOptimizationProblem_CheckIfLinear1
+Description:
+
+	This test verifies that the CheckIfLinear function properly identifies
+	a NOT well-defined problem is not linear.
+	The problem will have a vector constraint with mismatched dimensions.
+*/
+func TestOptimizationProblem_CheckIfLinear1(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_CheckIfLinear1")
+	vv1 := p1.AddVariableVector(3)
+	A2 := getKMatrix.From([][]float64{
+		{1.0, 2.0, 3.0},
+		{4.0, 5.0, 6.0},
+	})
+	c1 := symbolic.VectorConstraint{
+		LeftHandSide:  A2.Multiply(vv1).(symbolic.VectorExpression),
+		RightHandSide: getKVector.From(symbolic.OnesVector(5)),
+		Sense:         symbolic.SenseLessThanEqual,
+	}
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	err := p1.CheckIfLinear()
+	if err == nil {
+		t.Errorf("expected an error; received nil")
+	} else {
+		expectedError := mpiErrors.ProblemNotLinearError{
+			ProblemName:     p1.Name,
+			Cause:           causeOfProblemNonlinearity.NotWellDefined,
+			ConstraintIndex: -1,
+		}
+		if !strings.Contains(
+			err.Error(),
+			expectedError.Error(),
+		) {
+			t.Errorf("unexpected error: %v", err)
+		}
 	}
 }
