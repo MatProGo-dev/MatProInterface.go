@@ -2018,6 +2018,62 @@ func TestOptimizationProblem_ToProblemWithAllPositiveVariables1(t *testing.T) {
 }
 
 /*
+TestOptimizationProblem_ToProblemWithAllPositiveVariables2
+Description:
+
+	Tests the ToProblemWithAllPositiveVariables function with a simple problem
+	that has:
+	- a constant objective
+	- 2 variables,
+	- and two scalar linear inequality constraints.
+	One of the variables is purely positive, while the other is purely negative.
+	The result should be a problem with 2 variables and 2 constraints.
+*/
+func TestOptimizationProblem_ToProblemWithAllPositiveVariables2(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToProblemWithAllPositiveVariables2")
+	vv1 := p1.AddVariableVector(2)
+	// Add constraints
+	c1 := vv1.AtVec(0).GreaterEq(1.0)
+	c2 := vv1.AtVec(1).LessEq(-2.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+	p1.Constraints = append(p1.Constraints, c2)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	p2, err := p1.ToProblemWithAllPositiveVariables()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of variables is as expected.
+	if len(p2.Variables) != 2 {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			2, len(p2.Variables))
+	}
+
+	// Check that the number of constraints is as expected.
+	if len(p2.Constraints) != 2 {
+		t.Errorf("expected the number of constraints to be %v; received %v",
+			2, len(p2.Constraints))
+	}
+
+	// Verify that the new constraints contain two variables in the left hand side
+	for _, c := range p2.Constraints {
+		if len(c.Left().Variables()) != 1 {
+			t.Errorf("expected the number of variables in the left hand side to be %v; received %v",
+				1, len(c.Left().Variables()))
+		}
+	}
+}
+
+/*
 TestOptimizationProblem_ToLPStandardForm1_1
 Description:
 

@@ -568,26 +568,6 @@ func (op *OptimizationProblem) LinearEqualityConstraintMatrices() (symbolic.KMat
 	return COut2, dOut2, nil
 }
 
-// func (op *OptimizationProblem) Simplify() OptimizationProblem {
-// 	// Create a new optimization problem
-// 	newProblem := NewProblem(op.Name + " (Simplified)")
-
-// 	// Add all variables to the new problem
-// 	for _, variable := range op.Variables {
-// 		newProblem.Variables = append(newProblem.Variables, variable)
-// 	}
-
-// 	// Add all constraints to the new problem
-// 	for _, constraint := range op.Constraints {
-// 		newProblem.Constraints = append(newProblem.Constraints, constraint)
-// 	}
-
-// 	// Set the objective of the new problem
-// 	newProblem.Objective = op.Objective
-
-// 	return newProblem
-// }
-
 /*
 ToProblemWithAllPositiveVariables
 Description:
@@ -602,6 +582,7 @@ Description:
 func (op *OptimizationProblem) ToProblemWithAllPositiveVariables() (*OptimizationProblem, error) {
 	// Setup
 	newProblem := NewProblem(op.Name + " (All Positive Variables)")
+	epsMagic := 1e-8 // TODO(Kwesi): Make this a parameter OR a constant in the package.
 
 	// For each variable, let's create two new variables
 	// and set the original variable to be the difference of the two
@@ -610,20 +591,35 @@ func (op *OptimizationProblem) ToProblemWithAllPositiveVariables() (*Optimizatio
 		// Setup
 		xII := op.Variables[ii]
 
-		// Create the two new variables
-		newProblem.AddVariableClassic(0.0, symbolic.Infinity.Constant(), symbolic.Continuous)
-		nVariables := len(newProblem.Variables)
-		newProblem.Variables[nVariables-1].Name = xII.Name + " (+)"
-		variablePositivePart := newProblem.Variables[nVariables-1]
+		// Expression for the positive and negative parts
+		var expressionForReplacement symbolic.Expression = symbolic.K(0.0)
 
-		newProblem.AddVariableClassic(0.0, symbolic.Infinity.Constant(), symbolic.Continuous)
-		nVariables = len(newProblem.Variables)
-		newProblem.Variables[nVariables-1].Name = xII.Name + " (-)"
-		variableNegativePart := newProblem.Variables[nVariables-1]
+		// Create the two new variables
+		// - Positive Part
+		positivePartExists := xII.Upper >= 0
+		positivePartExists = positivePartExists && !ConstraintIsRedundantGivenOthers(xII.LessEq(0.0-epsMagic), op.Constraints)
+		if positivePartExists {
+			newProblem.AddVariableClassic(0.0, symbolic.Infinity.Constant(), symbolic.Continuous)
+			nVariables := len(newProblem.Variables)
+			newProblem.Variables[nVariables-1].Name = xII.Name + " (+)"
+			variablePositivePart := newProblem.Variables[nVariables-1]
+			expressionForReplacement = expressionForReplacement.Plus(variablePositivePart)
+		}
+
+		// - Negative Part
+		negativePartExists := xII.Lower < 0
+		negativePartExists = negativePartExists && !ConstraintIsRedundantGivenOthers(xII.GreaterEq(0.0), op.Constraints)
+		if negativePartExists {
+			newProblem.AddVariableClassic(0.0, symbolic.Infinity.Constant(), symbolic.Continuous)
+			nVariables := len(newProblem.Variables)
+			newProblem.Variables[nVariables-1].Name = xII.Name + " (-)"
+			variableNegativePart := newProblem.Variables[nVariables-1]
+
+			expressionForReplacement = expressionForReplacement.Minus(variableNegativePart)
+		}
 
 		// Set the original variable to be the difference of the two new variables
-		mapFromOriginalVariablesToNewExpressions[xII] =
-			variablePositivePart.Minus(variableNegativePart)
+		mapFromOriginalVariablesToNewExpressions[xII] = expressionForReplacement
 	}
 
 	// Now, let's create the new constraints by replacing the variables in the
@@ -687,6 +683,8 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 	problemInStandardForm := NewProblem(
 		problemIn.Name + " (In Standard Form)",
 	)
+
+	// Copy over each of the
 
 	// Add all variables to the new problem
 	mapFromInToNewVariables := make(map[symbolic.Variable]symbolic.Expression)
