@@ -568,6 +568,26 @@ func (op *OptimizationProblem) LinearEqualityConstraintMatrices() (symbolic.KMat
 	return COut2, dOut2, nil
 }
 
+// func (op *OptimizationProblem) Simplify() OptimizationProblem {
+// 	// Create a new optimization problem
+// 	newProblem := NewProblem(op.Name + " (Simplified)")
+
+// 	// Add all variables to the new problem
+// 	for _, variable := range op.Variables {
+// 		newProblem.Variables = append(newProblem.Variables, variable)
+// 	}
+
+// 	// Add all constraints to the new problem
+// 	for _, constraint := range op.Constraints {
+// 		newProblem.Constraints = append(newProblem.Constraints, constraint)
+// 	}
+
+// 	// Set the objective of the new problem
+// 	newProblem.Objective = op.Objective
+
+// 	return newProblem
+// }
+
 /*
 ToProblemWithAllPositiveVariables
 Description:
@@ -667,8 +687,6 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 	problemInStandardForm := NewProblem(
 		problemIn.Name + " (In Standard Form)",
 	)
-
-	// Copy over each of the
 
 	// Add all variables to the new problem
 	mapFromInToNewVariables := make(map[symbolic.Variable]symbolic.Expression)
@@ -856,4 +874,78 @@ func (op *OptimizationProblem) CheckIfLinear() error {
 
 	// All Checks Passed!
 	return nil
+}
+
+/*
+CopyVariable
+Description:
+
+	Creates a deep copy of the given variable within
+	the optimization problem.
+*/
+func (op *OptimizationProblem) CopyVariable(variable symbolic.Variable) symbolic.Variable {
+	// Setup
+	newVariable := variable
+	newVariable.ID = uint64(len(op.Variables)) // Assign a new ID
+	newVariable.Name = fmt.Sprintf("%s (copy)", variable.Name)
+
+	// Add the new variable to the problem
+	op.Variables = append(op.Variables, newVariable)
+	return newVariable
+}
+
+/*
+Copy
+Description:
+
+	Returns a deep copy of the optimization problem.
+*/
+func (op *OptimizationProblem) Copy() *OptimizationProblem {
+	// Setup
+	newProblem := NewProblem(op.Name)
+
+	// Copy Variables
+	replacementMap := make(map[symbolic.Variable]symbolic.Expression)
+	for _, variable := range op.Variables {
+		newVariable := newProblem.CopyVariable(variable)
+		replacementMap[variable] = newVariable
+	}
+
+	// Copy Constraints
+	for _, constraint := range op.Constraints {
+		newConstraint := constraint.SubstituteAccordingTo(replacementMap)
+		newProblem.Constraints = append(newProblem.Constraints, newConstraint)
+	}
+
+	// Copy Objective
+	newProblem.Objective = op.Objective
+
+	// Return the new problem
+	return newProblem
+}
+
+/*
+SimplifyConstraints
+Description:
+
+	This method simplifies the constraints of the optimization problem by removing redundant constraints.
+*/
+func (op *OptimizationProblem) SimplifyConstraints() {
+	// Setup
+	newConstraints := make([]symbolic.Constraint, 0)
+
+	// Iterate through all constraints and check if they are redundant
+	for _, constraint := range op.Constraints {
+		// Determine if the newConstraints imply that
+		// the current constraint is also satisfied.
+		if ConstraintIsRedundantGivenOthers(constraint, newConstraints) {
+			continue
+		}
+
+		// Otherwise, add the constraint to the newConstraints
+		newConstraints = append(newConstraints, constraint)
+	}
+
+	// Set the new constraints
+	op.Constraints = newConstraints
 }

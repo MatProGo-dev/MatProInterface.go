@@ -2624,3 +2624,161 @@ func TestOptimizationProblem_CheckIfLinear1(t *testing.T) {
 		}
 	}
 }
+
+/*
+TestOptimizationProblem_SimplifyConstraints1
+Description:
+
+	This test verifies that the SimplifyConstraints function properly simplifies
+	a problem with redundant constraints.
+	The problem will have:
+	- a constant objective
+	- 1 variable1,
+	- and 2 linear inequality constraints:
+		x1 <= 1
+		x1 <= 2
+	The second constraint is redundant and should be removed.
+	The result should be a problem with 1 variable and 1 constraint.
+*/
+func TestOptimizationProblem_SimplifyConstraints1(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_SimplifyConstraints1")
+	v1 := p1.AddVariable()
+	c1 := v1.LessEq(1.0)
+	c2 := v1.LessEq(2.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+	p1.Constraints = append(p1.Constraints, c2)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Create a copy of p1 to compare against after simplification
+	p2 := p1.Copy()
+
+	// Algorithm
+	p1.SimplifyConstraints()
+
+	// Check that the number of variables is as expected.
+	if len(p2.Variables) != len(p1.Variables) {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			len(p1.Variables), len(p2.Variables))
+	}
+
+	// Check that the number of constraints is as expected.
+	if len(p1.Constraints) != 1 {
+		t.Errorf("expected the new number of constraints to be %v; received %v",
+			1, len(p1.Constraints))
+	}
+
+	// Check that the remaining constraint is the expected one.
+	p1FirstConstraint := p1.Constraints[0]
+	L1 := p1FirstConstraint.Left().(symbolic.ScalarExpression).LinearCoeff(p1.Variables)
+	p2FirstConstraint := p2.Constraints[0]
+	L2 := p2FirstConstraint.Left().(symbolic.ScalarExpression).LinearCoeff(p2.Variables)
+
+	if L1.AtVec(0) != L2.AtVec(0) {
+		t.Errorf("expected the remaining constraint's coefficient to be %v; received %v",
+			L1, L2)
+	}
+}
+
+/*
+TestOptimizationProblem_SimplifyConstraints2
+Description:
+
+	This test verifies that the SimplifyConstraints function properly handles
+	a problem with no constraints.
+	The problem will have:
+	- a constant objective
+	- 1 variable,
+	- and no constraints.
+	The result should be a problem with 1 variable and no constraints.
+*/
+func TestOptimizationProblem_SimplifyConstraints2(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_SimplifyConstraints2")
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Create a copy of p1 to compare against after simplification
+	p2 := p1.Copy()
+
+	// Algorithm
+	p1.SimplifyConstraints()
+
+	// Check that the number of variables is as expected.
+	if len(p2.Variables) != len(p1.Variables) {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			len(p1.Variables), len(p2.Variables))
+	}
+
+	// Check that the number of constraints is as expected.
+	if len(p1.Constraints) != 0 {
+		t.Errorf("expected the new number of constraints to be %v; received %v",
+			0, len(p1.Constraints))
+	}
+}
+
+/*
+TestOptimizationProblem_SimplifyConstraints3
+Description:
+
+	This test verifies that the SimplifyConstraints function properly handles
+	a problem with a single constraint that is not redundant.
+	The problem will have:
+	- a constant objective
+	- 1 variable,
+	- and a single linear inequality constraint.
+	The result should be a problem with 1 variable and 1 constraint.
+*/
+func TestOptimizationProblem_SimplifyConstraints3(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_SimplifyConstraints3")
+	v1 := p1.AddVariable()
+	c1 := v1.LessEq(1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Create a copy of p1 to compare against after simplification
+	p2 := p1.Copy()
+
+	// Algorithm
+	p1.SimplifyConstraints()
+
+	// Check that the number of variables is as expected.
+	if len(p2.Variables) != len(p1.Variables) {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			len(p1.Variables), len(p2.Variables))
+	}
+
+	// Check that the number of constraints is as expected.
+	if len(p1.Constraints) != 1 {
+		t.Errorf("expected the new number of constraints to be %v; received %v",
+			1, len(p1.Constraints))
+	}
+
+	// Check that the remaining constraint is the expected one.
+	p1FirstConstraint := p1.Constraints[0]
+	L1 := p1FirstConstraint.Left().(symbolic.ScalarExpression).LinearCoeff(p1.Variables)
+	p2FirstConstraint := p2.Constraints[0]
+	L2 := p2FirstConstraint.Left().(symbolic.ScalarExpression).LinearCoeff(p2.Variables)
+
+	if L1.AtVec(0) != L2.AtVec(0) {
+		t.Errorf("expected the remaining constraint's coefficient to be %v; received %v",
+			L1, L2)
+	}
+}
