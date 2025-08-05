@@ -24,3 +24,14 @@ Description:
 func (o *Objective) IsLinear() bool {
 	return symbolic.IsLinear(o.Expression)
 }
+
+/*
+SubstituteAccordingTo
+Description:
+
+	Substitutes the variables in the objective according to the replacement map.
+*/
+func (o *Objective) SubstituteAccordingTo(replacementMap map[symbolic.Variable]symbolic.Expression) *Objective {
+	newExpression := o.Expression.SubstituteAccordingTo(replacementMap)
+	return &Objective{newExpression, o.Sense}
+}
