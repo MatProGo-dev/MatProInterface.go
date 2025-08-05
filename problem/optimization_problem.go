@@ -568,26 +568,6 @@ func (op *OptimizationProblem) LinearEqualityConstraintMatrices() (symbolic.KMat
 	return COut2, dOut2, nil
 }
 
-// func (op *OptimizationProblem) Simplify() OptimizationProblem {
-// 	// Create a new optimization problem
-// 	newProblem := NewProblem(op.Name + " (Simplified)")
-
-// 	// Add all variables to the new problem
-// 	for _, variable := range op.Variables {
-// 		newProblem.Variables = append(newProblem.Variables, variable)
-// 	}
-
-// 	// Add all constraints to the new problem
-// 	for _, constraint := range op.Constraints {
-// 		newProblem.Constraints = append(newProblem.Constraints, constraint)
-// 	}
-
-// 	// Set the objective of the new problem
-// 	newProblem.Objective = op.Objective
-
-// 	return newProblem
-// }
-
 /*
 ToProblemWithAllPositiveVariables
 Description:
@@ -602,6 +582,7 @@ Description:
 func (op *OptimizationProblem) ToProblemWithAllPositiveVariables() (*OptimizationProblem, error) {
 	// Setup
 	newProblem := NewProblem(op.Name + " (All Positive Variables)")
+	epsMagic := 1e-8 // TODO(Kwesi): Make this a parameter OR a constant in the package.
 
 	// For each variable, let's create two new variables
 	// and set the original variable to be the difference of the two
@@ -610,20 +591,35 @@ func (op *OptimizationProblem) ToProblemWithAllPositiveVariables() (*Optimizatio
 		// Setup
 		xII := op.Variables[ii]
 
-		// Create the two new variables
-		newProblem.AddVariableClassic(0.0, symbolic.Infinity.Constant(), symbolic.Continuous)
-		nVariables := len(newProblem.Variables)
-		newProblem.Variables[nVariables-1].Name = xII.Name + " (+)"
-		variablePositivePart := newProblem.Variables[nVariables-1]
+		// Expression for the positive and negative parts
+		var expressionForReplacement symbolic.Expression = symbolic.K(0.0)
 
-		newProblem.AddVariableClassic(0.0, symbolic.Infinity.Constant(), symbolic.Continuous)
-		nVariables = len(newProblem.Variables)
-		newProblem.Variables[nVariables-1].Name = xII.Name + " (-)"
-		variableNegativePart := newProblem.Variables[nVariables-1]
+		// Create the two new variables
+		// - Positive Part
+		positivePartExists := xII.Upper >= 0
+		positivePartExists = positivePartExists && !ConstraintIsRedundantGivenOthers(xII.LessEq(0.0-epsMagic), op.Constraints)
+		if positivePartExists {
+			newProblem.AddVariableClassic(0.0, symbolic.Infinity.Constant(), symbolic.Continuous)
+			nVariables := len(newProblem.Variables)
+			newProblem.Variables[nVariables-1].Name = xII.Name + " (+)"
+			variablePositivePart := newProblem.Variables[nVariables-1]
+			expressionForReplacement = expressionForReplacement.Plus(variablePositivePart)
+		}
+
+		// - Negative Part
+		negativePartExists := xII.Lower < 0
+		negativePartExists = negativePartExists && !ConstraintIsRedundantGivenOthers(xII.GreaterEq(0.0), op.Constraints)
+		if negativePartExists {
+			newProblem.AddVariableClassic(0.0, symbolic.Infinity.Constant(), symbolic.Continuous)
+			nVariables := len(newProblem.Variables)
+			newProblem.Variables[nVariables-1].Name = xII.Name + " (-)"
+			variableNegativePart := newProblem.Variables[nVariables-1]
+
+			expressionForReplacement = expressionForReplacement.Minus(variableNegativePart)
+		}
 
 		// Set the original variable to be the difference of the two new variables
-		mapFromOriginalVariablesToNewExpressions[xII] =
-			variablePositivePart.Minus(variableNegativePart)
+		mapFromOriginalVariablesToNewExpressions[xII] = expressionForReplacement
 	}
 
 	// Now, let's create the new constraints by replacing the variables in the
@@ -697,8 +693,9 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 	}
 
 	// Add all constraints to the new problem
+	problemWithPositivesAndCleanedConstraints := problemWithAllPositiveVariables.WithAllPositiveVariableConstraintsRemoved()
 	slackVariables := []symbolic.Variable{}
-	for _, constraint := range problemWithAllPositiveVariables.Constraints {
+	for _, constraint := range problemWithPositivesAndCleanedConstraints.Constraints {
 		// Create a new expression by substituting the variables according
 		// to the map we created above
 		oldLHS := constraint.Left()
@@ -827,10 +824,68 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 		problemWithAllPositiveVariables.Objective.Sense,
 	)
 
-	// fmt.Printf("The slack variables are: %v\n", slackVariables)
+	// Simplify The Constraints If Possible
+	problemInStandardForm.SimplifyConstraints()
 
 	// Return the new problem and the slack variables
 	return problemInStandardForm, slackVariables, nil
+}
+
+/*
+WithAllPositiveVariableConstraintsRemoved
+Description:
+
+	Returns a new optimization problem that is the same as the original problem
+	but with all constraints of the following form removed:
+		x >= 0
+		0 <= x
+	Where x is a variable in the problem.
+	This is useful for removing redundant constraints that are already implied by the variable bounds.
+*/
+func (op *OptimizationProblem) WithAllPositiveVariableConstraintsRemoved() *OptimizationProblem {
+	// Setup
+	newProblem := NewProblem(op.Name)
+
+	// Copy the variables
+	for _, variable := range op.Variables {
+		newProblem.Variables = append(newProblem.Variables, variable)
+	}
+
+	// Copy the constraints
+	for _, constraintII := range op.Constraints {
+		// Check if the constraint is a x >= 0 constraint
+		if symbolic.SenseGreaterThanEqual == constraintII.ConstrSense() {
+			lhsContains1Variable := len(constraintII.Left().Variables()) == 1
+			rhs, rhsIsConstant := constraintII.Right().(symbolic.K)
+			if lhsContains1Variable && rhsIsConstant {
+				if float64(rhs) == 0.0 {
+					// If the constraint is of the form x >= 0, we can remove it
+					continue
+				}
+			}
+		}
+
+		// Check if the constraint is a 0 <= x constraint
+		if symbolic.SenseLessThanEqual == constraintII.ConstrSense() {
+			rhsContains1Variable := len(constraintII.Left().Variables()) == 1
+			lhs, lhsIsConstant := constraintII.Right().(symbolic.K)
+			if rhsContains1Variable && lhsIsConstant {
+				if float64(lhs) == 0.0 {
+					// If the constraint is of the form 0 <= x, we can remove it
+					continue
+				}
+			}
+		}
+
+		// Otherwise, we can keep the constraint
+		newProblem.Constraints = append(newProblem.Constraints, constraintII)
+	}
+
+	// Copy the objective
+	newProblem.Objective = op.Objective
+
+	// Return the new problem
+	return newProblem
 }
 
 /*

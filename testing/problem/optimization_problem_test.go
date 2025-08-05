@@ -1891,7 +1891,9 @@ Description:
 	The problem will have:
 	- a linear objective
 	- 3 variables,
-	- and a single linear VECTORE equality constraint.
+	- and a single linear VECTOR equality constraint (n_ineq = 1).
+	Because each variable can be positive or negative, the resulting
+	linear equality constraint matrix should have 3 rows and 3*2+n_ineq columns.
 */
 func TestOptimizationProblem_LinearEqualityConstraintMatrices7(t *testing.T) {
 	// Constants
@@ -1967,6 +1969,110 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices8(t *testing.T) {
 }
 
 /*
+TestOptimizationProblem_LinearEqualityConstraintMatrices9
+Description:
+
+	Tests the LinearEqualityConstraintMatrices function with a problem
+	that led to panics in the field.
+	The problem is Problem4 from our examples file.
+	The problem will have:
+	- a linear objective
+	- 3 variables (each labeled as positive via the LB input to AddVariableVectorClassic),
+	- and a single linear VECTOR equality constraint.
+*/
+func TestOptimizationProblem_LinearEqualityConstraintMatrices9(t *testing.T) {
+	// Constants
+	p1 := problem.GetExampleProblem4()
+
+	// Transform p1 into the standard form
+	p1Standard, _, err := p1.ToLPStandardForm1()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Attempt to Call LinearEqualityConstraintMatrices
+	A, b, err := p1Standard.LinearEqualityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of rows is as expected.
+	if A.Dims()[0] != 3 {
+		t.Errorf("expected the number of rows to be %v; received %v",
+			3, A.Dims()[0])
+	}
+
+	// Check that the number of columns is as expected.
+	nVariables1 := len(p1.Variables)
+	nInequalityConstraints1 := p1.Constraints[0].Left().Dims()[0]
+	if A.Dims()[1] != nVariables1+nInequalityConstraints1 {
+		t.Errorf("expected the number of columns to be %v; received %v",
+			nVariables1+nInequalityConstraints1, A.Dims()[1])
+	}
+
+	// Check that the number of elements in b is as expected.
+	if len(b) != 3 {
+		t.Errorf("expected the number of elements in b to be %v; received %v",
+			3, len(b))
+	}
+}
+
+/*
+TestOptimizationProblem_LinearEqualityConstraintMatrices10
+Description:
+
+	Tests the LinearEqualityConstraintMatrices function with a problem
+	that led to panics in the field.
+	The problem is Problem4 from our examples file.
+	The problem will have:
+	- a linear objective
+	- 3 variables (each labeled as positive implicitly via the final 3 constraints),
+	- and a single linear VECTOR equality constraint.
+	The resulting problem should have 6 constraints (3 coming from inequality constraint)
+	and 3 from the positivity constraints.
+	The resulting linear equality constraint matrix should have 3 rows and 3+3 columns
+	(3 variables, 3 inequality constraints, and 3 positivity constraints).
+*/
+func TestOptimizationProblem_LinearEqualityConstraintMatrices10(t *testing.T) {
+	// Constants
+	p1 := problem.GetExampleProblem5()
+
+	// Transform p1 into the standard form
+	p1Standard, slackVariables, err := p1.ToLPStandardForm1()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Attempt to Call LinearEqualityConstraintMatrices
+	A, b, err := p1Standard.LinearEqualityConstraintMatrices()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of rows is as expected.
+
+	if A.Dims()[0] != 3 {
+		t.Errorf("expected the number of rows to be %v; received %v",
+			3, A.Dims()[0])
+	}
+
+	// Check that the number of columns is as expected.
+	nVariables1 := len(p1.Variables)
+	nSlackVariables1 := len(slackVariables)
+	expectedNumVariables := nVariables1 + nSlackVariables1
+	if A.Dims()[1] != expectedNumVariables {
+		t.Errorf("expected the number of columns to be %v; received %v",
+			expectedNumVariables, A.Dims()[1])
+	}
+
+	// Check that the number of elements in b is as expected.
+	if len(b) != 3 {
+		t.Errorf("expected the number of elements in b to be %v; received %v",
+			3, len(b))
+	}
+}
+
+/*
 TestOptimizationProblem_ToProblemWithAllPositiveVariables1
 Description:
 
@@ -2018,6 +2124,62 @@ func TestOptimizationProblem_ToProblemWithAllPositiveVariables1(t *testing.T) {
 }
 
 /*
+TestOptimizationProblem_ToProblemWithAllPositiveVariables2
+Description:
+
+	Tests the ToProblemWithAllPositiveVariables function with a simple problem
+	that has:
+	- a constant objective
+	- 2 variables,
+	- and two scalar linear inequality constraints.
+	One of the variables is purely positive, while the other is purely negative.
+	The result should be a problem with 2 variables and 2 constraints.
+*/
+func TestOptimizationProblem_ToProblemWithAllPositiveVariables2(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToProblemWithAllPositiveVariables2")
+	vv1 := p1.AddVariableVector(2)
+	// Add constraints
+	c1 := vv1.AtVec(0).GreaterEq(1.0)
+	c2 := vv1.AtVec(1).LessEq(-2.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+	p1.Constraints = append(p1.Constraints, c2)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	p2, err := p1.ToProblemWithAllPositiveVariables()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of variables is as expected.
+	if len(p2.Variables) != 2 {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			2, len(p2.Variables))
+	}
+
+	// Check that the number of constraints is as expected.
+	if len(p2.Constraints) != 2 {
+		t.Errorf("expected the number of constraints to be %v; received %v",
+			2, len(p2.Constraints))
+	}
+
+	// Verify that the new constraints contain two variables in the left hand side
+	for _, c := range p2.Constraints {
+		if len(c.Left().Variables()) != 1 {
+			t.Errorf("expected the number of variables in the left hand side to be %v; received %v",
+				1, len(c.Left().Variables()))
+		}
+	}
+}
+
+/*
 TestOptimizationProblem_ToLPStandardForm1_1
 Description:
 
@@ -2032,8 +2194,7 @@ func TestOptimizationProblem_ToLPStandardForm1_1(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_1")
 	v1 := p1.AddVariable()
-	p1.AddVariable()
-	c1 := v1.GreaterEq(1.0)
+	c1 := v1.GreaterEq(-1.0)
 
 	p1.Constraints = append(p1.Constraints, c1)
 
@@ -2055,7 +2216,7 @@ func TestOptimizationProblem_ToLPStandardForm1_1(t *testing.T) {
 	expectedNumVariables += len(p1.Constraints)   // slack variables
 	if len(p2.Variables) != expectedNumVariables {
 		t.Errorf("expected the number of variables to be %v; received %v",
-			2, len(p2.Variables))
+			expectedNumVariables, len(p2.Variables))
 	}
 
 	// Check that the number of constraints is as expected.
@@ -2393,7 +2554,7 @@ func TestOptimizationProblem_ToLPStandardForm1_7(t *testing.T) {
 
 	// Check that the number of variables is as expected.
 	expectedNumVariables := 0
-	expectedNumVariables += 2 * len(p1.Variables) // original variables (positive and negative halfs)
+	expectedNumVariables += 3 // original variables (one with positive and negative halfs, the other with only the positive part)
 	if len(p2.Variables) != expectedNumVariables {
 		t.Errorf("expected the number of variables to be %v; received %v",
 			expectedNumVariables, len(p2.Variables))
@@ -2505,7 +2666,7 @@ Description:
 	C = [ 0 0  1 -1 0 0  0  -1 0 ]
 		[ 0 0  0 0  1 -1 0  0  -1 ]
 	and
-		b = [ 1 2 3 ]
+		b = [ -1 -2 -3 ]
 	By creating a problem with 3 variables and 3 linear inequality constraints.
 	The results should produce equality constraint matrix C
 	with 3 rows and 6 columns and a vector b with 3 elements.
@@ -2514,9 +2675,9 @@ func TestOptimizationProblem_ToLPStandardForm1_9(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_9")
 	vv1 := p1.AddVariableVector(3)
-	c1 := vv1.AtVec(0).GreaterEq(1.0)
-	c2 := vv1.AtVec(1).GreaterEq(2.0)
-	c3 := vv1.AtVec(2).GreaterEq(3.0)
+	c1 := vv1.AtVec(0).GreaterEq(-1.0)
+	c2 := vv1.AtVec(1).GreaterEq(-2.0)
+	c3 := vv1.AtVec(2).GreaterEq(-3.0)
 
 	p1.Constraints = append(p1.Constraints, c1)
 	p1.Constraints = append(p1.Constraints, c2)
