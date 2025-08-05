@@ -886,8 +886,16 @@ Description:
 func (op *OptimizationProblem) CopyVariable(variable symbolic.Variable) symbolic.Variable {
 	// Setup
 	newVariable := variable
-	newVariable.ID = uint64(len(op.Variables)) // Assign a new ID
 	newVariable.Name = fmt.Sprintf("%s (copy)", variable.Name)
+
+	// Assign a new, unique ID to the variable
+	maxID := uint64(0)
+	for _, v := range op.Variables {
+		if v.ID >= maxID {
+			maxID = v.ID + 1
+		}
+	}
+	newVariable.ID = maxID
 
 	// Add the new variable to the problem
 	op.Variables = append(op.Variables, newVariable)
@@ -918,7 +926,7 @@ func (op *OptimizationProblem) Copy() *OptimizationProblem {
 	}
 
 	// Copy Objective
-	newProblem.Objective = op.Objective
+	newProblem.Objective = *op.Objective.SubstituteAccordingTo(replacementMap)
 
 	// Return the new problem
 	return newProblem
