@@ -2035,10 +2035,10 @@ Description:
 */
 func TestOptimizationProblem_LinearEqualityConstraintMatrices10(t *testing.T) {
 	// Constants
-	p1 := problem.GetExampleProblem4()
+	p1 := problem.GetExampleProblem5()
 
 	// Transform p1 into the standard form
-	p1Standard, _, err := p1.ToLPStandardForm1()
+	p1Standard, slackVariables, err := p1.ToLPStandardForm1()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2050,6 +2050,7 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices10(t *testing.T) {
 	}
 
 	// Check that the number of rows is as expected.
+
 	if A.Dims()[0] != 3 {
 		t.Errorf("expected the number of rows to be %v; received %v",
 			3, A.Dims()[0])
@@ -2057,10 +2058,11 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices10(t *testing.T) {
 
 	// Check that the number of columns is as expected.
 	nVariables1 := len(p1.Variables)
-	nInequalityConstraints1 := p1.Constraints[0].Left().Dims()[0]
-	if A.Dims()[1] != nVariables1+nInequalityConstraints1 {
+	nSlackVariables1 := len(slackVariables)
+	expectedNumVariables := nVariables1 + nSlackVariables1
+	if A.Dims()[1] != expectedNumVariables {
 		t.Errorf("expected the number of columns to be %v; received %v",
-			nVariables1+nInequalityConstraints1, A.Dims()[1])
+			expectedNumVariables, A.Dims()[1])
 	}
 
 	// Check that the number of elements in b is as expected.

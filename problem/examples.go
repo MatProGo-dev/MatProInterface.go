@@ -109,7 +109,7 @@ func GetExampleProblem4() *OptimizationProblem {
 }
 
 /*
-GetExampleProblem3
+GetExampleProblem5
 Description:
 
 	Returns the LP from this youtube video:

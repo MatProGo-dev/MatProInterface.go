@@ -684,8 +684,6 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 		problemIn.Name + " (In Standard Form)",
 	)
 
-	// Copy over each of the
-
 	// Add all variables to the new problem
 	mapFromInToNewVariables := make(map[symbolic.Variable]symbolic.Expression)
 	for _, varII := range problemWithAllPositiveVariables.Variables {
@@ -695,8 +693,9 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 	}
 
 	// Add all constraints to the new problem
+	problemWithPositivesAndCleanedConstraints := problemWithAllPositiveVariables.WithAllPositiveVariableConstraintsRemoved()
 	slackVariables := []symbolic.Variable{}
-	for _, constraint := range problemWithAllPositiveVariables.Constraints {
+	for _, constraint := range problemWithPositivesAndCleanedConstraints.Constraints {
 		// Create a new expression by substituting the variables according
 		// to the map we created above
 		oldLHS := constraint.Left()
@@ -829,6 +828,63 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 
 	// Return the new problem and the slack variables
 	return problemInStandardForm, slackVariables, nil
+}
+
+/*
+WithAllPositiveVariableConstraintsRemoved
+Description:
+
+	Returns a new optimization problem that is the same as the original problem
+	but with all constraints of the following form removed:
+		x >= 0
+		0 <= x
+	Where x is a variable in the problem.
+	This is useful for removing redundant constraints that are already implied by the variable bounds.
+*/
+func (op *OptimizationProblem) WithAllPositiveVariableConstraintsRemoved() *OptimizationProblem {
+	// Setup
+	newProblem := NewProblem(op.Name)
+
+	// Copy the variables
+	for _, variable := range op.Variables {
+		newProblem.Variables = append(newProblem.Variables, variable)
+	}
+
+	// Copy the constraints
+	for _, constraintII := range op.Constraints {
+		// Check if the constraint is a x >= 0 constraint
+		if symbolic.SenseGreaterThanEqual == constraintII.ConstrSense() {
+			lhsContains1Variable := len(constraintII.Left().Variables()) == 1
+			rhs, rhsIsConstant := constraintII.Right().(symbolic.K)
+			if lhsContains1Variable && rhsIsConstant {
+				if float64(rhs) == 0.0 {
+					// If the constraint is of the form x >= 0, we can remove it
+					continue
+				}
+			}
+		}
+
+		// Check if the constraint is a 0 <= x constraint
+		if symbolic.SenseLessThanEqual == constraintII.ConstrSense() {
+			rhsContains1Variable := len(constraintII.Left().Variables()) == 1
+			lhs, lhsIsConstant := constraintII.Right().(symbolic.K)
+			if rhsContains1Variable && lhsIsConstant {
+				if float64(lhs) == 0.0 {
+					// If the constraint is of the form 0 <= x, we can remove it
+					continue
+				}
+			}
+		}
+
+		// Otherwise, we can keep the constraint
+		newProblem.Constraints = append(newProblem.Constraints, constraintII)
+	}
+
+	// Copy the objective
+	newProblem.Objective = op.Objective
+
+	// Return the new problem
+	return newProblem
 }
 
 /*
