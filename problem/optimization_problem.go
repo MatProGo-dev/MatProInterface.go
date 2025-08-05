@@ -824,7 +824,8 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 		problemWithAllPositiveVariables.Objective.Sense,
 	)
 
-	// fmt.Printf("The slack variables are: %v\n", slackVariables)
+	// Simplify The Constraints If Possible
+	problemInStandardForm.SimplifyConstraints()
 
 	// Return the new problem and the slack variables
 	return problemInStandardForm, slackVariables, nil
