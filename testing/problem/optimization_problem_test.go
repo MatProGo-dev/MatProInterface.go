@@ -2943,3 +2943,66 @@ func TestOptimizationProblem_SimplifyConstraints3(t *testing.T) {
 			L1, L2)
 	}
 }
+
+/*
+TestOptimizationProblem_ToLPStandardForm2_1
+Description:
+
+	Tests the ToLPStandardForm2 function with a simple problem
+	that contains:
+	- a linear objective,
+	- a MINIMIZATION sense
+	- 1 variable,
+	- and a single linear inequality constraint (SenseGreaterThanEqual).
+	The result should be a problem with 2 variables and 1 constraint.
+	The sense of the resulting problem should be MAXIMIZATION.
+*/
+func TestOptimizationProblem_ToLPStandardForm2_1(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm2_1")
+	v1 := p1.AddVariable()
+	c1 := v1.GreaterEq(-1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		v1,
+		problem.SenseMinimize,
+	)
+
+	// Algorithm
+	p2, _, err := p1.ToLPStandardForm2()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of variables is as expected.
+	expectedNumVariables := 0
+	expectedNumVariables += 2 * len(p1.Variables) // original variables (positive and negative halfs)
+	expectedNumVariables += len(p1.Constraints)   // slack variables
+	if len(p2.Variables) != expectedNumVariables {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			expectedNumVariables, len(p2.Variables))
+	}
+
+	// Check that the number of constraints is as expected.
+	if len(p2.Constraints) != 1 {
+		t.Errorf("expected the number of constraints to be %v; received %v",
+			1, len(p2.Constraints))
+	}
+
+	// Verify that all constraints are equality constraints
+	for _, c := range p2.Constraints {
+		if c.ConstrSense() != symbolic.SenseEqual {
+			t.Errorf("expected the constraint to be an equality constraint; received %v",
+				c.ConstrSense())
+		}
+	}
+
+	// Verify that the sense of the objective is MAXIMIZATION
+	if p2.Objective.Sense != problem.SenseMaximize {
+		t.Errorf("expected the sense of the objective to be %v; received %v",
+			problem.SenseMaximize, p2.Objective.Sense)
+	}
+}

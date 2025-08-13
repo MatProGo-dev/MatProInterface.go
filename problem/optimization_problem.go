@@ -832,6 +832,52 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 }
 
 /*
+ToLPStandardForm2
+Description:
+
+	Transforms the given linear program (represented in an OptimizationProblem object)
+	into a standard form (i.e., only linear equality constraints and a linear objective function).
+
+		max c^T * x
+		subject to
+		A * x = b
+		x >= 0
+
+	Where:
+	- A is a matrix of coefficients,
+	- b is a vector of constants, and
+	- c is the vector of coefficients for the objective function.
+	This method also returns the slack variables (i.e., the variables that
+	are added to the problem to convert the inequalities into equalities).
+*/
+func (problemIn *OptimizationProblem) ToLPStandardForm2() (*OptimizationProblem, []symbolic.Variable, error) {
+	// Input Processing
+	err := problemIn.Check()
+	if err != nil {
+		return nil, nil, fmt.Errorf("the optimization problem is not well-formed: %v", err)
+	}
+
+	// Use the existing method to convert to standard form 1
+	problemInStandardForm, slackVariables, err := problemIn.ToLPStandardForm1()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// Modify the objective function to be a maximization problem,
+	// if it is not already.
+	if problemInStandardForm.Objective.Sense == SenseMinimize {
+		newObjectiveExpression := problemInStandardForm.Objective.Expression.Multiply(-1.0)
+		err = problemInStandardForm.SetObjective(newObjectiveExpression, SenseMaximize)
+		if err != nil {
+			return nil, nil, fmt.Errorf("there was a problem setting the new objective function: %v", err)
+		}
+	}
+
+	// Return the new problem and the slack variables
+	return problemInStandardForm, slackVariables, nil
+}
+
+/*
 WithAllPositiveVariableConstraintsRemoved
 Description:
 
