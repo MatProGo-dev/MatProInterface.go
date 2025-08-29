@@ -661,6 +661,12 @@ Description:
 	Where A is a matrix of coefficients, b is a vector of constants, and c is the vector of coefficients
 	for the objective function. This method also returns the slack variables (i.e., the variables that
 	are added to the problem to convert the inequalities into equalities).
+
+Note:
+
+	This method will transform the vector or matrix constraints in the input problem
+	into a set of scalar constraints. Thus, the number of constraints in your problem may
+	"seem" to change.
 */
 func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem, []symbolic.Variable, error) {
 	// Input Processing
@@ -674,8 +680,8 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 		return nil, nil, problemIn.CheckIfLinear()
 	}
 
-	// Setup
-	problemWithAllPositiveVariables, err := problemIn.ToProblemWithAllPositiveVariables()
+	// Change the problem so that it is written in terms of strictly positive variables
+	problemWithAllPositiveVariables, err := problemIn.ToProblemWithAllPositiveVariables() // Note: This method may change the number of variables and constraints in the problem.
 	if err != nil {
 		return nil, nil, err
 	}
