@@ -1218,6 +1218,66 @@ func TestOptimizationProblem_IsLinear4(t *testing.T) {
 }
 
 /*
+TestOptimizationProblem_IsLinear5
+Description:
+
+	Tests the IsLinear function with an optimization problem
+	that is NOT well-defined.
+	The function should cause a panic.
+*/
+func TestOptimizationProblem_IsLinear5(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_IsLinear5")
+	vv1 := p1.AddVariableVector(3)
+	c1 := vv1.AtVec(0).LessEq(1.0)
+	c2 := symbolic.ScalarConstraint{
+		LeftHandSide: vv1.AtVec(1),
+		RightHandSide: symbolic.Monomial{
+			Coefficient:     1.0,
+			VariableFactors: []symbolic.Variable{vv1.AtVec(1).(symbolic.Variable)},
+			Exponents:       []int{1, 2},
+		},
+		Sense: symbolic.SenseLessThanEqual,
+	}
+
+	// Add constraints
+	p1.Constraints = append(p1.Constraints, c1)
+	p1.Constraints = append(p1.Constraints, c2)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		vv1.Transpose().Multiply(symbolic.OnesVector(3)),
+		problem.SenseMinimize,
+	)
+
+	// Algorithm should panic with a not well-defined error
+	defer func() {
+		r := recover()
+		if r == nil {
+			t.Errorf("expected a panic; received none")
+		}
+
+		err, tf := r.(error)
+		if !tf {
+			t.Errorf("expected a panic of type error; received %T", r)
+		}
+
+		// Create the expected error
+		expectedError := p1.Check()
+		if !strings.Contains(
+			err.Error(),
+			expectedError.Error(),
+		) {
+			t.Errorf("expected a not well-defined panic; received %v", r)
+		}
+
+	}()
+
+	p1.IsLinear()
+	t.Errorf("expected a panic; received none")
+}
+
+/*
 TestOptimizationProblem_LinearInequalityConstraintMatrices1
 Description:
 
@@ -2734,6 +2794,49 @@ func TestOptimizationProblem_ToLPStandardForm1_9(t *testing.T) {
 	if len(b) != 3 {
 		t.Errorf("expected the number of elements in b to be %v; received %v",
 			3, len(b))
+	}
+}
+
+/*
+TestOptimizationProblem_ToLPStandardForm1_10
+Description:
+
+	This method verifies that the method will return an error
+	if the optimization problem is not well-defined.
+	In this case, we will create a problem with a constraint
+	that has mismatched dimensions.
+*/
+func TestOptimizationProblem_ToLPStandardForm1_10(t *testing.T) {
+	// Setup
+	N := 10
+
+	// Create objective function
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_10")
+	x := p1.AddVariableVector(N)
+	p1.Constraints = append(
+		p1.Constraints,
+		symbolic.VectorConstraint{
+			LeftHandSide:  x,
+			RightHandSide: symbolic.VecDenseToKVector(symbolic.OnesVector(N + 1)), // Mismatched dimensions
+			Sense:         symbolic.SenseLessThanEqual,
+		},
+	)
+
+	p1.Objective = *problem.NewObjective(
+		x.Transpose().Multiply(symbolic.OnesVector(x.Len())),
+		problem.SenseMinimize,
+	)
+
+	// Call the ToLPStandardForm1
+	_, _, err := p1.ToLPStandardForm1()
+	if err == nil {
+		t.Errorf("expected an error; received nil")
+	}
+
+	// Create the expected error
+	expectedError := p1.MakeNotWellDefinedError()
+	if err.Error() != expectedError.Error() {
+		t.Errorf("unexpected error: %v", err)
 	}
 }
 

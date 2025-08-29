@@ -5,6 +5,7 @@ import (
 
 	"github.com/MatProGo-dev/MatProInterface.go/causeOfProblemNonlinearity"
 	"github.com/MatProGo-dev/MatProInterface.go/mpiErrors"
+	ope "github.com/MatProGo-dev/MatProInterface.go/mpiErrors/optimization_problem"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	getKVector "github.com/MatProGo-dev/SymbolicMath.go/get/KVector"
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
@@ -665,7 +666,7 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 	// Input Processing
 	err := problemIn.Check()
 	if err != nil {
-		return nil, nil, fmt.Errorf("the optimization problem is not well-formed: %v", err)
+		return nil, nil, problemIn.MakeNotWellDefinedError()
 	}
 
 	// Check if the problem is linear
@@ -854,7 +855,7 @@ func (problemIn *OptimizationProblem) ToLPStandardForm2() (*OptimizationProblem,
 	// Input Processing
 	err := problemIn.Check()
 	if err != nil {
-		return nil, nil, fmt.Errorf("the optimization problem is not well-formed: %v", err)
+		return nil, nil, problemIn.MakeNotWellDefinedError()
 	}
 
 	// Use the existing method to convert to standard form 1
@@ -866,6 +867,8 @@ func (problemIn *OptimizationProblem) ToLPStandardForm2() (*OptimizationProblem,
 	// Modify the objective function to be a maximization problem,
 	// if it is not already.
 	if problemInStandardForm.Objective.Sense == SenseMinimize {
+		// If the problem is a minimization problem,
+		// then we can convert it to a maximization problem by negating the objective function.
 		newObjectiveExpression := problemInStandardForm.Objective.Expression.Multiply(-1.0)
 		err = problemInStandardForm.SetObjective(newObjectiveExpression, SenseMaximize)
 		if err != nil {
@@ -1057,4 +1060,11 @@ func (op *OptimizationProblem) SimplifyConstraints() {
 
 	// Set the new constraints
 	op.Constraints = newConstraints
+}
+
+func (op *OptimizationProblem) MakeNotWellDefinedError() ope.NotWellDefinedError {
+	return ope.NotWellDefinedError{
+		ProblemName: op.Name,
+		ErrorSource: op.Check(),
+	}
 }
