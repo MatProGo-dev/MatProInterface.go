@@ -715,94 +715,32 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 		case symbolic.SenseEqual:
 			// No need to do anything
 		case symbolic.SenseGreaterThanEqual:
-			switch concreteConstraint := constraint.(type) {
-			case symbolic.ScalarConstraint:
-				// Add a new SCALAR slack variable to the right hand side
-				problemInStandardForm.AddVariableClassic(0.0, symbolic.Infinity.Constant(), symbolic.Continuous)
-				nVariables := len(problemInStandardForm.Variables)
-				problemInStandardForm.Variables[nVariables-1].Name = problemInStandardForm.Variables[nVariables-1].Name + " (slack)"
-				slackVariables = append(
-					slackVariables,
-					problemInStandardForm.Variables[nVariables-1],
-				)
+			// Constraints MUST be scalar at this point
 
-				newRHS = newRHS.Plus(problemInStandardForm.Variables[nVariables-1])
-			case symbolic.VectorConstraint:
-				// Add a new VECTOR slack variable to the right hand side
-				// TODO(Kwesi): Revisit this when we have a proper Len() method for constraints.
-				dims := concreteConstraint.Dims()
-				nRows := dims[0]
-				problemInStandardForm.AddVariableVectorClassic(
-					nRows,
-					0.0,
-					symbolic.Infinity.Constant(),
-					symbolic.Continuous,
-				)
-				nVariables := len(problemInStandardForm.Variables)
-				for jj := nRows - 1; jj >= 0; jj-- {
-					problemInStandardForm.Variables[nVariables-1-jj].Name = problemInStandardForm.Variables[nVariables-1-jj].Name + " (slack)"
-					slackVariables = append(
-						slackVariables,
-						problemInStandardForm.Variables[nVariables-1-jj],
-					)
-				}
+			// Add a new SCALAR slack variable to the right hand side
+			problemInStandardForm.AddVariableClassic(0.0, symbolic.Infinity.Constant(), symbolic.Continuous)
+			nVariables := len(problemInStandardForm.Variables)
+			problemInStandardForm.Variables[nVariables-1].Name = problemInStandardForm.Variables[nVariables-1].Name + " (slack)"
+			slackVariables = append(
+				slackVariables,
+				problemInStandardForm.Variables[nVariables-1],
+			)
 
-				// Add the slack variable to the right hand side
-				newRHS = newRHS.Plus(
-					symbolic.VariableVector(problemInStandardForm.Variables[nVariables-nRows : nVariables]),
-				)
-			default:
-				return nil, nil, fmt.Errorf(
-					"Unexpected constraint type: %T for \"ToStandardFormWithSlackVariables\" with %v sense",
-					constraint,
-					constraint.ConstrSense(),
-				)
+			newRHS = newRHS.Plus(problemInStandardForm.Variables[nVariables-1])
 
-			}
 		case symbolic.SenseLessThanEqual:
-			// Use a switch statement to handle different dimensions of the constraint
-			switch concreteConstraint := constraint.(type) {
-			case symbolic.ScalarConstraint:
-				// Add a new SCALAR slack variable to the left hand side
-				problemInStandardForm.AddVariableClassic(0.0, symbolic.Infinity.Constant(), symbolic.Continuous)
-				nVariables := len(problemInStandardForm.Variables)
-				problemInStandardForm.Variables[nVariables-1].Name = problemInStandardForm.Variables[nVariables-1].Name + " (slack)"
-				slackVariables = append(
-					slackVariables,
-					problemInStandardForm.Variables[nVariables-1],
-				)
-				newLHS = newLHS.Plus(problemInStandardForm.Variables[nVariables-1])
-			case symbolic.VectorConstraint:
-				// Add a new VECTOR slack variable to the left hand side
-				// TODO(Kwesi): Revisit this when we have a proper Len() method for constraints.
-				dims := concreteConstraint.Dims()
-				nRows := dims[0]
-				problemInStandardForm.AddVariableVectorClassic(
-					nRows,
-					0.0,
-					symbolic.Infinity.Constant(),
-					symbolic.Continuous,
-				)
-				nVariables := len(problemInStandardForm.Variables)
-				for jj := nRows - 1; jj >= 0; jj-- {
-					problemInStandardForm.Variables[nVariables-1-jj].Name = problemInStandardForm.Variables[nVariables-1-jj].Name + " (slack)"
-					slackVariables = append(
-						slackVariables,
-						problemInStandardForm.Variables[nVariables-1-jj],
-					)
-					// fmt.Printf("Slack variable %d: %v\n", jj, problemInStandardForm.Variables[nVariables-1-jj])
-				}
-				// Add the slack variable to the left hand side
-				newLHS = newLHS.Plus(
-					symbolic.VariableVector(problemInStandardForm.Variables[nVariables-nRows : nVariables]),
-				)
-			default:
-				return nil, nil, fmt.Errorf(
-					"Unexpected constraint type %T for \"ToStandardFormWithSlackVariables\" with %v sense",
-					constraint,
-					constraint.ConstrSense(),
-				)
-			}
+			// Constraints MUST be scalar at this point
+
+			// Add a new SCALAR slack variable to the left hand side
+			problemInStandardForm.AddVariableClassic(0.0, symbolic.Infinity.Constant(), symbolic.Continuous)
+			nVariables := len(problemInStandardForm.Variables)
+			problemInStandardForm.Variables[nVariables-1].Name = problemInStandardForm.Variables[nVariables-1].Name + " (slack)"
+			slackVariables = append(
+				slackVariables,
+				problemInStandardForm.Variables[nVariables-1],
+			)
+			newLHS = newLHS.Plus(problemInStandardForm.Variables[nVariables-1])
+
 		default:
 			return nil, nil, fmt.Errorf(
 				"Unknown constraint sense: " + constraint.ConstrSense().String(),
