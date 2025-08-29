@@ -1218,6 +1218,66 @@ func TestOptimizationProblem_IsLinear4(t *testing.T) {
 }
 
 /*
+TestOptimizationProblem_IsLinear5
+Description:
+
+	Tests the IsLinear function with an optimization problem
+	that is NOT well-defined.
+	The function should cause a panic.
+*/
+func TestOptimizationProblem_IsLinear5(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_IsLinear5")
+	vv1 := p1.AddVariableVector(3)
+	c1 := vv1.AtVec(0).LessEq(1.0)
+	c2 := symbolic.ScalarConstraint{
+		LeftHandSide: vv1.AtVec(1),
+		RightHandSide: symbolic.Monomial{
+			Coefficient:     1.0,
+			VariableFactors: []symbolic.Variable{vv1.AtVec(1).(symbolic.Variable)},
+			Exponents:       []int{1, 2},
+		},
+		Sense: symbolic.SenseLessThanEqual,
+	}
+
+	// Add constraints
+	p1.Constraints = append(p1.Constraints, c1)
+	p1.Constraints = append(p1.Constraints, c2)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		vv1.Transpose().Multiply(symbolic.OnesVector(3)),
+		problem.SenseMinimize,
+	)
+
+	// Algorithm should panic with a not well-defined error
+	defer func() {
+		r := recover()
+		if r == nil {
+			t.Errorf("expected a panic; received none")
+		}
+
+		err, tf := r.(error)
+		if !tf {
+			t.Errorf("expected a panic of type error; received %T", r)
+		}
+
+		// Create the expected error
+		expectedError := p1.Check()
+		if !strings.Contains(
+			err.Error(),
+			expectedError.Error(),
+		) {
+			t.Errorf("expected a not well-defined panic; received %v", r)
+		}
+
+	}()
+
+	p1.IsLinear()
+	t.Errorf("expected a panic; received none")
+}
+
+/*
 TestOptimizationProblem_LinearInequalityConstraintMatrices1
 Description:
 
@@ -2287,9 +2347,12 @@ func TestOptimizationProblem_ToLPStandardForm1_2(t *testing.T) {
 	}
 
 	// Check that the number of constraints is as expected.
-	if len(p2.Constraints) != 1 {
-		t.Errorf("expected the number of constraints to be %v; received %v",
-			5, len(p2.Constraints))
+	if len(p2.Constraints) != 5 {
+		t.Errorf(
+			"expected the number of constraints to be %v; received %v",
+			5,
+			len(p2.Constraints),
+		)
 	}
 
 	// Verify that all constraints are equality constraints
@@ -2354,9 +2417,12 @@ func TestOptimizationProblem_ToLPStandardForm1_3(t *testing.T) {
 	}
 
 	// Check that the number of constraints is as expected.
-	if len(p2.Constraints) != 1 {
-		t.Errorf("expected the number of constraints to be %v; received %v",
-			expectedNumVariables, len(p2.Constraints))
+	if len(p2.Constraints) != A2.Dims()[0] {
+		t.Errorf(
+			"expected the number of constraints to be %v; received %v",
+			A2.Dims()[0],
+			len(p2.Constraints),
+		)
 	}
 
 	// Verify that all constraints are equality constraints
@@ -2738,6 +2804,49 @@ func TestOptimizationProblem_ToLPStandardForm1_9(t *testing.T) {
 }
 
 /*
+TestOptimizationProblem_ToLPStandardForm1_10
+Description:
+
+	This method verifies that the method will return an error
+	if the optimization problem is not well-defined.
+	In this case, we will create a problem with a constraint
+	that has mismatched dimensions.
+*/
+func TestOptimizationProblem_ToLPStandardForm1_10(t *testing.T) {
+	// Setup
+	N := 10
+
+	// Create objective function
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_10")
+	x := p1.AddVariableVector(N)
+	p1.Constraints = append(
+		p1.Constraints,
+		symbolic.VectorConstraint{
+			LeftHandSide:  x,
+			RightHandSide: symbolic.VecDenseToKVector(symbolic.OnesVector(N + 1)), // Mismatched dimensions
+			Sense:         symbolic.SenseLessThanEqual,
+		},
+	)
+
+	p1.Objective = *problem.NewObjective(
+		x.Transpose().Multiply(symbolic.OnesVector(x.Len())),
+		problem.SenseMinimize,
+	)
+
+	// Call the ToLPStandardForm1
+	_, _, err := p1.ToLPStandardForm1()
+	if err == nil {
+		t.Errorf("expected an error; received nil")
+	}
+
+	// Create the expected error
+	expectedError := p1.MakeNotWellDefinedError()
+	if err.Error() != expectedError.Error() {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+/*
 TestOptimizationProblem_CheckIfLinear1
 Description:
 
@@ -2941,5 +3050,102 @@ func TestOptimizationProblem_SimplifyConstraints3(t *testing.T) {
 	if L1.AtVec(0) != L2.AtVec(0) {
 		t.Errorf("expected the remaining constraint's coefficient to be %v; received %v",
 			L1, L2)
+	}
+}
+
+/*
+TestOptimizationProblem_ToLPStandardForm2_1
+Description:
+
+	Tests the ToLPStandardForm2 function with a simple problem
+	that contains:
+	- a linear objective,
+	- a MINIMIZATION sense
+	- 1 variable,
+	- and a single linear inequality constraint (SenseGreaterThanEqual).
+	The result should be a problem with 2 variables and 1 constraint.
+	The sense of the resulting problem should be MAXIMIZATION.
+*/
+func TestOptimizationProblem_ToLPStandardForm2_1(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm2_1")
+	v1 := p1.AddVariable()
+	c1 := v1.GreaterEq(-1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		v1,
+		problem.SenseMinimize,
+	)
+
+	// Algorithm
+	p2, _, err := p1.ToLPStandardForm2()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of variables is as expected.
+	expectedNumVariables := 0
+	expectedNumVariables += 2 * len(p1.Variables) // original variables (positive and negative halfs)
+	expectedNumVariables += len(p1.Constraints)   // slack variables
+	if len(p2.Variables) != expectedNumVariables {
+		t.Errorf("expected the number of variables to be %v; received %v",
+			expectedNumVariables, len(p2.Variables))
+	}
+
+	// Check that the number of constraints is as expected.
+	if len(p2.Constraints) != 1 {
+		t.Errorf("expected the number of constraints to be %v; received %v",
+			1, len(p2.Constraints))
+	}
+
+	// Verify that all constraints are equality constraints
+	for _, c := range p2.Constraints {
+		if c.ConstrSense() != symbolic.SenseEqual {
+			t.Errorf("expected the constraint to be an equality constraint; received %v",
+				c.ConstrSense())
+		}
+	}
+
+	// Verify that the sense of the objective is MAXIMIZATION
+	if p2.Objective.Sense != problem.SenseMaximize {
+		t.Errorf("expected the sense of the objective to be %v; received %v",
+			problem.SenseMaximize, p2.Objective.Sense)
+	}
+}
+
+/*
+TestOptimizationProblem_CopyVariable1
+Description:
+
+	This method tests that the CopyVariable method for OptimizationProblem
+	properly creates a copy of one variable in an optimization problem.
+	Check that:
+	- the new variable has a different ID than the one that is copied
+	- the new variable has a slightly different name than the one that is copied
+*/
+func TestOptimizationProblem_CopyVariable1(t *testing.T) {
+	p1 := problem.NewProblem("TestOptimizationProblem_CopyVariable1")
+	v1 := p1.AddVariable()
+
+	// Create a copy of the variable
+	v2 := p1.CopyVariable(v1)
+
+	// Check that the new variable has a different ID
+	if v1.ID == v2.ID {
+		t.Errorf(
+			"expected the new variable to have a different ID; received %v",
+			v2.ID,
+		)
+	}
+
+	// Check that the new variable has a slightly different name
+	if v1.Name == v2.Name {
+		t.Errorf(
+			"expected the new variable to have a slightly different name; received %v",
+			v2.Name,
+		)
 	}
 }

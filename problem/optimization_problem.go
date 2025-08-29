@@ -5,6 +5,7 @@ import (
 
 	"github.com/MatProGo-dev/MatProInterface.go/causeOfProblemNonlinearity"
 	"github.com/MatProGo-dev/MatProInterface.go/mpiErrors"
+	ope "github.com/MatProGo-dev/MatProInterface.go/mpiErrors/optimization_problem"
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	getKVector "github.com/MatProGo-dev/SymbolicMath.go/get/KVector"
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
@@ -660,12 +661,18 @@ Description:
 	Where A is a matrix of coefficients, b is a vector of constants, and c is the vector of coefficients
 	for the objective function. This method also returns the slack variables (i.e., the variables that
 	are added to the problem to convert the inequalities into equalities).
+
+Note:
+
+	This method will transform the vector or matrix constraints in the input problem
+	into a set of scalar constraints. Thus, the number of constraints in your problem may
+	"seem" to change.
 */
 func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem, []symbolic.Variable, error) {
 	// Input Processing
 	err := problemIn.Check()
 	if err != nil {
-		return nil, nil, fmt.Errorf("the optimization problem is not well-formed: %v", err)
+		return nil, nil, problemIn.MakeNotWellDefinedError()
 	}
 
 	// Check if the problem is linear
@@ -673,8 +680,8 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 		return nil, nil, problemIn.CheckIfLinear()
 	}
 
-	// Setup
-	problemWithAllPositiveVariables, err := problemIn.ToProblemWithAllPositiveVariables()
+	// Change the problem so that it is written in terms of strictly positive variables
+	problemWithAllPositiveVariables, err := problemIn.ToProblemWithAllPositiveVariables() // Note: This method may change the number of variables and constraints in the problem.
 	if err != nil {
 		return nil, nil, err
 	}
@@ -708,94 +715,32 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 		case symbolic.SenseEqual:
 			// No need to do anything
 		case symbolic.SenseGreaterThanEqual:
-			switch concreteConstraint := constraint.(type) {
-			case symbolic.ScalarConstraint:
-				// Add a new SCALAR slack variable to the right hand side
-				problemInStandardForm.AddVariableClassic(0.0, symbolic.Infinity.Constant(), symbolic.Continuous)
-				nVariables := len(problemInStandardForm.Variables)
-				problemInStandardForm.Variables[nVariables-1].Name = problemInStandardForm.Variables[nVariables-1].Name + " (slack)"
-				slackVariables = append(
-					slackVariables,
-					problemInStandardForm.Variables[nVariables-1],
-				)
+			// Constraints MUST be scalar at this point
 
-				newRHS = newRHS.Plus(problemInStandardForm.Variables[nVariables-1])
-			case symbolic.VectorConstraint:
-				// Add a new VECTOR slack variable to the right hand side
-				// TODO(Kwesi): Revisit this when we have a proper Len() method for constraints.
-				dims := concreteConstraint.Dims()
-				nRows := dims[0]
-				problemInStandardForm.AddVariableVectorClassic(
-					nRows,
-					0.0,
-					symbolic.Infinity.Constant(),
-					symbolic.Continuous,
-				)
-				nVariables := len(problemInStandardForm.Variables)
-				for jj := nRows - 1; jj >= 0; jj-- {
-					problemInStandardForm.Variables[nVariables-1-jj].Name = problemInStandardForm.Variables[nVariables-1-jj].Name + " (slack)"
-					slackVariables = append(
-						slackVariables,
-						problemInStandardForm.Variables[nVariables-1-jj],
-					)
-				}
+			// Add a new SCALAR slack variable to the right hand side
+			problemInStandardForm.AddVariableClassic(0.0, symbolic.Infinity.Constant(), symbolic.Continuous)
+			nVariables := len(problemInStandardForm.Variables)
+			problemInStandardForm.Variables[nVariables-1].Name = problemInStandardForm.Variables[nVariables-1].Name + " (slack)"
+			slackVariables = append(
+				slackVariables,
+				problemInStandardForm.Variables[nVariables-1],
+			)
 
-				// Add the slack variable to the right hand side
-				newRHS = newRHS.Plus(
-					symbolic.VariableVector(problemInStandardForm.Variables[nVariables-nRows : nVariables]),
-				)
-			default:
-				return nil, nil, fmt.Errorf(
-					"Unexpected constraint type: %T for \"ToStandardFormWithSlackVariables\" with %v sense",
-					constraint,
-					constraint.ConstrSense(),
-				)
+			newRHS = newRHS.Plus(problemInStandardForm.Variables[nVariables-1])
 
-			}
 		case symbolic.SenseLessThanEqual:
-			// Use a switch statement to handle different dimensions of the constraint
-			switch concreteConstraint := constraint.(type) {
-			case symbolic.ScalarConstraint:
-				// Add a new SCALAR slack variable to the left hand side
-				problemInStandardForm.AddVariableClassic(0.0, symbolic.Infinity.Constant(), symbolic.Continuous)
-				nVariables := len(problemInStandardForm.Variables)
-				problemInStandardForm.Variables[nVariables-1].Name = problemInStandardForm.Variables[nVariables-1].Name + " (slack)"
-				slackVariables = append(
-					slackVariables,
-					problemInStandardForm.Variables[nVariables-1],
-				)
-				newLHS = newLHS.Plus(problemInStandardForm.Variables[nVariables-1])
-			case symbolic.VectorConstraint:
-				// Add a new VECTOR slack variable to the left hand side
-				// TODO(Kwesi): Revisit this when we have a proper Len() method for constraints.
-				dims := concreteConstraint.Dims()
-				nRows := dims[0]
-				problemInStandardForm.AddVariableVectorClassic(
-					nRows,
-					0.0,
-					symbolic.Infinity.Constant(),
-					symbolic.Continuous,
-				)
-				nVariables := len(problemInStandardForm.Variables)
-				for jj := nRows - 1; jj >= 0; jj-- {
-					problemInStandardForm.Variables[nVariables-1-jj].Name = problemInStandardForm.Variables[nVariables-1-jj].Name + " (slack)"
-					slackVariables = append(
-						slackVariables,
-						problemInStandardForm.Variables[nVariables-1-jj],
-					)
-					// fmt.Printf("Slack variable %d: %v\n", jj, problemInStandardForm.Variables[nVariables-1-jj])
-				}
-				// Add the slack variable to the left hand side
-				newLHS = newLHS.Plus(
-					symbolic.VariableVector(problemInStandardForm.Variables[nVariables-nRows : nVariables]),
-				)
-			default:
-				return nil, nil, fmt.Errorf(
-					"Unexpected constraint type %T for \"ToStandardFormWithSlackVariables\" with %v sense",
-					constraint,
-					constraint.ConstrSense(),
-				)
-			}
+			// Constraints MUST be scalar at this point
+
+			// Add a new SCALAR slack variable to the left hand side
+			problemInStandardForm.AddVariableClassic(0.0, symbolic.Infinity.Constant(), symbolic.Continuous)
+			nVariables := len(problemInStandardForm.Variables)
+			problemInStandardForm.Variables[nVariables-1].Name = problemInStandardForm.Variables[nVariables-1].Name + " (slack)"
+			slackVariables = append(
+				slackVariables,
+				problemInStandardForm.Variables[nVariables-1],
+			)
+			newLHS = newLHS.Plus(problemInStandardForm.Variables[nVariables-1])
+
 		default:
 			return nil, nil, fmt.Errorf(
 				"Unknown constraint sense: " + constraint.ConstrSense().String(),
@@ -832,6 +777,54 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 }
 
 /*
+ToLPStandardForm2
+Description:
+
+	Transforms the given linear program (represented in an OptimizationProblem object)
+	into a standard form (i.e., only linear equality constraints and a linear objective function).
+
+		max c^T * x
+		subject to
+		A * x = b
+		x >= 0
+
+	Where:
+	- A is a matrix of coefficients,
+	- b is a vector of constants, and
+	- c is the vector of coefficients for the objective function.
+	This method also returns the slack variables (i.e., the variables that
+	are added to the problem to convert the inequalities into equalities).
+*/
+func (problemIn *OptimizationProblem) ToLPStandardForm2() (*OptimizationProblem, []symbolic.Variable, error) {
+	// Input Processing
+	err := problemIn.Check()
+	if err != nil {
+		return nil, nil, problemIn.MakeNotWellDefinedError()
+	}
+
+	// Use the existing method to convert to standard form 1
+	problemInStandardForm, slackVariables, err := problemIn.ToLPStandardForm1()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// Modify the objective function to be a maximization problem,
+	// if it is not already.
+	if problemInStandardForm.Objective.Sense == SenseMinimize {
+		// If the problem is a minimization problem,
+		// then we can convert it to a maximization problem by negating the objective function.
+		newObjectiveExpression := problemInStandardForm.Objective.Expression.Multiply(-1.0)
+		err = problemInStandardForm.SetObjective(newObjectiveExpression, SenseMaximize)
+		if err != nil {
+			return nil, nil, fmt.Errorf("there was a problem setting the new objective function: %v", err)
+		}
+	}
+
+	// Return the new problem and the slack variables
+	return problemInStandardForm, slackVariables, nil
+}
+
+/*
 WithAllPositiveVariableConstraintsRemoved
 Description:
 
@@ -851,30 +844,12 @@ func (op *OptimizationProblem) WithAllPositiveVariableConstraintsRemoved() *Opti
 		newProblem.Variables = append(newProblem.Variables, variable)
 	}
 
-	// Copy the constraints
-	for _, constraintII := range op.Constraints {
-		// Check if the constraint is a x >= 0 constraint
-		if symbolic.SenseGreaterThanEqual == constraintII.ConstrSense() {
-			lhsContains1Variable := len(constraintII.Left().Variables()) == 1
-			rhs, rhsIsConstant := constraintII.Right().(symbolic.K)
-			if lhsContains1Variable && rhsIsConstant {
-				if float64(rhs) == 0.0 {
-					// If the constraint is of the form x >= 0, we can remove it
-					continue
-				}
-			}
-		}
-
-		// Check if the constraint is a 0 <= x constraint
-		if symbolic.SenseLessThanEqual == constraintII.ConstrSense() {
-			rhsContains1Variable := len(constraintII.Left().Variables()) == 1
-			lhs, lhsIsConstant := constraintII.Right().(symbolic.K)
-			if rhsContains1Variable && lhsIsConstant {
-				if float64(lhs) == 0.0 {
-					// If the constraint is of the form 0 <= x, we can remove it
-					continue
-				}
-			}
+	// Reduce the constraints to scalar constraints
+	scalarConstraints := symbolic.CompileConstraintsIntoScalarConstraints(op.Constraints)
+	for _, constraintII := range scalarConstraints {
+		// Check if the constraint is a (Non-negativity) x >= 0 or 0 <= x constraint
+		if constraintII.IsNonnegativityConstraint() {
+			continue
 		}
 
 		// Otherwise, we can keep the constraint
@@ -1011,4 +986,11 @@ func (op *OptimizationProblem) SimplifyConstraints() {
 
 	// Set the new constraints
 	op.Constraints = newConstraints
+}
+
+func (op *OptimizationProblem) MakeNotWellDefinedError() ope.NotWellDefinedError {
+	return ope.NotWellDefinedError{
+		ProblemName: op.Name,
+		ErrorSource: op.Check(),
+	}
 }
