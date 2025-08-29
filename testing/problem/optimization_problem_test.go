@@ -3109,3 +3109,37 @@ func TestOptimizationProblem_ToLPStandardForm2_1(t *testing.T) {
 			problem.SenseMaximize, p2.Objective.Sense)
 	}
 }
+
+/*
+TestOptimizationProblem_CopyVariable1
+Description:
+
+	This method tests that the CopyVariable method for OptimizationProblem
+	properly creates a copy of one variable in an optimization problem.
+	Check that:
+	- the new variable has a different ID than the one that is copied
+	- the new variable has a slightly different name than the one that is copied
+*/
+func TestOptimizationProblem_CopyVariable1(t *testing.T) {
+	p1 := problem.NewProblem("TestOptimizationProblem_CopyVariable1")
+	v1 := p1.AddVariable()
+
+	// Create a copy of the variable
+	v2 := p1.CopyVariable(v1)
+
+	// Check that the new variable has a different ID
+	if v1.ID == v2.ID {
+		t.Errorf(
+			"expected the new variable to have a different ID; received %v",
+			v2.ID,
+		)
+	}
+
+	// Check that the new variable has a slightly different name
+	if v1.Name == v2.Name {
+		t.Errorf(
+			"expected the new variable to have a slightly different name; received %v",
+			v2.Name,
+		)
+	}
+}
