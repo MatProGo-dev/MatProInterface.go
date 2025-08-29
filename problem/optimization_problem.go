@@ -900,30 +900,12 @@ func (op *OptimizationProblem) WithAllPositiveVariableConstraintsRemoved() *Opti
 		newProblem.Variables = append(newProblem.Variables, variable)
 	}
 
-	// Copy the constraints
-	for _, constraintII := range op.Constraints {
-		// Check if the constraint is a x >= 0 constraint
-		if symbolic.SenseGreaterThanEqual == constraintII.ConstrSense() {
-			lhsContains1Variable := len(constraintII.Left().Variables()) == 1
-			rhs, rhsIsConstant := constraintII.Right().(symbolic.K)
-			if lhsContains1Variable && rhsIsConstant {
-				if float64(rhs) == 0.0 {
-					// If the constraint is of the form x >= 0, we can remove it
-					continue
-				}
-			}
-		}
-
-		// Check if the constraint is a 0 <= x constraint
-		if symbolic.SenseLessThanEqual == constraintII.ConstrSense() {
-			rhsContains1Variable := len(constraintII.Left().Variables()) == 1
-			lhs, lhsIsConstant := constraintII.Right().(symbolic.K)
-			if rhsContains1Variable && lhsIsConstant {
-				if float64(lhs) == 0.0 {
-					// If the constraint is of the form 0 <= x, we can remove it
-					continue
-				}
-			}
+	// Reduce the constraints to scalar constraints
+	scalarConstraints := symbolic.CompileConstraintsIntoScalarConstraints(op.Constraints)
+	for _, constraintII := range scalarConstraints {
+		// Check if the constraint is a (Non-negativity) x >= 0 or 0 <= x constraint
+		if constraintII.IsNonnegativityConstraint() {
+			continue
 		}
 
 		// Otherwise, we can keep the constraint

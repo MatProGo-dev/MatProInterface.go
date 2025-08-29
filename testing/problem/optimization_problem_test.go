@@ -2347,9 +2347,12 @@ func TestOptimizationProblem_ToLPStandardForm1_2(t *testing.T) {
 	}
 
 	// Check that the number of constraints is as expected.
-	if len(p2.Constraints) != 1 {
-		t.Errorf("expected the number of constraints to be %v; received %v",
-			5, len(p2.Constraints))
+	if len(p2.Constraints) != 5 {
+		t.Errorf(
+			"expected the number of constraints to be %v; received %v",
+			5,
+			len(p2.Constraints),
+		)
 	}
 
 	// Verify that all constraints are equality constraints
@@ -2414,9 +2417,12 @@ func TestOptimizationProblem_ToLPStandardForm1_3(t *testing.T) {
 	}
 
 	// Check that the number of constraints is as expected.
-	if len(p2.Constraints) != 1 {
-		t.Errorf("expected the number of constraints to be %v; received %v",
-			expectedNumVariables, len(p2.Constraints))
+	if len(p2.Constraints) != A2.Dims()[0] {
+		t.Errorf(
+			"expected the number of constraints to be %v; received %v",
+			A2.Dims()[0],
+			len(p2.Constraints),
+		)
 	}
 
 	// Verify that all constraints are equality constraints
