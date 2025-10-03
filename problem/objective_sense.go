@@ -1,16 +1,18 @@
 package problem
 
-import "github.com/MatProGo-dev/MatProInterface.go/optim"
+import (
+	"github.com/MatProGo-dev/MatProInterface.go/optim"
+)
 
 // ObjSense represents whether an optimization objective is to be maximized or
 // minimized. This implementation conforms to the Gurobi encoding
-type ObjSense int
+type ObjSense string
 
 // Objective senses (minimize and maximize) encoding using Gurobi's standard
 const (
-	SenseMinimize ObjSense = 1
-	SenseMaximize          = -1
-	SenseFind     ObjSense = 0
+	SenseMinimize ObjSense = "Minimize"
+	SenseMaximize          = "Maximize"
+	SenseFind     ObjSense = "Find"
 )
 
 /*
