@@ -264,7 +264,7 @@ func From(inputModel optim.Model) (*OptimizationProblem, error) {
 
 	err = newOptimProblem.SetObjective(
 		objectiveExpr,
-		ObjSense(inputModel.Obj.Sense),
+		ToObjSense(inputModel.Obj.Sense),
 	)
 	if err != nil {
 		return nil, err
