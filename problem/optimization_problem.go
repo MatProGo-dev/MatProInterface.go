@@ -994,3 +994,43 @@ func (op *OptimizationProblem) MakeNotWellDefinedError() ope.NotWellDefinedError
 		ErrorSource: op.Check(),
 	}
 }
+
+/*
+String
+Description:
+
+	Creates a string for the problem.
+*/
+func (op *OptimizationProblem) String() string {
+	// Create string for the objective
+	objString := fmt.Sprintf("\n%v\n\t%v\n", op.Objective.Sense, op.Objective.Expression)
+
+	// Create the constraints string
+	constraintsString := "subject to\n"
+	nVectorConstraints := 0
+	nMatrixConstraints := 0
+	for ii, constraint := range op.Constraints {
+		switch constraint.(type) {
+		case symbolic.ScalarConstraint:
+			constraintsString += fmt.Sprintf(
+				"\tConstraint #%v. %v\n",
+				ii,
+				constraint,
+			)
+		case symbolic.VectorConstraint:
+			nVectorConstraints += 1
+		case symbolic.MatrixConstraint:
+			nMatrixConstraints += 1
+		}
+	}
+
+	// Add a text summary of the vector and matrix constraints
+	// TODO(Kwesi): Create a String() method for vector and matrix constraints.
+	constraintsString += fmt.Sprintf(
+		"\t\tin addition to %v vector constraints and %v matrix constraints.",
+		nVectorConstraints,
+		nMatrixConstraints,
+	)
+
+	return objString + constraintsString
+}

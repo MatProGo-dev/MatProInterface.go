@@ -3149,3 +3149,56 @@ func TestOptimizationProblem_CopyVariable1(t *testing.T) {
 		)
 	}
 }
+
+/*
+TestOptimizationProblem_String1
+Description:
+
+	Tests that a small optimization problem with all scalar constraints gets represented
+	as a string with:
+	- Minimize sense of objective
+	- The objective expression is completely contained in the string
+	- the string describes that there are 0 vector constraints and 0 matrix constraints
+*/
+func TestOptimizationProblem_String1(t *testing.T) {
+	// Create Optimization Problem
+	p := problem.NewProblem("TestOptimizationProblem_String1")
+
+	N := 2
+	x := p.AddVariableVector(N)
+	c := symbolic.OnesVector(N)
+	objExpr := x.Transpose().Multiply(c)
+	p.SetObjective(objExpr, problem.SenseMinimize)
+
+	p.Constraints = append(p.Constraints, x.AtVec(0).LessEq(1.2))
+	p.Constraints = append(p.Constraints, x.AtVec(1).GreaterEq(3.14))
+
+	// Create String
+	pAsString := fmt.Sprintf("%s", p)
+
+	// Check that the string has "Minimize" in it
+	if !strings.Contains(pAsString, "Minimize") {
+		t.Errorf(
+			"Problem string does not contain the string \"Minimize\".",
+		)
+	}
+
+	if !strings.Contains(pAsString, objExpr.String()) {
+		t.Errorf(
+			"Problem string does not contain the expression in the objective %s",
+			objExpr,
+		)
+	}
+
+	if !strings.Contains(pAsString, "0 vector constraints") {
+		t.Errorf(
+			"Problem string does not contain \"0 vector constraints\".",
+		)
+	}
+
+	if !strings.Contains(pAsString, "0 matrix constraints") {
+		t.Errorf(
+			"Problem string does not contain \"0 matrix constraints\".",
+		)
+	}
+}
