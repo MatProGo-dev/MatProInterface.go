@@ -3202,3 +3202,50 @@ func TestOptimizationProblem_String1(t *testing.T) {
 		)
 	}
 }
+
+/*
+TestOptimizationProblem_String2
+Description:
+
+	Tests that a small optimization problem with all scalar constraints gets represented
+	as a string with:
+	- Maximize sense of objective
+	- the string describes that there are 2 vector constraints and 1 matrix constraints
+*/
+func TestOptimizationProblem_String2(t *testing.T) {
+	// Create Optimization Problem
+	p := problem.NewProblem("TestOptimizationProblem_String1")
+
+	N := 2
+	x := p.AddVariableVector(N)
+	y := p.AddVariableMatrix(N, N, 0.0, 200.0, symbolic.Continuous)
+	c := symbolic.OnesVector(N)
+	objExpr := x.Transpose().Multiply(c)
+	p.SetObjective(objExpr, problem.SenseMaximize)
+
+	p.Constraints = append(p.Constraints, x.LessEq(c))
+	p.Constraints = append(p.Constraints, x.GreaterEq(symbolic.ZerosVector(N)))
+	p.Constraints = append(p.Constraints, y.Eq(symbolic.ZerosMatrix(N, N)))
+
+	// Create String
+	pAsString := fmt.Sprintf("%s", p)
+
+	// Check that the string has "Maximize" in it
+	if !strings.Contains(pAsString, "Maximize") {
+		t.Errorf(
+			"Problem string does not contain the string \"Maximize\".",
+		)
+	}
+
+	if !strings.Contains(pAsString, "2 vector constraints") {
+		t.Errorf(
+			"Problem string does not contain \"2 vector constraints\".",
+		)
+	}
+
+	if !strings.Contains(pAsString, "1 matrix constraints") {
+		t.Errorf(
+			"Problem string does not contain \"1 matrix constraints\".",
+		)
+	}
+}
