@@ -12,7 +12,7 @@ const (
 )
 
 // Solution stores the solution of an optimization problem and associated
-// metatdata
+// metadata
 type Solution interface {
 	GetOptimalValue() float64
 	GetValueMap() map[uint64]float64
