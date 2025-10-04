@@ -10,35 +10,6 @@ import (
 )
 
 /*
- */
-type DummySolution struct {
-	Values map[uint64]float64
-
-	// The objective for the solution
-	Objective float64
-
-	// Whether or not the solution is within the optimality threshold
-	Status solution_status.SolutionStatus
-
-	// The optimality gap returned from the solver. For many solvers, this is
-	// the gap between the best possible solution with integer relaxation and
-	// the best integer solution found so far.
-	// Gap float64
-}
-
-func (ds *DummySolution) GetOptimalValue() float64 {
-	return ds.Objective
-}
-
-func (ds *DummySolution) GetValueMap() map[uint64]float64 {
-	return ds.Values
-}
-
-func (ds *DummySolution) GetStatus() solution_status.SolutionStatus {
-	return ds.Status
-}
-
-/*
 solution_test.go
 Description:
 	Testing for the solution object.
@@ -47,7 +18,7 @@ Description:
 
 func TestSolution_ToMessage1(t *testing.T) {
 	// Constants
-	tempSol := DummySolution{
+	tempSol := solution.DummySolution{
 		Values: map[uint64]float64{
 			0: 2.1,
 			1: 3.14,
@@ -128,7 +99,7 @@ func TestSolution_Value1(t *testing.T) {
 	v1 := symbolic.NewVariable()
 	v2 := symbolic.NewVariable()
 
-	tempSol := DummySolution{
+	tempSol := solution.DummySolution{
 		Values: map[uint64]float64{
 			v1.ID: 2.1,
 			v2.ID: 3.14,
