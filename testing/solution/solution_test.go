@@ -134,3 +134,186 @@ func TestSolution_Value1(t *testing.T) {
 	}
 
 }
+
+/*
+TestSolution_FindValueOfExpression1
+Description:
+
+	This function tests whether we can evaluate a simple linear expression
+	using the solution values.
+*/
+func TestSolution_FindValueOfExpression1(t *testing.T) {
+	// Constants
+	v1 := symbolic.NewVariable()
+	v2 := symbolic.NewVariable()
+
+	tempSol := solution.DummySolution{
+		Values: map[uint64]float64{
+			v1.ID: 2.0,
+			v2.ID: 3.0,
+		},
+		Objective: 2.3,
+		Status:    solution_status.OPTIMAL,
+	}
+
+	// Create expression: 2*v1 + 3*v2 = 2*2.0 + 3*3.0 = 4.0 + 9.0 = 13.0
+	expr := v1.Multiply(symbolic.K(2.0)).Plus(v2.Multiply(symbolic.K(3.0)))
+
+	// Algorithm
+	result, err := solution.FindValueOfExpression(&tempSol, expr)
+	if err != nil {
+		t.Errorf("FindValueOfExpression returned an error: %v", err)
+	}
+
+	expected := 13.0
+	if result != expected {
+		t.Errorf(
+			"Expected expression value to be %v; received %v",
+			expected,
+			result,
+		)
+	}
+}
+
+/*
+TestSolution_FindValueOfExpression2
+Description:
+
+	This function tests whether we can evaluate a constant expression.
+*/
+func TestSolution_FindValueOfExpression2(t *testing.T) {
+	// Constants
+	tempSol := solution.DummySolution{
+		Values:    map[uint64]float64{},
+		Objective: 2.3,
+		Status:    solution_status.OPTIMAL,
+	}
+
+	// Create constant expression: 42.0
+	expr := symbolic.K(42.0)
+
+	// Algorithm
+	result, err := solution.FindValueOfExpression(&tempSol, expr)
+	if err != nil {
+		t.Errorf("FindValueOfExpression returned an error: %v", err)
+	}
+
+	expected := 42.0
+	if result != expected {
+		t.Errorf(
+			"Expected expression value to be %v; received %v",
+			expected,
+			result,
+		)
+	}
+}
+
+/*
+TestSolution_FindValueOfExpression3
+Description:
+
+	This function tests whether we can evaluate an expression with a single variable.
+*/
+func TestSolution_FindValueOfExpression3(t *testing.T) {
+	// Constants
+	v1 := symbolic.NewVariable()
+
+	tempSol := solution.DummySolution{
+		Values: map[uint64]float64{
+			v1.ID: 5.5,
+		},
+		Objective: 2.3,
+		Status:    solution_status.OPTIMAL,
+	}
+
+	// Create expression: v1 + 10 = 5.5 + 10 = 15.5
+	expr := v1.Plus(symbolic.K(10.0))
+
+	// Algorithm
+	result, err := solution.FindValueOfExpression(&tempSol, expr)
+	if err != nil {
+		t.Errorf("FindValueOfExpression returned an error: %v", err)
+	}
+
+	expected := 15.5
+	if result != expected {
+		t.Errorf(
+			"Expected expression value to be %v; received %v",
+			expected,
+			result,
+		)
+	}
+}
+
+/*
+TestSolution_FindValueOfExpression4
+Description:
+
+	This function tests whether we get an error when a variable is missing
+	from the solution.
+*/
+func TestSolution_FindValueOfExpression4(t *testing.T) {
+	// Constants
+	v1 := symbolic.NewVariable()
+	v2 := symbolic.NewVariable()
+
+	tempSol := solution.DummySolution{
+		Values: map[uint64]float64{
+			v1.ID: 2.0,
+			// v2 is missing
+		},
+		Objective: 2.3,
+		Status:    solution_status.OPTIMAL,
+	}
+
+	// Create expression: v1 + v2
+	expr := v1.Plus(v2)
+
+	// Algorithm
+	_, err := solution.FindValueOfExpression(&tempSol, expr)
+	if err == nil {
+		t.Errorf("Expected FindValueOfExpression to return an error for missing variable, but got nil")
+	}
+}
+
+/*
+TestSolution_FindValueOfExpression5
+Description:
+
+	This function tests whether we can evaluate a more complex expression
+	with multiple operations.
+*/
+func TestSolution_FindValueOfExpression5(t *testing.T) {
+	// Constants
+	v1 := symbolic.NewVariable()
+	v2 := symbolic.NewVariable()
+	v3 := symbolic.NewVariable()
+
+	tempSol := solution.DummySolution{
+		Values: map[uint64]float64{
+			v1.ID: 1.0,
+			v2.ID: 2.0,
+			v3.ID: 3.0,
+		},
+		Objective: 2.3,
+		Status:    solution_status.OPTIMAL,
+	}
+
+	// Create expression: (v1 + v2) * v3 + 5 = (1.0 + 2.0) * 3.0 + 5 = 3.0 * 3.0 + 5 = 9.0 + 5 = 14.0
+	expr := v1.Plus(v2).Multiply(v3).Plus(symbolic.K(5.0))
+
+	// Algorithm
+	result, err := solution.FindValueOfExpression(&tempSol, expr)
+	if err != nil {
+		t.Errorf("FindValueOfExpression returned an error: %v", err)
+	}
+
+	expected := 14.0
+	if result != expected {
+		t.Errorf(
+			"Expected expression value to be %v; received %v",
+			expected,
+			result,
+		)
+	}
+}
