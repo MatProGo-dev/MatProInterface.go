@@ -123,7 +123,7 @@ func TestSolution_Value1(t *testing.T) {
 
 	v2Val, err := solution.ExtractValueOfVariable(&tempSol, v2)
 	if err != nil {
-		t.Errorf("the value of the variable v2 could not be extracted; received error %v", err)
+		t.Errorf("The value of the variable v2 could not be extracted; received error %v", err)
 	}
 
 	if v2Val != 3.14 {
