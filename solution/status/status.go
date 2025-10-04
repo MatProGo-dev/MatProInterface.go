@@ -1,27 +1,27 @@
-package solution
+package solution_status
 
 import "fmt"
 
-type OptimizationStatus int
+type SolutionStatus int
 
 // OptimizationStatuses
 const (
-	OptimizationStatus_LOADED          OptimizationStatus = 1
-	OptimizationStatus_OPTIMAL                            = 2
-	OptimizationStatus_INFEASIBLE                         = 3
-	OptimizationStatus_INF_OR_UNBD                        = 4
-	OptimizationStatus_UNBOUNDED                          = 5
-	OptimizationStatus_CUTOFF                             = 6
-	OptimizationStatus_ITERATION_LIMIT                    = 7
-	OptimizationStatus_NODE_LIMIT                         = 8
-	OptimizationStatus_TIME_LIMIT                         = 9
-	OptimizationStatus_SOLUTION_LIMIT                     = 10
-	OptimizationStatus_INTERRUPTED                        = 11
-	OptimizationStatus_NUMERIC                            = 12
-	OptimizationStatus_SUBOPTIMAL                         = 13
-	OptimizationStatus_INPROGRESS                         = 14
-	OptimizationStatus_USER_OBJ_LIMIT                     = 15
-	OptimizationStatus_WORK_LIMIT                         = 16
+	OptimizationStatus_LOADED          SolutionStatus = 1
+	OptimizationStatus_OPTIMAL                        = 2
+	OptimizationStatus_INFEASIBLE                     = 3
+	OptimizationStatus_INF_OR_UNBD                    = 4
+	OptimizationStatus_UNBOUNDED                      = 5
+	OptimizationStatus_CUTOFF                         = 6
+	OptimizationStatus_ITERATION_LIMIT                = 7
+	OptimizationStatus_NODE_LIMIT                     = 8
+	OptimizationStatus_TIME_LIMIT                     = 9
+	OptimizationStatus_SOLUTION_LIMIT                 = 10
+	OptimizationStatus_INTERRUPTED                    = 11
+	OptimizationStatus_NUMERIC                        = 12
+	OptimizationStatus_SUBOPTIMAL                     = 13
+	OptimizationStatus_INPROGRESS                     = 14
+	OptimizationStatus_USER_OBJ_LIMIT                 = 15
+	OptimizationStatus_WORK_LIMIT                     = 16
 )
 
 /*
@@ -31,7 +31,7 @@ Description:
 	Translates the code to the text meaning.
 	This comes from the status codes documentation: https://www.gurobi.com/documentation/9.5/refman/optimization_status_codes.html#sec:StatusCodes
 */
-func (os OptimizationStatus) ToMessage() (string, error) {
+func (os SolutionStatus) ToMessage() (string, error) {
 	// Converts each of the statuses to a text message that is human readable.
 	switch os {
 	case OptimizationStatus_LOADED:
