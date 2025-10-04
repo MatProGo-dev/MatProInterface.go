@@ -1,11 +1,41 @@
-package problem
+package solution_test
 
 import (
-	"github.com/MatProGo-dev/MatProInterface.go/optim"
-	"github.com/MatProGo-dev/MatProInterface.go/problem"
 	"strings"
 	"testing"
+
+	"github.com/MatProGo-dev/MatProInterface.go/solution"
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 )
+
+/*
+ */
+type DummySolution struct {
+	Values map[uint64]float64
+
+	// The objective for the solution
+	Objective float64
+
+	// Whether or not the solution is within the optimality threshold
+	Status solution.OptimizationStatus
+
+	// The optimality gap returned from the solver. For many solvers, this is
+	// the gap between the best possible solution with integer relaxation and
+	// the best integer solution found so far.
+	// Gap float64
+}
+
+func (ds *DummySolution) GetOptimalValue() float64 {
+	return ds.Objective
+}
+
+func (ds *DummySolution) GetValueMap() map[uint64]float64 {
+	return ds.Values
+}
+
+func (ds *DummySolution) GetStatus() solution.OptimizationStatus {
+	return ds.Status
+}
 
 /*
 solution_test.go
@@ -16,13 +46,13 @@ Description:
 
 func TestSolution_ToMessage1(t *testing.T) {
 	// Constants
-	tempSol := problem.Solution{
+	tempSol := DummySolution{
 		Values: map[uint64]float64{
 			0: 2.1,
 			1: 3.14,
 		},
 		Objective: 2.3,
-		Status:    problem.OptimizationStatus_NODE_LIMIT,
+		Status:    solution.OptimizationStatus_NODE_LIMIT,
 	}
 
 	// Test the ToMessage() Call on this solution.
@@ -45,7 +75,7 @@ func TestSolution_ToMessage2(t *testing.T) {
 
 	// Test
 	for statusIndex := 1; statusIndex < statusMax; statusIndex++ {
-		tempStatus := problem.OptimizationStatus(statusIndex)
+		tempStatus := solution.OptimizationStatus(statusIndex)
 
 		msg, err := tempStatus.ToMessage()
 		if err != nil {
@@ -94,33 +124,40 @@ Description:
 */
 func TestSolution_Value1(t *testing.T) {
 	// Constants
-	tempSol := problem.Solution{
+	v1 := symbolic.NewVariable()
+	v2 := symbolic.NewVariable()
+
+	tempSol := DummySolution{
 		Values: map[uint64]float64{
-			0: 2.1,
-			1: 3.14,
+			v1.ID: 2.1,
+			v2.ID: 3.14,
 		},
 		Objective: 2.3,
-		Status:    problem.OptimizationStatus_NODE_LIMIT,
-	}
-	v1 := optim.Variable{
-		ID: 0, Lower: -optim.INFINITY, Upper: optim.INFINITY, Vtype: optim.Continuous,
-	}
-	v2 := optim.Variable{
-		ID: 1, Lower: -optim.INFINITY, Upper: optim.INFINITY, Vtype: optim.Continuous,
+		Status:    solution.OptimizationStatus_NODE_LIMIT,
 	}
 
 	// Algorithm
-	if tempSol.Value(v1) != 2.1 {
+	v1Val, err := solution.ExtractValueOfVariable(&tempSol, v1)
+	if err != nil {
+		t.Errorf("The value of the variable v1 could not be extracted; received error %v", err)
+	}
+
+	if v1Val != 2.1 {
 		t.Errorf(
 			"Expected v1 to have value 2.1; received %v",
-			tempSol.Value(v1),
+			v1Val,
 		)
 	}
 
-	if tempSol.Value(v2) != 3.14 {
+	v2Val, err := solution.ExtractValueOfVariable(&tempSol, v2)
+	if err != nil {
+		t.Errorf("the value of the variable v2 could not be extracted; received error %v", err)
+	}
+
+	if v2Val != 3.14 {
 		t.Errorf(
 			"Expected v2 to have value 3.14; received %v",
-			tempSol.Value(v2),
+			v2Val,
 		)
 	}
 
