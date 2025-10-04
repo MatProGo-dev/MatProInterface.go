@@ -1,10 +1,12 @@
-package problem
+package solution_test
 
 import (
-	"github.com/MatProGo-dev/MatProInterface.go/optim"
-	"github.com/MatProGo-dev/MatProInterface.go/problem"
 	"strings"
 	"testing"
+
+	"github.com/MatProGo-dev/MatProInterface.go/solution"
+	solution_status "github.com/MatProGo-dev/MatProInterface.go/solution/status"
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 )
 
 /*
@@ -16,13 +18,13 @@ Description:
 
 func TestSolution_ToMessage1(t *testing.T) {
 	// Constants
-	tempSol := problem.Solution{
+	tempSol := solution.DummySolution{
 		Values: map[uint64]float64{
 			0: 2.1,
 			1: 3.14,
 		},
 		Objective: 2.3,
-		Status:    problem.OptimizationStatus_NODE_LIMIT,
+		Status:    solution_status.NODE_LIMIT,
 	}
 
 	// Test the ToMessage() Call on this solution.
@@ -45,7 +47,7 @@ func TestSolution_ToMessage2(t *testing.T) {
 
 	// Test
 	for statusIndex := 1; statusIndex < statusMax; statusIndex++ {
-		tempStatus := problem.OptimizationStatus(statusIndex)
+		tempStatus := solution_status.SolutionStatus(statusIndex)
 
 		msg, err := tempStatus.ToMessage()
 		if err != nil {
@@ -94,33 +96,40 @@ Description:
 */
 func TestSolution_Value1(t *testing.T) {
 	// Constants
-	tempSol := problem.Solution{
+	v1 := symbolic.NewVariable()
+	v2 := symbolic.NewVariable()
+
+	tempSol := solution.DummySolution{
 		Values: map[uint64]float64{
-			0: 2.1,
-			1: 3.14,
+			v1.ID: 2.1,
+			v2.ID: 3.14,
 		},
 		Objective: 2.3,
-		Status:    problem.OptimizationStatus_NODE_LIMIT,
-	}
-	v1 := optim.Variable{
-		ID: 0, Lower: -optim.INFINITY, Upper: optim.INFINITY, Vtype: optim.Continuous,
-	}
-	v2 := optim.Variable{
-		ID: 1, Lower: -optim.INFINITY, Upper: optim.INFINITY, Vtype: optim.Continuous,
+		Status:    solution_status.NODE_LIMIT,
 	}
 
 	// Algorithm
-	if tempSol.Value(v1) != 2.1 {
+	v1Val, err := solution.ExtractValueOfVariable(&tempSol, v1)
+	if err != nil {
+		t.Errorf("The value of the variable v1 could not be extracted; received error %v", err)
+	}
+
+	if v1Val != 2.1 {
 		t.Errorf(
 			"Expected v1 to have value 2.1; received %v",
-			tempSol.Value(v1),
+			v1Val,
 		)
 	}
 
-	if tempSol.Value(v2) != 3.14 {
+	v2Val, err := solution.ExtractValueOfVariable(&tempSol, v2)
+	if err != nil {
+		t.Errorf("The value of the variable v2 could not be extracted; received error %v", err)
+	}
+
+	if v2Val != 3.14 {
 		t.Errorf(
 			"Expected v2 to have value 3.14; received %v",
-			tempSol.Value(v2),
+			v2Val,
 		)
 	}
 
