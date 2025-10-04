@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/MatProGo-dev/MatProInterface.go/solution"
+	solution_status "github.com/MatProGo-dev/MatProInterface.go/solution/status"
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 )
 
@@ -17,7 +18,7 @@ type DummySolution struct {
 	Objective float64
 
 	// Whether or not the solution is within the optimality threshold
-	Status solution.OptimizationStatus
+	Status solution_status.SolutionStatus
 
 	// The optimality gap returned from the solver. For many solvers, this is
 	// the gap between the best possible solution with integer relaxation and
@@ -33,7 +34,7 @@ func (ds *DummySolution) GetValueMap() map[uint64]float64 {
 	return ds.Values
 }
 
-func (ds *DummySolution) GetStatus() solution.OptimizationStatus {
+func (ds *DummySolution) GetStatus() solution_status.SolutionStatus {
 	return ds.Status
 }
 
@@ -52,7 +53,7 @@ func TestSolution_ToMessage1(t *testing.T) {
 			1: 3.14,
 		},
 		Objective: 2.3,
-		Status:    solution.OptimizationStatus_NODE_LIMIT,
+		Status:    solution_status.NODE_LIMIT,
 	}
 
 	// Test the ToMessage() Call on this solution.
@@ -75,7 +76,7 @@ func TestSolution_ToMessage2(t *testing.T) {
 
 	// Test
 	for statusIndex := 1; statusIndex < statusMax; statusIndex++ {
-		tempStatus := solution.OptimizationStatus(statusIndex)
+		tempStatus := solution_status.SolutionStatus(statusIndex)
 
 		msg, err := tempStatus.ToMessage()
 		if err != nil {
@@ -133,7 +134,7 @@ func TestSolution_Value1(t *testing.T) {
 			v2.ID: 3.14,
 		},
 		Objective: 2.3,
-		Status:    solution.OptimizationStatus_NODE_LIMIT,
+		Status:    solution_status.NODE_LIMIT,
 	}
 
 	// Algorithm
