@@ -1960,7 +1960,7 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices7(t *testing.T) {
 	p1 := problem.GetExampleProblem3()
 
 	// Transform p1 into the standard form
-	p1Standard, _, err := p1.ToLPStandardForm1()
+	p1Standard, _, _, err := p1.ToLPStandardForm1()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2045,7 +2045,7 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices9(t *testing.T) {
 	p1 := problem.GetExampleProblem4()
 
 	// Transform p1 into the standard form
-	p1Standard, _, err := p1.ToLPStandardForm1()
+	p1Standard, _, _, err := p1.ToLPStandardForm1()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2098,7 +2098,7 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices10(t *testing.T) {
 	p1 := problem.GetExampleProblem5()
 
 	// Transform p1 into the standard form
-	p1Standard, slackVariables, err := p1.ToLPStandardForm1()
+	p1Standard, slackVariables, _, err := p1.ToLPStandardForm1()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2159,7 +2159,7 @@ func TestOptimizationProblem_ToProblemWithAllPositiveVariables1(t *testing.T) {
 	)
 
 	// Algorithm
-	p2, err := p1.ToProblemWithAllPositiveVariables()
+	p2, _, err := p1.ToProblemWithAllPositiveVariables()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2213,7 +2213,7 @@ func TestOptimizationProblem_ToProblemWithAllPositiveVariables2(t *testing.T) {
 	)
 
 	// Algorithm
-	p2, err := p1.ToProblemWithAllPositiveVariables()
+	p2, _, err := p1.ToProblemWithAllPositiveVariables()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2265,7 +2265,7 @@ func TestOptimizationProblem_ToLPStandardForm1_1(t *testing.T) {
 	)
 
 	// Algorithm
-	p2, _, err := p1.ToLPStandardForm1()
+	p2, _, _, err := p1.ToLPStandardForm1()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2327,7 +2327,7 @@ func TestOptimizationProblem_ToLPStandardForm1_2(t *testing.T) {
 	)
 
 	// Algorithm
-	p2, _, err := p1.ToLPStandardForm1()
+	p2, _, _, err := p1.ToLPStandardForm1()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2397,7 +2397,7 @@ func TestOptimizationProblem_ToLPStandardForm1_3(t *testing.T) {
 	)
 
 	// Algorithm
-	p2, _, err := p1.ToLPStandardForm1()
+	p2, _, _, err := p1.ToLPStandardForm1()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2464,7 +2464,7 @@ func TestOptimizationProblem_ToLPStandardForm1_4(t *testing.T) {
 	)
 
 	// Algorithm
-	_, _, err := p1.ToLPStandardForm1()
+	_, _, _, err := p1.ToLPStandardForm1()
 	if err == nil {
 		t.Errorf("expected an error; received nil")
 	} else {
@@ -2510,7 +2510,7 @@ func TestOptimizationProblem_ToLPStandardForm1_5(t *testing.T) {
 	)
 
 	// Algorithm
-	_, _, err := p1.ToLPStandardForm1()
+	_, _, _, err := p1.ToLPStandardForm1()
 	if err == nil {
 		t.Errorf("expected an error; received nil")
 	} else {
@@ -2556,7 +2556,7 @@ func TestOptimizationProblem_ToLPStandardForm1_6(t *testing.T) {
 	)
 
 	// Algorithm
-	p2, _, err := p1.ToLPStandardForm1()
+	p2, _, _, err := p1.ToLPStandardForm1()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2613,7 +2613,7 @@ func TestOptimizationProblem_ToLPStandardForm1_7(t *testing.T) {
 	)
 
 	// Algorithm
-	p2, _, err := p1.ToLPStandardForm1()
+	p2, _, _, err := p1.ToLPStandardForm1()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2675,7 +2675,7 @@ func TestOptimizationProblem_ToLPStandardForm1_8(t *testing.T) {
 	)
 
 	// Algorithm
-	p1Prime, _, err := p1.ToLPStandardForm1()
+	p1Prime, _, _, err := p1.ToLPStandardForm1()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2756,7 +2756,7 @@ func TestOptimizationProblem_ToLPStandardForm1_9(t *testing.T) {
 	)
 
 	// Algorithm
-	p1Prime, _, err := p1.ToLPStandardForm1()
+	p1Prime, _, _, err := p1.ToLPStandardForm1()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2834,7 +2834,7 @@ func TestOptimizationProblem_ToLPStandardForm1_10(t *testing.T) {
 	)
 
 	// Call the ToLPStandardForm1
-	_, _, err := p1.ToLPStandardForm1()
+	_, _, _, err := p1.ToLPStandardForm1()
 	if err == nil {
 		t.Errorf("expected an error; received nil")
 	}
@@ -3081,7 +3081,7 @@ func TestOptimizationProblem_ToLPStandardForm2_1(t *testing.T) {
 	)
 
 	// Algorithm
-	p2, _, err := p1.ToLPStandardForm2()
+	p2, _, _, err := p1.ToLPStandardForm2()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
