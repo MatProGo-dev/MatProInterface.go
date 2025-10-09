@@ -2969,6 +2969,18 @@ func TestOptimizationProblem_ToLPStandardForm1_12(t *testing.T) {
 		t.Errorf("expected the entry in the map to contain %v variables; received %v",
 			1, len(v2Expr.Variables()))
 	}
+
+	// TODO: Uncomment these checks once we have Polynomial's AsSimplifiedExpression method better tuned for polynomials.
+	// v2ExprAsMonomial, ok := v2Expr.(symbolic.Monomial)
+	// if !ok {
+	// 	t.Errorf("expected the entry in the map to be a Monomial; received %T", v2Expr)
+	// }
+
+	// coeff2 := v2ExprAsMonomial.LinearCoeff()
+	// if coeff2.AtVec(0) != -1.0 {
+	// 	t.Errorf("expected the entry in the map to have coefficient %v; received %v",
+	// 		-1.0, coeff2.AtVec(0))
+	// }
 }
 
 /*

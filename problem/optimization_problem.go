@@ -620,7 +620,7 @@ func (op *OptimizationProblem) ToProblemWithAllPositiveVariables() (*Optimizatio
 		}
 
 		// Set the original variable to be the difference of the two new variables
-		mapFromOriginalVariablesToNewExpressions[xII] = expressionForReplacement
+		mapFromOriginalVariablesToNewExpressions[xII] = expressionForReplacement.AsSimplifiedExpression()
 	}
 
 	// Now, let's create the new constraints by replacing the variables in the
