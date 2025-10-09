@@ -2847,6 +2847,62 @@ func TestOptimizationProblem_ToLPStandardForm1_10(t *testing.T) {
 }
 
 /*
+TestOptimizationProblem_ToLPStandardForm1_11
+Description:
+
+	This method verifies that the map from original variables to
+	standard form variables is correct for a small problem.
+	In this problem, we will have:
+	- a constant objective
+	- 1 variable,
+	- and a single linear inequality constraint.
+	The resulting map should contain 1 entry, mapping the original
+	variable to the positive half and negative half variables in the standard form.
+*/
+func TestOptimizationProblem_ToLPStandardForm1_11(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_11")
+	v1 := p1.AddVariable()
+	c1 := v1.LessEq(1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	_, _, varMap, err := p1.ToLPStandardForm1()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of entries in the map is as expected.
+	if len(varMap) != 1 {
+		t.Errorf("expected the number of entries in the map to be %v; received %v",
+			1, len(varMap))
+	}
+
+	// Check that the entry in the map contains two variables.
+	v1Expr, ok := varMap[v1]
+	if !ok {
+		t.Errorf("expected the map to contain an entry for variable %v; it does not", v1)
+	}
+
+	if len(v1Expr.Variables()) != 2 {
+		t.Errorf("expected the entry in the map to contain %v variables; received %v",
+			2, len(v1Expr.Variables()))
+	}
+
+	if len(symbolic.UniqueVars(v1Expr.Variables())) != 2 {
+		t.Errorf("expected the entry in the map to contain %v unique variables; received %v",
+			2, len(symbolic.UniqueVars(v1Expr.Variables())))
+	}
+}
+
+/*
 TestOptimizationProblem_CheckIfLinear1
 Description:
 
