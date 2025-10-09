@@ -2903,6 +2903,75 @@ func TestOptimizationProblem_ToLPStandardForm1_11(t *testing.T) {
 }
 
 /*
+TestOptimizationProblem_ToLPStandardForm1_12
+Description:
+
+	This method verifies that the map from original variables to
+	standard form variables is correct for a small problem.
+	In this problem, we will have:
+	- a constant objective
+	- 2 variables,
+	- and two linear inequality constraints.
+	One of the variables is purely positive, while the other is purely negative.
+	The resulting map should contain 2 entries, one mapping the purely positive
+	variable to itself, and the other mapping the purely negative variable to
+	the negative half variables in the standard form.
+*/
+func TestOptimizationProblem_ToLPStandardForm1_12(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_12")
+	vv1 := p1.AddVariableVector(2)
+	// Add constraints
+	c1 := vv1.AtVec(0).GreaterEq(1.0)
+	c2 := vv1.AtVec(1).LessEq(-2.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+	p1.Constraints = append(p1.Constraints, c2)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	_, _, varMap, err := p1.ToLPStandardForm1()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of entries in the map is as expected.
+	if len(varMap) != 2 {
+		t.Errorf("expected the number of entries in the map to be %v; received %v",
+			2, len(varMap))
+	}
+
+	// Check that the entry in the map for the purely positive variable contains one variable.
+	v1 := vv1.AtVec(0).(symbolic.Variable)
+	v1Expr, ok := varMap[v1]
+	if !ok {
+		t.Errorf("expected the map to contain an entry for variable %v; it does not", v1)
+	}
+
+	if len(v1Expr.Variables()) != 1 {
+		t.Errorf("expected the entry in the map to contain %v variables; received %v",
+			1, len(v1Expr.Variables()))
+	}
+
+	// Check that the entry in the map for the purely negative variable contains one variable.
+	v2 := vv1.AtVec(1).(symbolic.Variable)
+	v2Expr, ok := varMap[v2]
+	if !ok {
+		t.Errorf("expected the map to contain an entry for variable %v; it does not", v2)
+	}
+
+	if len(v2Expr.Variables()) != 1 {
+		t.Errorf("expected the entry in the map to contain %v variables; received %v",
+			1, len(v2Expr.Variables()))
+	}
+}
+
+/*
 TestOptimizationProblem_CheckIfLinear1
 Description:
 
