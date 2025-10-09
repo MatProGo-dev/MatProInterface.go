@@ -580,7 +580,7 @@ Description:
 	Then, we replace every instance of the original variable with the difference
 	of the two new variables (x = x_+ - x_-).
 */
-func (op *OptimizationProblem) ToProblemWithAllPositiveVariables() (*OptimizationProblem, error) {
+func (op *OptimizationProblem) ToProblemWithAllPositiveVariables() (*OptimizationProblem, map[symbolic.Variable]symbolic.Expression, error) {
 	// Setup
 	newProblem := NewProblem(op.Name + " (All Positive Variables)")
 	epsMagic := 1e-8 // TODO(Kwesi): Make this a parameter OR a constant in the package.
@@ -620,7 +620,7 @@ func (op *OptimizationProblem) ToProblemWithAllPositiveVariables() (*Optimizatio
 		}
 
 		// Set the original variable to be the difference of the two new variables
-		mapFromOriginalVariablesToNewExpressions[xII] = expressionForReplacement
+		mapFromOriginalVariablesToNewExpressions[xII] = expressionForReplacement.AsSimplifiedExpression()
 	}
 
 	// Now, let's create the new constraints by replacing the variables in the
@@ -643,7 +643,7 @@ func (op *OptimizationProblem) ToProblemWithAllPositiveVariables() (*Optimizatio
 		op.Objective.Sense,
 	)
 
-	return newProblem, nil
+	return newProblem, mapFromOriginalVariablesToNewExpressions, nil
 }
 
 /*
@@ -668,22 +668,22 @@ Note:
 	into a set of scalar constraints. Thus, the number of constraints in your problem may
 	"seem" to change.
 */
-func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem, []symbolic.Variable, error) {
+func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem, []symbolic.Variable, map[symbolic.Variable]symbolic.Expression, error) {
 	// Input Processing
 	err := problemIn.Check()
 	if err != nil {
-		return nil, nil, problemIn.MakeNotWellDefinedError()
+		return nil, nil, nil, problemIn.MakeNotWellDefinedError()
 	}
 
 	// Check if the problem is linear
 	if !problemIn.IsLinear() {
-		return nil, nil, problemIn.CheckIfLinear()
+		return nil, nil, nil, problemIn.CheckIfLinear()
 	}
 
 	// Change the problem so that it is written in terms of strictly positive variables
-	problemWithAllPositiveVariables, err := problemIn.ToProblemWithAllPositiveVariables() // Note: This method may change the number of variables and constraints in the problem.
+	problemWithAllPositiveVariables, originalVariablesToPositiveVariableExpressions, err := problemIn.ToProblemWithAllPositiveVariables() // Note: This method may change the number of variables and constraints in the problem.
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	// Create a new problem
@@ -692,11 +692,11 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 	)
 
 	// Add all variables to the new problem
-	mapFromInToNewVariables := make(map[symbolic.Variable]symbolic.Expression)
+	mapFromPositiveToNewVariables := make(map[symbolic.Variable]symbolic.Expression)
 	for _, varII := range problemWithAllPositiveVariables.Variables {
 		problemInStandardForm.AddVariable()
 		nVariables := len(problemInStandardForm.Variables)
-		mapFromInToNewVariables[varII] = problemInStandardForm.Variables[nVariables-1]
+		mapFromPositiveToNewVariables[varII] = problemInStandardForm.Variables[nVariables-1]
 	}
 
 	// Add all constraints to the new problem
@@ -706,10 +706,10 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 		// Create a new expression by substituting the variables according
 		// to the map we created above
 		oldLHS := constraint.Left()
-		newLHS := oldLHS.SubstituteAccordingTo(mapFromInToNewVariables)
+		newLHS := oldLHS.SubstituteAccordingTo(mapFromPositiveToNewVariables)
 
 		oldRHS := constraint.Right()
-		newRHS := oldRHS.SubstituteAccordingTo(mapFromInToNewVariables)
+		newRHS := oldRHS.SubstituteAccordingTo(mapFromPositiveToNewVariables)
 
 		switch constraint.ConstrSense() {
 		case symbolic.SenseEqual:
@@ -742,7 +742,7 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 			newLHS = newLHS.Plus(problemInStandardForm.Variables[nVariables-1])
 
 		default:
-			return nil, nil, fmt.Errorf(
+			return nil, nil, nil, fmt.Errorf(
 				"Unknown constraint sense: " + constraint.ConstrSense().String(),
 			)
 		}
@@ -762,7 +762,7 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 	// Now, let's create the new objective function by substituting the variables
 	// according to the map we created above
 	newObjectiveExpression := problemWithAllPositiveVariables.Objective.Expression.SubstituteAccordingTo(
-		mapFromInToNewVariables,
+		mapFromPositiveToNewVariables,
 	)
 	problemInStandardForm.SetObjective(
 		newObjectiveExpression,
@@ -772,8 +772,16 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 	// Simplify The Constraints If Possible
 	problemInStandardForm.SimplifyConstraints()
 
+	// Create the map from the original variables to the new variables
+	// by composing the two maps we created above
+	originalVariablesToNewVariables := make(map[symbolic.Variable]symbolic.Expression)
+	for originalVar, positiveVarExpr := range originalVariablesToPositiveVariableExpressions {
+		newVarExpr := positiveVarExpr.SubstituteAccordingTo(mapFromPositiveToNewVariables)
+		originalVariablesToNewVariables[originalVar] = newVarExpr
+	}
+
 	// Return the new problem and the slack variables
-	return problemInStandardForm, slackVariables, nil
+	return problemInStandardForm, slackVariables, originalVariablesToNewVariables, nil
 }
 
 /*
@@ -795,17 +803,17 @@ Description:
 	This method also returns the slack variables (i.e., the variables that
 	are added to the problem to convert the inequalities into equalities).
 */
-func (problemIn *OptimizationProblem) ToLPStandardForm2() (*OptimizationProblem, []symbolic.Variable, error) {
+func (problemIn *OptimizationProblem) ToLPStandardForm2() (*OptimizationProblem, []symbolic.Variable, map[symbolic.Variable]symbolic.Expression, error) {
 	// Input Processing
 	err := problemIn.Check()
 	if err != nil {
-		return nil, nil, problemIn.MakeNotWellDefinedError()
+		return nil, nil, nil, problemIn.MakeNotWellDefinedError()
 	}
 
 	// Use the existing method to convert to standard form 1
-	problemInStandardForm, slackVariables, err := problemIn.ToLPStandardForm1()
+	problemInStandardForm, slackVariables, originalVariablesToNewVariables, err := problemIn.ToLPStandardForm1()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	// Modify the objective function to be a maximization problem,
@@ -816,12 +824,12 @@ func (problemIn *OptimizationProblem) ToLPStandardForm2() (*OptimizationProblem,
 		newObjectiveExpression := problemInStandardForm.Objective.Expression.Multiply(-1.0)
 		err = problemInStandardForm.SetObjective(newObjectiveExpression, SenseMaximize)
 		if err != nil {
-			return nil, nil, fmt.Errorf("there was a problem setting the new objective function: %v", err)
+			return nil, nil, originalVariablesToNewVariables, fmt.Errorf("there was a problem setting the new objective function: %v", err)
 		}
 	}
 
 	// Return the new problem and the slack variables
-	return problemInStandardForm, slackVariables, nil
+	return problemInStandardForm, slackVariables, originalVariablesToNewVariables, nil
 }
 
 /*

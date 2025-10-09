@@ -1960,7 +1960,7 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices7(t *testing.T) {
 	p1 := problem.GetExampleProblem3()
 
 	// Transform p1 into the standard form
-	p1Standard, _, err := p1.ToLPStandardForm1()
+	p1Standard, _, _, err := p1.ToLPStandardForm1()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2045,7 +2045,7 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices9(t *testing.T) {
 	p1 := problem.GetExampleProblem4()
 
 	// Transform p1 into the standard form
-	p1Standard, _, err := p1.ToLPStandardForm1()
+	p1Standard, _, _, err := p1.ToLPStandardForm1()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2098,7 +2098,7 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices10(t *testing.T) {
 	p1 := problem.GetExampleProblem5()
 
 	// Transform p1 into the standard form
-	p1Standard, slackVariables, err := p1.ToLPStandardForm1()
+	p1Standard, slackVariables, _, err := p1.ToLPStandardForm1()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2159,7 +2159,7 @@ func TestOptimizationProblem_ToProblemWithAllPositiveVariables1(t *testing.T) {
 	)
 
 	// Algorithm
-	p2, err := p1.ToProblemWithAllPositiveVariables()
+	p2, _, err := p1.ToProblemWithAllPositiveVariables()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2213,7 +2213,7 @@ func TestOptimizationProblem_ToProblemWithAllPositiveVariables2(t *testing.T) {
 	)
 
 	// Algorithm
-	p2, err := p1.ToProblemWithAllPositiveVariables()
+	p2, _, err := p1.ToProblemWithAllPositiveVariables()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2265,7 +2265,7 @@ func TestOptimizationProblem_ToLPStandardForm1_1(t *testing.T) {
 	)
 
 	// Algorithm
-	p2, _, err := p1.ToLPStandardForm1()
+	p2, _, _, err := p1.ToLPStandardForm1()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2327,7 +2327,7 @@ func TestOptimizationProblem_ToLPStandardForm1_2(t *testing.T) {
 	)
 
 	// Algorithm
-	p2, _, err := p1.ToLPStandardForm1()
+	p2, _, _, err := p1.ToLPStandardForm1()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2397,7 +2397,7 @@ func TestOptimizationProblem_ToLPStandardForm1_3(t *testing.T) {
 	)
 
 	// Algorithm
-	p2, _, err := p1.ToLPStandardForm1()
+	p2, _, _, err := p1.ToLPStandardForm1()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2464,7 +2464,7 @@ func TestOptimizationProblem_ToLPStandardForm1_4(t *testing.T) {
 	)
 
 	// Algorithm
-	_, _, err := p1.ToLPStandardForm1()
+	_, _, _, err := p1.ToLPStandardForm1()
 	if err == nil {
 		t.Errorf("expected an error; received nil")
 	} else {
@@ -2510,7 +2510,7 @@ func TestOptimizationProblem_ToLPStandardForm1_5(t *testing.T) {
 	)
 
 	// Algorithm
-	_, _, err := p1.ToLPStandardForm1()
+	_, _, _, err := p1.ToLPStandardForm1()
 	if err == nil {
 		t.Errorf("expected an error; received nil")
 	} else {
@@ -2556,7 +2556,7 @@ func TestOptimizationProblem_ToLPStandardForm1_6(t *testing.T) {
 	)
 
 	// Algorithm
-	p2, _, err := p1.ToLPStandardForm1()
+	p2, _, _, err := p1.ToLPStandardForm1()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2613,7 +2613,7 @@ func TestOptimizationProblem_ToLPStandardForm1_7(t *testing.T) {
 	)
 
 	// Algorithm
-	p2, _, err := p1.ToLPStandardForm1()
+	p2, _, _, err := p1.ToLPStandardForm1()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2675,7 +2675,7 @@ func TestOptimizationProblem_ToLPStandardForm1_8(t *testing.T) {
 	)
 
 	// Algorithm
-	p1Prime, _, err := p1.ToLPStandardForm1()
+	p1Prime, _, _, err := p1.ToLPStandardForm1()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2756,7 +2756,7 @@ func TestOptimizationProblem_ToLPStandardForm1_9(t *testing.T) {
 	)
 
 	// Algorithm
-	p1Prime, _, err := p1.ToLPStandardForm1()
+	p1Prime, _, _, err := p1.ToLPStandardForm1()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -2834,7 +2834,7 @@ func TestOptimizationProblem_ToLPStandardForm1_10(t *testing.T) {
 	)
 
 	// Call the ToLPStandardForm1
-	_, _, err := p1.ToLPStandardForm1()
+	_, _, _, err := p1.ToLPStandardForm1()
 	if err == nil {
 		t.Errorf("expected an error; received nil")
 	}
@@ -2844,6 +2844,143 @@ func TestOptimizationProblem_ToLPStandardForm1_10(t *testing.T) {
 	if err.Error() != expectedError.Error() {
 		t.Errorf("unexpected error: %v", err)
 	}
+}
+
+/*
+TestOptimizationProblem_ToLPStandardForm1_11
+Description:
+
+	This method verifies that the map from original variables to
+	standard form variables is correct for a small problem.
+	In this problem, we will have:
+	- a constant objective
+	- 1 variable,
+	- and a single linear inequality constraint.
+	The resulting map should contain 1 entry, mapping the original
+	variable to the positive half and negative half variables in the standard form.
+*/
+func TestOptimizationProblem_ToLPStandardForm1_11(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_11")
+	v1 := p1.AddVariable()
+	c1 := v1.LessEq(1.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	_, _, varMap, err := p1.ToLPStandardForm1()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of entries in the map is as expected.
+	if len(varMap) != 1 {
+		t.Errorf("expected the number of entries in the map to be %v; received %v",
+			1, len(varMap))
+	}
+
+	// Check that the entry in the map contains two variables.
+	v1Expr, ok := varMap[v1]
+	if !ok {
+		t.Errorf("expected the map to contain an entry for variable %v; it does not", v1)
+	}
+
+	if len(v1Expr.Variables()) != 2 {
+		t.Errorf("expected the entry in the map to contain %v variables; received %v",
+			2, len(v1Expr.Variables()))
+	}
+
+	if len(symbolic.UniqueVars(v1Expr.Variables())) != 2 {
+		t.Errorf("expected the entry in the map to contain %v unique variables; received %v",
+			2, len(symbolic.UniqueVars(v1Expr.Variables())))
+	}
+}
+
+/*
+TestOptimizationProblem_ToLPStandardForm1_12
+Description:
+
+	This method verifies that the map from original variables to
+	standard form variables is correct for a small problem.
+	In this problem, we will have:
+	- a constant objective
+	- 2 variables,
+	- and two linear inequality constraints.
+	One of the variables is purely positive, while the other is purely negative.
+	The resulting map should contain 2 entries, one mapping the purely positive
+	variable to itself, and the other mapping the purely negative variable to
+	the negative half variables in the standard form.
+*/
+func TestOptimizationProblem_ToLPStandardForm1_12(t *testing.T) {
+	// Constants
+	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_12")
+	vv1 := p1.AddVariableVector(2)
+	// Add constraints
+	c1 := vv1.AtVec(0).GreaterEq(1.0)
+	c2 := vv1.AtVec(1).LessEq(-2.0)
+
+	p1.Constraints = append(p1.Constraints, c1)
+	p1.Constraints = append(p1.Constraints, c2)
+
+	// Create good objective
+	p1.Objective = *problem.NewObjective(
+		symbolic.K(3.14),
+		problem.SenseMaximize,
+	)
+
+	// Algorithm
+	_, _, varMap, err := p1.ToLPStandardForm1()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Check that the number of entries in the map is as expected.
+	if len(varMap) != 2 {
+		t.Errorf("expected the number of entries in the map to be %v; received %v",
+			2, len(varMap))
+	}
+
+	// Check that the entry in the map for the purely positive variable contains one variable.
+	v1 := vv1.AtVec(0).(symbolic.Variable)
+	v1Expr, ok := varMap[v1]
+	if !ok {
+		t.Errorf("expected the map to contain an entry for variable %v; it does not", v1)
+	}
+
+	if len(v1Expr.Variables()) != 1 {
+		t.Errorf("expected the entry in the map to contain %v variables; received %v",
+			1, len(v1Expr.Variables()))
+	}
+
+	// Check that the entry in the map for the purely negative variable contains one variable.
+	v2 := vv1.AtVec(1).(symbolic.Variable)
+	v2Expr, ok := varMap[v2]
+	if !ok {
+		t.Errorf("expected the map to contain an entry for variable %v; it does not", v2)
+	}
+
+	if len(v2Expr.Variables()) != 1 {
+		t.Errorf("expected the entry in the map to contain %v variables; received %v",
+			1, len(v2Expr.Variables()))
+	}
+
+	// TODO: Uncomment these checks once we have Polynomial's AsSimplifiedExpression method better tuned for polynomials.
+	// v2ExprAsMonomial, ok := v2Expr.(symbolic.Monomial)
+	// if !ok {
+	// 	t.Errorf("expected the entry in the map to be a Monomial; received %T", v2Expr)
+	// }
+
+	// coeff2 := v2ExprAsMonomial.LinearCoeff()
+	// if coeff2.AtVec(0) != -1.0 {
+	// 	t.Errorf("expected the entry in the map to have coefficient %v; received %v",
+	// 		-1.0, coeff2.AtVec(0))
+	// }
 }
 
 /*
@@ -3081,7 +3218,7 @@ func TestOptimizationProblem_ToLPStandardForm2_1(t *testing.T) {
 	)
 
 	// Algorithm
-	p2, _, err := p1.ToLPStandardForm2()
+	p2, _, _, err := p1.ToLPStandardForm2()
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
