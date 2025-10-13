@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/MatProGo-dev/MatProInterface.go/problem"
 	"github.com/MatProGo-dev/MatProInterface.go/solution"
 	solution_status "github.com/MatProGo-dev/MatProInterface.go/solution/status"
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
@@ -315,5 +316,64 @@ func TestSolution_FindValueOfExpression5(t *testing.T) {
 			expected,
 			result,
 		)
+	}
+}
+
+/*
+TestSolution_GetProblem1
+Description:
+
+	This function tests whether we can retrieve the problem from a solution.
+*/
+func TestSolution_GetProblem1(t *testing.T) {
+	// Constants
+	p := problem.NewProblem("TestProblem1")
+	v1 := p.AddVariable()
+
+	tempSol := solution.DummySolution{
+		Values: map[uint64]float64{
+			v1.ID: 2.1,
+		},
+		Objective: 2.3,
+		Status:    solution_status.OPTIMAL,
+		Problem:   p,
+	}
+
+	// Algorithm
+	retrievedProblem := tempSol.GetProblem()
+
+	// Verify the problem is the same
+	if retrievedProblem != p {
+		t.Errorf("Expected GetProblem to return the same problem pointer")
+	}
+
+	if retrievedProblem.Name != "TestProblem1" {
+		t.Errorf("Expected problem name to be 'TestProblem1'; received %v", retrievedProblem.Name)
+	}
+}
+
+/*
+TestSolution_GetProblem2
+Description:
+
+	This function tests whether GetProblem returns nil when no problem is set.
+*/
+func TestSolution_GetProblem2(t *testing.T) {
+	// Constants
+	tempSol := solution.DummySolution{
+		Values: map[uint64]float64{
+			0: 2.1,
+		},
+		Objective: 2.3,
+		Status:    solution_status.OPTIMAL,
+		Problem:   nil,
+	}
+
+	// Algorithm
+	retrievedProblem := tempSol.GetProblem()
+
+	// Verify the problem is nil
+	if retrievedProblem != nil {
+		t.Errorf("Expected GetProblem to return nil when no problem is set")
 	}
 }
