@@ -1,6 +1,9 @@
 package solution
 
-import solution_status "github.com/MatProGo-dev/MatProInterface.go/solution/status"
+import (
+	"github.com/MatProGo-dev/MatProInterface.go/problem"
+	solution_status "github.com/MatProGo-dev/MatProInterface.go/solution/status"
+)
 
 type DummySolution struct {
 	Values map[uint64]float64
@@ -10,6 +13,9 @@ type DummySolution struct {
 
 	// Whether or not the solution is within the optimality threshold
 	Status solution_status.SolutionStatus
+
+	// The optimization problem that this solution is for
+	Problem *problem.OptimizationProblem
 
 	// The optimality gap returned from the solver. For many solvers, this is
 	// the gap between the best possible solution with integer relaxation and
@@ -27,4 +33,8 @@ func (ds *DummySolution) GetValueMap() map[uint64]float64 {
 
 func (ds *DummySolution) GetStatus() solution_status.SolutionStatus {
 	return ds.Status
+}
+
+func (ds *DummySolution) GetProblem() *problem.OptimizationProblem {
+	return ds.Problem
 }

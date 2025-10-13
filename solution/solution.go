@@ -3,6 +3,7 @@ package solution
 import (
 	"fmt"
 
+	"github.com/MatProGo-dev/MatProInterface.go/problem"
 	solution_status "github.com/MatProGo-dev/MatProInterface.go/solution/status"
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 )
@@ -20,6 +21,9 @@ type Solution interface {
 	// GetStatus
 	//
 	GetStatus() solution_status.SolutionStatus
+
+	// GetProblem returns the optimization problem that this solution is for
+	GetProblem() *problem.OptimizationProblem
 }
 
 func ExtractValueOfVariableWithID(s Solution, idx uint64) (float64, error) {
