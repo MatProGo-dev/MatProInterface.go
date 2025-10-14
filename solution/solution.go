@@ -44,8 +44,8 @@ func ExtractValueOfVariable(s Solution, v symbolic.Variable) (float64, error) {
 
 // FindValueOfExpression evaluates a symbolic expression using the values from a solution.
 // It substitutes all variables in the expression with their values from the solution
-// and returns the resulting scalar value.
-func FindValueOfExpression(s Solution, expr symbolic.Expression) (float64, error) {
+// and returns the resulting symbolic expression (typically a constant).
+func FindValueOfExpression(s Solution, expr symbolic.Expression) (symbolic.Expression, error) {
 	// Get all variables in the expression
 	vars := expr.Variables()
 
@@ -54,7 +54,7 @@ func FindValueOfExpression(s Solution, expr symbolic.Expression) (float64, error
 	for _, v := range vars {
 		val, err := ExtractValueOfVariable(s, v)
 		if err != nil {
-			return 0.0, fmt.Errorf(
+			return nil, fmt.Errorf(
 				"failed to extract value for variable %v: %w",
 				v.ID,
 				err,
@@ -66,16 +66,7 @@ func FindValueOfExpression(s Solution, expr symbolic.Expression) (float64, error
 	// Substitute all variables with their values
 	resultExpr := expr.SubstituteAccordingTo(subMap)
 
-	// Type assert to K (constant) to extract the float64 value
-	resultK, ok := resultExpr.(symbolic.K)
-	if !ok {
-		return 0.0, fmt.Errorf(
-			"expected substituted expression to be a constant, got type %T",
-			resultExpr,
-		)
-	}
-
-	return float64(resultK), nil
+	return resultExpr, nil
 }
 
 // GetOptimalObjectiveValue evaluates the objective function of an optimization problem
@@ -95,10 +86,19 @@ func GetOptimalObjectiveValue(sol Solution) (float64, error) {
 	}
 
 	// Use FindValueOfExpression to evaluate the objective at the solution point
-	value, err := FindValueOfExpression(sol, objectiveExpr)
+	resultExpr, err := FindValueOfExpression(sol, objectiveExpr)
 	if err != nil {
 		return 0.0, fmt.Errorf("failed to evaluate objective expression: %w", err)
 	}
 
-	return value, nil
+	// Type assert to K (constant) to extract the float64 value
+	resultK, ok := resultExpr.(symbolic.K)
+	if !ok {
+		return 0.0, fmt.Errorf(
+			"expected substituted expression to be a constant, got type %T",
+			resultExpr,
+		)
+	}
+
+	return float64(resultK), nil
 }
