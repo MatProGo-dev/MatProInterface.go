@@ -161,10 +161,17 @@ func TestSolution_FindValueOfExpression1(t *testing.T) {
 	expr := v1.Multiply(symbolic.K(2.0)).Plus(v2.Multiply(symbolic.K(3.0)))
 
 	// Algorithm
-	result, err := solution.FindValueOfExpression(&tempSol, expr)
+	resultExpr, err := solution.FindValueOfExpression(&tempSol, expr)
 	if err != nil {
 		t.Errorf("FindValueOfExpression returned an error: %v", err)
 	}
+
+	// Convert to float64
+	resultK, ok := resultExpr.(symbolic.K)
+	if !ok {
+		t.Errorf("Expected result to be a constant, got type %T", resultExpr)
+	}
+	result := float64(resultK)
 
 	expected := 13.0
 	if result != expected {
@@ -194,10 +201,17 @@ func TestSolution_FindValueOfExpression2(t *testing.T) {
 	expr := symbolic.K(42.0)
 
 	// Algorithm
-	result, err := solution.FindValueOfExpression(&tempSol, expr)
+	resultExpr, err := solution.FindValueOfExpression(&tempSol, expr)
 	if err != nil {
 		t.Errorf("FindValueOfExpression returned an error: %v", err)
 	}
+
+	// Convert to float64
+	resultK, ok := resultExpr.(symbolic.K)
+	if !ok {
+		t.Errorf("Expected result to be a constant, got type %T", resultExpr)
+	}
+	result := float64(resultK)
 
 	expected := 42.0
 	if result != expected {
@@ -231,10 +245,17 @@ func TestSolution_FindValueOfExpression3(t *testing.T) {
 	expr := v1.Plus(symbolic.K(10.0))
 
 	// Algorithm
-	result, err := solution.FindValueOfExpression(&tempSol, expr)
+	resultExpr, err := solution.FindValueOfExpression(&tempSol, expr)
 	if err != nil {
 		t.Errorf("FindValueOfExpression returned an error: %v", err)
 	}
+
+	// Convert to float64
+	resultK, ok := resultExpr.(symbolic.K)
+	if !ok {
+		t.Errorf("Expected result to be a constant, got type %T", resultExpr)
+	}
+	result := float64(resultK)
 
 	expected := 15.5
 	if result != expected {
@@ -304,10 +325,17 @@ func TestSolution_FindValueOfExpression5(t *testing.T) {
 	expr := v1.Plus(v2).Multiply(v3).Plus(symbolic.K(5.0))
 
 	// Algorithm
-	result, err := solution.FindValueOfExpression(&tempSol, expr)
+	resultExpr, err := solution.FindValueOfExpression(&tempSol, expr)
 	if err != nil {
 		t.Errorf("FindValueOfExpression returned an error: %v", err)
 	}
+
+	// Convert to float64
+	resultK, ok := resultExpr.(symbolic.K)
+	if !ok {
+		t.Errorf("Expected result to be a constant, got type %T", resultExpr)
+	}
+	result := float64(resultK)
 
 	expected := 14.0
 	if result != expected {
