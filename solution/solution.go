@@ -77,3 +77,28 @@ func FindValueOfExpression(s Solution, expr symbolic.Expression) (float64, error
 
 	return float64(resultK), nil
 }
+
+// GetOptimalObjectiveValue evaluates the objective function of an optimization problem
+// at the solution point. It uses the FindValueOfExpression function to compute the value
+// of the objective expression using the variable values from the solution.
+func GetOptimalObjectiveValue(sol Solution) (float64, error) {
+	// Get the problem from the solution
+	prob := sol.GetProblem()
+	if prob == nil {
+		return 0.0, fmt.Errorf("solution does not have an associated problem")
+	}
+
+	// Get the objective expression from the problem
+	objectiveExpr := prob.Objective.Expression
+	if objectiveExpr == nil {
+		return 0.0, fmt.Errorf("problem does not have a defined objective")
+	}
+
+	// Use FindValueOfExpression to evaluate the objective at the solution point
+	value, err := FindValueOfExpression(sol, objectiveExpr)
+	if err != nil {
+		return 0.0, fmt.Errorf("failed to evaluate objective expression: %w", err)
+	}
+
+	return value, nil
+}
