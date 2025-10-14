@@ -17,6 +17,15 @@ Description:
 	(This seems like it is highly representative of the Gurobi solver; is there a reason to make it this way?)
 */
 
+// Helper function to convert a symbolic.Expression to float64
+func exprToFloat64(t *testing.T, expr symbolic.Expression) float64 {
+	resultK, ok := expr.(symbolic.K)
+	if !ok {
+		t.Fatalf("Expected result to be a constant, got type %T", expr)
+	}
+	return float64(resultK)
+}
+
 func TestSolution_ToMessage1(t *testing.T) {
 	// Constants
 	tempSol := solution.DummySolution{
@@ -166,12 +175,7 @@ func TestSolution_FindValueOfExpression1(t *testing.T) {
 		t.Errorf("FindValueOfExpression returned an error: %v", err)
 	}
 
-	// Convert to float64
-	resultK, ok := resultExpr.(symbolic.K)
-	if !ok {
-		t.Errorf("Expected result to be a constant, got type %T", resultExpr)
-	}
-	result := float64(resultK)
+	result := exprToFloat64(t, resultExpr)
 
 	expected := 13.0
 	if result != expected {
@@ -206,12 +210,7 @@ func TestSolution_FindValueOfExpression2(t *testing.T) {
 		t.Errorf("FindValueOfExpression returned an error: %v", err)
 	}
 
-	// Convert to float64
-	resultK, ok := resultExpr.(symbolic.K)
-	if !ok {
-		t.Errorf("Expected result to be a constant, got type %T", resultExpr)
-	}
-	result := float64(resultK)
+	result := exprToFloat64(t, resultExpr)
 
 	expected := 42.0
 	if result != expected {
@@ -250,12 +249,7 @@ func TestSolution_FindValueOfExpression3(t *testing.T) {
 		t.Errorf("FindValueOfExpression returned an error: %v", err)
 	}
 
-	// Convert to float64
-	resultK, ok := resultExpr.(symbolic.K)
-	if !ok {
-		t.Errorf("Expected result to be a constant, got type %T", resultExpr)
-	}
-	result := float64(resultK)
+	result := exprToFloat64(t, resultExpr)
 
 	expected := 15.5
 	if result != expected {
@@ -330,12 +324,7 @@ func TestSolution_FindValueOfExpression5(t *testing.T) {
 		t.Errorf("FindValueOfExpression returned an error: %v", err)
 	}
 
-	// Convert to float64
-	resultK, ok := resultExpr.(symbolic.K)
-	if !ok {
-		t.Errorf("Expected result to be a constant, got type %T", resultExpr)
-	}
-	result := float64(resultK)
+	result := exprToFloat64(t, resultExpr)
 
 	expected := 14.0
 	if result != expected {
