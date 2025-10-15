@@ -64,6 +64,21 @@ func (op *OptimizationProblem) AddVariableClassic(lower, upper float64, vtype sy
 	return newVar
 }
 
+// AddVariable adds a variable of a given variable type to the model given the lower
+// and upper value limits. This variable is returned.
+func (op *OptimizationProblem) AddVariableClassicWithName(name string, lower, upper float64, vtype symbolic.VarType) symbolic.Variable {
+	id := uint64(len(op.Variables))
+	newVar := symbolic.Variable{
+		ID:    id,
+		Lower: lower,
+		Upper: upper,
+		Type:  vtype,
+		Name:  name,
+	}
+	op.Variables = append(op.Variables, newVar)
+	return newVar
+}
+
 // AddBinaryVar adds a binary variable to the model and returns said variable.
 func (op *OptimizationProblem) AddBinaryVariable() symbolic.Variable {
 	return op.AddVariableClassic(0, 1, symbolic.Binary)
@@ -609,7 +624,9 @@ func (op *OptimizationProblem) ToProblemWithAllPositiveVariables() (*Optimizatio
 
 		// - Negative Part
 		negativePartExists := xII.Lower < 0
+		fmt.Println("negativePartExists for constraint ", ii, ": ", negativePartExists)
 		negativePartExists = negativePartExists && !ConstraintIsRedundantGivenOthers(xII.GreaterEq(0.0), op.Constraints)
+		fmt.Println("Constraint is redundant: ", ConstraintIsRedundantGivenOthers(xII.GreaterEq(0.0), op.Constraints))
 		if negativePartExists {
 			newProblem.AddVariableClassic(0.0, symbolic.Infinity.Constant(), symbolic.Continuous)
 			nVariables := len(newProblem.Variables)
@@ -694,9 +711,8 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 	// Add all variables to the new problem
 	mapFromPositiveToNewVariables := make(map[symbolic.Variable]symbolic.Expression)
 	for _, varII := range problemWithAllPositiveVariables.Variables {
-		problemInStandardForm.AddVariable()
-		nVariables := len(problemInStandardForm.Variables)
-		mapFromPositiveToNewVariables[varII] = problemInStandardForm.Variables[nVariables-1]
+		newVarII := problemInStandardForm.CopyVariable(varII)
+		mapFromPositiveToNewVariables[varII] = newVarII
 	}
 
 	// Add all constraints to the new problem

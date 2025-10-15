@@ -1,6 +1,8 @@
 package problem
 
-import "github.com/MatProGo-dev/SymbolicMath.go/symbolic"
+import (
+	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
+)
 
 func ConstraintIsRedundantGivenOthers(
 	constraint symbolic.Constraint,

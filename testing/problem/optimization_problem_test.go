@@ -3254,6 +3254,61 @@ func TestOptimizationProblem_ToLPStandardForm2_1(t *testing.T) {
 }
 
 /*
+TestOptimizationProblem_ToLPStandardForm2_2
+Description:
+
+	Tests the ToLPStandardForm2 function with the challenging
+	problem described in gonum issue:
+		https://github.com/gonum/gonum/issues/1914
+	The problem is fairly large with 57 variables.
+	We will verify that the function correctly creates:
+	- an objective that contains BOTH positive and negative coefficients,
+	- a MAXIMIZATION sense
+*/
+func TestOptimizationProblem_ToLPStandardForm2_2(t *testing.T) {
+	// Create the problem described in the gonum issue
+	pGonum := problem.GetGonumBugLPProblem()
+
+	// Convert to standard form
+	p2, _, _, err := pGonum.ToLPStandardForm2()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Verify that the sense of the objective is MAXIMIZATION
+	if p2.Objective.Sense != problem.SenseMaximize {
+		t.Errorf("expected the sense of the objective to be %v; received %v",
+			problem.SenseMaximize, p2.Objective.Sense)
+	}
+
+	// Verify that the objective contains both positive and negative coefficients
+	hasPositive := false
+	hasNegative := false
+	objAsPolynomial, ok := p2.Objective.Expression.(symbolic.Polynomial)
+	if !ok {
+		t.Errorf("expected the objective to be a Polynomial; received %T",
+			p2.Objective.Expression)
+	}
+
+	coeffs := objAsPolynomial.LinearCoeff(p2.Variables)
+
+	for _, coeff := range coeffs.RawVector().Data {
+		if coeff > 0 {
+			hasPositive = true
+		}
+		if coeff < 0 {
+			hasNegative = true
+		}
+	}
+	if !hasPositive {
+		t.Errorf("expected the objective to have at least one positive coefficient; it does not")
+	}
+	if !hasNegative {
+		t.Errorf("expected the objective to have at least one negative coefficient; it does not")
+	}
+}
+
+/*
 TestOptimizationProblem_CopyVariable1
 Description:
 
