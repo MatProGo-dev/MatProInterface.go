@@ -34,7 +34,14 @@ type Solution interface {
 	//   fmt.Println("Value of x1 in solution:", x1Value)
 	GetValueMap() map[uint64]float64
 
-	// GetStatus
+	// GetStatus returns the status of the solution (e.g., optimal, infeasible, etc.).
+	//
+	// The returned value is of type solution_status.SolutionStatus, which indicates
+	// whether the solution is optimal, infeasible, unbounded, or has another status.
+	//
+	// Example usage:
+	//   status := solution.GetStatus()
+	//   fmt.Println("Solution status:", status)
 	GetStatus() solution_status.SolutionStatus
 
 	// GetProblem returns the optimization problem that this solution is for
