@@ -15,11 +15,33 @@ const (
 // Solution stores the solution of an optimization problem and associated
 // metadata
 type Solution interface {
-	GetOptimalValue() float64
+	// GetValueMap returns a map from variable ID to its value in the solution
+	//
+	// The map keys are the IDs of the variables (uint64)
+	// The map values are the corresponding values of those variables in the solution (float64)
+	//
+	// Example:
+	// If variable with ID 1 has value 3.5 in the solution, then the map will contain an entry:
+	//   1: 3.5
+	//
+	// This allows easy lookup of variable values by their IDs.
+	//
+	// Note: Variable IDs can be obtained from the symbolic.Variable.ID field.
+	//
+	// Example usage:
+	//   valMap := solution.GetValueMap()
+	//   x1Value := valMap[x1.ID] // where x1 is a symbolic.Variable
+	//   fmt.Println("Value of x1 in solution:", x1Value)
 	GetValueMap() map[uint64]float64
 
-	// GetStatus
+	// GetStatus returns the status of the solution (e.g., optimal, infeasible, etc.).
 	//
+	// The returned value is of type solution_status.SolutionStatus, which indicates
+	// whether the solution is optimal, infeasible, unbounded, or has another status.
+	//
+	// Example usage:
+	//   status := solution.GetStatus()
+	//   fmt.Println("Solution status:", status)
 	GetStatus() solution_status.SolutionStatus
 
 	// GetProblem returns the optimization problem that this solution is for
