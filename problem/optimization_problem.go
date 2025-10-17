@@ -230,10 +230,12 @@ func From(inputModel optim.Model) (*OptimizationProblem, error) {
 	// problem object.
 	for ii, variable := range inputModel.Variables {
 		newOptimProblem.Variables = append(newOptimProblem.Variables, symbolic.Variable{
-			ID:    uint64(ii),
-			Lower: variable.Lower,
-			Upper: variable.Upper,
-			Type:  symbolic.VarType(variable.Vtype),
+			ID:          uint64(ii),
+			Lower:       variable.Lower,
+			Upper:       variable.Upper,
+			Type:        symbolic.VarType(variable.Vtype),
+			Name:        fmt.Sprintf("x_%v", ii),
+			Environment: newOptimProblem,
 		})
 	}
 
