@@ -6,4 +6,4 @@ toolchain go1.23.9
 
 require gonum.org/v1/gonum v0.16.0
 
-require github.com/MatProGo-dev/SymbolicMath.go v0.3.1
+require github.com/MatProGo-dev/SymbolicMath.go v0.3.2-0.20251017032605-a7dee10c22bf

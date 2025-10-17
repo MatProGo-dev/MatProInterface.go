@@ -1,4 +1,4 @@
-github.com/MatProGo-dev/SymbolicMath.go v0.3.1 h1:WM5lVAySD4mQDvq3RABUmJgSGkSYHT0CC+ZJXeTTJRg=
-github.com/MatProGo-dev/SymbolicMath.go v0.3.1/go.mod h1:tW8thj4pkaTV9lFNU3OCKmwQ3mZ2Eim6S4JpHRDfRvU=
+github.com/MatProGo-dev/SymbolicMath.go v0.3.2-0.20251017032605-a7dee10c22bf h1:fvHlqO39XHb/TfMm979zsnrcvZDSAFU7PW61g1UQCW8=
+github.com/MatProGo-dev/SymbolicMath.go v0.3.2-0.20251017032605-a7dee10c22bf/go.mod h1:tW8thj4pkaTV9lFNU3OCKmwQ3mZ2Eim6S4JpHRDfRvU=
 gonum.org/v1/gonum v0.16.0 h1:5+ul4Swaf3ESvrOnidPp4GZbzf0mxVQpDCYUQE7OJfk=
 gonum.org/v1/gonum v0.16.0/go.mod h1:fef3am4MQ93R2HHpKnLk4/Tbh/s0+wqD5nfa6Pnwy4E=
