@@ -33,8 +33,7 @@ func TestSolution_ToMessage1(t *testing.T) {
 			0: 2.1,
 			1: 3.14,
 		},
-		Objective: 2.3,
-		Status:    solution_status.NODE_LIMIT,
+		Status: solution_status.NODE_LIMIT,
 	}
 
 	// Test the ToMessage() Call on this solution.
@@ -114,8 +113,7 @@ func TestSolution_Value1(t *testing.T) {
 			v1.ID: 2.1,
 			v2.ID: 3.14,
 		},
-		Objective: 2.3,
-		Status:    solution_status.NODE_LIMIT,
+		Status: solution_status.NODE_LIMIT,
 	}
 
 	// Algorithm
@@ -162,8 +160,7 @@ func TestSolution_FindValueOfExpression1(t *testing.T) {
 			v1.ID: 2.0,
 			v2.ID: 3.0,
 		},
-		Objective: 2.3,
-		Status:    solution_status.OPTIMAL,
+		Status: solution_status.OPTIMAL,
 	}
 
 	// Create expression: 2*v1 + 3*v2 = 2*2.0 + 3*3.0 = 4.0 + 9.0 = 13.0
@@ -196,9 +193,9 @@ Description:
 func TestSolution_FindValueOfExpression2(t *testing.T) {
 	// Constants
 	tempSol := solution.DummySolution{
-		Values:    map[uint64]float64{},
-		Objective: 2.3,
-		Status:    solution_status.OPTIMAL,
+		Values: map[uint64]float64{},
+
+		Status: solution_status.OPTIMAL,
 	}
 
 	// Create constant expression: 42.0
@@ -236,8 +233,8 @@ func TestSolution_FindValueOfExpression3(t *testing.T) {
 		Values: map[uint64]float64{
 			v1.ID: 5.5,
 		},
-		Objective: 2.3,
-		Status:    solution_status.OPTIMAL,
+
+		Status: solution_status.OPTIMAL,
 	}
 
 	// Create expression: v1 + 10 = 5.5 + 10 = 15.5
@@ -278,8 +275,8 @@ func TestSolution_FindValueOfExpression4(t *testing.T) {
 			v1.ID: 2.0,
 			// v2 is missing
 		},
-		Objective: 2.3,
-		Status:    solution_status.OPTIMAL,
+
+		Status: solution_status.OPTIMAL,
 	}
 
 	// Create expression: v1 + v2
@@ -311,8 +308,8 @@ func TestSolution_FindValueOfExpression5(t *testing.T) {
 			v2.ID: 2.0,
 			v3.ID: 3.0,
 		},
-		Objective: 2.3,
-		Status:    solution_status.OPTIMAL,
+
+		Status: solution_status.OPTIMAL,
 	}
 
 	// Create expression: (v1 + v2) * v3 + 5 = (1.0 + 2.0) * 3.0 + 5 = 3.0 * 3.0 + 5 = 9.0 + 5 = 14.0
@@ -351,9 +348,9 @@ func TestSolution_GetProblem1(t *testing.T) {
 		Values: map[uint64]float64{
 			v1.ID: 2.1,
 		},
-		Objective: 2.3,
-		Status:    solution_status.OPTIMAL,
-		Problem:   p,
+
+		Status:  solution_status.OPTIMAL,
+		Problem: p,
 	}
 
 	// Algorithm
@@ -381,9 +378,9 @@ func TestSolution_GetProblem2(t *testing.T) {
 		Values: map[uint64]float64{
 			0: 2.1,
 		},
-		Objective: 2.3,
-		Status:    solution_status.OPTIMAL,
-		Problem:   nil,
+
+		Status:  solution_status.OPTIMAL,
+		Problem: nil,
 	}
 
 	// Algorithm
@@ -422,9 +419,8 @@ func TestSolution_GetOptimalObjectiveValue1(t *testing.T) {
 			v1.ID: 2.0,
 			v2.ID: 3.0,
 		},
-		Objective: 13.0,
-		Status:    solution_status.OPTIMAL,
-		Problem:   p,
+		Status:  solution_status.OPTIMAL,
+		Problem: p,
 	}
 
 	// Algorithm
@@ -458,9 +454,9 @@ func TestSolution_GetOptimalObjectiveValue2(t *testing.T) {
 		Values: map[uint64]float64{
 			v1.ID: 2.0,
 		},
-		Objective: 2.3,
-		Status:    solution_status.OPTIMAL,
-		Problem:   nil,
+
+		Status:  solution_status.OPTIMAL,
+		Problem: nil,
 	}
 
 	// Algorithm
@@ -494,9 +490,8 @@ func TestSolution_GetOptimalObjectiveValue3(t *testing.T) {
 		Values: map[uint64]float64{
 			v1.ID: 1.0,
 		},
-		Objective: 42.0,
-		Status:    solution_status.OPTIMAL,
-		Problem:   p,
+		Status:  solution_status.OPTIMAL,
+		Problem: p,
 	}
 
 	// Algorithm
@@ -544,9 +539,8 @@ func TestSolution_GetOptimalObjectiveValue4(t *testing.T) {
 			v2.ID: 2.0,
 			v3.ID: 3.0,
 		},
-		Objective: 14.0,
-		Status:    solution_status.OPTIMAL,
-		Problem:   p,
+		Status:  solution_status.OPTIMAL,
+		Problem: p,
 	}
 
 	// Algorithm
