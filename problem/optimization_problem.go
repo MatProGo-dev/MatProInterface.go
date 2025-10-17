@@ -54,11 +54,12 @@ func (op *OptimizationProblem) AddRealVariable() symbolic.Variable {
 func (op *OptimizationProblem) AddVariableClassic(lower, upper float64, vtype symbolic.VarType) symbolic.Variable {
 	id := uint64(len(op.Variables))
 	newVar := symbolic.Variable{
-		ID:    id,
-		Lower: lower,
-		Upper: upper,
-		Type:  vtype,
-		Name:  fmt.Sprintf("x_%v", id),
+		ID:          id,
+		Lower:       lower,
+		Upper:       upper,
+		Type:        vtype,
+		Name:        fmt.Sprintf("x_%v", id),
+		Environment: op,
 	}
 	op.Variables = append(op.Variables, newVar)
 	return newVar
@@ -100,11 +101,12 @@ func (op *OptimizationProblem) AddVariableVectorClassic(
 	vs := make([]symbolic.Variable, num)
 	for i := range vs {
 		vs[i] = symbolic.Variable{
-			ID:    stID + uint64(i),
-			Lower: lower,
-			Upper: upper,
-			Type:  vtype,
-			Name:  fmt.Sprintf("x_%v", stID+uint64(i)),
+			ID:          stID + uint64(i),
+			Lower:       lower,
+			Upper:       upper,
+			Type:        vtype,
+			Name:        fmt.Sprintf("x_%v", stID+uint64(i)),
+			Environment: op,
 		}
 	}
 
@@ -127,14 +129,7 @@ func (op *OptimizationProblem) AddVariableMatrix(
 	// environment as well as upper and lower bounds.
 
 	// Create variables
-	vmOut := symbolic.NewVariableMatrix(rows, cols)
-
-	// Add variables to the problem
-	for i := 0; i < rows; i++ {
-		for j := 0; j < cols; j++ {
-			op.Variables = append(op.Variables, vmOut[i][j])
-		}
-	}
+	vmOut := symbolic.NewVariableMatrix(rows, cols, op)
 
 	return vmOut
 }
@@ -1041,4 +1036,46 @@ func (op *OptimizationProblem) String() string {
 	)
 
 	return objString + constraintsString
+}
+
+/*
+GetName
+Description:
+
+	Returns the name of the optimization problem.
+	(Necessary for implementing the symbolic.Environment interface).
+*/
+func (op *OptimizationProblem) GetName() string {
+	return op.Name
+}
+
+/*
+TrackVariable
+Description:
+
+	Adds the given variable to the optimization problem if it is not already present.
+	Returns true if the variable was added, false if it was already present.
+*/
+func (op *OptimizationProblem) TrackVariable(v symbolic.Variable) bool {
+	// Check if the variable is already present
+	for _, variable := range op.Variables {
+		if variable.ID == v.ID {
+			return false
+		}
+	}
+
+	// Add the variable to the problem
+	op.Variables = append(op.Variables, v)
+	return true
+}
+
+/*
+AllTrackedVariables
+Description:
+
+	Returns a slice of all variables that are tracked by the optimization problem.
+	(Necessary for implementing the symbolic.Environment interface).
+*/
+func (op *OptimizationProblem) AllTrackedVariables() []symbolic.Variable {
+	return op.Variables
 }
