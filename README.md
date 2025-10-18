@@ -87,7 +87,7 @@ ask if this is intentional by creating an issue.
 
 There are two dominant approaches for handling errors/problems
 in numerical Go programs. One is to raise an exception/create a fatal flag which terminates the program.
-The other is to share error messages to the user using Go's build-in `error` type (or extensions of it) during
+The other is to share error messages to the user using Go's built-in `error` type (or extensions of it) during
 most function calls. In most cases, these error messages will be `nil` indicating
 that no error occurred, but occasionally they will contain valuable information.
 
