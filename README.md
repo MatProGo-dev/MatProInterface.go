@@ -98,7 +98,7 @@ code. Hopefully, this is avoided using this format.
 
 > I have a question for you. How can I ask it?
 
-Feel free to create an issue (see the Issues tab above) in this repository! 
+Feel free to create an issue (see the Issues tab above) in this repository!
 
 > I have noticed an error in the code. What should I do?
 
