@@ -6,53 +6,47 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-// Integer constants represnting commonly used numbers. Makes for better
-// readability
 const (
+	// Zero is a constant expression representing the value 0.
 	Zero = K(0)
-	One  = K(1)
+	// One is a constant expression representing the value 1.
+	One = K(1)
 )
 
-// K is a constant expression type for an MIP. K for short ¯\_(ツ)_/¯
+// K is a constant expression type for an MIP (Mixed Integer Program).
 type K float64
 
-/*
-Variables
-Description:
-
-	Shares all variables included in the expression that is K.
-	It is a constant, so there are none.
-*/
+// Variables returns all variables included in the expression.
+// For constant K, there are no variables, so it returns an empty slice.
 func (c K) Variables() []Variable {
 	return []Variable{}
 }
 
-// NumVars returns the number of variables in the expression. For constants,
-// this is always 0
+// NumVars returns the number of variables in the expression.
+// For constant K, this is always 0.
 func (c K) NumVars() int {
 	return 0
 }
 
-// Vars returns a slice of the Var ids in the expression. For constants,
-// this is always nil
+// IDs returns a slice of the variable IDs in the expression.
+// For constant K, this is always nil.
 func (c K) IDs() []uint64 {
 	return nil
 }
 
-// Coeffs returns a slice of the coefficients in the expression. For constants,
-// this is always nil
+// Coeffs returns a slice of the coefficients in the expression.
+// For constant K, this is always nil.
 func (c K) Coeffs() []float64 {
 	return nil
 }
 
-// Constant returns the constant additive value in the expression. For
-// constants, this is just the constants value
+// Constant returns the constant additive value in the expression.
+// For constant K, this is just the constant's value.
 func (c K) Constant() float64 {
 	return float64(c)
 }
 
-// Plus adds the current expression to another and returns the resulting
-// expression
+// Plus adds the current expression to another and returns the resulting expression.
 func (c K) Plus(rightIn interface{}, errors ...error) (Expression, error) {
 	// Input Processing
 	err := CheckErrors(errors)
@@ -83,30 +77,22 @@ func (c K) Plus(rightIn interface{}, errors ...error) (Expression, error) {
 	}
 }
 
-// LessEq returns a less than or equal to (<=) constraint between the
-// current expression and another
+// LessEq returns a less than or equal to (<=) constraint between the current expression and another.
 func (c K) LessEq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return c.Comparison(rightIn, SenseLessThanEqual, errors...)
 }
 
-// GreaterEq returns a greater than or equal to (>=) constraint between the
-// current expression and another
+// GreaterEq returns a greater than or equal to (>=) constraint between the current expression and another.
 func (c K) GreaterEq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return c.Comparison(rightIn, SenseGreaterThanEqual, errors...)
 }
 
-// Eq returns an equality (==) constraint between the current expression
-// and another
+// Eq returns an equality (==) constraint between the current expression and another.
 func (c K) Eq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return c.Comparison(rightIn, SenseEqual, errors...)
 }
 
-/*
-Comparison
-Description:
-
-	This method compares the receiver with expression rhs in the sense provided by sense.
-*/
+// Comparison compares the receiver with expression rhs in the sense provided by sense.
 func (c K) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (Constraint, error) {
 	// InputProcessing
 	err := CheckErrors(errors)
@@ -125,12 +111,7 @@ func (c K) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (Co
 	return ScalarConstraint{c, rhs, sense}, nil
 }
 
-/*
-Multiply
-Description:
-
-	This method multiplies the input constant by another expression.
-*/
+// Multiply multiplies the input constant by another expression.
 func (c K) Multiply(term1 interface{}, errors ...error) (Expression, error) {
 	// Constants
 
@@ -248,13 +229,7 @@ func (c K) Transpose() Expression {
 	return c
 }
 
-/*
-ToSymbolic
-Description:
-
-	Converts the constant to a symbolic expression (i.e., one that uses the
-	symbolic math toolbox).
-*/
+// ToSymbolic converts the constant to a symbolic expression (i.e., one that uses the symbolic math toolbox).
 func (c K) ToSymbolic() (symbolic.Expression, error) {
 	return symbolic.K(c), nil
 }
