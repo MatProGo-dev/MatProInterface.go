@@ -6,12 +6,11 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-// Zero is a constant expression representing the value 0.
-// One is a constant expression representing the value 1.
-// These constants represent commonly used numbers and make code more readable.
 const (
+	// Zero is a constant expression representing the value 0.
 	Zero = K(0)
-	One  = K(1)
+	// One is a constant expression representing the value 1.
+	One = K(1)
 )
 
 // K is a constant expression type for an MIP (Mixed Integer Program).
