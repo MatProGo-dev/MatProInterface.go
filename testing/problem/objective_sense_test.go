@@ -8,19 +8,9 @@ import (
 	"github.com/MatProGo-dev/MatProInterface.go/problem"
 )
 
-/*
-objective_sense_test.go
-Description:
+// Tests for the objective sense object.
 
-	Tests for the objective sense object.
-*/
-
-/*
-TestObjectiveSense_ToObjSense1
-Description:
-
-	Tests the ToObjSense function with a minimization sense.
-*/
+// TestObjectiveSense_ToObjSense1 Tests the ToObjSense function with a minimization sense.
 func TestObjectiveSense_ToObjSense1(t *testing.T) {
 	// Constants
 	sense := optim.SenseMinimize
@@ -35,12 +25,7 @@ func TestObjectiveSense_ToObjSense1(t *testing.T) {
 	}
 }
 
-/*
-TestObjectiveSense_ToObjSense2
-Description:
-
-	Tests the ToObjSense function with a maximization sense.
-*/
+// TestObjectiveSense_ToObjSense2 Tests the ToObjSense function with a maximization sense.
 func TestObjectiveSense_ToObjSense2(t *testing.T) {
 	// Constants
 	var sense optim.ObjSense = optim.SenseMaximize
@@ -55,13 +40,8 @@ func TestObjectiveSense_ToObjSense2(t *testing.T) {
 	}
 }
 
-/*
-TestObjectiveSense_String1
-Description:
-
-	Tests that we can extract strings from the three normal ObjSense values
-	(Minimize, Maximize, Find).
-*/
+// TestObjectiveSense_String1 Tests that we can extract strings from the three normal ObjSense values
+// (Minimize, Maximize, Find).
 func TestObjectiveSense_String1(t *testing.T) {
 	// Test Minimize
 	minSense := problem.SenseMinimize

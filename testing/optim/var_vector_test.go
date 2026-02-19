@@ -25,12 +25,7 @@ func TestVarVector_Length1(t *testing.T) {
 
 }
 
-/*
-TestVarVector_Length2
-Description:
-
-	Tests that a larger vector variable (contains 5 elements) properly returns the right length.
-*/
+// TestVarVector_Length2 Tests that a larger vector variable (contains 5 elements) properly returns the right length.
 func TestVarVector_Length2(t *testing.T) {
 	m := optim.NewModel("Length2")
 	x := m.AddBinaryVariable()
@@ -47,12 +42,7 @@ func TestVarVector_Length2(t *testing.T) {
 
 }
 
-/*
-TestVarVector_At1
-Description:
-
-	Tests whether or not we can properly retrieve an element from a given vector.
-*/
+// TestVarVector_At1 Tests whether or not we can properly retrieve an element from a given vector.
 func TestVarVector_At1(t *testing.T) {
 	m := optim.NewModel("At1")
 	x := m.AddBinaryVariable()
@@ -69,13 +59,8 @@ func TestVarVector_At1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_At2
-Description:
-
-	Tests whether or not we can properly retrieve an element from a given vector.
-	Makes sure that if we change the extracted vector, it does not effect the element saved in the slice.
-*/
+// TestVarVector_At2 Tests whether or not we can properly retrieve an element from a given vector.
+// Makes sure that if we change the extracted vector, it does not effect the element saved in the slice.
 func TestVarVector_At2(t *testing.T) {
 	m := optim.NewModel("At2")
 	x := m.AddBinaryVariable()
@@ -94,13 +79,8 @@ func TestVarVector_At2(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_VariableIDs1
-Description:
-
-	This test will check to see if 2 unique ids in a VariableVector object will be returned correctly when
-	the VariableIDs method is called.
-*/
+// TestVarVector_VariableIDs1 This test will check to see if 2 unique ids in a VariableVector object will be returned correctly when
+// the VariableIDs method is called.
 func TestVarVector_VariableIDs1(t *testing.T) {
 	m := optim.NewModel("VariableIDs1")
 	x := m.AddBinaryVariable()
@@ -122,13 +102,8 @@ func TestVarVector_VariableIDs1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_VariableIDs2
-Description:
-
-	This test will check to see if a single unique id in a large VariableVector object will be returned correctly when
-	the VariableIDs method is called.
-*/
+// TestVarVector_VariableIDs2 This test will check to see if a single unique id in a large VariableVector object will be returned correctly when
+// the VariableIDs method is called.
 func TestVarVector_VariableIDs2(t *testing.T) {
 	m := optim.NewModel("VariableIDs2")
 	x := m.AddBinaryVariable()
@@ -154,13 +129,8 @@ func TestVarVector_VariableIDs2(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_NumVars1
-Description:
-
-	This test will check to see vector of length 10
-	contains 2 n Vars.
-*/
+// TestVarVector_NumVars1 This test will check to see vector of length 10
+// contains 2 n Vars.
 func TestVarVector_NumVars1(t *testing.T) {
 	m := optim.NewModel("NumVars1")
 	x := m.AddBinaryVariable()
@@ -181,12 +151,7 @@ func TestVarVector_NumVars1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_Constant1
-Description:
-
-	This test verifies that the constant method returns an all zero vector for any varvector object.
-*/
+// TestVarVector_Constant1 This test verifies that the constant method returns an all zero vector for any varvector object.
 func TestVarVector_Constant1(t *testing.T) {
 	m := optim.NewModel("Constant1")
 	x := m.AddBinaryVariable()
@@ -208,13 +173,8 @@ func TestVarVector_Constant1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_Constant2
-Description:
-
-	This test verifies that the constant method returns an all zero vector for any varvector object.
-	This one will be extremely long.
-*/
+// TestVarVector_Constant2 This test verifies that the constant method returns an all zero vector for any varvector object.
+// This one will be extremely long.
 func TestVarVector_Constant2(t *testing.T) {
 	m := optim.NewModel("Constant2")
 	x := m.AddBinaryVariable()
@@ -236,13 +196,8 @@ func TestVarVector_Constant2(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_LinearCoeff1
-Description:
-
-	This test will check to see vector of length 10
-	contains 10 n Vars.
-*/
+// TestVarVector_LinearCoeff1 This test will check to see vector of length 10
+// contains 10 n Vars.
 func TestVarVector_LinearCoeff1(t *testing.T) {
 	m := optim.NewModel("LinearCoeff1")
 	x := m.AddBinaryVariable()
@@ -289,12 +244,7 @@ func TestVarVector_LinearCoeff1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_Eq1
-Description:
-
-	This test verifies that the Eq method works between a varvector and another object.
-*/
+// TestVarVector_Eq1 This test verifies that the Eq method works between a varvector and another object.
 func TestVarVector_Eq1(t *testing.T) {
 	m := optim.NewModel("Eq1")
 	x := m.AddBinaryVariable()
@@ -315,13 +265,8 @@ func TestVarVector_Eq1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_Eq2
-Description:
-
-	This test verifies that the Eq method works between a varvector and another object.
-	Comparison should be between var vector and an unsupported type.
-*/
+// TestVarVector_Eq2 This test verifies that the Eq method works between a varvector and another object.
+// Comparison should be between var vector and an unsupported type.
 func TestVarVector_Eq2(t *testing.T) {
 	m := optim.NewModel("Eq2")
 	x := m.AddBinaryVariable()
@@ -346,12 +291,7 @@ func TestVarVector_Eq2(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_Eq2
-Description:
-
-	This test verifies that the Eq method works between a varvector and another var vector.
-*/
+// TestVarVector_Eq3 This test verifies that the Eq method works between a varvector and another var vector.
 func TestVarVector_Eq3(t *testing.T) {
 	m := optim.NewModel("Eq3")
 	x := m.AddBinaryVariable()
@@ -373,12 +313,7 @@ func TestVarVector_Eq3(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_Comparison1
-Description:
-
-	Tests how well the comparison function works with a VectorLinearExpression comparison.
-*/
+// TestVarVector_Comparison1 Tests how well the comparison function works with a VectorLinearExpression comparison.
 func TestVarVector_Comparison1(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -401,13 +336,8 @@ func TestVarVector_Comparison1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_Comparison2
-Description:
-
-	Tests how well the comparison function works with a VectorLinearExpression comparison.
-	Valid comparison of
-*/
+// TestVarVector_Comparison2 Tests how well the comparison function works with a VectorLinearExpression comparison.
+// Valid comparison of
 func TestVarVector_Comparison2(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -430,12 +360,7 @@ func TestVarVector_Comparison2(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_Comparison3
-Description:
-
-	Tests that the Comparison() Method works well for future users.
-*/
+// TestVarVector_Comparison3 Tests that the Comparison() Method works well for future users.
 func TestVarVector_Comparison3(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -457,12 +382,7 @@ func TestVarVector_Comparison3(t *testing.T) {
 
 }
 
-/*
-TestVarVector_Comparison4
-Description:
-
-	Tests that the Comparison() Method works for two VarVectors of different lengths.
-*/
+// TestVarVector_Comparison4 Tests that the Comparison() Method works for two VarVectors of different lengths.
 func TestVarVector_Comparison4(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -486,13 +406,8 @@ func TestVarVector_Comparison4(t *testing.T) {
 
 }
 
-/*
-TestVarVector_Comparison5
-Description:
-
-	Tests that the Comparison() Method works well for a VarVector and
-	a VarVectorTranspose.
-*/
+// TestVarVector_Comparison5 Tests that the Comparison() Method works well for a VarVector and
+// a VarVectorTranspose.
 func TestVarVector_Comparison5(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -514,13 +429,8 @@ func TestVarVector_Comparison5(t *testing.T) {
 
 }
 
-/*
-TestVarVector_Comparison6
-Description:
-
-	Tests that the Comparison() Method works well for a VarVector and
-	a VectorLinearExpressionTranspose.
-*/
+// TestVarVector_Comparison6 Tests that the Comparison() Method works well for a VarVector and
+// a VectorLinearExpressionTranspose.
 func TestVarVector_Comparison6(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -544,12 +454,7 @@ func TestVarVector_Comparison6(t *testing.T) {
 
 }
 
-/*
-TestVarVector_Plus1
-Description:
-
-	Testing the Plus operator between a VarVector and a KVector. Proper sizes were given.
-*/
+// TestVarVector_Plus1 Testing the Plus operator between a VarVector and a KVector. Proper sizes were given.
 func TestVarVector_Plus1(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -600,12 +505,7 @@ func TestVarVector_Plus1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_Plus2
-Description:
-
-	Testing the Plus operator between a VarVector and a KVector. Incorrect sizes were given.
-*/
+// TestVarVector_Plus2 Testing the Plus operator between a VarVector and a KVector. Incorrect sizes were given.
 func TestVarVector_Plus2(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -625,12 +525,7 @@ func TestVarVector_Plus2(t *testing.T) {
 
 }
 
-/*
-TestVarVector_Plus3
-Description:
-
-	Testing the Plus operator between a VarVector and a KVector. Proper sizes were given.
-*/
+// TestVarVector_Plus3 Testing the Plus operator between a VarVector and a KVector. Proper sizes were given.
 func TestVarVector_Plus3(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -681,12 +576,7 @@ func TestVarVector_Plus3(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_Plus4
-Description:
-
-	Testing the Plus operator between a VarVector and a VarVector. All vectors are of same size. Some overlap in the variables but not all.
-*/
+// TestVarVector_Plus4 Testing the Plus operator between a VarVector and a VarVector. All vectors are of same size. Some overlap in the variables but not all.
 func TestVarVector_Plus4(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -803,13 +693,8 @@ func TestVarVector_Plus4(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_Plus5
-Description:
-
-	Testing the Plus operator between a VarVector and a VarVector. All vectors are of the same size.
-	No overlap between elements.
-*/
+// TestVarVector_Plus5 Testing the Plus operator between a VarVector and a VarVector. All vectors are of the same size.
+// No overlap between elements.
 func TestVarVector_Plus5(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -923,14 +808,9 @@ func TestVarVector_Plus5(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_Plus6
-Description:
-
-	Testing the Plus operator between a VarVector and a KVectorTranspose.
-	All vectors are of the same size.
-	No overlap between elements.
-*/
+// TestVarVector_Plus6 Testing the Plus operator between a VarVector and a KVectorTranspose.
+// All vectors are of the same size.
+// No overlap between elements.
 func TestVarVector_Plus6(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -952,12 +832,7 @@ func TestVarVector_Plus6(t *testing.T) {
 
 }
 
-/*
-TestVarVector_Plus7
-Description:
-
-	Testing the Plus operator between a VarVector and a VarVectorTranspose.
-*/
+// TestVarVector_Plus7 Testing the Plus operator between a VarVector and a VarVectorTranspose.
 func TestVarVector_Plus7(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -978,12 +853,7 @@ func TestVarVector_Plus7(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_Plus8
-Description:
-
-	Testing the Plus operator between a VarVector and a VectorLinearExpressionTranspose.
-*/
+// TestVarVector_Plus8 Testing the Plus operator between a VarVector and a VectorLinearExpressionTranspose.
 func TestVarVector_Plus8(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -1006,12 +876,7 @@ func TestVarVector_Plus8(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_Plus9
-Description:
-
-	Testing the Plus operator between a VarVector and a VectorLinearExpressionTranspose.
-*/
+// TestVarVector_Plus9 Testing the Plus operator between a VarVector and a VectorLinearExpressionTranspose.
 func TestVarVector_Plus9(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -1033,12 +898,10 @@ func TestVarVector_Plus9(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_Mult1
-Descripiion:
-
-	Tests that the Mult() method currently returns errors.
-*/
+// TestVarVector_Mult1
+// Descripiion:
+//
+// Tests that the Mult() method currently returns errors.
 func TestVarVector_Mult1(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -1055,12 +918,7 @@ func TestVarVector_Mult1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_GreaterEq1
-Description:
-
-	Tests that the GreaterEq() Method works well for future users.
-*/
+// TestVarVector_GreaterEq1 Tests that the GreaterEq() Method works well for future users.
 func TestVarVector_GreaterEq1(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -1090,12 +948,7 @@ func TestVarVector_GreaterEq1(t *testing.T) {
 
 }
 
-/*
-TestVarVector_AtVec1
-Description:
-
-	Testing the At operator on a VarVector object.
-*/
+// TestVarVector_AtVec1 Testing the At operator on a VarVector object.
 func TestVarVector_AtVec1(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -1125,13 +978,8 @@ func TestVarVector_AtVec1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_1
-Description:
-
-	Tests that the error catching behavior works when
-	VarVector is malformed.
-*/
+// TestVarVector_Check1 Tests that the error catching behavior works when
+// VarVector is malformed.
 func TestVarVector_Check1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("TestVarVector_Check1")
@@ -1164,13 +1012,8 @@ func TestVarVector_Check1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_Multiply1
-Description:
-
-	Tests that the error catching behavior works when
-	VarVector is malformed.
-*/
+// TestVarVector_Multiply1 Tests that the error catching behavior works when
+// VarVector is malformed.
 func TestVarVector_Multiply1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("TestVarVector_Multiply1")
@@ -1203,13 +1046,8 @@ func TestVarVector_Multiply1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_Multiply2
-Description:
-
-	Tests that the error catching behavior works when
-	a bad error input is given.
-*/
+// TestVarVector_Multiply2 Tests that the error catching behavior works when
+// a bad error input is given.
 func TestVarVector_Multiply2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("TestVarVector_Multiply2")
@@ -1230,13 +1068,8 @@ func TestVarVector_Multiply2(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_Multiply3
-Description:
-
-	Tests that the error catching behavior works when
-	an input with bad shape is given.
-*/
+// TestVarVector_Multiply3 Tests that the error catching behavior works when
+// an input with bad shape is given.
 func TestVarVector_Multiply3(t *testing.T) {
 	// Constants
 	m := optim.NewModel("TestVarVector_Multiply3")
@@ -1261,13 +1094,8 @@ func TestVarVector_Multiply3(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_Multiply4
-Description:
-
-	Tests that the error catching behavior works when
-	a scalar float is given. Should result in VectorLinearExpression
-*/
+// TestVarVector_Multiply4 Tests that the error catching behavior works when
+// a scalar float is given. Should result in VectorLinearExpression
 func TestVarVector_Multiply4(t *testing.T) {
 	// Constants
 	m := optim.NewModel("TestVarVector_Multiply4")
@@ -1310,13 +1138,8 @@ func TestVarVector_Multiply4(t *testing.T) {
 
 }
 
-/*
-TestVarVector_Multiply5
-Description:
-
-	Tests that the error catching behavior works when
-	a scalar K is given. Should result in VectorLinearExpression
-*/
+// TestVarVector_Multiply5 Tests that the error catching behavior works when
+// a scalar K is given. Should result in VectorLinearExpression
 func TestVarVector_Multiply5(t *testing.T) {
 	// Constants
 	m := optim.NewModel("TestVarVector_Multiply5")
@@ -1359,13 +1182,8 @@ func TestVarVector_Multiply5(t *testing.T) {
 
 }
 
-/*
-TestVarVector_Multiply6
-Description:
-
-	Tests that the error catching behavior works when
-	a one element KVector is given. Should result in VectorLinearExpression
-*/
+// TestVarVector_Multiply6 Tests that the error catching behavior works when
+// a one element KVector is given. Should result in VectorLinearExpression
 func TestVarVector_Multiply6(t *testing.T) {
 	// Constants
 	m := optim.NewModel("TestVarVector_Multiply3")
@@ -1409,13 +1227,8 @@ func TestVarVector_Multiply6(t *testing.T) {
 	}
 }
 
-/*
-TestVarVector_Multiply7
-Description:
-
-	Tests that the error catching behavior works when
-	a one element KVectorTranspose is given. Should result in VectorLinearExpression
-*/
+// TestVarVector_Multiply7 Tests that the error catching behavior works when
+// a one element KVectorTranspose is given. Should result in VectorLinearExpression
 func TestVarVector_Multiply7(t *testing.T) {
 	// Constants
 	m := optim.NewModel("TestVarVector_Multiply7")
@@ -1460,13 +1273,8 @@ func TestVarVector_Multiply7(t *testing.T) {
 
 }
 
-/*
-TestVarVector_Multiply8
-Description:
-
-	Tests that the error catching behavior works when
-	a non-single element KVectorTranspose is given. Should result in VectorLinearExpression
-*/
+// TestVarVector_Multiply8 Tests that the error catching behavior works when
+// a non-single element KVectorTranspose is given. Should result in VectorLinearExpression
 func TestVarVector_Multiply8(t *testing.T) {
 	// Constants
 	m := optim.NewModel("TestVarVector_Multiply8")
@@ -1490,13 +1298,8 @@ func TestVarVector_Multiply8(t *testing.T) {
 
 }
 
-/*
-TestVarVector_ToSymbolic1
-Description:
-
-	Tests that the ToSymbolic() produces an error when the VarVector has one
-	variable that is not well-defined.
-*/
+// TestVarVector_ToSymbolic1 Tests that the ToSymbolic() produces an error when the VarVector has one
+// variable that is not well-defined.
 func TestVarVector_ToSymbolic1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("TestVarVector_ToSymbolic1")
@@ -1526,13 +1329,8 @@ func TestVarVector_ToSymbolic1(t *testing.T) {
 
 }
 
-/*
-TestVarVector_ToSymbolic2
-Description:
-
-	Tests that the ToSymbolic() does not produce an error when the VarVector
-	is well-defined. In addition, the output should be of type symbolic.VariableVector
-*/
+// TestVarVector_ToSymbolic2 Tests that the ToSymbolic() does not produce an error when the VarVector
+// is well-defined. In addition, the output should be of type symbolic.VariableVector
 func TestVarVector_ToSymbolic2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("TestVarVector_ToSymbolic2")

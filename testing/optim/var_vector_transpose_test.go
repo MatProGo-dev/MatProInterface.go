@@ -2,11 +2,12 @@ package optim_test
 
 import (
 	"fmt"
+	"strings"
+	"testing"
+
 	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
-	"strings"
-	"testing"
 )
 
 func TestVarVectorTranspose_Length1(t *testing.T) {
@@ -25,12 +26,7 @@ func TestVarVectorTranspose_Length1(t *testing.T) {
 
 }
 
-/*
-TestVarVectorTranspose_Length2
-Description:
-
-	Tests that a larger vector variable (contains 5 elements) properly returns the right length.
-*/
+// TestVarVectorTranspose_Length2 Tests that a larger vector variable (contains 5 elements) properly returns the right length.
 func TestVarVectorTranspose_Length2(t *testing.T) {
 	m := optim.NewModel("Length2")
 	x := m.AddBinaryVariable()
@@ -47,12 +43,7 @@ func TestVarVectorTranspose_Length2(t *testing.T) {
 
 }
 
-/*
-TestVarVectorTranspose_NumVars1
-Description:
-
-	Tests that the NumVars() method is working properly for a length 10 VarVectorTranspose.
-*/
+// TestVarVectorTranspose_NumVars1 Tests that the NumVars() method is working properly for a length 10 VarVectorTranspose.
 func TestVarVectorTranspose_NumVars1(t *testing.T) {
 	m := optim.NewModel("NumVars1")
 	vv1 := m.AddVariableVector(10)
@@ -65,14 +56,9 @@ func TestVarVectorTranspose_NumVars1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_LinearCoeff1
-Description:
-
-	Tests that the LinearCoeff() method is working properly for a length 10 VarVectorTranspose.
-	For a transposed vector, the linear coefficient L is the coefficient on the right of the variable.
-	(i.e., x^T L^T + c^T)
-*/
+// TestVarVectorTranspose_LinearCoeff1 Tests that the LinearCoeff() method is working properly for a length 10 VarVectorTranspose.
+// For a transposed vector, the linear coefficient L is the coefficient on the right of the variable.
+// (i.e., x^T L^T + c^T)
 func TestVarVectorTranspose_LinearCoeff1(t *testing.T) {
 	m := optim.NewModel("LinearCoeff1")
 	vv1 := m.AddVariableVector(10)
@@ -112,12 +98,7 @@ func TestVarVectorTranspose_LinearCoeff1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_At1
-Description:
-
-	Tests whether or not we can properly retrieve an element from a given vector.
-*/
+// TestVarVectorTranspose_At1 Tests whether or not we can properly retrieve an element from a given vector.
 func TestVarVectorTranspose_At1(t *testing.T) {
 	m := optim.NewModel("At1")
 	x := m.AddBinaryVariable()
@@ -134,13 +115,8 @@ func TestVarVectorTranspose_At1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_At2
-Description:
-
-	Tests whether or not we can properly retrieve an element from a given vector.
-	Makes sure that if we change the extracted vector, it does not effect the element saved in the slice.
-*/
+// TestVarVectorTranspose_At2 Tests whether or not we can properly retrieve an element from a given vector.
+// Makes sure that if we change the extracted vector, it does not effect the element saved in the slice.
 func TestVarVectorTranspose_At2(t *testing.T) {
 	m := optim.NewModel("At2")
 	x := m.AddBinaryVariable()
@@ -159,13 +135,8 @@ func TestVarVectorTranspose_At2(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_VariableIDs1
-Description:
-
-	This test will check to see if 2 unique ids in a VariableVector object will be returned correctly when
-	the VariableIDs method is called.
-*/
+// TestVarVectorTranspose_VariableIDs1 This test will check to see if 2 unique ids in a VariableVector object will be returned correctly when
+// the VariableIDs method is called.
 func TestVarVectorTranspose_VariableIDs1(t *testing.T) {
 	m := optim.NewModel("VariableIDs1")
 	x := m.AddBinaryVariable()
@@ -187,13 +158,8 @@ func TestVarVectorTranspose_VariableIDs1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_VariableIDs2
-Description:
-
-	This test will check to see if a single unique id in a large VariableVector object will be returned correctly when
-	the VariableIDs method is called.
-*/
+// TestVarVectorTranspose_VariableIDs2 This test will check to see if a single unique id in a large VariableVector object will be returned correctly when
+// the VariableIDs method is called.
 func TestVarVectorTranspose_VariableIDs2(t *testing.T) {
 	m := optim.NewModel("VariableIDs2")
 	x := m.AddBinaryVariable()
@@ -219,12 +185,7 @@ func TestVarVectorTranspose_VariableIDs2(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Constant1
-Description:
-
-	This test verifies that the constant method returns an all zero vector for any VarVectorTranspose object.
-*/
+// TestVarVectorTranspose_Constant1 This test verifies that the constant method returns an all zero vector for any VarVectorTranspose object.
 func TestVarVectorTranspose_Constant1(t *testing.T) {
 	m := optim.NewModel("Constant1")
 	x := m.AddBinaryVariable()
@@ -246,13 +207,8 @@ func TestVarVectorTranspose_Constant1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Constant2
-Description:
-
-	This test verifies that the constant method returns an all zero vector for any VarVectorTranspose object.
-	This one will be extremely long.
-*/
+// TestVarVectorTranspose_Constant2 This test verifies that the constant method returns an all zero vector for any VarVectorTranspose object.
+// This one will be extremely long.
 func TestVarVectorTranspose_Constant2(t *testing.T) {
 	m := optim.NewModel("Constant2")
 	x := m.AddBinaryVariable()
@@ -274,12 +230,7 @@ func TestVarVectorTranspose_Constant2(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Eq1
-Description:
-
-	This test verifies that the Eq method works between a VarVectorTranspose and another object.
-*/
+// TestVarVectorTranspose_Eq1 This test verifies that the Eq method works between a VarVectorTranspose and another object.
 func TestVarVectorTranspose_Eq1(t *testing.T) {
 	m := optim.NewModel("Eq1")
 	x := m.AddBinaryVariable()
@@ -300,13 +251,8 @@ func TestVarVectorTranspose_Eq1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Eq2
-Description:
-
-	This test verifies that the Eq method works between a VarVectorTranspose and another object.
-	Comparison should be between var vector and an unsupported type.
-*/
+// TestVarVectorTranspose_Eq2 This test verifies that the Eq method works between a VarVectorTranspose and another object.
+// Comparison should be between var vector and an unsupported type.
 func TestVarVectorTranspose_Eq2(t *testing.T) {
 	m := optim.NewModel("Eq2")
 	x := m.AddBinaryVariable()
@@ -327,12 +273,7 @@ func TestVarVectorTranspose_Eq2(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Eq3
-Description:
-
-	This test verifies that the Eq method works between a VarVectorTranspose and another var vector.
-*/
+// TestVarVectorTranspose_Eq3 This test verifies that the Eq method works between a VarVectorTranspose and another var vector.
 func TestVarVectorTranspose_Eq3(t *testing.T) {
 	m := optim.NewModel("Eq3")
 	x := m.AddBinaryVariable()
@@ -354,13 +295,8 @@ func TestVarVectorTranspose_Eq3(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Eq4
-Description:
-
-	This test verifies that the Eq method does not work between a
-	VarVectorTranspose object and a normal KVector.
-*/
+// TestVarVectorTranspose_Eq4 This test verifies that the Eq method does not work between a
+// VarVectorTranspose object and a normal KVector.
 func TestVarVectorTranspose_Eq4(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Eq1")
@@ -382,12 +318,7 @@ func TestVarVectorTranspose_Eq4(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Comparison1
-Description:
-
-	Tests how well the comparison function works with a VectorLinearExpression comparison.
-*/
+// TestVarVectorTranspose_Comparison1 Tests how well the comparison function works with a VectorLinearExpression comparison.
 func TestVarVectorTranspose_Comparison1(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -410,13 +341,8 @@ func TestVarVectorTranspose_Comparison1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Comparison2
-Description:
-
-	Tests how well the comparison function works with a VectorLinearExpression comparison.
-	Valid comparison of
-*/
+// TestVarVectorTranspose_Comparison2 Tests how well the comparison function works with a VectorLinearExpression comparison.
+// Valid comparison of
 func TestVarVectorTranspose_Comparison2(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -448,13 +374,8 @@ func TestVarVectorTranspose_Comparison2(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Comparison3
-Description:
-
-	Tests how well the comparison function works with a VectorLinearExpression comparison.
-	Valid comparison of
-*/
+// TestVarVectorTranspose_Comparison3 Tests how well the comparison function works with a VectorLinearExpression comparison.
+// Valid comparison of
 func TestVarVectorTranspose_Comparison3(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -478,13 +399,8 @@ func TestVarVectorTranspose_Comparison3(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Comparison4
-Description:
-
-	Tests how well the comparison function works with a VectorLinearExpressionTranspose comparison.
-	Valid comparison
-*/
+// TestVarVectorTranspose_Comparison4 Tests how well the comparison function works with a VectorLinearExpressionTranspose comparison.
+// Valid comparison
 func TestVarVectorTranspose_Comparison4(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -507,13 +423,8 @@ func TestVarVectorTranspose_Comparison4(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Comparison5
-Description:
-
-	Tests how well the comparison function works with a VarVectorTranspose comparison.
-	Invalid comparison with a bad length.
-*/
+// TestVarVectorTranspose_Comparison5 Tests how well the comparison function works with a VarVectorTranspose comparison.
+// Invalid comparison with a bad length.
 func TestVarVectorTranspose_Comparison5(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -539,12 +450,7 @@ func TestVarVectorTranspose_Comparison5(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Plus1
-Description:
-
-	Testing the Plus operator between a VarVectorTranspose and a KVectorTranspose. Proper sizes were given.
-*/
+// TestVarVectorTranspose_Plus1 Testing the Plus operator between a VarVectorTranspose and a KVectorTranspose. Proper sizes were given.
 func TestVarVectorTranspose_Plus1(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -595,12 +501,7 @@ func TestVarVectorTranspose_Plus1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Plus2
-Description:
-
-	Testing the Plus operator between a VarVectorTranspose and a KVector. Incorrect sizes were given.
-*/
+// TestVarVectorTranspose_Plus2 Testing the Plus operator between a VarVectorTranspose and a KVector. Incorrect sizes were given.
 func TestVarVectorTranspose_Plus2(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -620,12 +521,7 @@ func TestVarVectorTranspose_Plus2(t *testing.T) {
 
 }
 
-/*
-TestVarVectorTranspose_Plus3
-Description:
-
-	Testing the Plus operator between a VarVectorTranspose and a KVector. Proper sizes were given.
-*/
+// TestVarVectorTranspose_Plus3 Testing the Plus operator between a VarVectorTranspose and a KVector. Proper sizes were given.
 func TestVarVectorTranspose_Plus3(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -676,12 +572,7 @@ func TestVarVectorTranspose_Plus3(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Plus4
-Description:
-
-	Testing the Plus operator between a VarVectorTranspose and a VarVectorTranspose. All vectors are of same size. Some overlap in the variables but not all.
-*/
+// TestVarVectorTranspose_Plus4 Testing the Plus operator between a VarVectorTranspose and a VarVectorTranspose. All vectors are of same size. Some overlap in the variables but not all.
 func TestVarVectorTranspose_Plus4(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -798,13 +689,8 @@ func TestVarVectorTranspose_Plus4(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Plus5
-Description:
-
-	Testing the Plus operator between a VarVectorTranspose and a VarVectorTranspose. All vectors are of the same size.
-	No overlap between elements.
-*/
+// TestVarVectorTranspose_Plus5 Testing the Plus operator between a VarVectorTranspose and a VarVectorTranspose. All vectors are of the same size.
+// No overlap between elements.
 func TestVarVectorTranspose_Plus5(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -918,12 +804,7 @@ func TestVarVectorTranspose_Plus5(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Plus6
-Description:
-
-	Testing the Plus operator between a VarVectorTranspose and a KVector. Proper sizes were given.
-*/
+// TestVarVectorTranspose_Plus6 Testing the Plus operator between a VarVectorTranspose and a KVector. Proper sizes were given.
 func TestVarVectorTranspose_Plus6(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -944,12 +825,7 @@ func TestVarVectorTranspose_Plus6(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Plus7
-Description:
-
-	Testing the Plus operator between a VarVectorTranspose and a KVector. Proper sizes were given.
-*/
+// TestVarVectorTranspose_Plus7 Testing the Plus operator between a VarVectorTranspose and a KVector. Proper sizes were given.
 func TestVarVectorTranspose_Plus7(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -970,13 +846,8 @@ func TestVarVectorTranspose_Plus7(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Plus8
-Description:
-
-	Testing the Plus operator between a VarVectorTranspose and a KVectorTranspose.
-	Improper lengths are used.
-*/
+// TestVarVectorTranspose_Plus8 Testing the Plus operator between a VarVectorTranspose and a KVectorTranspose.
+// Improper lengths are used.
 func TestVarVectorTranspose_Plus8(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -998,12 +869,7 @@ func TestVarVectorTranspose_Plus8(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Plus9
-Description:
-
-	Testing the Plus operator between a VarVectorTranspose and a VarVector.
-*/
+// TestVarVectorTranspose_Plus9 Testing the Plus operator between a VarVectorTranspose and a VarVector.
 func TestVarVectorTranspose_Plus9(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -1024,12 +890,7 @@ func TestVarVectorTranspose_Plus9(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Plus10
-Description:
-
-	Testing the Plus operator between a VarVectorTranspose and a ScalarLinearExpr.
-*/
+// TestVarVectorTranspose_Plus10 Testing the Plus operator between a VarVectorTranspose and a ScalarLinearExpr.
 func TestVarVectorTranspose_Plus10(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -1056,12 +917,7 @@ func TestVarVectorTranspose_Plus10(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Plus11
-Description:
-
-	Testing the Plus operator between a VarVectorTranspose and a bool.
-*/
+// TestVarVectorTranspose_Plus11 Testing the Plus operator between a VarVectorTranspose and a bool.
 func TestVarVectorTranspose_Plus11(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -1082,12 +938,7 @@ func TestVarVectorTranspose_Plus11(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_AtVec1
-Description:
-
-	Testing the At operator on a VarVectorTranspose object.
-*/
+// TestVarVectorTranspose_AtVec1 Testing the At operator on a VarVectorTranspose object.
 func TestVarVectorTranspose_AtVec1(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -1117,13 +968,8 @@ func TestVarVectorTranspose_AtVec1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_LessEq1
-Description:
-
-	Verifies that the LessEq method throws an error when the KVectorTranspose is
-	of the wrong length.
-*/
+// TestVarVectorTranspose_LessEq1 Verifies that the LessEq method throws an error when the KVectorTranspose is
+// of the wrong length.
 func TestVarVectorTranspose_LessEq1(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -1146,13 +992,8 @@ func TestVarVectorTranspose_LessEq1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_GreaterEq1
-Description:
-
-	Verifies that the GreaterEq method throws an error when the KVectorTranspose is
-	of the wrong length.
-*/
+// TestVarVectorTranspose_GreaterEq1 Verifies that the GreaterEq method throws an error when the KVectorTranspose is
+// of the wrong length.
 func TestVarVectorTranspose_GreaterEq1(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -1180,13 +1021,8 @@ func TestVarVectorTranspose_GreaterEq1(t *testing.T) {
 
 }
 
-/*
-TestVarVectorTranspose_Multiply1
-Description:
-
-	Tests that the simple multiplication of a VarVectorTranspose with a KVector
-	produces the right size of output for a unique varvector and KVector.
-*/
+// TestVarVectorTranspose_Multiply1 Tests that the simple multiplication of a VarVectorTranspose with a KVector
+// produces the right size of output for a unique varvector and KVector.
 func TestVarVectorTranspose_Multiply1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("VarVectorTranspose_Multiply1")
@@ -1227,13 +1063,8 @@ func TestVarVectorTranspose_Multiply1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Multiply2
-Description:
-
-	Tests that the simple multiplication of a VarVectorTranspose with a KVector
-	produces the right size of output for a NON-unique varvector and KVector.
-*/
+// TestVarVectorTranspose_Multiply2 Tests that the simple multiplication of a VarVectorTranspose with a KVector
+// produces the right size of output for a NON-unique varvector and KVector.
 func TestVarVectorTranspose_Multiply2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("VarVectorTranspose_Multiply2")
@@ -1285,13 +1116,8 @@ func TestVarVectorTranspose_Multiply2(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Multiply3
-Description:
-
-	Tests that the simple multiplication of a VarVectorTranspose with a mat.VecDense
-	produces the right size of output for a NON-unique varvector and mat.VecDense.
-*/
+// TestVarVectorTranspose_Multiply3 Tests that the simple multiplication of a VarVectorTranspose with a mat.VecDense
+// produces the right size of output for a NON-unique varvector and mat.VecDense.
 func TestVarVectorTranspose_Multiply3(t *testing.T) {
 	// Constants
 	m := optim.NewModel("VarVectorTranspose_Multiply2")
@@ -1345,13 +1171,8 @@ func TestVarVectorTranspose_Multiply3(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Multiply4
-Description:
-
-	Tests that the simple multiplication of a VarVectorTranspose with a float64
-	produces the right size of output for a NON-unique varvector and float64.
-*/
+// TestVarVectorTranspose_Multiply4 Tests that the simple multiplication of a VarVectorTranspose with a float64
+// produces the right size of output for a NON-unique varvector and float64.
 func TestVarVectorTranspose_Multiply4(t *testing.T) {
 	// Constants
 	m := optim.NewModel("VarVectorTranspose_Multiply4")
@@ -1413,13 +1234,8 @@ func TestVarVectorTranspose_Multiply4(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Multiply5
-Description:
-
-	Tests that the simple multiplication of a VarVectorTranspose with a float64
-	and with an error.
-*/
+// TestVarVectorTranspose_Multiply5 Tests that the simple multiplication of a VarVectorTranspose with a float64
+// and with an error.
 func TestVarVectorTranspose_Multiply5(t *testing.T) {
 	// Constants
 	m := optim.NewModel("VarVectorTranspose_Multiply5")
@@ -1440,12 +1256,7 @@ func TestVarVectorTranspose_Multiply5(t *testing.T) {
 
 }
 
-/*
-TestVarVectorTranspose_Multiply6
-Description:
-
-	Tests that the simple multiplication of a VarVectorTranspose with a vector of the wrong dimension.
-*/
+// TestVarVectorTranspose_Multiply6 Tests that the simple multiplication of a VarVectorTranspose with a vector of the wrong dimension.
 func TestVarVectorTranspose_Multiply6(t *testing.T) {
 	// Constants
 	m := optim.NewModel("VarVectorTranspose_Multiply5")
@@ -1472,13 +1283,8 @@ func TestVarVectorTranspose_Multiply6(t *testing.T) {
 
 }
 
-/*
-TestVarVectorTranspose_Multiply7
-Description:
-
-	Tests that the simple multiplication of a VarVectorTranspose with a K
-	produces the right size of output for a NON-unique varvector and K.
-*/
+// TestVarVectorTranspose_Multiply7 Tests that the simple multiplication of a VarVectorTranspose with a K
+// produces the right size of output for a NON-unique varvector and K.
 func TestVarVectorTranspose_Multiply7(t *testing.T) {
 	// Constants
 	m := optim.NewModel("VarVectorTranspose_Multiply7")
@@ -1540,12 +1346,7 @@ func TestVarVectorTranspose_Multiply7(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_Multiply8
-Description:
-
-	Tests that the simple multiplication of a VarVectorTranspose with a vector of the wrong dimension.
-*/
+// TestVarVectorTranspose_Multiply8 Tests that the simple multiplication of a VarVectorTranspose with a vector of the wrong dimension.
 func TestVarVectorTranspose_Multiply8(t *testing.T) {
 	// Constants
 	m := optim.NewModel("VarVectorTranspose_Multiply8")
@@ -1572,14 +1373,9 @@ func TestVarVectorTranspose_Multiply8(t *testing.T) {
 
 }
 
-/*
-TestVarVectorTranspose_Multiply9
-Description:
-
-	Tests the multiplication of a VarVectorTranspose with a
-	vector constant transpose.
-	(When lengths are not matching, this should throw an error)
-*/
+// TestVarVectorTranspose_Multiply9 Tests the multiplication of a VarVectorTranspose with a
+// vector constant transpose.
+// (When lengths are not matching, this should throw an error)
 func TestVarVectorTranspose_Multiply9(t *testing.T) {
 	// Constants
 	m := optim.NewModel("VarVectorTranspose_Multiply9")
@@ -1605,14 +1401,9 @@ func TestVarVectorTranspose_Multiply9(t *testing.T) {
 
 }
 
-/*
-TestVarVectorTranspose_Multiply10
-Description:
-
-	Tests the multiplication of a VarVectorTranspose with a
-	vector constant transpose.
-	(When lengths are mismatched, this should throw an error)
-*/
+// TestVarVectorTranspose_Multiply10 Tests the multiplication of a VarVectorTranspose with a
+// vector constant transpose.
+// (When lengths are mismatched, this should throw an error)
 func TestVarVectorTranspose_Multiply10(t *testing.T) {
 	// Constants
 	m := optim.NewModel("VarVectorTranspose_Multiply10")
@@ -1644,14 +1435,14 @@ func TestVarVectorTranspose_Multiply10(t *testing.T) {
 
 }
 
-///*
+//
 //TestVarVectorTranspose_Multiply11
-//Description:
+//
 //
 //	Tests the multiplication of a VarVectorTranspose with a
 //	mat.Dense object.
 //	(When dimensions are mismatched, this should throw an error)
-//*/
+//
 //func TestVarVectorTranspose_Multiply11(t *testing.T) {
 //	// Constants
 //	m := optim.NewModel("VarVectorTranspose_Multiply11")
@@ -1680,13 +1471,8 @@ func TestVarVectorTranspose_Multiply10(t *testing.T) {
 //
 //}
 
-/*
-TestVarVectorTranspose_Multiply12
-Description:
-
-	Tests the multiplication of a VarVectorTranspose with a
-	proper mat.Dense object.
-*/
+// TestVarVectorTranspose_Multiply12 Tests the multiplication of a VarVectorTranspose with a
+// proper mat.Dense object.
 func TestVarVectorTranspose_Multiply12(t *testing.T) {
 	// Constants
 	m := optim.NewModel("VarVectorTranspose_Multiply12")
@@ -1754,13 +1540,13 @@ func TestVarVectorTranspose_Multiply12(t *testing.T) {
 
 }
 
-///*
+//
 //TestVarVectorTranspose_Multiply13
-//Description:
+//
 //
 //	Tests the multiplication of a VarVectorTranspose with a
 //	proper matrix.Constant object.
-//*/
+//
 //func TestVarVectorTranspose_Multiply13(t *testing.T) {
 //	// Constants
 //	m := optim.NewModel("VarVectorTranspose_Multiply13")
@@ -1829,14 +1615,9 @@ func TestVarVectorTranspose_Multiply12(t *testing.T) {
 //
 //}
 
-/*
-TestVarVectorTranspose_Multiply14
-Description:
-
-	Tests the multiplication of a VarVectorTranspose with a
-	proper optim.VectorLinearExpr object.
-	(Used a varVector that is identical to vvt0 in VectorLinearExpression)
-*/
+// TestVarVectorTranspose_Multiply14 Tests the multiplication of a VarVectorTranspose with a
+// proper optim.VectorLinearExpr object.
+// (Used a varVector that is identical to vvt0 in VectorLinearExpression)
 func TestVarVectorTranspose_Multiply14(t *testing.T) {
 	// Constants
 	m := optim.NewModel("VarVectorTranspose_Multiply13")
@@ -1908,14 +1689,9 @@ func TestVarVectorTranspose_Multiply14(t *testing.T) {
 
 }
 
-/*
-TestVarVectorTranspose_Check1
-Description:
-
-	Tests the Check method for a VarVectorTranspose.
-	When there is an incorrectly initialized variable in one of the elements,
-	then this should throw an error.
-*/
+// TestVarVectorTranspose_Check1 Tests the Check method for a VarVectorTranspose.
+// When there is an incorrectly initialized variable in one of the elements,
+// then this should throw an error.
 func TestVarVectorTranspose_Check1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("VarVectorTranspose_Check1")
@@ -1946,13 +1722,8 @@ func TestVarVectorTranspose_Check1(t *testing.T) {
 
 }
 
-/*
-TestVarVectorTranspose_Check2
-Description:
-
-	Tests the Check method for a VarVectorTranspose.
-	For a properly initialized VarVectorTranspose, this should not throw an error.
-*/
+// TestVarVectorTranspose_Check2 Tests the Check method for a VarVectorTranspose.
+// For a properly initialized VarVectorTranspose, this should not throw an error.
 func TestVarVectorTranspose_Check2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("VarVectorTranspose_Check2")
@@ -1968,13 +1739,8 @@ func TestVarVectorTranspose_Check2(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_ToSymbolic1
-Description:
-
-	Tests the ToSymbolic method for a VarVectorTranspose
-	that is not well-defined. This should throw an error.
-*/
+// TestVarVectorTranspose_ToSymbolic1 Tests the ToSymbolic method for a VarVectorTranspose
+// that is not well-defined. This should throw an error.
 func TestVarVectorTranspose_ToSymbolic1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("VarVectorTranspose_ToSymbolic1")
@@ -2004,14 +1770,9 @@ func TestVarVectorTranspose_ToSymbolic1(t *testing.T) {
 	}
 }
 
-/*
-TestVarVectorTranspose_ToSymbolic2
-Description:
-
-	Tests the ToSymbolic method for a VarVectorTranspose
-	that is well-defined. The result should not produce
-	an error and should be of the type symbolic.VariableMatrix.
-*/
+// TestVarVectorTranspose_ToSymbolic2 Tests the ToSymbolic method for a VarVectorTranspose
+// that is well-defined. The result should not produce
+// an error and should be of the type symbolic.VariableMatrix.
 func TestVarVectorTranspose_ToSymbolic2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("VarVectorTranspose_ToSymbolic2")

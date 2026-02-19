@@ -5,18 +5,9 @@ import (
 	"testing"
 )
 
-/*
-expression_test.go
-Description:
-	Tests some of the functions for our Expression interface.
-*/
+// Tests some of the functions for our Expression interface.
 
-/*
-TestExpression_NumVars1()
-Description:
-
-	Tests that the expression's NumVars() expression works.
-*/
+// TestExpression_NumVars1 Tests that the expression's NumVars() expression works.
 func TestExpression_NumVars1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-expression-numvars1")
@@ -56,12 +47,7 @@ func TestExpression_NumVars1(t *testing.T) {
 
 }
 
-/*
-TestExpression_ToExpression1
-Description:
-
-	Tests whether or not a variable is correctly detected as an expression.
-*/
+// TestExpression_ToExpression1 Tests whether or not a variable is correctly detected as an expression.
 func TestExpression_ToExpression1(t *testing.T) {
 	// Constant
 	v := optim.Variable{
@@ -83,12 +69,7 @@ func TestExpression_ToExpression1(t *testing.T) {
 
 }
 
-/*
-TestExpression_ToExpression2
-Description:
-
-	Tests whether or not a bool is correctly detected as an expression.
-*/
+// TestExpression_ToExpression2 Tests whether or not a bool is correctly detected as an expression.
 func TestExpression_ToExpression2(t *testing.T) {
 	// Constant
 	b1 := false
@@ -103,12 +84,7 @@ func TestExpression_ToExpression2(t *testing.T) {
 
 }
 
-/*
-TestExpression_ToExpression3
-Description:
-
-	Tests whether or not a ScalarQuadraticExpression is correctly detected as an expression.
-*/
+// TestExpression_ToExpression3 Tests whether or not a ScalarQuadraticExpression is correctly detected as an expression.
 func TestExpression_ToExpression3(t *testing.T) {
 	// Constant
 	v1 := optim.Variable{
@@ -139,12 +115,7 @@ func TestExpression_ToExpression3(t *testing.T) {
 
 }
 
-/*
-TestExpression_ToExpression4
-Description:
-
-	Tests whether or not a VarVectorTranspose is correctly detected as an expression.
-*/
+// TestExpression_ToExpression4 Tests whether or not a VarVectorTranspose is correctly detected as an expression.
 func TestExpression_ToExpression4(t *testing.T) {
 	// Constant
 	m := optim.NewModel("ToExpression4")
@@ -165,12 +136,7 @@ func TestExpression_ToExpression4(t *testing.T) {
 
 }
 
-/*
-TestExpression_ToExpression5
-Description:
-
-	Tests whether or not a K is correctly detected as an expression.
-*/
+// TestExpression_ToExpression5 Tests whether or not a K is correctly detected as an expression.
 func TestExpression_ToExpression5(t *testing.T) {
 	// Constant
 	k1 := optim.K(3.14)
@@ -190,12 +156,7 @@ func TestExpression_ToExpression5(t *testing.T) {
 
 }
 
-/*
-TestExpression_ToExpression6
-Description:
-
-	Tests whether or not a mat.VecDense is correctly detected as an expression.
-*/
+// TestExpression_ToExpression6 Tests whether or not a mat.VecDense is correctly detected as an expression.
 func TestExpression_ToExpression6(t *testing.T) {
 	// Constant
 	vd1 := optim.OnesVector(7)
@@ -215,12 +176,7 @@ func TestExpression_ToExpression6(t *testing.T) {
 
 }
 
-/*
-TestExpression_ToExpression7
-Description:
-
-	Tests whether or not a KVector is correctly detected as an expression.
-*/
+// TestExpression_ToExpression7 Tests whether or not a KVector is correctly detected as an expression.
 func TestExpression_ToExpression7(t *testing.T) {
 	// Constant
 	kv1 := optim.KVector(optim.OnesVector(7))
@@ -240,12 +196,7 @@ func TestExpression_ToExpression7(t *testing.T) {
 
 }
 
-/*
-TestExpression_ToExpression8
-Description:
-
-	Tests whether or not a VectorLinearExpr is correctly detected as an expression.
-*/
+// TestExpression_ToExpression8 Tests whether or not a VectorLinearExpr is correctly detected as an expression.
 func TestExpression_ToExpression8(t *testing.T) {
 	// Constant
 	m := optim.NewModel("ToExpression8")
@@ -267,12 +218,7 @@ func TestExpression_ToExpression8(t *testing.T) {
 
 }
 
-/*
-TestExpression_ToExpression9
-Description:
-
-	Tests whether or not a KVectorTranspose is correctly detected as an expression.
-*/
+// TestExpression_ToExpression9 Tests whether or not a KVectorTranspose is correctly detected as an expression.
 func TestExpression_ToExpression9(t *testing.T) {
 	// Constant
 	kv1 := optim.KVector(optim.OnesVector(7))
@@ -292,12 +238,7 @@ func TestExpression_ToExpression9(t *testing.T) {
 
 }
 
-/*
-TestExpression_ToExpression10
-Description:
-
-	Tests whether or not a VectorLinearExpressionTranspose is correctly detected as an expression.
-*/
+// TestExpression_ToExpression10 Tests whether or not a VectorLinearExpressionTranspose is correctly detected as an expression.
 func TestExpression_ToExpression10(t *testing.T) {
 	// Constant
 	m := optim.NewModel("ToExpression10")
@@ -319,12 +260,7 @@ func TestExpression_ToExpression10(t *testing.T) {
 
 }
 
-/*
-TestExpression_IsExpression1
-Description:
-
-	Tests whether or not a ScalarQuadraticExpression is correctly detected as an expression.
-*/
+// TestExpression_IsExpression1 Tests whether or not a ScalarQuadraticExpression is correctly detected as an expression.
 func TestExpression_IsExpression1(t *testing.T) {
 	// Constant
 	v1 := optim.Variable{
@@ -350,12 +286,7 @@ func TestExpression_IsExpression1(t *testing.T) {
 
 }
 
-/*
-TestExpression_IsExpression2
-Description:
-
-	Tests whether or not a Bool is correctly detected as an expression.
-*/
+// TestExpression_IsExpression2 Tests whether or not a Bool is correctly detected as an expression.
 func TestExpression_IsExpression2(t *testing.T) {
 	// Constant
 	b1 := true

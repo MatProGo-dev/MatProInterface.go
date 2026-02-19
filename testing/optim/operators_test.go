@@ -7,12 +7,7 @@ import (
 	"testing"
 )
 
-/*
-TestOperators_Eq1
-Description:
-
-	Tests whether or not Eq works for two valid expressions.
-*/
+// TestOperators_Eq1 Tests whether or not Eq works for two valid expressions.
 func TestOperators_Eq1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-eq1")
@@ -36,12 +31,7 @@ func TestOperators_Eq1(t *testing.T) {
 
 }
 
-/*
-TestOperators_LessEq1
-Description:
-
-	Tests whether or not a good LessEq comparison successfully is built and contains the right variables.
-*/
+// TestOperators_LessEq1 Tests whether or not a good LessEq comparison successfully is built and contains the right variables.
 func TestOperators_LessEq1(t *testing.T) {
 	// Constants
 	desLength := 5
@@ -82,12 +72,7 @@ func TestOperators_LessEq1(t *testing.T) {
 
 }
 
-/*
-TestOperators_GreaterEq1
-Description:
-
-	Tests whether or not GreaterEq works for two valid expressions.
-*/
+// TestOperators_GreaterEq1 Tests whether or not GreaterEq works for two valid expressions.
 func TestOperators_GreaterEq1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-greatereq1")
@@ -116,12 +101,7 @@ func TestOperators_GreaterEq1(t *testing.T) {
 
 }
 
-/*
-TestOperators_Comparison1
-Description:
-
-	Tests whether or not Comparison works for two valid expressions.
-*/
+// TestOperators_Comparison1 Tests whether or not Comparison works for two valid expressions.
 func TestOperators_Comparison1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-comparison1")
@@ -150,13 +130,8 @@ func TestOperators_Comparison1(t *testing.T) {
 
 }
 
-/*
-TestOperators_Comparison2
-Description:
-
-	Tests whether or not Comparison works for a valid expression and
-	a boolean.
-*/
+// TestOperators_Comparison2 Tests whether or not Comparison works for a valid expression and
+// a boolean.
 func TestOperators_Comparison2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-comparison2")
@@ -182,13 +157,8 @@ func TestOperators_Comparison2(t *testing.T) {
 	}
 }
 
-/*
-TestOperators_Comparison3
-Description:
-
-	Tests whether or not Comparison works for a valid expression and
-	a boolean.
-*/
+// TestOperators_Comparison3 Tests whether or not Comparison works for a valid expression and
+// a boolean.
 func TestOperators_Comparison3(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-comparison3")
@@ -209,12 +179,7 @@ func TestOperators_Comparison3(t *testing.T) {
 	}
 }
 
-/*
-TestOperators_Comparison4
-Description:
-
-	Tests whether or not Comparison works for two valid expressions.
-*/
+// TestOperators_Comparison4 Tests whether or not Comparison works for two valid expressions.
 func TestOperators_Comparison4(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-comparison4")
@@ -238,13 +203,8 @@ func TestOperators_Comparison4(t *testing.T) {
 
 }
 
-/*
-TestOperators_Comparison5
-Description:
-
-	Tests whether or not Comparison works for a valid expression and
-	a boolean.
-*/
+// TestOperators_Comparison5 Tests whether or not Comparison works for a valid expression and
+// a boolean.
 func TestOperators_Comparison5(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-comparison3")
@@ -265,13 +225,8 @@ func TestOperators_Comparison5(t *testing.T) {
 	}
 }
 
-/*
-TestOperators_Comparison6
-Description:
-
-	Tests whether or not Comparison works for a valid expression and
-	a boolean.
-*/
+// TestOperators_Comparison6 Tests whether or not Comparison works for a valid expression and
+// a boolean.
 func TestOperators_Comparison6(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-comparison2")
@@ -296,10 +251,7 @@ func TestOperators_Comparison6(t *testing.T) {
 	}
 }
 
-/*
-TestOperators_Multiply1
-Description:
-*/
+
 func TestOperators_Multiply1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-multiply1")
@@ -323,12 +275,7 @@ func TestOperators_Multiply1(t *testing.T) {
 
 }
 
-/*
-TestOperators_Multiply2
-Description:
-
-	Tests multiply of scalar float with ScalarLinearExpression
-*/
+// TestOperators_Multiply2 Tests multiply of scalar float with ScalarLinearExpression
 func TestOperators_Multiply2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-multiply1")
@@ -370,10 +317,7 @@ func TestOperators_Multiply2(t *testing.T) {
 
 }
 
-/*
-TestOperators_Multiply3
-Description:
-*/
+
 func TestOperators_Multiply3(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-multiply3")
@@ -397,12 +341,7 @@ func TestOperators_Multiply3(t *testing.T) {
 
 }
 
-/*
-TestOperators_Multiply4
-Description:
-
-	Multiply a vecdense with a VarVector. Idk if this will work at all?
-*/
+// TestOperators_Multiply4 Multiply a vecdense with a VarVector. Idk if this will work at all?
 func TestOperators_Multiply4(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-multiply3")
@@ -424,12 +363,7 @@ func TestOperators_Multiply4(t *testing.T) {
 
 }
 
-/*
-TestOperators_Multiply5
-Description:
-
-	Multiply a KVectorTranspose with a VarVector. Should return a LinearExpression value
-*/
+// TestOperators_Multiply5 Multiply a KVectorTranspose with a VarVector. Should return a LinearExpression value
 func TestOperators_Multiply5(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-multiply3")
@@ -499,12 +433,7 @@ func TestOperators_Multiply5(t *testing.T) {
 //	optim.Dot(xs.Elements, coeffs)
 //}
 
-/*
-TestOperators_Sum1
-Description:
-
-	Sums two expressions together.
-*/
+// TestOperators_Sum1 Sums two expressions together.
 func TestOperators_Sum1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-sum1")
@@ -534,13 +463,8 @@ func TestOperators_Sum1(t *testing.T) {
 	}
 }
 
-/*
-TestOperators_Sum2
-Description:
-
-	Sums two expressions together. Tests whether or not error handling works when
-	first argument is not an expression.
-*/
+// TestOperators_Sum2 Sums two expressions together. Tests whether or not error handling works when
+// first argument is not an expression.
 func TestOperators_Sum2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-sum1")
@@ -562,13 +486,8 @@ func TestOperators_Sum2(t *testing.T) {
 	}
 }
 
-/*
-TestOperators_Sum3
-Description:
-
-	Sums two expressions together. Tests whether or not Sum of single expression is
-	properly returned.
-*/
+// TestOperators_Sum3 Sums two expressions together. Tests whether or not Sum of single expression is
+// properly returned.
 func TestOperators_Sum3(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-sum3")
@@ -622,13 +541,8 @@ func TestOperators_Sum3(t *testing.T) {
 	}
 }
 
-/*
-TestOperators_Sum4
-Description:
-
-	Sums two expressions together. Tests whether or not single expression input
-	with error input is properly returned (when error is nil).
-*/
+// TestOperators_Sum4 Sums two expressions together. Tests whether or not single expression input
+// with error input is properly returned (when error is nil).
 func TestOperators_Sum4(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-sum4")
@@ -683,13 +597,8 @@ func TestOperators_Sum4(t *testing.T) {
 	}
 }
 
-/*
-TestOperators_Sum5
-Description:
-
-	Sums two expressions together. Tests whether or not single expression input
-	with error input is properly errored (when error is NOT nil).
-*/
+// TestOperators_Sum5 Sums two expressions together. Tests whether or not single expression input
+// with error input is properly errored (when error is NOT nil).
 func TestOperators_Sum5(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-sum4")
@@ -714,13 +623,8 @@ func TestOperators_Sum5(t *testing.T) {
 
 }
 
-/*
-TestOperators_Sum6
-Description:
-
-	Sums two expressions together. Tests whether or not two expression input
-	with error input is properly returned (when error between is nil).
-*/
+// TestOperators_Sum6 Sums two expressions together. Tests whether or not two expression input
+// with error input is properly returned (when error between is nil).
 func TestOperators_Sum6(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-sum4")
@@ -775,13 +679,8 @@ func TestOperators_Sum6(t *testing.T) {
 	}
 }
 
-/*
-TestOperators_Sum7
-Description:
-
-	Sums two expressions together. Tests whether or not two expression input
-	with error input is properly returned (when no error between).
-*/
+// TestOperators_Sum7 Sums two expressions together. Tests whether or not two expression input
+// with error input is properly returned (when no error between).
 func TestOperators_Sum7(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-sum7")
@@ -836,13 +735,8 @@ func TestOperators_Sum7(t *testing.T) {
 	}
 }
 
-/*
-TestOperators_Sum8
-Description:
-
-	Sums two expressions together. Tests whether or not two vector expression input
-	with error input is properly returned (when no error between).
-*/
+// TestOperators_Sum8 Sums two expressions together. Tests whether or not two vector expression input
+// with error input is properly returned (when no error between).
 func TestOperators_Sum8(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-sum8")
@@ -892,13 +786,8 @@ func TestOperators_Sum8(t *testing.T) {
 	}
 }
 
-/*
-TestOperators_Sum9
-Description:
-
-	Sums two expressions together. Tests whether or not sum of expression
-	and bool throws error (as expected).
-*/
+// TestOperators_Sum9 Sums two expressions together. Tests whether or not sum of expression
+// and bool throws error (as expected).
 func TestOperators_Sum9(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-sum9")
@@ -918,13 +807,8 @@ func TestOperators_Sum9(t *testing.T) {
 	}
 }
 
-/*
-TestOperators_Sum10
-Description:
-
-	Sums two expressions together. Tests whether or not sum of three expressions
-	is correct.
-*/
+// TestOperators_Sum10 Sums two expressions together. Tests whether or not sum of three expressions
+// is correct.
 func TestOperators_Sum10(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-operators-sum10")

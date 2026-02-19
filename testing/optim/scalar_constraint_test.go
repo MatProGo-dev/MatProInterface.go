@@ -1,10 +1,6 @@
 package optim
 
-/*
-scalar_constraint_test.go
-Description:
-	Creates the scalar constraint object.
-*/
+// Creates the scalar constraint object.
 
 import (
 	"testing"
@@ -34,13 +30,8 @@ func TestScalarConstraint_ScalarConstraint1(t *testing.T) {
 	}
 }
 
-/*
-TestScalarConstraint_IsLinear1
-Description:
-
-	Detects whether a simple inequality between
-	a variable and a constant is a linear constraint.
-*/
+// TestScalarConstraint_IsLinear1 Detects whether a simple inequality between
+// a variable and a constant is a linear constraint.
 func TestScalarConstraint_IsLinear1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("scalar-constraint-test1")
@@ -64,13 +55,8 @@ func TestScalarConstraint_IsLinear1(t *testing.T) {
 
 }
 
-/*
-TestScalarConstraint_IsLinear2
-Description:
-
-	Detects whether a simple inequality between
-	a variable and a constant is a linear constraint.
-*/
+// TestScalarConstraint_IsLinear2 Detects whether a simple inequality between
+// a variable and a constant is a linear constraint.
 func TestScalarConstraint_IsLinear2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("scalar-constraint-test1")
@@ -100,14 +86,9 @@ func TestScalarConstraint_IsLinear2(t *testing.T) {
 
 }
 
-/*
-TestScalarConstraint_IsLinear3
-Description:
-
-	Detects whether a simple inequality between
-	a variable and a constant is a quadratic expression.
-	The function should identify that this is NOT a linear expression.
-*/
+// TestScalarConstraint_IsLinear3 Detects whether a simple inequality between
+// a variable and a constant is a quadratic expression.
+// The function should identify that this is NOT a linear expression.
 func TestScalarConstraint_IsLinear3(t *testing.T) {
 	// Constants
 	m := optim.NewModel("scalar-constraint-test1")
@@ -137,13 +118,8 @@ func TestScalarConstraint_IsLinear3(t *testing.T) {
 
 }
 
-/*
-TestScalarConstraint_Simplify1
-Description:
-
-	Attempts to simplify the constraint between
-	a scalar linear epression and a scalar linear expression.
-*/
+// TestScalarConstraint_Simplify1 Attempts to simplify the constraint between
+// a scalar linear epression and a scalar linear expression.
 func TestScalarConstraint_Simplify1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("scalar-constraint-test1")
@@ -177,15 +153,10 @@ func TestScalarConstraint_Simplify1(t *testing.T) {
 	}
 }
 
-/*
-TestScalarConstraint_Simplify2
-Description:
-
-	Attempts to simplify the constraint between
-	a scalar linear epression and a variable.
-	The resulting constraint should have a zero remainder on the right hand side
-	and the left hand side should contain a variable vector with 1 more element than it started with.
-*/
+// TestScalarConstraint_Simplify2 Attempts to simplify the constraint between
+// a scalar linear epression and a variable.
+// The resulting constraint should have a zero remainder on the right hand side
+// and the left hand side should contain a variable vector with 1 more element than it started with.
 func TestScalarConstraint_Simplify2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("scalar-constraint-test2")
@@ -219,13 +190,8 @@ func TestScalarConstraint_Simplify2(t *testing.T) {
 	}
 }
 
-/*
-TestScalarConstraint_Simplify3
-Description:
-
-	Attempts to simplify the constraint between
-	a scalar linear epression and a scalar quadratic expression.
-*/
+// TestScalarConstraint_Simplify3 Attempts to simplify the constraint between
+// a scalar linear epression and a scalar quadratic expression.
 func TestScalarConstraint_Simplify3(t *testing.T) {
 	// Constants
 	m := optim.NewModel("scalar-constraint-test3")

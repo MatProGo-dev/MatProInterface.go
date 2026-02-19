@@ -1,10 +1,6 @@
 package optim_test
 
-/*
-util_test.go
-Description:
-	This file tests some of the utilities added in MatProInterface.go's util.go file.
-*/
+// This file tests some of the utilities added in MatProInterface.go's util.go file.
 
 import (
 	"fmt"
@@ -13,12 +9,7 @@ import (
 	"testing"
 )
 
-/*
-TestUtil_OnesVector1
-Description:
-
-	Tests that the OnesVector() function works well with a large input size.
-*/
+// TestUtil_OnesVector1 Tests that the OnesVector() function works well with a large input size.
 func TestUtil_OnesVector1(t *testing.T) {
 	// Constants
 	length1 := 10
@@ -37,12 +28,7 @@ func TestUtil_OnesVector1(t *testing.T) {
 	}
 }
 
-/*
-TestUtil_OnesVector2
-Description:
-
-	Tests that the OnesVector() function works well with an input size of 1.
-*/
+// TestUtil_OnesVector2 Tests that the OnesVector() function works well with an input size of 1.
 func TestUtil_OnesVector2(t *testing.T) {
 	// Constants
 	length1 := 1
@@ -61,12 +47,7 @@ func TestUtil_OnesVector2(t *testing.T) {
 	}
 }
 
-/*
-TestUtil_CheckExtras1
-Description:
-
-	Tests the CheckExtras function can properly handle cases where extras has nil.
-*/
+// TestUtil_CheckExtras1 Tests the CheckExtras function can properly handle cases where extras has nil.
 func TestUtil_CheckExtras1(t *testing.T) {
 	// Constants
 	extras := []interface{}{}
@@ -81,13 +62,8 @@ func TestUtil_CheckExtras1(t *testing.T) {
 	}
 }
 
-/*
-TestUtil_CheckExtras2
-Description:
-
-	Tests the CheckExtras function can properly handle cases where extras
-	is simply a nil.
-*/
+// TestUtil_CheckExtras2 Tests the CheckExtras function can properly handle cases where extras
+// is simply a nil.
 func TestUtil_CheckExtras2(t *testing.T) {
 	// Constants
 	extras := []interface{}{
@@ -104,13 +80,8 @@ func TestUtil_CheckExtras2(t *testing.T) {
 	}
 }
 
-/*
-TestUtil_CheckExtras3
-Description:
-
-	Tests the CheckExtras function can properly handle cases where extras has
-	one element but it is not an error.
-*/
+// TestUtil_CheckExtras3 Tests the CheckExtras function can properly handle cases where extras has
+// one element but it is not an error.
 func TestUtil_CheckExtras3(t *testing.T) {
 	// Constants
 	extras := []interface{}{
@@ -133,13 +104,8 @@ func TestUtil_CheckExtras3(t *testing.T) {
 	}
 }
 
-/*
-TestUtil_CheckExtras4
-Description:
-
-	Tests the CheckExtras function can properly handle cases where extras has
-	one element but it is a proper error.
-*/
+// TestUtil_CheckExtras4 Tests the CheckExtras function can properly handle cases where extras has
+// one element but it is a proper error.
 func TestUtil_CheckExtras4(t *testing.T) {
 	// Constants
 	err0 := fmt.Errorf("test")
@@ -160,13 +126,8 @@ func TestUtil_CheckExtras4(t *testing.T) {
 	}
 }
 
-/*
-TestUtil_CheckExtras5
-Description:
-
-	Tests the CheckExtras function can properly handle cases where extras has
-	multiple elements but it is a proper error.
-*/
+// TestUtil_CheckExtras5 Tests the CheckExtras function can properly handle cases where extras has
+// multiple elements but it is a proper error.
 func TestUtil_CheckExtras5(t *testing.T) {
 	// Constants
 	err0 := fmt.Errorf("test")
@@ -190,12 +151,7 @@ func TestUtil_CheckExtras5(t *testing.T) {
 	}
 }
 
-/*
-TestUtils_SumVars1
-Description:
-
-	This function tests the rewritten version of SumVars.
-*/
+// TestUtils_SumRow1 This function tests the rewritten version of SumVars.
 func TestUtils_SumRow1(t *testing.T) {
 	// Constants
 	N := 9
@@ -240,12 +196,7 @@ func TestUtils_SumRow1(t *testing.T) {
 	}
 }
 
-/*
-TestUtils_SumCol1
-Description:
-
-	This function tests the rewritten version of SumCol.
-*/
+// TestUtils_SumCol1 This function tests the rewritten version of SumCol.
 func TestUtils_SumCol1(t *testing.T) {
 	// Constants
 	N := 9
@@ -290,12 +241,7 @@ func TestUtils_SumCol1(t *testing.T) {
 	}
 }
 
-/*
-TestUtils_FindInSlice1
-Description:
-
-	Tests whether or not FindInSlice collectly handles erorrs when a bad slice is given.
-*/
+// TestUtils_FindInSlice1 Tests whether or not FindInSlice collectly handles erorrs when a bad slice is given.
 func TestUtils_FindInSlice1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("FindInSlice1")
@@ -319,12 +265,7 @@ func TestUtils_FindInSlice1(t *testing.T) {
 	}
 }
 
-/*
-TestUtils_FindInSlice2
-Description:
-
-	Tests whether or not FindInSlice collectly handles erorrs when an unknown type is given.
-*/
+// TestUtils_FindInSlice2 Tests whether or not FindInSlice collectly handles erorrs when an unknown type is given.
 func TestUtils_FindInSlice2(t *testing.T) {
 	// Constants
 	b1 := false

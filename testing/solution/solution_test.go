@@ -10,14 +10,10 @@ import (
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 )
 
-/*
-solution_test.go
-Description:
-	Testing for the solution object.
-	(This seems like it is highly representative of the Gurobi solver; is there a reason to make it this way?)
-*/
+// Testing for the solution object.
+// (This seems like it is highly representative of the Gurobi solver; is there a reason to make it this way?)
 
-// Helper function to convert a symbolic.Expression to float64
+// exprToFloat64 Helper function to convert a symbolic.Expression to float64
 func exprToFloat64(t *testing.T, expr symbolic.Expression) float64 {
 	resultK, ok := expr.(symbolic.K)
 	if !ok {
@@ -97,12 +93,7 @@ func TestSolution_ToMessage2(t *testing.T) {
 	}
 }
 
-/*
-TestSolution_Value1
-Description:
-
-	This function tests whether or not we can properly retrieve values from a solution object.
-*/
+// TestSolution_Value1 This function tests whether or not we can properly retrieve values from a solution object.
 func TestSolution_Value1(t *testing.T) {
 	// Constants
 	v1 := symbolic.NewVariable()
@@ -143,13 +134,8 @@ func TestSolution_Value1(t *testing.T) {
 
 }
 
-/*
-TestSolution_FindValueOfExpression1
-Description:
-
-	This function tests whether we can evaluate a simple linear expression
-	using the solution values.
-*/
+// TestSolution_FindValueOfExpression1 This function tests whether we can evaluate a simple linear expression
+// using the solution values.
 func TestSolution_FindValueOfExpression1(t *testing.T) {
 	// Constants
 	v1 := symbolic.NewVariable()
@@ -184,12 +170,7 @@ func TestSolution_FindValueOfExpression1(t *testing.T) {
 	}
 }
 
-/*
-TestSolution_FindValueOfExpression2
-Description:
-
-	This function tests whether we can evaluate a constant expression.
-*/
+// TestSolution_FindValueOfExpression2 This function tests whether we can evaluate a constant expression.
 func TestSolution_FindValueOfExpression2(t *testing.T) {
 	// Constants
 	tempSol := solution.DummySolution{
@@ -219,12 +200,7 @@ func TestSolution_FindValueOfExpression2(t *testing.T) {
 	}
 }
 
-/*
-TestSolution_FindValueOfExpression3
-Description:
-
-	This function tests whether we can evaluate an expression with a single variable.
-*/
+// TestSolution_FindValueOfExpression3 This function tests whether we can evaluate an expression with a single variable.
 func TestSolution_FindValueOfExpression3(t *testing.T) {
 	// Constants
 	v1 := symbolic.NewVariable()
@@ -258,13 +234,8 @@ func TestSolution_FindValueOfExpression3(t *testing.T) {
 	}
 }
 
-/*
-TestSolution_FindValueOfExpression4
-Description:
-
-	This function tests whether we get an error when a variable is missing
-	from the solution.
-*/
+// TestSolution_FindValueOfExpression4 This function tests whether we get an error when a variable is missing
+// from the solution.
 func TestSolution_FindValueOfExpression4(t *testing.T) {
 	// Constants
 	v1 := symbolic.NewVariable()
@@ -289,13 +260,8 @@ func TestSolution_FindValueOfExpression4(t *testing.T) {
 	}
 }
 
-/*
-TestSolution_FindValueOfExpression5
-Description:
-
-	This function tests whether we can evaluate a more complex expression
-	with multiple operations.
-*/
+// TestSolution_FindValueOfExpression5 This function tests whether we can evaluate a more complex expression
+// with multiple operations.
 func TestSolution_FindValueOfExpression5(t *testing.T) {
 	// Constants
 	v1 := symbolic.NewVariable()
@@ -333,12 +299,7 @@ func TestSolution_FindValueOfExpression5(t *testing.T) {
 	}
 }
 
-/*
-TestSolution_GetProblem1
-Description:
-
-	This function tests whether we can retrieve the problem from a solution.
-*/
+// TestSolution_GetProblem1 This function tests whether we can retrieve the problem from a solution.
 func TestSolution_GetProblem1(t *testing.T) {
 	// Constants
 	p := problem.NewProblem("TestProblem1")
@@ -366,12 +327,7 @@ func TestSolution_GetProblem1(t *testing.T) {
 	}
 }
 
-/*
-TestSolution_GetProblem2
-Description:
-
-	This function tests whether GetProblem returns nil when no problem is set.
-*/
+// TestSolution_GetProblem2 This function tests whether GetProblem returns nil when no problem is set.
 func TestSolution_GetProblem2(t *testing.T) {
 	// Constants
 	tempSol := solution.DummySolution{
@@ -392,13 +348,8 @@ func TestSolution_GetProblem2(t *testing.T) {
 	}
 }
 
-/*
-TestSolution_GetOptimalObjectiveValue1
-Description:
-
-	This function tests whether we can compute the objective value at the solution point
-	for a simple linear objective.
-*/
+// TestSolution_GetOptimalObjectiveValue1 This function tests whether we can compute the objective value at the solution point
+// for a simple linear objective.
 func TestSolution_GetOptimalObjectiveValue1(t *testing.T) {
 	// Constants
 	p := problem.NewProblem("TestProblem")
@@ -439,13 +390,8 @@ func TestSolution_GetOptimalObjectiveValue1(t *testing.T) {
 	}
 }
 
-/*
-TestSolution_GetOptimalObjectiveValue2
-Description:
-
-	This function tests whether GetOptimalObjectiveValue returns an error
-	when the solution has no associated problem.
-*/
+// TestSolution_GetOptimalObjectiveValue2 This function tests whether GetOptimalObjectiveValue returns an error
+// when the solution has no associated problem.
 func TestSolution_GetOptimalObjectiveValue2(t *testing.T) {
 	// Constants
 	v1 := symbolic.NewVariable()
@@ -466,13 +412,8 @@ func TestSolution_GetOptimalObjectiveValue2(t *testing.T) {
 	}
 }
 
-/*
-TestSolution_GetOptimalObjectiveValue3
-Description:
-
-	This function tests whether we can compute the objective value
-	for a constant objective function.
-*/
+// TestSolution_GetOptimalObjectiveValue3 This function tests whether we can compute the objective value
+// for a constant objective function.
 func TestSolution_GetOptimalObjectiveValue3(t *testing.T) {
 	// Constants
 	p := problem.NewProblem("TestProblem")
@@ -510,13 +451,8 @@ func TestSolution_GetOptimalObjectiveValue3(t *testing.T) {
 	}
 }
 
-/*
-TestSolution_GetOptimalObjectiveValue4
-Description:
-
-	This function tests whether we can compute the objective value
-	for a more complex objective with multiple variables and operations.
-*/
+// TestSolution_GetOptimalObjectiveValue4 This function tests whether we can compute the objective value
+// for a more complex objective with multiple variables and operations.
 func TestSolution_GetOptimalObjectiveValue4(t *testing.T) {
 	// Constants
 	p := problem.NewProblem("TestProblem")

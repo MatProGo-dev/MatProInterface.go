@@ -1,11 +1,6 @@
 package problem_test
 
-/*
-optimization_problem_test.go
-Description:
-
-	Tests for all functions and objects defined in the optimization_problem.go file.
-*/
+// Tests for all functions and objects defined in the optimization_problem.go file.
 
 import (
 	"fmt"
@@ -22,15 +17,10 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-/*
-TestOptimizationProblem_NewProblem1
-Description:
-
-	Tests the NewProblem function with a simple name.
-	Verifies that the name is set correctly and
-	that zero variables and constraints exist in the fresh
-	problem.
-*/
+// TestOptimizationProblem_NewProblem1 Tests the NewProblem function with a simple name.
+// Verifies that the name is set correctly and
+// that zero variables and constraints exist in the fresh
+// problem.
 func TestOptimizationProblem_NewProblem1(t *testing.T) {
 	// Constants
 	name := "TestProblem1"
@@ -57,12 +47,7 @@ func TestOptimizationProblem_NewProblem1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_AddVariable1
-Description:
-
-	Tests the AddVariable function with a simple problem.
-*/
+// TestOptimizationProblem_AddVariable1 Tests the AddVariable function with a simple problem.
 func TestOptimizationProblem_AddVariable1(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestProblem1")
@@ -83,12 +68,7 @@ func TestOptimizationProblem_AddVariable1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_AddRealVariable1
-Description:
-
-	Tests the AddRealVariable function with a simple problem.
-*/
+// TestOptimizationProblem_AddRealVariable1 Tests the AddRealVariable function with a simple problem.
 func TestOptimizationProblem_AddRealVariable1(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestProblem1")
@@ -109,12 +89,7 @@ func TestOptimizationProblem_AddRealVariable1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_AddVariableClassic1
-Description:
-
-	Tests the AddVariableClassic function with a simple problem.
-*/
+// TestOptimizationProblem_AddVariableClassic1 Tests the AddVariableClassic function with a simple problem.
 func TestOptimizationProblem_AddVariableClassic1(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestProblem1")
@@ -135,12 +110,7 @@ func TestOptimizationProblem_AddVariableClassic1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_AddBinaryVariable1
-Description:
-
-	Tests the AddBinaryVariable function with a simple problem.
-*/
+// TestOptimizationProblem_AddBinaryVariable1 Tests the AddBinaryVariable function with a simple problem.
 func TestOptimizationProblem_AddBinaryVariable1(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestProblem1")
@@ -161,12 +131,7 @@ func TestOptimizationProblem_AddBinaryVariable1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_AddVariableVector1
-Description:
-
-	Tests the AddVariableVector function with a simple problem.
-*/
+// TestOptimizationProblem_AddVariableVector1 Tests the AddVariableVector function with a simple problem.
 func TestOptimizationProblem_AddVariableVector1(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestProblem1")
@@ -190,12 +155,7 @@ func TestOptimizationProblem_AddVariableVector1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_AddVariableVectorClassic1
-Description:
-
-	Tests the AddVariableVectorClassic function with a simple problem.
-*/
+// TestOptimizationProblem_AddVariableVectorClassic1 Tests the AddVariableVectorClassic function with a simple problem.
 func TestOptimizationProblem_AddVariableVectorClassic1(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestProblem1")
@@ -219,12 +179,7 @@ func TestOptimizationProblem_AddVariableVectorClassic1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_AddBinaryVariableVector1
-Description:
-
-	Tests the AddBinaryVariableVector function with a simple problem.
-*/
+// TestOptimizationProblem_AddBinaryVariableVector1 Tests the AddBinaryVariableVector function with a simple problem.
 func TestOptimizationProblem_AddBinaryVariableVector1(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestProblem1")
@@ -248,12 +203,7 @@ func TestOptimizationProblem_AddBinaryVariableVector1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_AddVariableMatrix1
-Description:
-
-	Tests the AddVariableMatrix function with a simple problem.
-*/
+// TestOptimizationProblem_AddVariableMatrix1 Tests the AddVariableMatrix function with a simple problem.
 func TestOptimizationProblem_AddVariableMatrix1(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestProblem1")
@@ -278,12 +228,7 @@ func TestOptimizationProblem_AddVariableMatrix1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_AddBinaryVariableMatrix1
-Description:
-
-	Tests the AddBinaryVariableMatrix function with a simple problem.
-*/
+// TestOptimizationProblem_AddBinaryVariableMatrix1 Tests the AddBinaryVariableMatrix function with a simple problem.
 func TestOptimizationProblem_AddBinaryVariableMatrix1(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestProblem1")
@@ -308,12 +253,7 @@ func TestOptimizationProblem_AddBinaryVariableMatrix1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_SetObjective1
-Description:
-
-	Tests the SetObjective function with a simple linear objective.
-*/
+// TestOptimizationProblem_SetObjective1 Tests the SetObjective function with a simple linear objective.
 func TestOptimizationProblem_SetObjective1(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_SetObjective1")
@@ -333,13 +273,8 @@ func TestOptimizationProblem_SetObjective1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_SetObjective2
-Description:
-
-	Tests the SetObjective function with a vector objective
-	which should cause an error.
-*/
+// TestOptimizationProblem_SetObjective2 Tests the SetObjective function with a vector objective
+// which should cause an error.
 func TestOptimizationProblem_SetObjective2(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_SetObjective2")
@@ -359,12 +294,7 @@ func TestOptimizationProblem_SetObjective2(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_ToSymbolicConstraint1
-Description:
-
-	Tests the ToSymbolicConstraint function with a simple problem.
-*/
+// TestOptimizationProblem_ToSymbolicConstraint1 Tests the ToSymbolicConstraint function with a simple problem.
 func TestOptimizationProblem_ToSymbolicConstraint1(t *testing.T) {
 	// Constants
 	model1 := optim.NewModel("TestModel1")
@@ -392,15 +322,10 @@ func TestOptimizationProblem_ToSymbolicConstraint1(t *testing.T) {
 
 }
 
-/*
-TestOptimizationProblem_ToSymbolicConstraint2
-Description:
-
-	Tests the ToSymbolicConstraint function with a simple problem
-	that has a vector constraint. This vector constraint
-	will be a GreaterThanEqual vector constraint between
-	a vector variable and a vector variable.
-*/
+// TestOptimizationProblem_ToSymbolicConstraint2 Tests the ToSymbolicConstraint function with a simple problem
+// that has a vector constraint. This vector constraint
+// will be a GreaterThanEqual vector constraint between
+// a vector variable and a vector variable.
 func TestOptimizationProblem_ToSymbolicConstraint2(t *testing.T) {
 	// Constants
 	model1 := optim.NewModel("TestModel1")
@@ -421,14 +346,9 @@ func TestOptimizationProblem_ToSymbolicConstraint2(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_ToSymbolicConstraint3
-Description:
-
-	Tests the ToSymbolicConstraint function with a simple problem
-	that has a LeftHandSide that is not well-defined (in this case,
-	a variable). This should cause an error.
-*/
+// TestOptimizationProblem_ToSymbolicConstraint3 Tests the ToSymbolicConstraint function with a simple problem
+// that has a LeftHandSide that is not well-defined (in this case,
+// a variable). This should cause an error.
 func TestOptimizationProblem_ToSymbolicConstraint3(t *testing.T) {
 	// Constants
 	model1 := optim.NewModel("TestModel1")
@@ -455,14 +375,9 @@ func TestOptimizationProblem_ToSymbolicConstraint3(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_ToSymbolicConstraint4
-Description:
-
-	Tests the ToSymbolicConstraint function with a simple constraint
-	that has a RightHandSide that is not well-defined (in this case,
-	a variable). This should cause an error.
-*/
+// TestOptimizationProblem_ToSymbolicConstraint4 Tests the ToSymbolicConstraint function with a simple constraint
+// that has a RightHandSide that is not well-defined (in this case,
+// a variable). This should cause an error.
 func TestOptimizationProblem_ToSymbolicConstraint4(t *testing.T) {
 	// Constants
 	model1 := optim.NewModel("TestModel1")
@@ -489,13 +404,8 @@ func TestOptimizationProblem_ToSymbolicConstraint4(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_From1
-Description:
-
-	Tests the From function with a simple
-	model that doesn't have an objective.
-*/
+// TestOptimizationProblem_From1 Tests the From function with a simple
+// model that doesn't have an objective.
 func TestOptimizationProblem_From1(t *testing.T) {
 	// Constants
 	model := optim.NewModel(
@@ -521,13 +431,8 @@ func TestOptimizationProblem_From1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_From2
-Description:
-
-	Tests the From function with a simple
-	model that doesn't have an objective.
-*/
+// TestOptimizationProblem_From2 Tests the From function with a simple
+// model that doesn't have an objective.
 func TestOptimizationProblem_From2(t *testing.T) {
 	// Constants
 	model := optim.NewModel(
@@ -566,14 +471,9 @@ func TestOptimizationProblem_From2(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_From3
-Description:
-
-	Tests the From function with a convex optimization
-	model that has a quadratic objective and
-	at least two constraints.
-*/
+// TestOptimizationProblem_From3 Tests the From function with a convex optimization
+// model that has a quadratic objective and
+// at least two constraints.
 func TestOptimizationProblem_From3(t *testing.T) {
 	// Constants
 	model := optim.NewModel(
@@ -634,14 +534,9 @@ func TestOptimizationProblem_From3(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_From4
-Description:
-
-	Tests the From function with a convex optimization
-	problem that has a linear objective and
-	a vector inequality constraint.
-*/
+// TestOptimizationProblem_From4 Tests the From function with a convex optimization
+// problem that has a linear objective and
+// a vector inequality constraint.
 func TestOptimizationProblem_From4(t *testing.T) {
 	// Constants
 	model := optim.NewModel(
@@ -700,14 +595,9 @@ func TestOptimizationProblem_From4(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_From5
-Description:
-
-	Tests the From function with a convex optimization
-	problem that has a linear objective and
-	two vector inequality constraints.
-*/
+// TestOptimizationProblem_From5 Tests the From function with a convex optimization
+// problem that has a linear objective and
+// two vector inequality constraints.
 func TestOptimizationProblem_From5(t *testing.T) {
 	// Constants
 	model := optim.NewModel(
@@ -773,13 +663,8 @@ func TestOptimizationProblem_From5(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_From6
-Description:
-
-	Tests the From function properly produces an error
-	when the input model is not well-defined.
-*/
+// TestOptimizationProblem_From6 Tests the From function properly produces an error
+// when the input model is not well-defined.
 func TestOptimizationProblem_From6(t *testing.T) {
 	// Constants
 	model := optim.NewModel(
@@ -800,13 +685,8 @@ func TestOptimizationProblem_From6(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_From7
-Description:
-
-	Tests the From function properly produces an error
-	when the input model has an improperly defined objective.
-*/
+// TestOptimizationProblem_From7 Tests the From function properly produces an error
+// when the input model has an improperly defined objective.
 func TestOptimizationProblem_From7(t *testing.T) {
 	// Constants
 	model := optim.NewModel(
@@ -830,14 +710,9 @@ func TestOptimizationProblem_From7(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_From8
-Description:
-
-	Tests the From function properly produces an error
-	when the input model has an objective function that
-	is not well-defined.
-*/
+// TestOptimizationProblem_From8 Tests the From function properly produces an error
+// when the input model has an objective function that
+// is not well-defined.
 func TestOptimizationProblem_From8(t *testing.T) {
 	// Constants
 	model := optim.NewModel(
@@ -871,13 +746,8 @@ func TestOptimizationProblem_From8(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_From9
-Description:
-
-	Tests that the From function properly produces an error
-	when a constraint has been added to the problem that is not well-defined.
-*/
+// TestOptimizationProblem_From9 Tests that the From function properly produces an error
+// when a constraint has been added to the problem that is not well-defined.
 func TestOptimizationProblem_From9(t *testing.T) {
 	// Constants
 	model := optim.NewModel(
@@ -911,13 +781,8 @@ func TestOptimizationProblem_From9(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_From10
-Description:
-
-	Tests that the From function properly produces an error
-	when the objective is not well-formed.
-*/
+// TestOptimizationProblem_From10 Tests that the From function properly produces an error
+// when the objective is not well-formed.
 func TestOptimizationProblem_From10(t *testing.T) {
 	// Constants
 	model := optim.NewModel(
@@ -951,14 +816,9 @@ func TestOptimizationProblem_From10(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_Check1
-Description:
-
-	Tests the Check function with a simple problem
-	that has one variable, one constraint and an objective
-	that is not well-defined.
-*/
+// TestOptimizationProblem_Check1 Tests the Check function with a simple problem
+// that has one variable, one constraint and an objective
+// that is not well-defined.
 func TestOptimizationProblem_Check1(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_Check1")
@@ -986,14 +846,9 @@ func TestOptimizationProblem_Check1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_Check2
-Description:
-
-	Tests the Check function with a simple problem
-	that has one variable, one well-defined objective
-	and a set of constraints containing one bad constraint.
-*/
+// TestOptimizationProblem_Check2 Tests the Check function with a simple problem
+// that has one variable, one well-defined objective
+// and a set of constraints containing one bad constraint.
 func TestOptimizationProblem_Check2(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_Check2")
@@ -1025,14 +880,9 @@ func TestOptimizationProblem_Check2(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_Check3
-Description:
-
-	Tests the Check function with a simple problem
-	that has one variable and no objective defined.
-	The mpiErrors.NoObjectiveDefinedError should be created.
-*/
+// TestOptimizationProblem_Check3 Tests the Check function with a simple problem
+// that has one variable and no objective defined.
+// The mpiErrors.NoObjectiveDefinedError should be created.
 func TestOptimizationProblem_Check3(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_Check3")
@@ -1053,17 +903,12 @@ func TestOptimizationProblem_Check3(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_Check4
-Description:
-
-	Tests the Check function with a simple problem
-	that has:
-	- objective defined
-	- two variables (one is NOT well-defined)
-	- and no constraints defined.
-	The result should throw an error relating to the bad variable.
-*/
+// TestOptimizationProblem_Check4 Tests the Check function with a simple problem
+// that has:
+// - objective defined
+// - two variables (one is NOT well-defined)
+// - and no constraints defined.
+// The result should throw an error relating to the bad variable.
 func TestOptimizationProblem_Check4(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_Check4")
@@ -1093,13 +938,8 @@ func TestOptimizationProblem_Check4(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_IsLinear1
-Description:
-
-	Tests the IsLinear function with a simple problem
-	that has a constant objective and a single, linear constraint.
-*/
+// TestOptimizationProblem_IsLinear1 Tests the IsLinear function with a simple problem
+// that has a constant objective and a single, linear constraint.
 func TestOptimizationProblem_IsLinear1(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_IsLinear1")
@@ -1121,14 +961,9 @@ func TestOptimizationProblem_IsLinear1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_IsLinear2
-Description:
-
-	Tests the IsLinear function with a simple problem
-	that has a linear objective containing 3 variables and two lienar constraints,
-	each containing one variable.
-*/
+// TestOptimizationProblem_IsLinear2 Tests the IsLinear function with a simple problem
+// that has a linear objective containing 3 variables and two lienar constraints,
+// each containing one variable.
 func TestOptimizationProblem_IsLinear2(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_IsLinear2")
@@ -1153,14 +988,9 @@ func TestOptimizationProblem_IsLinear2(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_IsLinear3
-Description:
-
-	Tests the IsLinear function with a simple problem
-	that has a quadratic objective containing 3 variables and two lienar constraints,
-	each containing one variable.
-*/
+// TestOptimizationProblem_IsLinear3 Tests the IsLinear function with a simple problem
+// that has a quadratic objective containing 3 variables and two lienar constraints,
+// each containing one variable.
 func TestOptimizationProblem_IsLinear3(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_IsLinear3")
@@ -1185,14 +1015,9 @@ func TestOptimizationProblem_IsLinear3(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_IsLinear4
-Description:
-
-	Tests the IsLinear function with a simple problem
-	that has a constant objective and a single, quadratic constraint.
-	The problem should be non-linear.
-*/
+// TestOptimizationProblem_IsLinear4 Tests the IsLinear function with a simple problem
+// that has a constant objective and a single, quadratic constraint.
+// The problem should be non-linear.
 func TestOptimizationProblem_IsLinear4(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_IsLinear4")
@@ -1217,14 +1042,9 @@ func TestOptimizationProblem_IsLinear4(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_IsLinear5
-Description:
-
-	Tests the IsLinear function with an optimization problem
-	that is NOT well-defined.
-	The function should cause a panic.
-*/
+// TestOptimizationProblem_IsLinear5 Tests the IsLinear function with an optimization problem
+// that is NOT well-defined.
+// The function should cause a panic.
 func TestOptimizationProblem_IsLinear5(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_IsLinear5")
@@ -1277,17 +1097,12 @@ func TestOptimizationProblem_IsLinear5(t *testing.T) {
 	t.Errorf("expected a panic; received none")
 }
 
-/*
-TestOptimizationProblem_LinearInequalityConstraintMatrices1
-Description:
-
-	Tests the LinearInequalityConstraintMatrices function with a simple problem.
-	The problem will have:
-	- a constant objective
-	- 2 variables,
-	- and a single linear inequality constraint.
-	The result should be a matrix with 1 row and 2 columns.
-*/
+// TestOptimizationProblem_LinearInequalityConstraintMatrices1 Tests the LinearInequalityConstraintMatrices function with a simple problem.
+// The problem will have:
+// - a constant objective
+// - 2 variables,
+// - and a single linear inequality constraint.
+// The result should be a matrix with 1 row and 2 columns.
 func TestOptimizationProblem_LinearInequalityConstraintMatrices1(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_LinearInequalityConstraintMatrices1")
@@ -1328,17 +1143,12 @@ func TestOptimizationProblem_LinearInequalityConstraintMatrices1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_LinearInequalityConstraintMatrices2
-Description:
-
-	Tests the LinearInequalityConstraintMatrices function with a simple problem.
-	The problem will have:
-	- a constant objective
-	- 2 variables,
-	- and two scalar linear inequality constraints.
-	The result should be a matrix with 2 rows and 2 columns.
-*/
+// TestOptimizationProblem_LinearInequalityConstraintMatrices2 Tests the LinearInequalityConstraintMatrices function with a simple problem.
+// The problem will have:
+// - a constant objective
+// - 2 variables,
+// - and two scalar linear inequality constraints.
+// The result should be a matrix with 2 rows and 2 columns.
 func TestOptimizationProblem_LinearInequalityConstraintMatrices2(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_LinearInequalityConstraintMatrices2")
@@ -1380,17 +1190,12 @@ func TestOptimizationProblem_LinearInequalityConstraintMatrices2(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_LinearInequalityConstraintMatrices3
-Description:
-
-	Tests the LinearInequalityConstraintMatrices function with a simple problem.
-	The problem will have:
-	- a constant objective
-	- 3 variables,
-	- and a single vector linear inequality constraint.
-	The result should be a matrix with 3 rows and 3 columns.
-*/
+// TestOptimizationProblem_LinearInequalityConstraintMatrices3 Tests the LinearInequalityConstraintMatrices function with a simple problem.
+// The problem will have:
+// - a constant objective
+// - 3 variables,
+// - and a single vector linear inequality constraint.
+// The result should be a matrix with 3 rows and 3 columns.
 func TestOptimizationProblem_LinearInequalityConstraintMatrices3(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_LinearInequalityConstraintMatrices3")
@@ -1430,17 +1235,12 @@ func TestOptimizationProblem_LinearInequalityConstraintMatrices3(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_LinearInequalityConstraintMatrices4
-Description:
-
-	Tests the LinearInequalityConstraintMatrices function with a simple problem.
-	The problem will have:
-	- a constant objective
-	- 3 variables,
-	- and two vector linear inequality constraints.
-	The result should be a matrix with 6 rows and 3 columns.
-*/
+// TestOptimizationProblem_LinearInequalityConstraintMatrices4 Tests the LinearInequalityConstraintMatrices function with a simple problem.
+// The problem will have:
+// - a constant objective
+// - 3 variables,
+// - and two vector linear inequality constraints.
+// The result should be a matrix with 6 rows and 3 columns.
 func TestOptimizationProblem_LinearInequalityConstraintMatrices4(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_LinearInequalityConstraintMatrices4")
@@ -1482,19 +1282,14 @@ func TestOptimizationProblem_LinearInequalityConstraintMatrices4(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_LinearInequalityConstraintMatrices5
-Description:
-
-	Tests the LinearInequalityConstraintMatrices function with a simple problem
-	that looks like the one in TestOptimizationProblem_LinearInequalityConstraintMatrices1.
-	The problem will have:
-	- a constant objective
-	- 2 variables,
-	- a single linear inequality constraint,
-	- and a single linear equality constraint.
-	The result should be a matrix with 1 row and 2 columns.
-*/
+// TestOptimizationProblem_LinearInequalityConstraintMatrices5 Tests the LinearInequalityConstraintMatrices function with a simple problem
+// that looks like the one in TestOptimizationProblem_LinearInequalityConstraintMatrices1.
+// The problem will have:
+// - a constant objective
+// - 2 variables,
+// - a single linear inequality constraint,
+// - and a single linear equality constraint.
+// The result should be a matrix with 1 row and 2 columns.
 func TestOptimizationProblem_LinearInequalityConstraintMatrices5(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_LinearInequalityConstraintMatrices5")
@@ -1537,19 +1332,14 @@ func TestOptimizationProblem_LinearInequalityConstraintMatrices5(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_LinearInequalityConstraintMatrices6
-Description:
-
-	Tests the LinearInequalityConstraintMatrices function with a simple problem
-	that contains a mixture of scalar and vector inequality constraints.
-	The problem will have:
-	- a constant objective
-	- 3 variables,
-	- a single vector linear inequality constraint,
-	- and a single scalar linear inequality constraint.
-	The result should be a matrix with 4 rows and 3 columns.
-*/
+// TestOptimizationProblem_LinearInequalityConstraintMatrices6 Tests the LinearInequalityConstraintMatrices function with a simple problem
+// that contains a mixture of scalar and vector inequality constraints.
+// The problem will have:
+// - a constant objective
+// - 3 variables,
+// - a single vector linear inequality constraint,
+// - and a single scalar linear inequality constraint.
+// The result should be a matrix with 4 rows and 3 columns.
 func TestOptimizationProblem_LinearInequalityConstraintMatrices6(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_LinearInequalityConstraintMatrices6")
@@ -1591,13 +1381,8 @@ func TestOptimizationProblem_LinearInequalityConstraintMatrices6(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_LinearInequalityConstraintMatrices7
-Description:
-
-	Tests that the LinearInequalityConstraintMatrices function
-	properly produces an error when the problem has NO inequality constraints.
-*/
+// TestOptimizationProblem_LinearInequalityConstraintMatrices7 Tests that the LinearInequalityConstraintMatrices function
+// properly produces an error when the problem has NO inequality constraints.
 func TestOptimizationProblem_LinearInequalityConstraintMatrices7(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_LinearInequalityConstraintMatrices7")
@@ -1627,17 +1412,12 @@ func TestOptimizationProblem_LinearInequalityConstraintMatrices7(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_LinearEqualityConstraintMatrices1
-Description:
-
-	Tests the LinearEqualityConstraintMatrices function with a simple problem.
-	The problem will have:
-	- a constant objective
-	- 2 variables,
-	- and a single linear equality constraint.
-	The result should be a matrix with 1 row and 2 columns.
-*/
+// TestOptimizationProblem_LinearEqualityConstraintMatrices1 Tests the LinearEqualityConstraintMatrices function with a simple problem.
+// The problem will have:
+// - a constant objective
+// - 2 variables,
+// - and a single linear equality constraint.
+// The result should be a matrix with 1 row and 2 columns.
 func TestOptimizationProblem_LinearEqualityConstraintMatrices1(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_LinearEqualityConstraintMatrices1")
@@ -1678,17 +1458,12 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_LinearEqualityConstraintMatrices2
-Description:
-
-	Tests the LinearEqualityConstraintMatrices function with a simple problem.
-	The problem will have:
-	- a constant objective
-	- 2 variables,
-	- and two scalar linear equality constraints.
-	The result should be a matrix with 2 rows and 2 columns.
-*/
+// TestOptimizationProblem_LinearEqualityConstraintMatrices2 Tests the LinearEqualityConstraintMatrices function with a simple problem.
+// The problem will have:
+// - a constant objective
+// - 2 variables,
+// - and two scalar linear equality constraints.
+// The result should be a matrix with 2 rows and 2 columns.
 func TestOptimizationProblem_LinearEqualityConstraintMatrices2(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_LinearEqualityConstraintMatrices2")
@@ -1730,17 +1505,12 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices2(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_LinearEqualityConstraintMatrices3
-Description:
-
-	Tests the LinearEqualityConstraintMatrices function with a simple problem.
-	The problem will have:
-	- a constant objective
-	- 3 variables,
-	- and a single vector linear equality constraint.
-	The result should be a matrix with 3 rows and 3 columns.
-*/
+// TestOptimizationProblem_LinearEqualityConstraintMatrices3 Tests the LinearEqualityConstraintMatrices function with a simple problem.
+// The problem will have:
+// - a constant objective
+// - 3 variables,
+// - and a single vector linear equality constraint.
+// The result should be a matrix with 3 rows and 3 columns.
 func TestOptimizationProblem_LinearEqualityConstraintMatrices3(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_LinearEqualityConstraintMatrices3")
@@ -1780,17 +1550,12 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices3(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_LinearEqualityConstraintMatrices4
-Description:
-
-	Tests the LinearEqualityConstraintMatrices function with a simple problem.
-	The problem will have:
-	- a constant objective
-	- 3 variables,
-	- and two vector linear equality constraints.
-	The result should be a matrix with 6 rows and 3 columns.
-*/
+// TestOptimizationProblem_LinearEqualityConstraintMatrices4 Tests the LinearEqualityConstraintMatrices function with a simple problem.
+// The problem will have:
+// - a constant objective
+// - 3 variables,
+// - and two vector linear equality constraints.
+// The result should be a matrix with 6 rows and 3 columns.
 func TestOptimizationProblem_LinearEqualityConstraintMatrices4(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_LinearEqualityConstraintMatrices4")
@@ -1832,19 +1597,14 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices4(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_LinearEqualityConstraintMatrices5
-Description:
-
-	Tests the LinearEqualityConstraintMatrices function with a simple problem
-	that looks like the one in TestOptimizationProblem_LinearEqualityConstraintMatrices1.
-	The problem will have:
-	- a constant objective
-	- 2 variables,
-	- a single linear equality constraint,
-	- and a single linear inequality constraint.
-	The result should be a matrix with 1 row and 2 columns.
-*/
+// TestOptimizationProblem_LinearEqualityConstraintMatrices5 Tests the LinearEqualityConstraintMatrices function with a simple problem
+// that looks like the one in TestOptimizationProblem_LinearEqualityConstraintMatrices1.
+// The problem will have:
+// - a constant objective
+// - 2 variables,
+// - a single linear equality constraint,
+// - and a single linear inequality constraint.
+// The result should be a matrix with 1 row and 2 columns.
 func TestOptimizationProblem_LinearEqualityConstraintMatrices5(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_LinearEqualityConstraintMatrices5")
@@ -1887,19 +1647,14 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices5(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_LinearEqualityConstraintMatrices6
-Description:
-
-	Tests the LinearEqualityConstraintMatrices function with a simple problem
-	that contains a mixture of scalar and vector equality constraints.
-	The problem will have:
-	- a constant objective
-	- 3 variables,
-	- a single vector linear equality constraint,
-	- and a single scalar linear equality constraint.
-	The result should be a matrix with 4 rows and 3 columns.
-*/
+// TestOptimizationProblem_LinearEqualityConstraintMatrices6 Tests the LinearEqualityConstraintMatrices function with a simple problem
+// that contains a mixture of scalar and vector equality constraints.
+// The problem will have:
+// - a constant objective
+// - 3 variables,
+// - a single vector linear equality constraint,
+// - and a single scalar linear equality constraint.
+// The result should be a matrix with 4 rows and 3 columns.
 func TestOptimizationProblem_LinearEqualityConstraintMatrices6(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_LinearEqualityConstraintMatrices6")
@@ -1941,20 +1696,15 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices6(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_LinearEqualityConstraintMatrices7
-Description:
-
-	Tests the LinearEqualityConstraintMatrices function with a problem
-	that led to panics in the field.
-	The problem is Problem3 from our examples file.
-	The problem will have:
-	- a linear objective
-	- 3 variables,
-	- and a single linear VECTOR equality constraint (n_ineq = 1).
-	Because each variable can be positive or negative, the resulting
-	linear equality constraint matrix should have 3 rows and 3*2+n_ineq columns.
-*/
+// TestOptimizationProblem_LinearEqualityConstraintMatrices7 Tests the LinearEqualityConstraintMatrices function with a problem
+// that led to panics in the field.
+// The problem is Problem3 from our examples file.
+// The problem will have:
+// - a linear objective
+// - 3 variables,
+// - and a single linear VECTOR equality constraint (n_ineq = 1).
+// Because each variable can be positive or negative, the resulting
+// linear equality constraint matrix should have 3 rows and 3*2+n_ineq columns.
 func TestOptimizationProblem_LinearEqualityConstraintMatrices7(t *testing.T) {
 	// Constants
 	p1 := problem.GetExampleProblem3()
@@ -1992,13 +1742,8 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices7(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_LinearEqualityConstraintMatrices8
-Description:
-
-	Tests the LinearEqualityConstraintMatrices function properly produces
-	an NoEqualityConstraintsFoundError when the problem has NO equality constraints.
-*/
+// TestOptimizationProblem_LinearEqualityConstraintMatrices8 Tests the LinearEqualityConstraintMatrices function properly produces
+// an NoEqualityConstraintsFoundError when the problem has NO equality constraints.
 func TestOptimizationProblem_LinearEqualityConstraintMatrices8(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_LinearEqualityConstraintMatrices8")
@@ -2028,18 +1773,13 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices8(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_LinearEqualityConstraintMatrices9
-Description:
-
-	Tests the LinearEqualityConstraintMatrices function with a problem
-	that led to panics in the field.
-	The problem is Problem4 from our examples file.
-	The problem will have:
-	- a linear objective
-	- 3 variables (each labeled as positive via the LB input to AddVariableVectorClassic),
-	- and a single linear VECTOR equality constraint.
-*/
+// TestOptimizationProblem_LinearEqualityConstraintMatrices9 Tests the LinearEqualityConstraintMatrices function with a problem
+// that led to panics in the field.
+// The problem is Problem4 from our examples file.
+// The problem will have:
+// - a linear objective
+// - 3 variables (each labeled as positive via the LB input to AddVariableVectorClassic),
+// - and a single linear VECTOR equality constraint.
 func TestOptimizationProblem_LinearEqualityConstraintMatrices9(t *testing.T) {
 	// Constants
 	p1 := problem.GetExampleProblem4()
@@ -2077,22 +1817,17 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices9(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_LinearEqualityConstraintMatrices10
-Description:
-
-	Tests the LinearEqualityConstraintMatrices function with a problem
-	that led to panics in the field.
-	The problem is Problem4 from our examples file.
-	The problem will have:
-	- a linear objective
-	- 3 variables (each labeled as positive implicitly via the final 3 constraints),
-	- and a single linear VECTOR equality constraint.
-	The resulting problem should have 6 constraints (3 coming from inequality constraint)
-	and 3 from the positivity constraints.
-	The resulting linear equality constraint matrix should have 3 rows and 3+3 columns
-	(3 variables, 3 inequality constraints, and 3 positivity constraints).
-*/
+// TestOptimizationProblem_LinearEqualityConstraintMatrices10 Tests the LinearEqualityConstraintMatrices function with a problem
+// that led to panics in the field.
+// The problem is Problem4 from our examples file.
+// The problem will have:
+// - a linear objective
+// - 3 variables (each labeled as positive implicitly via the final 3 constraints),
+// - and a single linear VECTOR equality constraint.
+// The resulting problem should have 6 constraints (3 coming from inequality constraint)
+// and 3 from the positivity constraints.
+// The resulting linear equality constraint matrix should have 3 rows and 3+3 columns
+// (3 variables, 3 inequality constraints, and 3 positivity constraints).
 func TestOptimizationProblem_LinearEqualityConstraintMatrices10(t *testing.T) {
 	// Constants
 	p1 := problem.GetExampleProblem5()
@@ -2132,17 +1867,12 @@ func TestOptimizationProblem_LinearEqualityConstraintMatrices10(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_ToProblemWithAllPositiveVariables1
-Description:
-
-	Tests the ToProblemWithAllPositiveVariables function with a simple problem
-	that has:
-	- a constant objective
-	- 2 variables,
-	- and a single linear inequality constraint.
-	The result should be a problem with 4 variables and 1 constraint.
-*/
+// TestOptimizationProblem_ToProblemWithAllPositiveVariables1 Tests the ToProblemWithAllPositiveVariables function with a simple problem
+// that has:
+// - a constant objective
+// - 2 variables,
+// - and a single linear inequality constraint.
+// The result should be a problem with 4 variables and 1 constraint.
 func TestOptimizationProblem_ToProblemWithAllPositiveVariables1(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_ToProblemWithAllPositiveVariables1")
@@ -2183,18 +1913,13 @@ func TestOptimizationProblem_ToProblemWithAllPositiveVariables1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_ToProblemWithAllPositiveVariables2
-Description:
-
-	Tests the ToProblemWithAllPositiveVariables function with a simple problem
-	that has:
-	- a constant objective
-	- 2 variables,
-	- and two scalar linear inequality constraints.
-	One of the variables is purely positive, while the other is purely negative.
-	The result should be a problem with 2 variables and 2 constraints.
-*/
+// TestOptimizationProblem_ToProblemWithAllPositiveVariables2 Tests the ToProblemWithAllPositiveVariables function with a simple problem
+// that has:
+// - a constant objective
+// - 2 variables,
+// - and two scalar linear inequality constraints.
+// One of the variables is purely positive, while the other is purely negative.
+// The result should be a problem with 2 variables and 2 constraints.
 func TestOptimizationProblem_ToProblemWithAllPositiveVariables2(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_ToProblemWithAllPositiveVariables2")
@@ -2239,17 +1964,12 @@ func TestOptimizationProblem_ToProblemWithAllPositiveVariables2(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_ToLPStandardForm1_1
-Description:
-
-	Tests the ToLPStandardForm function with a simple problem
-	that contains:
-	- a constant objective
-	- 1 variable,
-	- and a single linear inequality constraint (SenseGreaterThanEqual).
-	The result should be a problem with 2 variables and 1 constraint.
-*/
+// TestOptimizationProblem_ToLPStandardForm1_1 Tests the ToLPStandardForm function with a simple problem
+// that contains:
+// - a constant objective
+// - 1 variable,
+// - and a single linear inequality constraint (SenseGreaterThanEqual).
+// The result should be a problem with 2 variables and 1 constraint.
 func TestOptimizationProblem_ToLPStandardForm1_1(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_1")
@@ -2294,17 +2014,12 @@ func TestOptimizationProblem_ToLPStandardForm1_1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_ToLPStandardForm1_2
-Description:
-
-	Tests the ToLPStandardForm function with a simple problem
-	that contains:
-	- a constant objective
-	- 3 variables,
-	- and a single vector linear inequality constraint (SenseGreaterThanEqual) of 5 dimensions.
-	The result should be a problem with 3*2+5 = 11 variables and 1 constraint.
-*/
+// TestOptimizationProblem_ToLPStandardForm1_2 Tests the ToLPStandardForm function with a simple problem
+// that contains:
+// - a constant objective
+// - 3 variables,
+// - and a single vector linear inequality constraint (SenseGreaterThanEqual) of 5 dimensions.
+// The result should be a problem with 3*2+5 = 11 variables and 1 constraint.
 func TestOptimizationProblem_ToLPStandardForm1_2(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_2")
@@ -2364,17 +2079,12 @@ func TestOptimizationProblem_ToLPStandardForm1_2(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_ToLPStandardForm1_3
-Description:
-
-	Tests the ToLPStandardForm function with a simple problem
-	that contains:
-	- a constant objective
-	- 3 variables,
-	- and a single vector linear inequality constraint (SenseLessThanEqual) of 5 dimensions.
-	The result should be a problem with 3*2+5 = 11 variables and 1 constraint.
-*/
+// TestOptimizationProblem_ToLPStandardForm1_3 Tests the ToLPStandardForm function with a simple problem
+// that contains:
+// - a constant objective
+// - 3 variables,
+// - and a single vector linear inequality constraint (SenseLessThanEqual) of 5 dimensions.
+// The result should be a problem with 3*2+5 = 11 variables and 1 constraint.
 func TestOptimizationProblem_ToLPStandardForm1_3(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_3")
@@ -2436,18 +2146,13 @@ func TestOptimizationProblem_ToLPStandardForm1_3(t *testing.T) {
 
 }
 
-/*
-TestOptimizationProblem_ToLPStandardForm1_4
-Description:
-
-	This test verifies that the ToLPStandardForm function throws an error
-	when called on a problem that is not linear.
-	In this case, we will define a problem with a quadratic objective function.
-	The problem will have:
-	- a quadratic objective
-	- 2 variables,
-	- and a single linear inequality constraint.
-*/
+// TestOptimizationProblem_ToLPStandardForm1_4 This test verifies that the ToLPStandardForm function throws an error
+// when called on a problem that is not linear.
+// In this case, we will define a problem with a quadratic objective function.
+// The problem will have:
+// - a quadratic objective
+// - 2 variables,
+// - and a single linear inequality constraint.
 func TestOptimizationProblem_ToLPStandardForm1_4(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_4")
@@ -2482,18 +2187,13 @@ func TestOptimizationProblem_ToLPStandardForm1_4(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_ToLPStandardForm1_5
-Description:
-
-	This test verifies that the ToLPStandardForm function throws an error
-	when called on a problem that is not linear.
-	In this case, we will define a problem with a quadratic constraint.
-	The problem will have:
-	- a constant objective
-	- 2 variables,
-	- and a single quadratic inequality constraint.
-*/
+// TestOptimizationProblem_ToLPStandardForm1_5 This test verifies that the ToLPStandardForm function throws an error
+// when called on a problem that is not linear.
+// In this case, we will define a problem with a quadratic constraint.
+// The problem will have:
+// - a constant objective
+// - 2 variables,
+// - and a single quadratic inequality constraint.
 func TestOptimizationProblem_ToLPStandardForm1_5(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_5")
@@ -2528,18 +2228,13 @@ func TestOptimizationProblem_ToLPStandardForm1_5(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_ToLPStandardForm1_6
-Description:
-
-	This test verifies that the ToLPStandardForm function properly handles
-	a simple problem with a single, scalar linear inequality constraint.
-	The problem will have:
-	- a constant objective
-	- 2 variables,
-	- and a single scalar linear inequality constraint (SenseLessThanEqual).
-	The result should be a problem with 2*2+1 = 5 variables and 1 constraint.
-*/
+// TestOptimizationProblem_ToLPStandardForm1_6 This test verifies that the ToLPStandardForm function properly handles
+// a simple problem with a single, scalar linear inequality constraint.
+// The problem will have:
+// - a constant objective
+// - 2 variables,
+// - and a single scalar linear inequality constraint (SenseLessThanEqual).
+// The result should be a problem with 2*2+1 = 5 variables and 1 constraint.
 func TestOptimizationProblem_ToLPStandardForm1_6(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_6")
@@ -2585,18 +2280,13 @@ func TestOptimizationProblem_ToLPStandardForm1_6(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_ToLPStandardForm1_7
-Description:
-
-	This test verifies that the ToLPStandardForm function properly handles
-	a simple problem with a single, scalar equality constraint.
-	The problem will have:
-	- a constant objective
-	- 2 variables,
-	- and a single scalar linear equality constraint (SenseEqual).
-	The result should be a problem with 2*2 = 4 variables and 1 constraint.
-*/
+// TestOptimizationProblem_ToLPStandardForm1_7 This test verifies that the ToLPStandardForm function properly handles
+// a simple problem with a single, scalar equality constraint.
+// The problem will have:
+// - a constant objective
+// - 2 variables,
+// - and a single scalar linear equality constraint (SenseEqual).
+// The result should be a problem with 2*2 = 4 variables and 1 constraint.
 func TestOptimizationProblem_ToLPStandardForm1_7(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_7")
@@ -2641,21 +2331,16 @@ func TestOptimizationProblem_ToLPStandardForm1_7(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_ToLPStandardForm1_8
-Description:
-
-	Tests the LinearEqualityConstraintMatrices function properly produces
-	a matrix:
-		[ 1 -1 0 0  0 0  1 0 0 ]
-	C = [ 0 0  1 -1 0 0  0 1 0 ]
-		[ 0 0  0 0  1 -1 0 0 1 ]
-	and
-		b = [ 1 2 3 ]
-	By creating a problem with 3 variables and 3 linear inequality constraints.
-	The results should produce equality constraint matrix C
-	with 3 rows and 6 columns and a vector b with 3 elements.
-*/
+// TestOptimizationProblem_ToLPStandardForm1_8 Tests the LinearEqualityConstraintMatrices function properly produces
+// a matrix:
+// [ 1 -1 0 0  0 0  1 0 0 ]
+// C = [ 0 0  1 -1 0 0  0 1 0 ]
+// [ 0 0  0 0  1 -1 0 0 1 ]
+// and
+// b = [ 1 2 3 ]
+// By creating a problem with 3 variables and 3 linear inequality constraints.
+// The results should produce equality constraint matrix C
+// with 3 rows and 6 columns and a vector b with 3 elements.
 func TestOptimizationProblem_ToLPStandardForm1_8(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_8")
@@ -2722,21 +2407,16 @@ func TestOptimizationProblem_ToLPStandardForm1_8(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_ToLPStandardForm1_9
-Description:
-
-	Tests the LinearEqualityConstraintMatrices function properly produces
-	a matrix:
-		[ 1 -1 0 0  0 0  -1 0  0 ]
-	C = [ 0 0  1 -1 0 0  0  -1 0 ]
-		[ 0 0  0 0  1 -1 0  0  -1 ]
-	and
-		b = [ -1 -2 -3 ]
-	By creating a problem with 3 variables and 3 linear inequality constraints.
-	The results should produce equality constraint matrix C
-	with 3 rows and 6 columns and a vector b with 3 elements.
-*/
+// TestOptimizationProblem_ToLPStandardForm1_9 Tests the LinearEqualityConstraintMatrices function properly produces
+// a matrix:
+// [ 1 -1 0 0  0 0  -1 0  0 ]
+// C = [ 0 0  1 -1 0 0  0  -1 0 ]
+// [ 0 0  0 0  1 -1 0  0  -1 ]
+// and
+// b = [ -1 -2 -3 ]
+// By creating a problem with 3 variables and 3 linear inequality constraints.
+// The results should produce equality constraint matrix C
+// with 3 rows and 6 columns and a vector b with 3 elements.
 func TestOptimizationProblem_ToLPStandardForm1_9(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_9")
@@ -2803,15 +2483,10 @@ func TestOptimizationProblem_ToLPStandardForm1_9(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_ToLPStandardForm1_10
-Description:
-
-	This method verifies that the method will return an error
-	if the optimization problem is not well-defined.
-	In this case, we will create a problem with a constraint
-	that has mismatched dimensions.
-*/
+// TestOptimizationProblem_ToLPStandardForm1_10 This method verifies that the method will return an error
+// if the optimization problem is not well-defined.
+// In this case, we will create a problem with a constraint
+// that has mismatched dimensions.
 func TestOptimizationProblem_ToLPStandardForm1_10(t *testing.T) {
 	// Setup
 	N := 10
@@ -2846,19 +2521,14 @@ func TestOptimizationProblem_ToLPStandardForm1_10(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_ToLPStandardForm1_11
-Description:
-
-	This method verifies that the map from original variables to
-	standard form variables is correct for a small problem.
-	In this problem, we will have:
-	- a constant objective
-	- 1 variable,
-	- and a single linear inequality constraint.
-	The resulting map should contain 1 entry, mapping the original
-	variable to the positive half and negative half variables in the standard form.
-*/
+// TestOptimizationProblem_ToLPStandardForm1_11 This method verifies that the map from original variables to
+// standard form variables is correct for a small problem.
+// In this problem, we will have:
+// - a constant objective
+// - 1 variable,
+// - and a single linear inequality constraint.
+// The resulting map should contain 1 entry, mapping the original
+// variable to the positive half and negative half variables in the standard form.
 func TestOptimizationProblem_ToLPStandardForm1_11(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_11")
@@ -2902,21 +2572,16 @@ func TestOptimizationProblem_ToLPStandardForm1_11(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_ToLPStandardForm1_12
-Description:
-
-	This method verifies that the map from original variables to
-	standard form variables is correct for a small problem.
-	In this problem, we will have:
-	- a constant objective
-	- 2 variables,
-	- and two linear inequality constraints.
-	One of the variables is purely positive, while the other is purely negative.
-	The resulting map should contain 2 entries, one mapping the purely positive
-	variable to itself, and the other mapping the purely negative variable to
-	the negative half variables in the standard form.
-*/
+// TestOptimizationProblem_ToLPStandardForm1_12 This method verifies that the map from original variables to
+// standard form variables is correct for a small problem.
+// In this problem, we will have:
+// - a constant objective
+// - 2 variables,
+// - and two linear inequality constraints.
+// One of the variables is purely positive, while the other is purely negative.
+// The resulting map should contain 2 entries, one mapping the purely positive
+// variable to itself, and the other mapping the purely negative variable to
+// the negative half variables in the standard form.
 func TestOptimizationProblem_ToLPStandardForm1_12(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm1_12")
@@ -2983,14 +2648,9 @@ func TestOptimizationProblem_ToLPStandardForm1_12(t *testing.T) {
 	// }
 }
 
-/*
-TestOptimizationProblem_CheckIfLinear1
-Description:
-
-	This test verifies that the CheckIfLinear function properly identifies
-	a NOT well-defined problem is not linear.
-	The problem will have a vector constraint with mismatched dimensions.
-*/
+// TestOptimizationProblem_CheckIfLinear1 This test verifies that the CheckIfLinear function properly identifies
+// a NOT well-defined problem is not linear.
+// The problem will have a vector constraint with mismatched dimensions.
 func TestOptimizationProblem_CheckIfLinear1(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_CheckIfLinear1")
@@ -3032,21 +2692,16 @@ func TestOptimizationProblem_CheckIfLinear1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_SimplifyConstraints1
-Description:
-
-	This test verifies that the SimplifyConstraints function properly simplifies
-	a problem with redundant constraints.
-	The problem will have:
-	- a constant objective
-	- 1 variable1,
-	- and 2 linear inequality constraints:
-		x1 <= 1
-		x1 <= 2
-	The second constraint is redundant and should be removed.
-	The result should be a problem with 1 variable and 1 constraint.
-*/
+// TestOptimizationProblem_SimplifyConstraints1 This test verifies that the SimplifyConstraints function properly simplifies
+// a problem with redundant constraints.
+// The problem will have:
+// - a constant objective
+// - 1 variable1,
+// - and 2 linear inequality constraints:
+// x1 <= 1
+// x1 <= 2
+// The second constraint is redundant and should be removed.
+// The result should be a problem with 1 variable and 1 constraint.
 func TestOptimizationProblem_SimplifyConstraints1(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_SimplifyConstraints1")
@@ -3093,18 +2748,13 @@ func TestOptimizationProblem_SimplifyConstraints1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_SimplifyConstraints2
-Description:
-
-	This test verifies that the SimplifyConstraints function properly handles
-	a problem with no constraints.
-	The problem will have:
-	- a constant objective
-	- 1 variable,
-	- and no constraints.
-	The result should be a problem with 1 variable and no constraints.
-*/
+// TestOptimizationProblem_SimplifyConstraints2 This test verifies that the SimplifyConstraints function properly handles
+// a problem with no constraints.
+// The problem will have:
+// - a constant objective
+// - 1 variable,
+// - and no constraints.
+// The result should be a problem with 1 variable and no constraints.
 func TestOptimizationProblem_SimplifyConstraints2(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_SimplifyConstraints2")
@@ -3134,18 +2784,13 @@ func TestOptimizationProblem_SimplifyConstraints2(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_SimplifyConstraints3
-Description:
-
-	This test verifies that the SimplifyConstraints function properly handles
-	a problem with a single constraint that is not redundant.
-	The problem will have:
-	- a constant objective
-	- 1 variable,
-	- and a single linear inequality constraint.
-	The result should be a problem with 1 variable and 1 constraint.
-*/
+// TestOptimizationProblem_SimplifyConstraints3 This test verifies that the SimplifyConstraints function properly handles
+// a problem with a single constraint that is not redundant.
+// The problem will have:
+// - a constant objective
+// - 1 variable,
+// - and a single linear inequality constraint.
+// The result should be a problem with 1 variable and 1 constraint.
 func TestOptimizationProblem_SimplifyConstraints3(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_SimplifyConstraints3")
@@ -3190,19 +2835,14 @@ func TestOptimizationProblem_SimplifyConstraints3(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_ToLPStandardForm2_1
-Description:
-
-	Tests the ToLPStandardForm2 function with a simple problem
-	that contains:
-	- a linear objective,
-	- a MINIMIZATION sense
-	- 1 variable,
-	- and a single linear inequality constraint (SenseGreaterThanEqual).
-	The result should be a problem with 2 variables and 1 constraint.
-	The sense of the resulting problem should be MAXIMIZATION.
-*/
+// TestOptimizationProblem_ToLPStandardForm2_1 Tests the ToLPStandardForm2 function with a simple problem
+// that contains:
+// - a linear objective,
+// - a MINIMIZATION sense
+// - 1 variable,
+// - and a single linear inequality constraint (SenseGreaterThanEqual).
+// The result should be a problem with 2 variables and 1 constraint.
+// The sense of the resulting problem should be MAXIMIZATION.
 func TestOptimizationProblem_ToLPStandardForm2_1(t *testing.T) {
 	// Constants
 	p1 := problem.NewProblem("TestOptimizationProblem_ToLPStandardForm2_1")
@@ -3253,16 +2893,11 @@ func TestOptimizationProblem_ToLPStandardForm2_1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_CopyVariable1
-Description:
-
-	This method tests that the CopyVariable method for OptimizationProblem
-	properly creates a copy of one variable in an optimization problem.
-	Check that:
-	- the new variable has a different ID than the one that is copied
-	- the new variable has a slightly different name than the one that is copied
-*/
+// TestOptimizationProblem_CopyVariable1 This method tests that the CopyVariable method for OptimizationProblem
+// properly creates a copy of one variable in an optimization problem.
+// Check that:
+// - the new variable has a different ID than the one that is copied
+// - the new variable has a slightly different name than the one that is copied
 func TestOptimizationProblem_CopyVariable1(t *testing.T) {
 	p1 := problem.NewProblem("TestOptimizationProblem_CopyVariable1")
 	v1 := p1.AddVariable()
@@ -3287,16 +2922,11 @@ func TestOptimizationProblem_CopyVariable1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_String1
-Description:
-
-	Tests that a small optimization problem with all scalar constraints gets represented
-	as a string with:
-	- Minimize sense of objective
-	- The objective expression is completely contained in the string
-	- the string describes that there are 0 vector constraints and 0 matrix constraints
-*/
+// TestOptimizationProblem_String1 Tests that a small optimization problem with all scalar constraints gets represented
+// as a string with:
+// - Minimize sense of objective
+// - The objective expression is completely contained in the string
+// - the string describes that there are 0 vector constraints and 0 matrix constraints
 func TestOptimizationProblem_String1(t *testing.T) {
 	// Create Optimization Problem
 	p := problem.NewProblem("TestOptimizationProblem_String1")
@@ -3340,15 +2970,10 @@ func TestOptimizationProblem_String1(t *testing.T) {
 	}
 }
 
-/*
-TestOptimizationProblem_String2
-Description:
-
-	Tests that a small optimization problem with all scalar constraints gets represented
-	as a string with:
-	- Maximize sense of objective
-	- the string describes that there are 2 vector constraints and 1 matrix constraints
-*/
+// TestOptimizationProblem_String2 Tests that a small optimization problem with all scalar constraints gets represented
+// as a string with:
+// - Maximize sense of objective
+// - the string describes that there are 2 vector constraints and 1 matrix constraints
 func TestOptimizationProblem_String2(t *testing.T) {
 	// Create Optimization Problem
 	p := problem.NewProblem("TestOptimizationProblem_String1")

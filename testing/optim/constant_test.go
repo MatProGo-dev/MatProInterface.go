@@ -8,18 +8,9 @@ import (
 	"testing"
 )
 
-/*
-constant_test.go
-Description:
-	Test for the functions of the constant class for MatProInterface.go.
-*/
+// Test for the functions of the constant class for MatProInterface.go.
 
-/*
-TestK_K1
-Description:
-
-	Tests the ability to convert a float to a variable of type K
-*/
+// TestK_K1 Tests the ability to convert a float to a variable of type K
 func TestK_K1(t *testing.T) {
 	c1 := 2.1
 	c2 := optim.K(3.2)
@@ -33,12 +24,7 @@ func TestK_K1(t *testing.T) {
 	}
 }
 
-/*
-TestK_Variables1
-Description:
-
-	Tests the method for extracting variables from the constant K.
-*/
+// TestK_Variables1 Tests the method for extracting variables from the constant K.
 func TestK_Variables1(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -50,12 +36,7 @@ func TestK_Variables1(t *testing.T) {
 	}
 }
 
-/*
-TestK_NumVars1
-Description:
-
-	Tests the method for extracting variables from the constant K.
-*/
+// TestK_NumVars1 Tests the method for extracting variables from the constant K.
 func TestK_NumVars1(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -70,13 +51,8 @@ func TestK_NumVars1(t *testing.T) {
 	}
 }
 
-/*
-TestK_IDs1
-Description:
-
-	Tests the method for extracting IDs of variables in the constant K.
-	There should be no such ids available.
-*/
+// TestK_IDs1 Tests the method for extracting IDs of variables in the constant K.
+// There should be no such ids available.
 func TestK_IDs1(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -91,12 +67,7 @@ func TestK_IDs1(t *testing.T) {
 	}
 }
 
-/*
-TestK_Coeffs1
-Description:
-
-	Tests the method for extracting coefficients of the constant K.
-*/
+// TestK_Coeffs1 Tests the method for extracting coefficients of the constant K.
 func TestK_Coeffs1(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -111,12 +82,7 @@ func TestK_Coeffs1(t *testing.T) {
 	}
 }
 
-/*
-TestK_Constant1
-Description:
-
-	Tests the method for extracting the constant of the constant K.
-*/
+// TestK_Constant1 Tests the method for extracting the constant of the constant K.
 func TestK_Constant1(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -131,12 +97,7 @@ func TestK_Constant1(t *testing.T) {
 	}
 }
 
-/*
-TestK_Plus1
-Description:
-
-	Tests the addition operator of a constant with another expression.
-*/
+// TestK_Plus1 Tests the addition operator of a constant with another expression.
 func TestK_Plus1(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -160,12 +121,7 @@ func TestK_Plus1(t *testing.T) {
 	}
 }
 
-/*
-TestK_Plus2
-Description:
-
-	Tests the addition operator of a constant with a variable.
-*/
+// TestK_Plus2 Tests the addition operator of a constant with a variable.
 func TestK_Plus2(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -205,12 +161,7 @@ func TestK_Plus2(t *testing.T) {
 	}
 }
 
-/*
-TestK_Plus3
-Description:
-
-	Tests the addition operator of a constant with a scalar linear expression.
-*/
+// TestK_Plus3 Tests the addition operator of a constant with a scalar linear expression.
 func TestK_Plus3(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -258,12 +209,7 @@ func TestK_Plus3(t *testing.T) {
 	}
 }
 
-/*
-TestK_Plus4
-Description:
-
-	Tests the addition operator of a constant with a scalar quadratic expression.
-*/
+// TestK_Plus4 Tests the addition operator of a constant with a scalar quadratic expression.
 func TestK_Plus4(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -322,12 +268,7 @@ func TestK_Plus4(t *testing.T) {
 	}
 }
 
-/*
-TestK_Plus5
-Description:
-
-	Tests the addition operator of a constant with an error.
-*/
+// TestK_Plus5 Tests the addition operator of a constant with an error.
 func TestK_Plus5(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -346,12 +287,7 @@ func TestK_Plus5(t *testing.T) {
 
 }
 
-/*
-TestK_Plus6
-Description:
-
-	Tests the addition operator of a constant with a constant but with an optional error included.
-*/
+// TestK_Plus6 Tests the addition operator of a constant with a constant but with an optional error included.
 func TestK_Plus6(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -371,12 +307,7 @@ func TestK_Plus6(t *testing.T) {
 
 }
 
-/*
-TestK_LessEq1
-Description:
-
-	Tests the ability to create constraints using a constant and a variable.
-*/
+// TestK_LessEq1 Tests the ability to create constraints using a constant and a variable.
 func TestK_LessEq1(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -407,12 +338,7 @@ func TestK_LessEq1(t *testing.T) {
 	}
 }
 
-/*
-TestK_GreaterEq1
-Description:
-
-	Tests the ability to create constraints using a constant and a scalar linear expression.
-*/
+// TestK_GreaterEq1 Tests the ability to create constraints using a constant and a scalar linear expression.
 func TestK_GreaterEq1(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -456,12 +382,7 @@ func TestK_GreaterEq1(t *testing.T) {
 	}
 }
 
-/*
-TestK_Eq1
-Description:
-
-	Tests the ability to create constraints using a constant and a scalar linear expression.
-*/
+// TestK_Eq1 Tests the ability to create constraints using a constant and a scalar linear expression.
 func TestK_Eq1(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -504,12 +425,7 @@ func TestK_Eq1(t *testing.T) {
 	}
 }
 
-/*
-TestK_Comparison1
-Description:
-
-	Tests the comparison method's error handling properties.
-*/
+// TestK_Comparison1 Tests the comparison method's error handling properties.
 func TestK_Comparison1(t *testing.T) {
 	// Constants
 	k1 := optim.K(2.3)
@@ -531,13 +447,8 @@ func TestK_Comparison1(t *testing.T) {
 
 }
 
-/*
-TestK_Comparison2
-Description:
-
-	Tests the comparison method's error handling properties
-	with nil error.
-*/
+// TestK_Comparison2 Tests the comparison method's error handling properties
+// with nil error.
 func TestK_Comparison2(t *testing.T) {
 	// Constants
 	k1 := optim.K(2.3)
@@ -552,12 +463,7 @@ func TestK_Comparison2(t *testing.T) {
 
 }
 
-/*
-TestK_Comparison3
-Description:
-
-	Tests the comparison method's error handling properties.
-*/
+// TestK_Comparison3 Tests the comparison method's error handling properties.
 func TestK_Comparison3(t *testing.T) {
 	// Constants
 	k1 := optim.K(2.3)
@@ -581,12 +487,7 @@ func TestK_Comparison3(t *testing.T) {
 
 }
 
-/*
-TestK_Multiply1
-Description:
-
-	Tests the ability to multiply a constant with another constant.
-*/
+// TestK_Multiply1 Tests the ability to multiply a constant with another constant.
 func TestK_Multiply1(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -612,12 +513,7 @@ func TestK_Multiply1(t *testing.T) {
 	}
 }
 
-/*
-TestK_Multiply2
-Description:
-
-	Tests the ability to multiply a constant with a variable.
-*/
+// TestK_Multiply2 Tests the ability to multiply a constant with a variable.
 func TestK_Multiply2(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -653,12 +549,7 @@ func TestK_Multiply2(t *testing.T) {
 	}
 }
 
-/*
-TestK_Multiply3
-Description:
-
-	Tests the ability to multiply a constant with a scalar linear expression.
-*/
+// TestK_Multiply3 Tests the ability to multiply a constant with a scalar linear expression.
 func TestK_Multiply3(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -701,12 +592,7 @@ func TestK_Multiply3(t *testing.T) {
 	}
 }
 
-/*
-TestK_Multiply4
-Description:
-
-	Tests the ability to multiply a constant with a scalar linear expression.
-*/
+// TestK_Multiply4 Tests the ability to multiply a constant with a scalar linear expression.
 func TestK_Multiply4(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -766,13 +652,8 @@ func TestK_Multiply4(t *testing.T) {
 	}
 }
 
-/*
-TestK_Multiply5
-Description:
-
-	Tests the ability to multiply a constant with another constant,
-	but with a bad error.
-*/
+// TestK_Multiply5 Tests the ability to multiply a constant with another constant,
+// but with a bad error.
 func TestK_Multiply5(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -794,12 +675,7 @@ func TestK_Multiply5(t *testing.T) {
 
 }
 
-/*
-TestK_Multiply6
-Description:
-
-	Tests the ability to multiply a constant with a constant vector.
-*/
+// TestK_Multiply6 Tests the ability to multiply a constant with a constant vector.
 func TestK_Multiply6(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -820,12 +696,7 @@ func TestK_Multiply6(t *testing.T) {
 
 }
 
-/*
-TestK_Multiply7
-Description:
-
-Tests the ability to multiply a constant with a float.
-*/
+// TestK_Multiply7 Tests the ability to multiply a constant with a float.
 func TestK_Multiply7(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -851,12 +722,7 @@ func TestK_Multiply7(t *testing.T) {
 	}
 }
 
-/*
-TestK_Multiply8
-Description:
-
-Tests the ability to multiply a constant with a float.
-*/
+// TestK_Multiply8 Tests the ability to multiply a constant with a float.
 func TestK_Multiply8(t *testing.T) {
 	// Constants
 	c1 := optim.K(3.14)
@@ -882,12 +748,7 @@ func TestK_Multiply8(t *testing.T) {
 	}
 }
 
-/*
-TestK_Multiply9
-Description:
-
-Tests the ability to multiply a constant with a KVectorTranspose.
-*/
+// TestK_Multiply9 Tests the ability to multiply a constant with a KVectorTranspose.
 func TestK_Multiply9(t *testing.T) {
 	// Constants
 	N := 3
@@ -921,13 +782,8 @@ func TestK_Multiply9(t *testing.T) {
 	}
 }
 
-/*
-TestK_Multiply10
-Description:
-
-	Tests the ability to multiply a constant with a VarVector
-	of non-unit length.
-*/
+// TestK_Multiply10 Tests the ability to multiply a constant with a VarVector
+// of non-unit length.
 func TestK_Multiply10(t *testing.T) {
 	// Constants
 	m := optim.NewModel("TestK_Multiply10")
@@ -954,13 +810,8 @@ func TestK_Multiply10(t *testing.T) {
 	}
 }
 
-/*
-TestK_Multiply11
-Description:
-
-	Tests the ability to multiply a constant with a VarVector
-	of unit length.
-*/
+// TestK_Multiply11 Tests the ability to multiply a constant with a VarVector
+// of unit length.
 func TestK_Multiply11(t *testing.T) {
 	// Constants
 	m := optim.NewModel("TestK_Multiply10")
@@ -985,13 +836,8 @@ func TestK_Multiply11(t *testing.T) {
 	}
 }
 
-/*
-TestK_Multiply12
-Description:
-
-	Tests the multiplication of a constant with a
-	non-unit VarVectorTranspose.
-*/
+// TestK_Multiply12 Tests the multiplication of a constant with a
+// non-unit VarVectorTranspose.
 func TestK_Multiply12(t *testing.T) {
 	// Constants
 	m := optim.NewModel("TestK_Multiply11")
@@ -1038,13 +884,8 @@ func TestK_Multiply12(t *testing.T) {
 	}
 }
 
-/*
-TestK_Multiply13
-Description:
-
-	Tests the multiplication of a constant with a
-	non-unit VarVectorTranspose.
-*/
+// TestK_Multiply13 Tests the multiplication of a constant with a
+// non-unit VarVectorTranspose.
 func TestK_Multiply13(t *testing.T) {
 	// Constants
 	m := optim.NewModel("TestK_Multiply13")
@@ -1084,12 +925,7 @@ func TestK_Multiply13(t *testing.T) {
 	}
 }
 
-/*
-TestK_Check1
-Description:
-
-	Tests that the Check() method returns nil as expected.
-*/
+// TestK_Check1 Tests that the Check() method returns nil as expected.
 func TestK_Check1(t *testing.T) {
 	// Constants
 	k1 := optim.K(3.14)

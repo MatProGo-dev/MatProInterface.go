@@ -29,21 +29,17 @@ func NewProblem(name string) *OptimizationProblem {
 	return &OptimizationProblem{Name: name}
 }
 
-/*
-This method adds an "unbounded" continuous variable to the model.
-*/
+// AddVariable This method adds an "unbounded" continuous variable to the model.
 func (op *OptimizationProblem) AddVariable() symbolic.Variable {
 	return op.AddRealVariable()
 }
 
-/*
-Adds a Real variable to the model and returns said variable.
-*/
+// AddRealVariable Adds a Real variable to the model and returns said variable.
 func (op *OptimizationProblem) AddRealVariable() symbolic.Variable {
 	return op.AddVariableClassic(-optim.INFINITY, optim.INFINITY, symbolic.Continuous)
 }
 
-// AddVariable adds a variable of a given variable type to the model given the lower
+// AddVariableClassic AddVariable adds a variable of a given variable type to the model given the lower
 // and upper value limits. This variable is returned.
 func (op *OptimizationProblem) AddVariableClassic(lower, upper float64, vtype symbolic.VarType) symbolic.Variable {
 	id := uint64(len(op.Variables))
@@ -59,15 +55,13 @@ func (op *OptimizationProblem) AddVariableClassic(lower, upper float64, vtype sy
 	return newVar
 }
 
-// AddBinaryVar adds a binary variable to the model and returns said variable.
+// AddBinaryVariable AddBinaryVar adds a binary variable to the model and returns said variable.
 func (op *OptimizationProblem) AddBinaryVariable() symbolic.Variable {
 	return op.AddVariableClassic(0, 1, symbolic.Binary)
 }
 
-/*
-Creates a VarVector object using a constructor that assumes you want an "unbounded" vector of real optimization
-variables.
-*/
+// AddVariableVector Creates a VarVector object using a constructor that assumes you want an "unbounded" vector of real optimization
+// variables.
 func (op *OptimizationProblem) AddVariableVector(dim int) symbolic.VariableVector {
 	// Constants
 
@@ -79,9 +73,7 @@ func (op *OptimizationProblem) AddVariableVector(dim int) symbolic.VariableVecto
 	return varSlice
 }
 
-/*
-The classic version of AddVariableVector defined in the original goop.
-*/
+// AddVariableVectorClassic The classic version of AddVariableVector defined in the original goop.
 func (op *OptimizationProblem) AddVariableVectorClassic(
 	num int, lower, upper float64, vtype symbolic.VarType,
 ) symbolic.VariableVector {
@@ -128,14 +120,12 @@ func (op *OptimizationProblem) AddBinaryVariableMatrix(rows, cols int) [][]symbo
 	return op.AddVariableMatrix(rows, cols, 0, 1, symbolic.Binary)
 }
 
-/*
-Sets the objective of the model given an expression and
-objective sense.
-
-Notes:
-	To make this function easier to parse, we will assume an expression
-	is given, even though objectives are normally scalars.
-*/
+// Sets the objective of the model given an expression and
+// objective sense.
+//
+// Notes:
+// To make this function easier to parse, we will assume an expression
+// is given, even though objectives are normally scalars.
 
 func (op *OptimizationProblem) SetObjective(e symbolic.Expression, sense ObjSense) error {
 	// Input Processing
@@ -149,9 +139,7 @@ func (op *OptimizationProblem) SetObjective(e symbolic.Expression, sense ObjSens
 	return nil
 }
 
-/*
-Converts a constraint in the form of a optim.Constraint object into a symbolic.Constraint object.
-*/
+// ToSymbolicConstraint Converts a constraint in the form of a optim.Constraint object into a symbolic.Constraint object.
 func ToSymbolicConstraint(inputConstraint optim.Constraint) (symbolic.Constraint, error) {
 	// Input Processing
 
@@ -190,9 +178,7 @@ func ToSymbolicConstraint(inputConstraint optim.Constraint) (symbolic.Constraint
 
 }
 
-/*
-Converts the given input into an optimization problem.
-*/
+// From Converts the given input into an optimization problem.
 func From(inputModel optim.Model) (*OptimizationProblem, error) {
 	// Create a new optimization problem
 	newOptimProblem := NewProblem(inputModel.Name)
@@ -253,9 +239,7 @@ func From(inputModel optim.Model) (*OptimizationProblem, error) {
 
 }
 
-/*
-Checks that the OptimizationProblem is valid.
-*/
+// Check Checks that the OptimizationProblem is valid.
 func (op *OptimizationProblem) Check() error {
 	// Check Objective
 	if op.Objective == (Objective{}) {
@@ -287,12 +271,10 @@ func (op *OptimizationProblem) Check() error {
 	return nil
 }
 
-/*
-Checks if the optimization problem is linear.
-Per the definition of a linear optimization problem, the problem is linear if and only if:
-1. The objective function is linear (i.e., a constant or an affine combination of variables).
-2. All constraints are linear (i.e., an affine combination of variables in an inequality or equality).
-*/
+// IsLinear Checks if the optimization problem is linear.
+// Per the definition of a linear optimization problem, the problem is linear if and only if:
+// 1. The objective function is linear (i.e., a constant or an affine combination of variables).
+// 2. All constraints are linear (i.e., an affine combination of variables in an inequality or equality).
 func (op *OptimizationProblem) IsLinear() bool {
 	// Run the check method
 	err := op.CheckIfLinear()
@@ -320,13 +302,11 @@ func (op *OptimizationProblem) IsLinear() bool {
 	return true
 }
 
-/*
-Returns the linear INEQUALITY constraint matrices and vectors.
-For all linear inequality constraints, we assemble them into the form:
-	Ax <= b
-Where A is the matrix of coefficients, x is the vector of variables, and b is the vector of constants.
-We return A and b.
-*/
+// LinearInequalityConstraintMatrices Returns the linear INEQUALITY constraint matrices and vectors.
+// For all linear inequality constraints, we assemble them into the form:
+// Ax <= b
+// Where A is the matrix of coefficients, x is the vector of variables, and b is the vector of constants.
+// We return A and b.
 func (op *OptimizationProblem) LinearInequalityConstraintMatrices() (symbolic.KMatrix, symbolic.KVector, error) {
 	// Setup
 
@@ -423,13 +403,11 @@ func (op *OptimizationProblem) LinearInequalityConstraintMatrices() (symbolic.KM
 	return AOut.(symbolic.KMatrix), bOut.(symbolic.KVector), nil
 }
 
-/*
-Returns the linear EQUALITY constraint matrices and vectors.
-For all linear equality constraints, we assemble them into the form:
-	Cx = d
-Where C is the matrix of coefficients, x is the vector of variables, and d is the vector of constants.
-We return C and d.
-*/
+// LinearEqualityConstraintMatrices Returns the linear EQUALITY constraint matrices and vectors.
+// For all linear equality constraints, we assemble them into the form:
+// Cx = d
+// Where C is the matrix of coefficients, x is the vector of variables, and d is the vector of constants.
+// We return C and d.
 func (op *OptimizationProblem) LinearEqualityConstraintMatrices() (symbolic.KMatrix, symbolic.KVector, error) {
 	// Setup
 
@@ -535,14 +513,12 @@ func (op *OptimizationProblem) LinearEqualityConstraintMatrices() (symbolic.KMat
 	return COut2, dOut2, nil
 }
 
-/*
-Transforms the given optimization problem into a new optimization problem
-that only contains positive variables.
-In math, this means that we will create two new variables (x_+ and x_-) for each
-original variable (x), one for the positive part and one for the negative part.
-Then, we replace every instance of the original variable with the difference
-of the two new variables (x = x_+ - x_-).
-*/
+// ToProblemWithAllPositiveVariables Transforms the given optimization problem into a new optimization problem
+// that only contains positive variables.
+// In math, this means that we will create two new variables (x_+ and x_-) for each
+// original variable (x), one for the positive part and one for the negative part.
+// Then, we replace every instance of the original variable with the difference
+// of the two new variables (x = x_+ - x_-).
 func (op *OptimizationProblem) ToProblemWithAllPositiveVariables() (*OptimizationProblem, map[symbolic.Variable]symbolic.Expression, error) {
 	// Setup
 	newProblem := NewProblem(op.Name + " (All Positive Variables)")
@@ -609,25 +585,23 @@ func (op *OptimizationProblem) ToProblemWithAllPositiveVariables() (*Optimizatio
 	return newProblem, mapFromOriginalVariablesToNewExpressions, nil
 }
 
-/*
-Transforms the given linear program (represented in an OptimizationProblem object)
-into a standard form (i.e., only linear equality constraints and a linear objective function).
-
-	sense c^T * x
-	subject to
-	A * x = b
-	x >= 0
-
-Where A is a matrix of coefficients, b is a vector of constants, and c is the vector of coefficients
-for the objective function. This method also returns the slack variables (i.e., the variables that
-are added to the problem to convert the inequalities into equalities).
-
-Note:
-
-	This method will transform the vector or matrix constraints in the input problem
-	into a set of scalar constraints. Thus, the number of constraints in your problem may
-	"seem" to change.
-*/
+// ToLPStandardForm1 Transforms the given linear program (represented in an OptimizationProblem object)
+// into a standard form (i.e., only linear equality constraints and a linear objective function).
+//
+// sense c^T * x
+// subject to
+// A * x = b
+// x >= 0
+//
+// Where A is a matrix of coefficients, b is a vector of constants, and c is the vector of coefficients
+// for the objective function. This method also returns the slack variables (i.e., the variables that
+// are added to the problem to convert the inequalities into equalities).
+//
+// Note:
+//
+// This method will transform the vector or matrix constraints in the input problem
+// into a set of scalar constraints. Thus, the number of constraints in your problem may
+// "seem" to change.
 func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem, []symbolic.Variable, map[symbolic.Variable]symbolic.Expression, error) {
 	// Input Processing
 	err := problemIn.Check()
@@ -744,22 +718,20 @@ func (problemIn *OptimizationProblem) ToLPStandardForm1() (*OptimizationProblem,
 	return problemInStandardForm, slackVariables, originalVariablesToNewVariables, nil
 }
 
-/*
-Transforms the given linear program (represented in an OptimizationProblem object)
-into a standard form (i.e., only linear equality constraints and a linear objective function).
-
-	max c^T * x
-	subject to
-	A * x = b
-	x >= 0
-
-Where:
-- A is a matrix of coefficients,
-- b is a vector of constants, and
-- c is the vector of coefficients for the objective function.
-This method also returns the slack variables (i.e., the variables that
-are added to the problem to convert the inequalities into equalities).
-*/
+// ToLPStandardForm2 Transforms the given linear program (represented in an OptimizationProblem object)
+// into a standard form (i.e., only linear equality constraints and a linear objective function).
+//
+// max c^T * x
+// subject to
+// A * x = b
+// x >= 0
+//
+// Where:
+// - A is a matrix of coefficients,
+// - b is a vector of constants, and
+// - c is the vector of coefficients for the objective function.
+// This method also returns the slack variables (i.e., the variables that
+// are added to the problem to convert the inequalities into equalities).
 func (problemIn *OptimizationProblem) ToLPStandardForm2() (*OptimizationProblem, []symbolic.Variable, map[symbolic.Variable]symbolic.Expression, error) {
 	// Input Processing
 	err := problemIn.Check()
@@ -789,14 +761,12 @@ func (problemIn *OptimizationProblem) ToLPStandardForm2() (*OptimizationProblem,
 	return problemInStandardForm, slackVariables, originalVariablesToNewVariables, nil
 }
 
-/*
-Returns a new optimization problem that is the same as the original problem
-but with all constraints of the following form removed:
-	x >= 0
-	0 <= x
-Where x is a variable in the problem.
-This is useful for removing redundant constraints that are already implied by the variable bounds.
-*/
+// WithAllPositiveVariableConstraintsRemoved Returns a new optimization problem that is the same as the original problem
+// but with all constraints of the following form removed:
+// x >= 0
+// 0 <= x
+// Where x is a variable in the problem.
+// This is useful for removing redundant constraints that are already implied by the variable bounds.
 func (op *OptimizationProblem) WithAllPositiveVariableConstraintsRemoved() *OptimizationProblem {
 	// Setup
 	newProblem := NewProblem(op.Name)
@@ -825,10 +795,8 @@ func (op *OptimizationProblem) WithAllPositiveVariableConstraintsRemoved() *Opti
 	return newProblem
 }
 
-/*
-Checks the current optimization problem to see if it is linear.
-Returns an error if the problem is not linear.
-*/
+// CheckIfLinear Checks the current optimization problem to see if it is linear.
+// Returns an error if the problem is not linear.
 func (op *OptimizationProblem) CheckIfLinear() error {
 	// Input Processing
 	// Verify that the problem is well-formed
@@ -865,10 +833,8 @@ func (op *OptimizationProblem) CheckIfLinear() error {
 	return nil
 }
 
-/*
-Creates a deep copy of the given variable within
-the optimization problem.
-*/
+// CopyVariable Creates a deep copy of the given variable within
+// the optimization problem.
 func (op *OptimizationProblem) CopyVariable(variable symbolic.Variable) symbolic.Variable {
 	// Setup
 	newVariable := variable
@@ -888,9 +854,7 @@ func (op *OptimizationProblem) CopyVariable(variable symbolic.Variable) symbolic
 	return newVariable
 }
 
-/*
-Returns a deep copy of the optimization problem.
-*/
+// Copy Returns a deep copy of the optimization problem.
 func (op *OptimizationProblem) Copy() *OptimizationProblem {
 	// Setup
 	newProblem := NewProblem(op.Name)
@@ -915,9 +879,7 @@ func (op *OptimizationProblem) Copy() *OptimizationProblem {
 	return newProblem
 }
 
-/*
-This method simplifies the constraints of the optimization problem by removing redundant constraints.
-*/
+// SimplifyConstraints This method simplifies the constraints of the optimization problem by removing redundant constraints.
 func (op *OptimizationProblem) SimplifyConstraints() {
 	// Setup
 	newConstraints := make([]symbolic.Constraint, 0)
@@ -945,9 +907,7 @@ func (op *OptimizationProblem) MakeNotWellDefinedError() ope.NotWellDefinedError
 	}
 }
 
-/*
-Creates a string for the problem.
-*/
+// String Creates a string for the problem.
 func (op *OptimizationProblem) String() string {
 	// Create string for the objective
 	objString := fmt.Sprintf("\n%v\n\t%v\n", op.Objective.Sense, op.Objective.Expression)
@@ -982,18 +942,14 @@ func (op *OptimizationProblem) String() string {
 	return objString + constraintsString
 }
 
-/*
-Returns the name of the optimization problem.
-(Necessary for implementing the symbolic.Environment interface).
-*/
+// GetName Returns the name of the optimization problem.
+// (Necessary for implementing the symbolic.Environment interface).
 func (op *OptimizationProblem) GetName() string {
 	return op.Name
 }
 
-/*
-Adds the given variable to the optimization problem if it is not already present.
-Returns true if the variable was added, false if it was already present.
-*/
+// TrackVariable Adds the given variable to the optimization problem if it is not already present.
+// Returns true if the variable was added, false if it was already present.
 func (op *OptimizationProblem) TrackVariable(v symbolic.Variable) bool {
 	// Check if the variable is already present
 	for _, variable := range op.Variables {
@@ -1007,10 +963,8 @@ func (op *OptimizationProblem) TrackVariable(v symbolic.Variable) bool {
 	return true
 }
 
-/*
-Returns a slice of all variables that are tracked by the optimization problem.
-(Necessary for implementing the symbolic.Environment interface).
-*/
+// AllTrackedVariables Returns a slice of all variables that are tracked by the optimization problem.
+// (Necessary for implementing the symbolic.Environment interface).
 func (op *OptimizationProblem) AllTrackedVariables() []symbolic.Variable {
 	return op.Variables
 }

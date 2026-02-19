@@ -1,10 +1,6 @@
 package optim
 
-/*
-vector_constraint_test.go
-Description:
-	A set of tests for the class VectorConstraint and its associated methods.
-*/
+// A set of tests for the class VectorConstraint and its associated methods.
 
 import (
 	"fmt"
@@ -13,13 +9,8 @@ import (
 	"testing"
 )
 
-/*
-TestVectorConstraint_Check1
-Description:
-
-	Checks to see whether or not a bad vector constraint is good or not.
-	Provide a vector constraint that contains a slightly bad expression (length of one expression is different than the other).
-*/
+// TestVectorConstraint_Check1 Checks to see whether or not a bad vector constraint is good or not.
+// Provide a vector constraint that contains a slightly bad expression (length of one expression is different than the other).
 func TestVectorConstraint_Check1(t *testing.T) {
 	// Constants
 	dim := 4
@@ -50,13 +41,8 @@ func TestVectorConstraint_Check1(t *testing.T) {
 	}
 }
 
-/*
-TestVectorConstraint_Check2
-Description:
-
-	This function checks whether or not a good vector constraint is good or not.
-	All dimensions of the vectors in the constraint should match.
-*/
+// TestVectorConstraint_Check2 This function checks whether or not a good vector constraint is good or not.
+// All dimensions of the vectors in the constraint should match.
 func TestVectorConstraint_Check2(t *testing.T) {
 	// Constants
 	dim := 4
@@ -81,12 +67,7 @@ func TestVectorConstraint_Check2(t *testing.T) {
 
 }
 
-/*
-TestVectorConstraint_AtVec1
-Description:
-
-	Tests whether or not the function AtVec() throws an error properly if given a bad expression to use AtVec on.
-*/
+// TestVectorConstraint_AtVec1 Tests whether or not the function AtVec() throws an error properly if given a bad expression to use AtVec on.
 func TestVectorConstraint_AtVec1(t *testing.T) {
 	// Constants
 	dim := 4
@@ -127,12 +108,7 @@ func TestVectorConstraint_AtVec1(t *testing.T) {
 	}
 }
 
-/*
-TestVectorConstraint_AtVec2
-Description:
-
-	Tests whether or not the function AtVec() throws an error properly if given a bad index to the AtVec function.
-*/
+// TestVectorConstraint_AtVec2 Tests whether or not the function AtVec() throws an error properly if given a bad index to the AtVec function.
 func TestVectorConstraint_AtVec2(t *testing.T) {
 	// Constants
 	dim := 4
@@ -172,12 +148,7 @@ func TestVectorConstraint_AtVec2(t *testing.T) {
 	}
 }
 
-/*
-TestVectorConstraint_AtVec3
-Description:
-
-	Tests whether or not the function AtVec() doesn't throw an error when properly accessing a well-structured vector constraint.
-*/
+// TestVectorConstraint_AtVec3 Tests whether or not the function AtVec() doesn't throw an error when properly accessing a well-structured vector constraint.
 func TestVectorConstraint_AtVec3(t *testing.T) {
 	// Constants
 	dim := 4
