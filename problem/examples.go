@@ -6,22 +6,18 @@ import (
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 )
 
-/*
-GetExampleProblem3
-Description:
-
-	Returns the LP from this youtube video:
-		https://www.youtube.com/watch?v=QAR8zthQypc&t=483s
-	It should look like this:
-		Maximize	4 x1 + 3 x2 + 5 x3
-		Subject to
-			x1 + 2 x2 + 2 x3 <= 4
-			3 x1 + 4 x3 <= 6
-			2 x1 + x2 + 4 x3 <= 8
-			x1 >= -1.0
-			x2 >= -1.0
-			x3 >= -1.0
-*/
+// GetExampleProblem3 Returns the LP from this YouTube video:
+// https://www.youtube.com/watch?v=QAR8zthQypc&t=483s
+//
+// It should look like this:
+// Maximize	4 x1 + 3 x2 + 5 x3
+// Subject to
+// 	x1 + 2 x2 + 2 x3 <= 4
+// 	3 x1 + 4 x3 <= 6
+// 	2 x1 + x2 + 4 x3 <= 8
+// 	x1 >= -1.0
+// 	x2 >= -1.0
+// 	x3 >= -1.0
 func GetExampleProblem3() *OptimizationProblem {
 	// Setup
 	out := NewProblem("TestProblem3")
@@ -61,22 +57,18 @@ func GetExampleProblem3() *OptimizationProblem {
 	return out
 }
 
-/*
-GetExampleProblem4
-Description:
-
-	Returns the LP from this youtube video:
-		https://www.youtube.com/watch?v=QAR8zthQypc&t=483s
-	It should look like this:
-		Maximize	4 x1 + 3 x2 + 5 x3
-		Subject to
-			x1 + 2 x2 + 2 x3 <= 4
-			3 x1 + 4 x3 <= 6
-			2 x1 + x2 + 4 x3 <= 8
-			x1 >= 0
-			x2 >= 0
-			x3 >= 0
-*/
+// GetExampleProblem4 Returns the LP from this YouTube video:
+// https://www.youtube.com/watch?v=QAR8zthQypc&t=483s
+//
+// It should look like this:
+// Maximize	4 x1 + 3 x2 + 5 x3
+// Subject to
+// 	x1 + 2 x2 + 2 x3 <= 4
+// 	3 x1 + 4 x3 <= 6
+// 	2 x1 + x2 + 4 x3 <= 8
+// 	x1 >= 0
+// 	x2 >= 0
+// 	x3 >= 0
 func GetExampleProblem4() *OptimizationProblem {
 	// Setup
 	out := NewProblem("TestProblem3")
@@ -108,22 +100,18 @@ func GetExampleProblem4() *OptimizationProblem {
 	return out
 }
 
-/*
-GetExampleProblem5
-Description:
-
-	Returns the LP from this youtube video:
-		https://www.youtube.com/watch?v=QAR8zthQypc&t=483s
-	It should look like this:
-		Maximize	4 x1 + 3 x2 + 5 x3
-		Subject to
-			x1 + 2 x2 + 2 x3 <= 4
-			3 x1 + 4 x3 <= 6
-			2 x1 + x2 + 4 x3 <= 8
-			x1 >= 0
-			x2 >= 0
-			x3 >= 0
-*/
+// GetExampleProblem5 Returns the LP from this YouTube video:
+// https://www.youtube.com/watch?v=QAR8zthQypc&t=483s
+//
+// It should look like this:
+// Maximize	4 x1 + 3 x2 + 5 x3
+// Subject to
+// 	x1 + 2 x2 + 2 x3 <= 4
+// 	3 x1 + 4 x3 <= 6
+// 	2 x1 + x2 + 4 x3 <= 8
+// 	x1 >= 0
+// 	x2 >= 0
+// 	x3 >= 0
 func GetExampleProblem5() *OptimizationProblem {
 	// Setup
 	out := NewProblem("TestProblem3")

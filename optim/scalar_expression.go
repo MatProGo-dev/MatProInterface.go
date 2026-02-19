@@ -68,7 +68,7 @@ type ScalarExpression interface {
 	Check() error
 }
 
-// NewExpr returns a new expression with a single additive constant value, c,
+// NewScalarExpression NewExpr returns a new expression with a single additive constant value, c,
 // and no variables. Creating an expression like sum := NewExpr(0) is useful
 // for creating new empty expressions that you can perform operatotions on
 // later

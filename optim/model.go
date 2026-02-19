@@ -41,7 +41,7 @@ func (m *Model) AddRealVariable() Variable {
 	return m.AddVariableClassic(-INFINITY, INFINITY, Continuous)
 }
 
-// AddVariable adds a variable of a given variable type to the model given the lower
+// AddVariableClassic AddVariable adds a variable of a given variable type to the model given the lower
 // and upper value limits. This variable is returned.
 func (m *Model) AddVariableClassic(lower, upper float64, vtype VarType) Variable {
 	id := uint64(len(m.Variables))
@@ -50,7 +50,7 @@ func (m *Model) AddVariableClassic(lower, upper float64, vtype VarType) Variable
 	return newVar
 }
 
-// AddBinaryVar adds a binary variable to the model and returns said variable.
+// AddBinaryVariable AddBinaryVar adds a binary variable to the model and returns said variable.
 func (m *Model) AddBinaryVariable() Variable {
 	return m.AddVariableClassic(0, 1, Binary)
 }
@@ -118,7 +118,7 @@ func (m *Model) AddBinaryVariableMatrix(rows, cols int) [][]Variable {
 	return m.AddVariableMatrix(rows, cols, 0, 1, Binary)
 }
 
-// AddConstr adds the given constraint to the model.
+// AddConstraint AddConstr adds the given constraint to the model.
 func (m *Model) AddConstraint(constr Constraint, errors ...error) error {
 	// Constants
 

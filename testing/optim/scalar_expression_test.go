@@ -5,20 +5,11 @@ import (
 	"testing"
 )
 
-/*
-scalar_expression_test.go
-Description:
-	Tests whether or not the functions designed for the ScalarExpression interace
-	works well.
-*/
+// Tests whether or not the functions designed for the ScalarExpression interace
+// works well.
 
-/*
-TestScalarExpression_NewScalarExpression1
-Description:
-
-	Tests how well the algorithm detects a small scalar expression created with
-	NewScalarExpression.
-*/
+// TestScalarExpression_NewScalarExpression1 Tests how well the algorithm detects a small scalar expression created with
+// NewScalarExpression.
 func TestScalarExpression_NewScalarExpression1(t *testing.T) {
 	// Constants
 	se := optim.NewScalarExpression(2.1)
@@ -36,12 +27,7 @@ func TestScalarExpression_NewScalarExpression1(t *testing.T) {
 	}
 }
 
-/*
-TestScalarExpression_IsScalarExpression1
-Description:
-
-	Tests whether or not the IsScalarExpression function works on ScalarQuadraticExpression.
-*/
+// TestScalarExpression_IsScalarExpression1 Tests whether or not the IsScalarExpression function works on ScalarQuadraticExpression.
 func TestScalarExpression_IsScalarExpression1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("testse_IsScalarExpression1")
@@ -61,13 +47,8 @@ func TestScalarExpression_IsScalarExpression1(t *testing.T) {
 	}
 }
 
-/*
-TestScalarExpression_ToScalarExpression1
-Description:
-
-	Tests how the conversion function ToScalarExpression() works on a
-	scalar quadratic expression.
-*/
+// TestScalarExpression_ToScalarExpression1 Tests how the conversion function ToScalarExpression() works on a
+// scalar quadratic expression.
 func TestScalarExpression_ToScalarExpression1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("testse_ToScalarExpression1")

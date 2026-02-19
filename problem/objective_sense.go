@@ -15,12 +15,7 @@ const (
 	SenseFind     ObjSense = "Find"
 )
 
-/*
-ToObjSense
-Description:
-
-	This method converts an input optim.ObjSense to a problem.ObjSense.
-*/
+// ToObjSense Converts an input optim.ObjSense to a problem.ObjSense.
 func ToObjSense(sense optim.ObjSense) ObjSense {
 	if sense == optim.SenseMinimize {
 		return SenseMinimize

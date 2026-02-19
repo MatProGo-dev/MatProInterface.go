@@ -42,12 +42,7 @@ func TestLinearExpr_CoeffsAndConstant1(t *testing.T) {
 	}
 }
 
-/*
-TestScalarLinearExpr_IDs1
-Description:
-
-	Tests how well the IDs() method works for the ScalarLinearExpr
-*/
+// TestScalarLinearExpr_IDs1 Tests how well the IDs() method works for the ScalarLinearExpr
 func TestScalarLinearExpr_IDs1(t *testing.T) {
 	// Constants
 	N := 4
@@ -86,12 +81,7 @@ func TestScalarLinearExpr_IDs1(t *testing.T) {
 
 }
 
-/*
-TestScalarLinearExpr_GreaterEq1
-Description:
-
-	Makes sure that GreaterEq works for an arbitrary input.
-*/
+// TestScalarLinearExpr_GreaterEq1 Makes sure that GreaterEq works for an arbitrary input.
 func TestScalarLinearExpr_GreaterEq1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("SLE-GreaterEq1")
@@ -129,13 +119,8 @@ func TestScalarLinearExpr_GreaterEq1(t *testing.T) {
 
 }
 
-/*
-TestScalarLinearExpr_Eq1
-Description:
-
-	Makes sure that Eq works with a
-	variable.
-*/
+// TestScalarLinearExpr_Eq1 Makes sure that Eq works with a
+// variable.
 func TestScalarLinearExpr_Eq1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("SLE-Eq1")
@@ -190,13 +175,8 @@ func TestScalarLinearExpr_Eq1(t *testing.T) {
 
 }
 
-/*
-TestScalarLinearExpr_Comparison1
-Description:
-
-	Makes sure that Comparison throws an error when compared with a
-	constant with a malformed sle!
-*/
+// TestScalarLinearExpr_Comparison1 Makes sure that Comparison throws an error when compared with a
+// constant with a malformed sle!
 func TestScalarLinearExpr_Comparison1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("SLE-Eq1")
@@ -231,13 +211,8 @@ func TestScalarLinearExpr_Comparison1(t *testing.T) {
 
 }
 
-/*
-TestScalarLinearExpr_Plus1
-Description:
-
-	This function should test the Plus method of ScalarLinearExpr for a very nice case.
-	Two SLEs with the SAME varvector and simple constants.
-*/
+// TestScalarLinearExpr_Plus1 This function should test the Plus method of ScalarLinearExpr for a very nice case.
+// Two SLEs with the SAME varvector and simple constants.
 func TestScalarLinearExpr_Plus1(t *testing.T) {
 	// Constants
 	L1 := optim.OnesVector(2)
@@ -283,13 +258,8 @@ func TestScalarLinearExpr_Plus1(t *testing.T) {
 	}
 }
 
-/*
-TestScalarLinearExpr_Plus2
-Description:
-
-	This function should test the Plus method of ScalarLinearExpr for a very nice case.
-	Two SLEs with very similar varvector objects simple constants.
-*/
+// TestScalarLinearExpr_Plus2 This function should test the Plus method of ScalarLinearExpr for a very nice case.
+// Two SLEs with very similar varvector objects simple constants.
 func TestScalarLinearExpr_Plus2(t *testing.T) {
 	// Constants
 	L1 := optim.OnesVector(2)
@@ -370,12 +340,7 @@ func TestScalarLinearExpr_Plus2(t *testing.T) {
 	}
 }
 
-/*
-TestScalarLinearExpr_Plus3
-Description:
-
-	This function should test the Plus method of ScalarLinearExpr for the case of (SLE + K).
-*/
+// TestScalarLinearExpr_Plus3 This function should test the Plus method of ScalarLinearExpr for the case of (SLE + K).
 func TestScalarLinearExpr_Plus3(t *testing.T) {
 	// Constants
 	L1 := optim.OnesVector(2)
@@ -424,13 +389,8 @@ func TestScalarLinearExpr_Plus3(t *testing.T) {
 	}
 }
 
-/*
-TestScalarLinearExpression_Plus3
-Description:
-
-	Tests whether or not the Plus() function works for a linear expression and a quadratic one containing
-	slightly different variables.
-*/
+// TestScalarLinearExpression_Plus3 Tests whether or not the Plus() function works for a linear expression and a quadratic one containing
+// slightly different variables.
 func TestScalarLinearExpression_Plus3(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Plus3")
@@ -511,13 +471,8 @@ func TestScalarLinearExpression_Plus3(t *testing.T) {
 
 }
 
-/*
-TestScalarLinearExpression_Plus4
-Description:
-
-	Tests whether or not the Plus() function works for a linear expression and a single variable that is not known
-	slightly different variables.
-*/
+// TestScalarLinearExpression_Plus4 Tests whether or not the Plus() function works for a linear expression and a single variable that is not known
+// slightly different variables.
 func TestScalarLinearExpression_Plus4(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Plus4")
@@ -574,13 +529,8 @@ func TestScalarLinearExpression_Plus4(t *testing.T) {
 
 }
 
-/*
-TestScalarLinearExpression_Plus5
-Description:
-
-	Verifies that Plus() throws an error when the scalar linear expression
-	is not well-formed.
-*/
+// TestScalarLinearExpression_Plus5 Verifies that Plus() throws an error when the scalar linear expression
+// is not well-formed.
 func TestScalarLinearExpression_Plus5(t *testing.T) {
 	// Constants
 	m := optim.NewModel("TestSLE Plus5")
@@ -613,13 +563,8 @@ func TestScalarLinearExpression_Plus5(t *testing.T) {
 
 }
 
-/*
-TestScalarLinearExpression_Plus6
-Description:
-
-	Verifies that Plus() throws an error when a non-nil
-	error is provided.
-*/
+// TestScalarLinearExpression_Plus6 Verifies that Plus() throws an error when a non-nil
+// error is provided.
 func TestScalarLinearExpression_Plus6(t *testing.T) {
 	// Constants
 	m := optim.NewModel("TestSLE Plus6")
@@ -648,13 +593,8 @@ func TestScalarLinearExpression_Plus6(t *testing.T) {
 
 }
 
-/*
-TestScalarLinearExpression_Plus7
-Description:
-
-	Verifies that Plus() throws an error when a nil
-	error is provided.
-*/
+// TestScalarLinearExpression_Plus7 Verifies that Plus() throws an error when a nil
+// error is provided.
 func TestScalarLinearExpression_Plus7(t *testing.T) {
 	// Constants
 	m := optim.NewModel("TestSLE Plus7")
@@ -692,13 +632,8 @@ func TestScalarLinearExpression_Plus7(t *testing.T) {
 
 }
 
-/*
-TestScalarLinearExpression_Plus8
-Description:
-
-	Verifies that Plus() throws an error when a bad
-	input is provided.
-*/
+// TestScalarLinearExpression_Plus8 Verifies that Plus() throws an error when a bad
+// input is provided.
 func TestScalarLinearExpression_Plus8(t *testing.T) {
 	// Constants
 	m := optim.NewModel("TestSLE Plus8")
@@ -732,12 +667,7 @@ func TestScalarLinearExpression_Plus8(t *testing.T) {
 
 }
 
-/*
-TestScalarLinearExpr_Multiply1
-Description:
-
-	Tests the Multiply() function for an input of a float.
-*/
+// TestScalarLinearExpr_Multiply1 Tests the Multiply() function for an input of a float.
 func TestScalarLinearExpr_Multiply1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Test-sle-Multiply1")
@@ -785,12 +715,7 @@ func TestScalarLinearExpr_Multiply1(t *testing.T) {
 	}
 }
 
-/*
-TestScalarLinearExpr_Multiply2
-Description:
-
-	Tests the Multiply() function for an input of a constant K.
-*/
+// TestScalarLinearExpr_Multiply2 Tests the Multiply() function for an input of a constant K.
 func TestScalarLinearExpr_Multiply2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Test-sle-Multiply2")
@@ -838,12 +763,7 @@ func TestScalarLinearExpr_Multiply2(t *testing.T) {
 	}
 }
 
-/*
-TestScalarLinearExpr_Multiply3
-Description:
-
-	Tests the Multiply() function for an input of a variable v.
-*/
+// TestScalarLinearExpr_Multiply3 Tests the Multiply() function for an input of a variable v.
 func TestScalarLinearExpr_Multiply3(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Test-sle-Multiply3")
@@ -898,13 +818,8 @@ func TestScalarLinearExpr_Multiply3(t *testing.T) {
 	}
 }
 
-/*
-TestScalarLinearExpr_Multiply4
-Description:
-
-	Tests the Multiply() function for an input of a variable v.
-	Input sle has offset.
-*/
+// TestScalarLinearExpr_Multiply4 Tests the Multiply() function for an input of a variable v.
+// Input sle has offset.
 func TestScalarLinearExpr_Multiply4(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Test-sle-Multiply4")
@@ -967,12 +882,7 @@ func TestScalarLinearExpr_Multiply4(t *testing.T) {
 	}
 }
 
-/*
-TestScalarLinearExpr_Multiply5
-Description:
-
-	Tests the Multiply() function for an input of a variable (different from original).
-*/
+// TestScalarLinearExpr_Multiply5 Tests the Multiply() function for an input of a variable (different from original).
 func TestScalarLinearExpr_Multiply5(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Test-sle-Multiply5")
@@ -1059,12 +969,7 @@ func TestScalarLinearExpr_Multiply5(t *testing.T) {
 	}
 }
 
-/*
-TestScalarLinearExpr_Multiply6
-Description:
-
-	Tests the Multiply() function for an input of a scalar linear expression.
-*/
+// TestScalarLinearExpr_Multiply6 Tests the Multiply() function for an input of a scalar linear expression.
 func TestScalarLinearExpr_Multiply6(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Test-sle-Multiply5")
@@ -1128,12 +1033,7 @@ func TestScalarLinearExpr_Multiply6(t *testing.T) {
 	}
 }
 
-/*
-TestScalarLinearExpr_Multiply7
-Description:
-
-	Tests the Multiply() function for an input of a scalar linear expression.
-*/
+// TestScalarLinearExpr_Multiply7 Tests the Multiply() function for an input of a scalar linear expression.
 func TestScalarLinearExpr_Multiply7(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Test-sle-Multiply7")
@@ -1167,13 +1067,8 @@ func TestScalarLinearExpr_Multiply7(t *testing.T) {
 
 }
 
-/*
-TestScalarLinearExpr_Multiply8
-Description:
-
-	Verifies that a malformed scalar linear expression throws an
-	error when used in a multiply().
-*/
+// TestScalarLinearExpr_Multiply8 Verifies that a malformed scalar linear expression throws an
+// error when used in a multiply().
 func TestScalarLinearExpr_Multiply8(t *testing.T) {
 	// Constants
 	N := 4
@@ -1204,13 +1099,8 @@ func TestScalarLinearExpr_Multiply8(t *testing.T) {
 	}
 }
 
-/*
-TestScalarLinearExpr_Multiply9
-Description:
-
-	Verifies that a multiplication with a vector of non-unit length
-	throws an error when used in a multiply().
-*/
+// TestScalarLinearExpr_Multiply9 Verifies that a multiplication with a vector of non-unit length
+// throws an error when used in a multiply().
 func TestScalarLinearExpr_Multiply9(t *testing.T) {
 	// Constants
 	N := 4
@@ -1243,13 +1133,8 @@ func TestScalarLinearExpr_Multiply9(t *testing.T) {
 	}
 }
 
-/*
-TestScalarLinearExpr_Multiply10
-Description:
-
-	Verifies that a multiplication with a KVector of unit length
-	doesn't throw an error.
-*/
+// TestScalarLinearExpr_Multiply10 Verifies that a multiplication with a KVector of unit length
+// doesn't throw an error.
 func TestScalarLinearExpr_Multiply10(t *testing.T) {
 	// Constants
 	N := 2
@@ -1287,12 +1172,7 @@ func TestScalarLinearExpr_Multiply10(t *testing.T) {
 	}
 }
 
-/*
-TestScalarLinearExpr_NewLinearExpr1
-Description:
-
-	Tests that the scalar linear expression is properly created by NewLinearExpr.
-*/
+// TestScalarLinearExpr_NewLinearExpr1 Tests that the scalar linear expression is properly created by NewLinearExpr.
 func TestScalarLinearExpr_NewLinearExpr1(t *testing.T) {
 	// Constants
 	se := optim.NewLinearExpr(2.1)
@@ -1310,12 +1190,7 @@ func TestScalarLinearExpr_NewLinearExpr1(t *testing.T) {
 	}
 }
 
-/*
-TestScalarLinearExpr_Variables1
-Description:
-
-	Verifies that this function works well for SLE's of one variable.
-*/
+// TestScalarLinearExpr_Variables1 Verifies that this function works well for SLE's of one variable.
 func TestScalarLinearExpr_Variables1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("testSLE-variables1")
@@ -1344,12 +1219,7 @@ func TestScalarLinearExpr_Variables1(t *testing.T) {
 	}
 }
 
-/*
-TestScalarLinearExpr_Variables2
-Description:
-
-	Verifies that this function works well for SLE's of ten variable.
-*/
+// TestScalarLinearExpr_Variables2 Verifies that this function works well for SLE's of ten variable.
 func TestScalarLinearExpr_Variables2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("testSLE-variables1")

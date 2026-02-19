@@ -39,7 +39,7 @@ func (sle ScalarLinearExpr) NumVars() int {
 	return sle.X.Len()
 }
 
-// Vars returns a slice of the Var ids in the expression
+// IDs Vars returns a slice of the Var ids in the expression
 func (sle ScalarLinearExpr) IDs() []uint64 {
 	return sle.X.IDs()
 }

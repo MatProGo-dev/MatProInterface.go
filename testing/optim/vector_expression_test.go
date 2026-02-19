@@ -7,12 +7,7 @@ import (
 	"testing"
 )
 
-/*
-TestVectorExpression_IsVectorExpression1
-Description:
-
-	Tests whether or not IsVectorExpression() works on a KVector object.
-*/
+// TestVectorExpression_IsVectorExpression1 Tests whether or not IsVectorExpression() works on a KVector object.
 func TestVectorExpression_IsVectorExpression1(t *testing.T) {
 	// Constants
 	N := 10
@@ -24,12 +19,7 @@ func TestVectorExpression_IsVectorExpression1(t *testing.T) {
 	}
 }
 
-/*
-TestVectorExpression_IsVectorExpression2
-Description:
-
-	Tests whether or not IsVectorExpression() works on a KVectorTranspose object.
-*/
+// TestVectorExpression_IsVectorExpression2 Tests whether or not IsVectorExpression() works on a KVectorTranspose object.
 func TestVectorExpression_IsVectorExpression2(t *testing.T) {
 	// Constants
 	N := 10
@@ -41,12 +31,7 @@ func TestVectorExpression_IsVectorExpression2(t *testing.T) {
 	}
 }
 
-/*
-TestVectorExpression_IsVectorExpression3
-Description:
-
-	Tests whether or not IsVectorExpression() works on a VarVectorTranspose object.
-*/
+// TestVectorExpression_IsVectorExpression3 Tests whether or not IsVectorExpression() works on a VarVectorTranspose object.
 func TestVectorExpression_IsVectorExpression3(t *testing.T) {
 	// Constants
 	N := 10
@@ -62,12 +47,7 @@ func TestVectorExpression_IsVectorExpression3(t *testing.T) {
 	}
 }
 
-/*
-TestVectorExpression_IsVectorExpression4
-Description:
-
-	Tests whether or not IsVectorExpression() works on a VectorLinearExpression object.
-*/
+// TestVectorExpression_IsVectorExpression4 Tests whether or not IsVectorExpression() works on a VectorLinearExpression object.
 func TestVectorExpression_IsVectorExpression4(t *testing.T) {
 	// Constants
 	N := 10
@@ -83,12 +63,7 @@ func TestVectorExpression_IsVectorExpression4(t *testing.T) {
 	}
 }
 
-/*
-TestVectorExpression_IsVectorExpression5
-Description:
-
-	Tests whether or not IsVectorExpression() works on a VectorLinearExpressionTranspose object.
-*/
+// TestVectorExpression_IsVectorExpression5 Tests whether or not IsVectorExpression() works on a VectorLinearExpressionTranspose object.
 func TestVectorExpression_IsVectorExpression5(t *testing.T) {
 	// Constants
 	N := 10
@@ -104,12 +79,7 @@ func TestVectorExpression_IsVectorExpression5(t *testing.T) {
 	}
 }
 
-/*
-TestVectorExpression_NewVectorExpression1
-Description:
-
-	Tests whether or not the NewVectorExpression function returns a vector expression.
-*/
+// TestVectorExpression_NewVectorExpression1 Tests whether or not the NewVectorExpression function returns a vector expression.
 func TestVectorExpression_NewVectorExpression1(t *testing.T) {
 	// Constants
 	N := 10
@@ -126,12 +96,7 @@ func TestVectorExpression_NewVectorExpression1(t *testing.T) {
 
 }
 
-/*
-TestVectorExpression_ToVectorExpression1
-Description:
-
-	Tests whether or not the ToVectorExpression properly handles bad inputs.
-*/
+// TestVectorExpression_ToVectorExpression1 Tests whether or not the ToVectorExpression properly handles bad inputs.
 func TestVectorExpression_ToVectorExpression1(t *testing.T) {
 	// Constants
 	b1 := false
@@ -155,13 +120,8 @@ func TestVectorExpression_ToVectorExpression1(t *testing.T) {
 	}
 }
 
-/*
-TestVectorExpression_ToVectorExpression2
-Description:
-
-	Tests whether or not the ToVectorExpression properly handles
-	VarVectorTranspose.
-*/
+// TestVectorExpression_ToVectorExpression2 Tests whether or not the ToVectorExpression properly handles
+// VarVectorTranspose.
 func TestVectorExpression_ToVectorExpression2(t *testing.T) {
 	// Constants
 	N := 10
@@ -183,13 +143,8 @@ func TestVectorExpression_ToVectorExpression2(t *testing.T) {
 	}
 }
 
-/*
-TestVectorExpression_ToVectorExpression3
-Description:
-
-	Tests whether or not the ToVectorExpression properly handles
-	LinearVectorExpr.
-*/
+// TestVectorExpression_ToVectorExpression3 Tests whether or not the ToVectorExpression properly handles
+// LinearVectorExpr.
 func TestVectorExpression_ToVectorExpression3(t *testing.T) {
 	// Constants
 	N := 10
@@ -211,13 +166,8 @@ func TestVectorExpression_ToVectorExpression3(t *testing.T) {
 	}
 }
 
-/*
-TestVectorExpression_ToVectorExpression4
-Description:
-
-	Tests whether or not the ToVectorExpression properly handles
-	LinearVectorExpressionTranspose.
-*/
+// TestVectorExpression_ToVectorExpression4 Tests whether or not the ToVectorExpression properly handles
+// LinearVectorExpressionTranspose.
 func TestVectorExpression_ToVectorExpression4(t *testing.T) {
 	// Constants
 	N := 10
@@ -239,13 +189,8 @@ func TestVectorExpression_ToVectorExpression4(t *testing.T) {
 	}
 }
 
-/*
-TestVectorExpression_ToVectorExpression5
-Description:
-
-	Tests whether or not the ToVectorExpression properly handles
-	mat.VecDense.
-*/
+// TestVectorExpression_ToVectorExpression5 Tests whether or not the ToVectorExpression properly handles
+// mat.VecDense.
 func TestVectorExpression_ToVectorExpression5(t *testing.T) {
 	// Constants
 	N := 10

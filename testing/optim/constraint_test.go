@@ -5,18 +5,9 @@ import (
 	"testing"
 )
 
-/*
-constraint_test.go
-Description:
-	Tests for all functions and objects defined in the constraint.go file.
-*/
+// Tests for all functions and objects defined in the constraint.go file.
 
-/*
-TestConstraint_IsConstraint1
-Description:
-
-	This test verifies if a scalar constraint is properly detected by IsConstraint.
-*/
+// TestConstraint_IsConstraint1 This test verifies if a scalar constraint is properly detected by IsConstraint.
 func TestConstraint_IsConstraint1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("IsConstraint1")
@@ -36,12 +27,7 @@ func TestConstraint_IsConstraint1(t *testing.T) {
 	}
 }
 
-/*
-TestConstraint_IsConstraint2
-Description:
-
-	This test verifies if a vector constraint is properly detected by IsConstraint.
-*/
+// TestConstraint_IsConstraint2 This test verifies if a vector constraint is properly detected by IsConstraint.
 func TestConstraint_IsConstraint2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("IsConstraint2")
@@ -64,12 +50,7 @@ func TestConstraint_IsConstraint2(t *testing.T) {
 	}
 }
 
-/*
-TestConstraint_IsConstraint3
-Description:
-
-	This verifies that a float is not a constraint.
-*/
+// TestConstraint_IsConstraint3 This verifies that a float is not a constraint.
 func TestConstraint_IsConstraint3(t *testing.T) {
 	// Constants
 	f1 := 7.5
@@ -80,12 +61,7 @@ func TestConstraint_IsConstraint3(t *testing.T) {
 	}
 }
 
-/*
-TestConstraint_IsConstraint4
-Description:
-
-	This test verifies if a pointer to a scalar constraint is properly detected by IsConstraint.
-*/
+// TestConstraint_IsConstraint4 This test verifies if a pointer to a scalar constraint is properly detected by IsConstraint.
 func TestConstraint_IsConstraint4(t *testing.T) {
 	// Constants
 	m := optim.NewModel("IsConstraint4")
@@ -105,12 +81,7 @@ func TestConstraint_IsConstraint4(t *testing.T) {
 	}
 }
 
-/*
-TestConstraint_IsConstraint2
-Description:
-
-	This test verifies if a pointer to vector constraint is properly detected by IsConstraint.
-*/
+// TestConstraint_IsConstraint5 This test verifies if a pointer to vector constraint is properly detected by IsConstraint.
 func TestConstraint_IsConstraint5(t *testing.T) {
 	// Constants
 	m := optim.NewModel("IsConstraint5")
@@ -133,12 +104,7 @@ func TestConstraint_IsConstraint5(t *testing.T) {
 	}
 }
 
-/*
-TestConstraint_IsConstraint6
-Description:
-
-	This test verifies if a pointer to a scalar constraint is properly detected by IsConstraint.
-*/
+// TestConstraint_IsConstraint6 This test verifies if a pointer to a scalar constraint is properly detected by IsConstraint.
 func TestConstraint_IsConstraint6(t *testing.T) {
 	// Constants
 	m := optim.NewModel("IsConstraint6")

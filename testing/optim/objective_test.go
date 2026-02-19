@@ -5,12 +5,7 @@ import (
 	"testing"
 )
 
-/*
-objective_test.go
-Description:
-
-	Tests for the Objective object.
-*/
+// TestObjective_NewObjective1 Tests for the Objective object.
 func TestObjective_NewObjective1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-newobjective1")

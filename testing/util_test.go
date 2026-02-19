@@ -30,12 +30,7 @@ func TestSumVars(t *testing.T) {
 	}
 }
 
-/*
-TestUtil_Identity1
-Description:
-
-	Create identity matrix of dimension 1 (scalar?).
-*/
+// TestUtil_Identity1 Create identity matrix of dimension 1 (scalar?).
 func TestUtil_Identity1(t *testing.T) {
 	// Constants
 	n := 1
@@ -52,12 +47,7 @@ func TestUtil_Identity1(t *testing.T) {
 
 }
 
-/*
-TestUtil_Identity2
-Description:
-
-	Create identity matrix of dimension 10.
-*/
+// TestUtil_Identity2 Create identity matrix of dimension 10.
 func TestUtil_Identity2(t *testing.T) {
 	// Constants
 	n := 10
@@ -74,13 +64,8 @@ func TestUtil_Identity2(t *testing.T) {
 
 }
 
-/*
-TestUtil_FindInSlice1
-Description:
-
-	Tests the find in slice function for strings!
-	(string in slice)
-*/
+// TestUtil_FindInSlice1 Tests the find in slice function for strings!
+// (string in slice)
 func TestUtil_FindInSlice1(t *testing.T) {
 	// Constant
 	slice0 := []string{"Why", "test", "this", "?"}
@@ -98,13 +83,8 @@ func TestUtil_FindInSlice1(t *testing.T) {
 	}
 }
 
-/*
-TestUtil_FindInSlice2
-Description:
-
-	Tests the find in slice function for strings!
-	(string NOT in slice)
-*/
+// TestUtil_FindInSlice2 Tests the find in slice function for strings!
+// (string NOT in slice)
 func TestUtil_FindInSlice2(t *testing.T) {
 	// Constant
 	slice0 := []string{"Why", "test", "this", "?"}
@@ -122,13 +102,8 @@ func TestUtil_FindInSlice2(t *testing.T) {
 	}
 }
 
-/*
-TestUtil_FindInSlice3
-Description:
-
-	Tests the find in slice function for ints!
-	(int in slice)
-*/
+// TestUtil_FindInSlice3 Tests the find in slice function for ints!
+// (int in slice)
 func TestUtil_FindInSlice3(t *testing.T) {
 	// Constant
 	slice0 := []int{1, 3, 7, 11}
@@ -146,13 +121,8 @@ func TestUtil_FindInSlice3(t *testing.T) {
 	}
 }
 
-/*
-TestUtil_FindInSlice4
-Description:
-
-	Tests the find in slice function for ints!
-	(int NOT in slice)
-*/
+// TestUtil_FindInSlice4 Tests the find in slice function for ints!
+// (int NOT in slice)
 func TestUtil_FindInSlice4(t *testing.T) {
 	// Constant
 	slice0 := []int{1, 3, 7, 11}
@@ -170,13 +140,8 @@ func TestUtil_FindInSlice4(t *testing.T) {
 	}
 }
 
-/*
-TestUtil_FindInSlice5
-Description:
-
-	Tests the find in slice function for uint64!
-	(uint64 in slice)
-*/
+// TestUtil_FindInSlice5 Tests the find in slice function for uint64!
+// (uint64 in slice)
 func TestUtil_FindInSlice5(t *testing.T) {
 	// Constant
 	slice0 := []uint64{1, 3, 7, 11}
@@ -195,13 +160,8 @@ func TestUtil_FindInSlice5(t *testing.T) {
 	}
 }
 
-/*
-TestUtil_FindInSlice6
-Description:
-
-	Tests the find in slice function for uint64!
-	(uint64 NOT in slice)
-*/
+// TestUtil_FindInSlice6 Tests the find in slice function for uint64!
+// (uint64 NOT in slice)
 func TestUtil_FindInSlice6(t *testing.T) {
 	// Constant
 	slice0 := []uint64{1, 3, 7, 11}
@@ -220,13 +180,8 @@ func TestUtil_FindInSlice6(t *testing.T) {
 	}
 }
 
-/*
-TestUtil_FindInSlice7
-Description:
-
-	Tests the find in slice function for strings!
-	(Variable in slice)
-*/
+// TestUtil_FindInSlice7 Tests the find in slice function for strings!
+// (Variable in slice)
 func TestUtil_FindInSlice7(t *testing.T) {
 	// Constant
 	m := optim.NewModel("test-util-findinslice7")
@@ -248,13 +203,8 @@ func TestUtil_FindInSlice7(t *testing.T) {
 	}
 }
 
-/*
-TestUtil_FindInSlice4
-Description:
-
-	Tests the find in slice function for strings!
-	(int NOT in slice)
-*/
+// TestUtil_FindInSlice8 Tests the find in slice function for strings!
+// (int NOT in slice)
 func TestUtil_FindInSlice8(t *testing.T) {
 	// Constant
 	m := optim.NewModel("test-util-findinslice7")

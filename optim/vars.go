@@ -31,7 +31,7 @@ func (v Variable) NumVars() int {
 	return 1
 }
 
-// Vars returns a slice of the Var ids in the expression. For a variable, it
+// IDs Vars returns a slice of the Var ids in the expression. For a variable, it
 // always returns a singleton slice with the given variable ID.
 func (v Variable) IDs() []uint64 {
 	return []uint64{v.ID}

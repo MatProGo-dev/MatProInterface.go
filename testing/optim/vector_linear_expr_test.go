@@ -8,13 +8,8 @@ import (
 	"testing"
 )
 
-/*
-TestVectorLinearExpression_Check1
-Description:
-
-	This test will evaluate whether or not the linear expression that has been given is valid.
-	In this case, the VectorLinearExpression is valid.
-*/
+// TestVectorLinearExpression_Check1 This test will evaluate whether or not the linear expression that has been given is valid.
+// In this case, the VectorLinearExpression is valid.
 func TestVectorLinearExpression_Check1(t *testing.T) {
 	m := optim.NewModel("Check1")
 	x := m.AddBinaryVariable()
@@ -40,13 +35,8 @@ func TestVectorLinearExpression_Check1(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpression_Check2
-Description:
-
-	This test will evaluate whether or not the linear expression that has been given is valid.
-	In this case, the VectorLinearExpression is NOT valid. L is too big in rows.
-*/
+// TestVectorLinearExpression_Check2 This test will evaluate whether or not the linear expression that has been given is valid.
+// In this case, the VectorLinearExpression is NOT valid. L is too big in rows.
 func TestVectorLinearExpression_Check2(t *testing.T) {
 	m := optim.NewModel("Check2")
 	x := m.AddBinaryVariable()
@@ -77,13 +67,8 @@ func TestVectorLinearExpression_Check2(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpression_Check3
-Description:
-
-	This test will evaluate whether or not the linear expression that has been given is valid.
-	In this case, the VectorLinearExpression is NOT valid. L is too big in columns.
-*/
+// TestVectorLinearExpression_Check3 This test will evaluate whether or not the linear expression that has been given is valid.
+// In this case, the VectorLinearExpression is NOT valid. L is too big in columns.
 func TestVectorLinearExpression_Check3(t *testing.T) {
 	m := optim.NewModel("Check3")
 	x := m.AddBinaryVariable()
@@ -114,12 +99,7 @@ func TestVectorLinearExpression_Check3(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpression_VariableIDs1
-Description:
-
-	This test the VariableIDs() method when a variable vector with 2 unique vectors.
-*/
+// TestVectorLinearExpression_VariableIDs1 This test the VariableIDs() method when a variable vector with 2 unique vectors.
 func TestVectorLinearExpression_VariableIDs1(t *testing.T) {
 	m := optim.NewModel("VariableIDs1")
 	x := m.AddBinaryVariable()
@@ -155,12 +135,7 @@ func TestVectorLinearExpression_VariableIDs1(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpression_VariableIDs2
-Description:
-
-	This test the VariableIDs() method works for a variable vector with 1 unique vectors.
-*/
+// TestVectorLinearExpression_VariableIDs2 This test the VariableIDs() method works for a variable vector with 1 unique vectors.
 func TestVectorLinearExpression_VariableIDs2(t *testing.T) {
 	m := optim.NewModel("VariableIDs2")
 	x := m.AddBinaryVariable()
@@ -200,12 +175,7 @@ func TestVectorLinearExpression_VariableIDs2(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpression_Coeffs1
-Description:
-
-	This test the Coeffs() method which should return the matrix's elements in a prescribed order.
-*/
+// TestVectorLinearExpression_Coeffs1 This test the Coeffs() method which should return the matrix's elements in a prescribed order.
 func TestVectorLinearExpression_Coeffs1(t *testing.T) {
 	m := optim.NewModel("Coeffs1")
 	x := m.AddBinaryVariable()
@@ -249,12 +219,7 @@ func TestVectorLinearExpression_Coeffs1(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpression_Coeffs2
-Description:
-
-	This test the Coeffs() method which should return the matrix's elements in a prescribed order.
-*/
+// TestVectorLinearExpression_Coeffs2 This test the Coeffs() method which should return the matrix's elements in a prescribed order.
 func TestVectorLinearExpression_Coeffs2(t *testing.T) {
 	m := optim.NewModel("Coeffs2")
 	x := m.AddBinaryVariable()
@@ -296,11 +261,7 @@ func TestVectorLinearExpression_Coeffs2(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpression_LessEq1
-Description:
-	This tests that the less than or equal to command works with a constant input.
-*/
+// This tests that the less than or equal to command works with a constant input.
 //func TestVectorLinearExpression_LessEq1(t *testing.T) {
 //	// Constants
 //	m := optim.NewModel()
@@ -337,15 +298,10 @@ Description:
 //
 //}
 
-/*
-TestVectorLinearExpression_Eq1
-Description:
-
-	Tests whether or not an equality constraint between a ones vector and a standard vector variable works well.
-	Eq comparison between:
-	- Vector Linear Expression, and
-	- mat.VecDense
-*/
+// TestVectorLinearExpression_Eq1 Tests whether or not an equality constraint between a ones vector and a standard vector variable works well.
+// Eq comparison between:
+// - Vector Linear Expression, and
+// - mat.VecDense
 func TestVectorLinearExpression_Eq1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Eq1")
@@ -388,15 +344,10 @@ func TestVectorLinearExpression_Eq1(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpression_Eq2
-Description:
-
-	Tests whether or not an equality constraint between a bool and a proper vector variable leads to an error.
-	Eq comparison between:
-	- Vector Linear Expression, and
-	- bool
-*/
+// TestVectorLinearExpression_Eq2 Tests whether or not an equality constraint between a bool and a proper vector variable leads to an error.
+// Eq comparison between:
+// - Vector Linear Expression, and
+// - bool
 func TestVectorLinearExpression_Eq2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Eq2")
@@ -430,15 +381,10 @@ func TestVectorLinearExpression_Eq2(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpression_Eq3
-Description:
-
-	Tests whether or not an equality constraint between a KVector and a proper vector variable leads to an error.
-	Eq comparison between:
-	- Vector Linear Expression, and
-	- KVector
-*/
+// TestVectorLinearExpression_Eq3 Tests whether or not an equality constraint between a KVector and a proper vector variable leads to an error.
+// Eq comparison between:
+// - Vector Linear Expression, and
+// - KVector
 func TestVectorLinearExpression_Eq3(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Eq3")
@@ -477,16 +423,11 @@ func TestVectorLinearExpression_Eq3(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpression_Eq4
-Description:
-
-	This test will evaluate how well the Eq() method for the vector of linear constraints works.
-	Creates a simple two-dimensional constraint.
-	Eq comparison between:
-	- Vector Linear Expression, and
-	- VarVector
-*/
+// TestVectorLinearExpression_Eq4 This test will evaluate how well the Eq() method for the vector of linear constraints works.
+// Creates a simple two-dimensional constraint.
+// Eq comparison between:
+// - Vector Linear Expression, and
+// - VarVector
 func TestVectorLinearExpression_Eq4(t *testing.T) {
 	m := optim.NewModel("Eq4")
 	dimX := 2
@@ -513,16 +454,11 @@ func TestVectorLinearExpression_Eq4(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpression_Eq5
-Description:
-
-	This test will evaluate how well the Eq() method for the vector of linear constraints works.
-	Creates a simple two-dimensional constraint.
-	Eq comparison between:
-	- Vector Linear Expression, and
-	- Vector Linear Expression
-*/
+// TestVectorLinearExpression_Eq5 This test will evaluate how well the Eq() method for the vector of linear constraints works.
+// Creates a simple two-dimensional constraint.
+// Eq comparison between:
+// - Vector Linear Expression, and
+// - Vector Linear Expression
 func TestVectorLinearExpression_Eq5(t *testing.T) {
 	m := optim.NewModel("Eq5")
 	dimX := 2
@@ -549,13 +485,8 @@ func TestVectorLinearExpression_Eq5(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpression_Len1
-Description:
-
-	This test will evaluate how well the Len() method for the vector of linear constraints works.
-	A constraint between two vectors of length 2
-*/
+// TestVectorLinearExpression_Len1 This test will evaluate how well the Len() method for the vector of linear constraints works.
+// A constraint between two vectors of length 2
 func TestVectorLinearExpression_Len1(t *testing.T) {
 	m := optim.NewModel("Len1")
 	x := m.AddBinaryVariable()
@@ -585,13 +516,8 @@ func TestVectorLinearExpression_Len1(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpression_Len2
-Description:
-
-	This test will evaluate how well the Len() method for the vector of linear constraints works.
-	A constraint between two vectors of length 10
-*/
+// TestVectorLinearExpression_Len2 This test will evaluate how well the Len() method for the vector of linear constraints works.
+// A constraint between two vectors of length 10
 func TestVectorLinearExpression_Len2(t *testing.T) {
 	m := optim.NewModel("Len2")
 	x := m.AddBinaryVariable()
@@ -623,12 +549,7 @@ func TestVectorLinearExpression_Len2(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpr_Plus1
-Description:
-
-	Add VectorLinearExpr to a KVector of appropriate length.
-*/
+// TestVectorLinearExpr_Plus1 Add VectorLinearExpr to a KVector of appropriate length.
 func TestVectorLinearExpr_Plus1(t *testing.T) {
 	// Constants
 	n := 5
@@ -691,12 +612,7 @@ func TestVectorLinearExpr_Plus1(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpr_Plus2
-Description:
-
-	Add VectorLinearExpr to a KVector of inappropriate length.
-*/
+// TestVectorLinearExpr_Plus2 Add VectorLinearExpr to a KVector of inappropriate length.
 func TestVectorLinearExpr_Plus2(t *testing.T) {
 	// Constants
 	n := 5
@@ -730,13 +646,8 @@ func TestVectorLinearExpr_Plus2(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpr_Plus3
-Description:
-
-	Add VectorLinearExpr to a KVector of appropriate length.
-	Nonzero offset in VectorLinearExpression.
-*/
+// TestVectorLinearExpr_Plus3 Add VectorLinearExpr to a KVector of appropriate length.
+// Nonzero offset in VectorLinearExpression.
 func TestVectorLinearExpr_Plus3(t *testing.T) {
 	// Constants
 	n := 5
@@ -799,12 +710,7 @@ func TestVectorLinearExpr_Plus3(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpr_Plus4
-Description:
-
-	Add VectorLinearExpr to a VarVector of appropriate length.
-*/
+// TestVectorLinearExpr_Plus4 Add VectorLinearExpr to a VarVector of appropriate length.
 func TestVectorLinearExpr_Plus4(t *testing.T) {
 	// Constants
 	n := 5
@@ -878,12 +784,7 @@ func TestVectorLinearExpr_Plus4(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpr_Plus5
-Description:
-
-	Add VectorLinearExpr to a VarVector of appropriate length.
-*/
+// TestVectorLinearExpr_Plus5 Add VectorLinearExpr to a VarVector of appropriate length.
 func TestVectorLinearExpr_Plus5(t *testing.T) {
 	// Constants
 	n := 5
@@ -954,12 +855,7 @@ func TestVectorLinearExpr_Plus5(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpr_Plus6
-Description:
-
-	Add VectorLinearExpr to a VectorLinearExpression of appropriate length. (But different variables)
-*/
+// TestVectorLinearExpr_Plus6 Add VectorLinearExpr to a VectorLinearExpression of appropriate length. (But different variables)
 func TestVectorLinearExpr_Plus6(t *testing.T) {
 	// Constants
 	n := 5
@@ -1038,12 +934,7 @@ func TestVectorLinearExpr_Plus6(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpr_Plus7
-Description:
-
-	Add VectorLinearExpr to a KVectorTranspose of appropriate length.
-*/
+// TestVectorLinearExpr_Plus7 Add VectorLinearExpr to a KVectorTranspose of appropriate length.
 func TestVectorLinearExpr_Plus7(t *testing.T) {
 	// Constants
 	n := 5
@@ -1077,12 +968,7 @@ func TestVectorLinearExpr_Plus7(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpr_Plus8
-Description:
-
-	Add VectorLinearExpr to a VarVectorTranspose of appropriate length.
-*/
+// TestVectorLinearExpr_Plus8 Add VectorLinearExpr to a VarVectorTranspose of appropriate length.
 func TestVectorLinearExpr_Plus8(t *testing.T) {
 	// Constants
 	n := 5
@@ -1113,12 +999,7 @@ func TestVectorLinearExpr_Plus8(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpr_Plus9
-Description:
-
-	Add VectorLinearExpr to a VectorLinearExpressionTranspose of appropriate length.
-*/
+// TestVectorLinearExpr_Plus9 Add VectorLinearExpr to a VectorLinearExpressionTranspose of appropriate length.
 func TestVectorLinearExpr_Plus9(t *testing.T) {
 	// Constants
 	n := 5
@@ -1149,15 +1030,10 @@ func TestVectorLinearExpr_Plus9(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpression_GreaterEq1
-Description:
-
-	Tests whether or not an equality constraint between a ones vector and a standard vector variable works well.
-	Eq comparison between:
-	- Vector Linear Expression, and
-	- mat.VecDense
-*/
+// TestVectorLinearExpression_GreaterEq1 Tests whether or not an equality constraint between a ones vector and a standard vector variable works well.
+// Eq comparison between:
+// - Vector Linear Expression, and
+// - mat.VecDense
 func TestVectorLinearExpression_GreaterEq1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("VLE-GreaterEq1")
@@ -1192,12 +1068,7 @@ func TestVectorLinearExpression_GreaterEq1(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpr_Multiply1
-Description:
-
-	Testing that the method properly throws an error when an error is provided.
-*/
+// TestVectorLinearExpr_Multiply1 Testing that the method properly throws an error when an error is provided.
 func TestVectorLinearExpr_Multiply1(t *testing.T) {
 	// Constants
 	n := 5
@@ -1225,13 +1096,8 @@ func TestVectorLinearExpr_Multiply1(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpr_Multiply2
-Description:
-
-	Testing that the method properly throws an error when a dimension mismatch
-	occurs.
-*/
+// TestVectorLinearExpr_Multiply2 Testing that the method properly throws an error when a dimension mismatch
+// occurs.
 func TestVectorLinearExpr_Multiply2(t *testing.T) {
 	// Constants
 	n := 5
@@ -1264,12 +1130,7 @@ func TestVectorLinearExpr_Multiply2(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpr_Multiply3
-Description:
-
-	Testing that the method properly multiplies vle with float.
-*/
+// TestVectorLinearExpr_Multiply3 Testing that the method properly multiplies vle with float.
 func TestVectorLinearExpr_Multiply3(t *testing.T) {
 	// Constants
 	n := 5
@@ -1334,12 +1195,7 @@ func TestVectorLinearExpr_Multiply3(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpr_Multiply4
-Description:
-
-	Testing that the method properly multiplies vle with K.
-*/
+// TestVectorLinearExpr_Multiply4 Testing that the method properly multiplies vle with K.
 func TestVectorLinearExpr_Multiply4(t *testing.T) {
 	// Constants
 	n := 5
@@ -1404,13 +1260,8 @@ func TestVectorLinearExpr_Multiply4(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpr_Multiply5
-Description:
-
-	Testing that the Multiply method properly works for
-	mat.VecDense
-*/
+// TestVectorLinearExpr_Multiply5 Testing that the Multiply method properly works for
+// mat.VecDense
 func TestVectorLinearExpr_Multiply5(t *testing.T) {
 	// Constants
 	n := 5
@@ -1442,13 +1293,8 @@ func TestVectorLinearExpr_Multiply5(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpr_Multiply6
-Description:
-
-	Testing that the Multiply method properly works for
-	KVector
-*/
+// TestVectorLinearExpr_Multiply6 Testing that the Multiply method properly works for
+// KVector
 func TestVectorLinearExpr_Multiply6(t *testing.T) {
 	// Constants
 	n := 5
@@ -1480,13 +1326,8 @@ func TestVectorLinearExpr_Multiply6(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpr_Multiply7
-Description:
-
-	Testing that the Multiply method properly works for
-	KVectorTranspose
-*/
+// TestVectorLinearExpr_Multiply7 Testing that the Multiply method properly works for
+// KVectorTranspose
 func TestVectorLinearExpr_Multiply7(t *testing.T) {
 	// Constants
 	n := 5
@@ -1517,13 +1358,8 @@ func TestVectorLinearExpr_Multiply7(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpr_Multiply8
-Description:
-
-	Testing that the Multiply method properly works for
-	VectorLinearExpr
-*/
+// TestVectorLinearExpr_Multiply8 Testing that the Multiply method properly works for
+// VectorLinearExpr
 func TestVectorLinearExpr_Multiply8(t *testing.T) {
 	// Constants
 	n := 5
@@ -1555,13 +1391,8 @@ func TestVectorLinearExpr_Multiply8(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpr_Multiply9
-Description:
-
-	Testing that the Multiply method properly works for
-	KVectorTranspose
-*/
+// TestVectorLinearExpr_Multiply9 Testing that the Multiply method properly works for
+// KVectorTranspose
 func TestVectorLinearExpr_Multiply9(t *testing.T) {
 	// Constants
 	n := 5

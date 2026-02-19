@@ -1,22 +1,14 @@
 package optim
 
-/*
-model_test.go
-Description:
-	This script tests the model object.
-*/
+// This script tests the model object.
 
 import (
-	"github.com/MatProGo-dev/MatProInterface.go/optim"
 	"testing"
+
+	"github.com/MatProGo-dev/MatProInterface.go/optim"
 )
 
-/*
-TestModel_NewModel1
-Description:
-
-	Tests the new model was initialized in the proper way.
-*/
+// TestModel_NewModel1 Tests the new model was initialized in the proper way.
 func TestModel_NewModel1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test")
@@ -27,10 +19,6 @@ func TestModel_NewModel1(t *testing.T) {
 	}
 }
 
-/*
-TestModel_AddVariable1
-Description:
-*/
 func TestModel_AddVariable1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-addvariable1")
@@ -58,10 +46,6 @@ func TestModel_AddVariable1(t *testing.T) {
 	}
 }
 
-/*
-TestModel_AddRealVariable1
-Description:
-*/
 func TestModel_AddRealVariable1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-addvariable1")
@@ -95,10 +79,6 @@ func TestModel_AddRealVariable1(t *testing.T) {
 	}
 }
 
-/*
-TestModel_AddBinaryVariable1
-Description:
-*/
 func TestModel_AddBinaryVariable1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-addbinaryvariable1")
@@ -145,10 +125,6 @@ func TestModel_AddBinaryVariable1(t *testing.T) {
 	}
 }
 
-/*
-TestModel_AddVariableClassic1
-Description:
-*/
 func TestModel_AddVariableClassic1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-addvariable-classic1")
@@ -192,13 +168,8 @@ func TestModel_AddVariableClassic1(t *testing.T) {
 	}
 }
 
-/*
-TestModel_AddVariableVector1
-Description:
-
-	This test verifies that the AddVariableVector function correctly adds
-	a vector of variables.
-*/
+// TestModel_AddVariableVector1 This test verifies that the AddVariableVector function correctly adds
+// a vector of variables.
 func TestModel_AddVariableVector1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-addbinaryvariable1")
@@ -235,13 +206,8 @@ func TestModel_AddVariableVector1(t *testing.T) {
 	}
 }
 
-/*
-TestModel_AddVariableVectorClassic1
-Description:
-
-	This test verifies that the AddVariableVectorClassic function correctly adds
-	a vector of variables.
-*/
+// TestModel_AddVariableVectorClassic1 This test verifies that the AddVariableVectorClassic function correctly adds
+// a vector of variables.
 func TestModel_AddVariableVectorClassic1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-model-addvariablevectorclassic1")
@@ -278,13 +244,8 @@ func TestModel_AddVariableVectorClassic1(t *testing.T) {
 	}
 }
 
-/*
-TestModel_AddBinaryVariableVector1
-Description:
-
-	This test verifies that the AddBinaryVariableVector function correctly adds
-	a vector of variables.
-*/
+// TestModel_AddBinaryVariableVector1 This test verifies that the AddBinaryVariableVector function correctly adds
+// a vector of variables.
 func TestModel_AddBinaryVariableVector1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-model-addvariablevectorclassic1")
@@ -321,13 +282,8 @@ func TestModel_AddBinaryVariableVector1(t *testing.T) {
 	}
 }
 
-/*
-TestModel_AddVariableMatrix1
-Description:
-
-	This test will verify that the appropriate number of variables are created by
-	AddVariableMatrix.
-*/
+// TestModel_AddVariableMatrix1 This test will verify that the appropriate number of variables are created by
+// AddVariableMatrix.
 func TestModel_AddVariableMatrix1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-addvariablematrix1")
@@ -371,13 +327,8 @@ func TestModel_AddVariableMatrix1(t *testing.T) {
 	}
 }
 
-/*
-TestModel_AddBinaryVariableMatrix1
-Description:
-
-	This test will verify that the appropriate number of variables are created by
-	AddVariableMatrix.
-*/
+// TestModel_AddBinaryVariableMatrix1 This test will verify that the appropriate number of variables are created by
+// AddVariableMatrix.
 func TestModel_AddBinaryVariableMatrix1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-addbinaryvariablematrix1")
@@ -421,13 +372,8 @@ func TestModel_AddBinaryVariableMatrix1(t *testing.T) {
 	}
 }
 
-/*
-TestModel_SetObjective1
-Description:
-
-	This test verifies that the AddVariableVector function and some other functions
-	can be used to set the objective properly.
-*/
+// TestModel_SetObjective1 This test verifies that the AddVariableVector function and some other functions
+// can be used to set the objective properly.
 func TestModel_SetObjective1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("test-setobjective1")
@@ -462,12 +408,7 @@ func TestModel_SetObjective1(t *testing.T) {
 	}
 }
 
-/*
-TestModel_AddConstr1
-Description:
-
-	Tests that a simple constraint (scalarlinearconstraint) can be given to the model.
-*/
+// TestModel_AddConstr1 Tests that a simple constraint (scalarlinearconstraint) can be given to the model.
 func TestModel_AddConstr1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("AddConstr1")
@@ -497,12 +438,7 @@ func TestModel_AddConstr1(t *testing.T) {
 
 }
 
-/*
-TestModel_AddConstraint2
-Description:
-
-	Tests that a simple constraint (VectorConstraint) can be given to the model.
-*/
+// TestModel_AddConstraint2 Tests that a simple constraint (VectorConstraint) can be given to the model.
 func TestModel_AddConstraint2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("AddConstraint1")
@@ -528,12 +464,7 @@ func TestModel_AddConstraint2(t *testing.T) {
 
 }
 
-/*
-TestModel_AddConstraint3
-Description:
-
-	Tests that a simple constraint (VectorConstraint) can be given to the model.
-*/
+// TestModel_AddConstraint3 Tests that a simple constraint (VectorConstraint) can be given to the model.
 func TestModel_AddConstraint3(t *testing.T) {
 	// Constants
 	m := optim.NewModel("AddConstraint1")
@@ -567,13 +498,8 @@ func TestModel_AddConstraint3(t *testing.T) {
 
 }
 
-/*
-TestModel_AddConstraint
-Description:
-
-	Tests that a simple constraint (VectorConstraint) can be given to the model
-	along with a nil error.
-*/
+// TestModel_AddConstraint4 Tests that a simple constraint (VectorConstraint) can be given to the model
+// along with a nil error.
 func TestModel_AddConstraint4(t *testing.T) {
 	// Constants
 	m := optim.NewModel("AddConstraint1")
@@ -608,13 +534,13 @@ func TestModel_AddConstraint4(t *testing.T) {
 
 }
 
-///*
+//
 //TestModel_AddConstraint5
-//Description:
+//
 //
 //	Tests that a simple constraint (VectorConstraint) can be given to the model
 //	along with a bool.
-//*/
+//
 //func TestModel_AddConstraint5(t *testing.T) {
 //	// Constants
 //	m := optim.NewModel("AddConstraint5")
@@ -651,13 +577,13 @@ func TestModel_AddConstraint4(t *testing.T) {
 //
 //}
 
-///*
+//
 //TestModel_AddConstraint6
-//Description:
+//
 //
 //	Tests that a simple constraint (VectorConstraint) can be given to the model
 //	along with a couple of bools.
-//*/
+//
 //func TestModel_AddConstraint6(t *testing.T) {
 //	// Constants
 //	m := optim.NewModel("AddConstraint6")

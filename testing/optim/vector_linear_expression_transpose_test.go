@@ -9,13 +9,8 @@ import (
 	"testing"
 )
 
-/*
-TestVectorLinearExpressionTranspose_Check1
-Description:
-
-	This test will evaluate whether or not the linear expression that has been given is valid.
-	In this case, the VectorLinearExpressionTranspose is valid.
-*/
+// TestVectorLinearExpressionTranspose_Check1 This test will evaluate whether or not the linear expression that has been given is valid.
+// In this case, the VectorLinearExpressionTranspose is valid.
 func TestVectorLinearExpressionTranspose_Check1(t *testing.T) {
 	m := optim.NewModel("Check1")
 	x := m.AddBinaryVariable()
@@ -41,13 +36,8 @@ func TestVectorLinearExpressionTranspose_Check1(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_Check2
-Description:
-
-	This test will evaluate whether or not the linear expression that has been given is valid.
-	In this case, the VectorLinearExpressionTranspose is NOT valid. L is too big in rows.
-*/
+// TestVectorLinearExpressionTranspose_Check2 This test will evaluate whether or not the linear expression that has been given is valid.
+// In this case, the VectorLinearExpressionTranspose is NOT valid. L is too big in rows.
 func TestVectorLinearExpressionTranspose_Check2(t *testing.T) {
 	m := optim.NewModel("Check2")
 	x := m.AddBinaryVariable()
@@ -78,13 +68,8 @@ func TestVectorLinearExpressionTranspose_Check2(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_Check3
-Description:
-
-	This test will evaluate whether or not the linear expression that has been given is valid.
-	In this case, the VectorLinearExpressionTranspose is NOT valid. L is too big in columns.
-*/
+// TestVectorLinearExpressionTranspose_Check3 This test will evaluate whether or not the linear expression that has been given is valid.
+// In this case, the VectorLinearExpressionTranspose is NOT valid. L is too big in columns.
 func TestVectorLinearExpressionTranspose_Check3(t *testing.T) {
 	m := optim.NewModel("Check3")
 	x := m.AddBinaryVariable()
@@ -115,12 +100,7 @@ func TestVectorLinearExpressionTranspose_Check3(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_VariableIDs1
-Description:
-
-	This test the VariableIDs() method when a variable vector with 2 unique vectors.
-*/
+// TestVectorLinearExpressionTranspose_VariableIDs1 This test the VariableIDs() method when a variable vector with 2 unique vectors.
 func TestVectorLinearExpressionTranspose_VariableIDs1(t *testing.T) {
 	m := optim.NewModel("VariableIDs1")
 	x := m.AddBinaryVariable()
@@ -156,12 +136,7 @@ func TestVectorLinearExpressionTranspose_VariableIDs1(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_VariableIDs2
-Description:
-
-	This test the VariableIDs() method works for a variable vector with 1 unique vectors.
-*/
+// TestVectorLinearExpressionTranspose_VariableIDs2 This test the VariableIDs() method works for a variable vector with 1 unique vectors.
 func TestVectorLinearExpressionTranspose_VariableIDs2(t *testing.T) {
 	m := optim.NewModel("VariableIDs2")
 	x := m.AddBinaryVariable()
@@ -201,12 +176,7 @@ func TestVectorLinearExpressionTranspose_VariableIDs2(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_NumVars1
-Description:
-
-	This test the NumVars() method when a variable vector with a short, unique vectors.
-*/
+// TestVectorLinearExpressionTranspose_NumVars1 This test the NumVars() method when a variable vector with a short, unique vectors.
 func TestVectorLinearExpressionTranspose_NumVars1(t *testing.T) {
 	m := optim.NewModel("VariableIDs1")
 	x := m.AddBinaryVariable()
@@ -236,12 +206,7 @@ func TestVectorLinearExpressionTranspose_NumVars1(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_Coeffs1
-Description:
-
-	This test the Coeffs() method which should return the matrix's elements in a prescribed order.
-*/
+// TestVectorLinearExpressionTranspose_Coeffs1 This test the Coeffs() method which should return the matrix's elements in a prescribed order.
 func TestVectorLinearExpressionTranspose_Coeffs1(t *testing.T) {
 	m := optim.NewModel("Coeffs1")
 	x := m.AddBinaryVariable()
@@ -285,12 +250,7 @@ func TestVectorLinearExpressionTranspose_Coeffs1(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_Coeffs2
-Description:
-
-	This test the Coeffs() method which should return the matrix's elements in a prescribed order.
-*/
+// TestVectorLinearExpressionTranspose_Coeffs2 This test the Coeffs() method which should return the matrix's elements in a prescribed order.
 func TestVectorLinearExpressionTranspose_Coeffs2(t *testing.T) {
 	m := optim.NewModel("Coeffs2")
 	x := m.AddBinaryVariable()
@@ -332,12 +292,7 @@ func TestVectorLinearExpressionTranspose_Coeffs2(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_LessEq1
-Description:
-
-	This tests that the less than or equal to command works with a constant input.
-*/
+// TestVectorLinearExpressionTranspose_LessEq1 This tests that the less than or equal to command works with a constant input.
 func TestVectorLinearExpressionTranspose_LessEq1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("TestVectorLinearExpressionTranspose_LessEq1")
@@ -380,12 +335,7 @@ func TestVectorLinearExpressionTranspose_LessEq1(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_GreaterEq1
-Description:
-
-	This tests that the greater than or equal to command works with a constant input.
-*/
+// TestVectorLinearExpressionTranspose_GreaterEq1 This tests that the greater than or equal to command works with a constant input.
 func TestVectorLinearExpressionTranspose_GreaterEq1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("TestVectorLinearExpressionTranspose_GreaterEq1")
@@ -428,12 +378,7 @@ func TestVectorLinearExpressionTranspose_GreaterEq1(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_Mult1
-Description:
-
-	Tests that the unfinished Mult() function is properly returning errors.
-*/
+// TestVectorLinearExpressionTranspose_Mult1 Tests that the unfinished Mult() function is properly returning errors.
 func TestVectorLinearExpressionTranspose_Mult1(t *testing.T) {
 	// Constants
 
@@ -465,15 +410,10 @@ func TestVectorLinearExpressionTranspose_Mult1(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_Eq1
-Description:
-
-	Tests whether or not an equality constraint between a ones vector and a standard vector variable works well.
-	Eq comparison between:
-	- Vector Linear Expression, and
-	- mat.VecDense
-*/
+// TestVectorLinearExpressionTranspose_Eq1 Tests whether or not an equality constraint between a ones vector and a standard vector variable works well.
+// Eq comparison between:
+// - Vector Linear Expression, and
+// - mat.VecDense
 func TestVectorLinearExpressionTranspose_Eq1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("VLETranspose-Eq1")
@@ -516,15 +456,10 @@ func TestVectorLinearExpressionTranspose_Eq1(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_Eq2
-Description:
-
-	Tests whether or not an equality constraint between a bool and a proper vector variable leads to an error.
-	Eq comparison between:
-	- Vector Linear Expression, and
-	- bool
-*/
+// TestVectorLinearExpressionTranspose_Eq2 Tests whether or not an equality constraint between a bool and a proper vector variable leads to an error.
+// Eq comparison between:
+// - Vector Linear Expression, and
+// - bool
 func TestVectorLinearExpressionTranspose_Eq2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Eq2")
@@ -558,15 +493,10 @@ func TestVectorLinearExpressionTranspose_Eq2(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_Eq3
-Description:
-
-	Tests whether or not an equality constraint between a KVector and a proper vector variable leads to an error.
-	Eq comparison between:
-	- Vector Linear Expression, and
-	- KVector
-*/
+// TestVectorLinearExpressionTranspose_Eq3 Tests whether or not an equality constraint between a KVector and a proper vector variable leads to an error.
+// Eq comparison between:
+// - Vector Linear Expression, and
+// - KVector
 func TestVectorLinearExpressionTranspose_Eq3(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Eq3")
@@ -605,16 +535,11 @@ func TestVectorLinearExpressionTranspose_Eq3(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_Eq4
-Description:
-
-	This test will evaluate how well the Eq() method for the vector of linear constraints works.
-	Creates a simple two-dimensional constraint.
-	Eq comparison between:
-	- Vector Linear Expression, and
-	- VarVector
-*/
+// TestVectorLinearExpressionTranspose_Eq4 This test will evaluate how well the Eq() method for the vector of linear constraints works.
+// Creates a simple two-dimensional constraint.
+// Eq comparison between:
+// - Vector Linear Expression, and
+// - VarVector
 func TestVectorLinearExpressionTranspose_Eq4(t *testing.T) {
 	m := optim.NewModel("Eq4")
 	dimX := 2
@@ -641,16 +566,11 @@ func TestVectorLinearExpressionTranspose_Eq4(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_Eq5
-Description:
-
-	This test will evaluate how well the Eq() method for the vector of linear constraints works.
-	Creates a simple two-dimensional constraint.
-	Eq comparison between:
-	- Vector Linear Expression, and
-	- Vector Linear Expression
-*/
+// TestVectorLinearExpressionTranspose_Eq5 This test will evaluate how well the Eq() method for the vector of linear constraints works.
+// Creates a simple two-dimensional constraint.
+// Eq comparison between:
+// - Vector Linear Expression, and
+// - Vector Linear Expression
 func TestVectorLinearExpressionTranspose_Eq5(t *testing.T) {
 	m := optim.NewModel("Eq5")
 	dimX := 2
@@ -677,15 +597,10 @@ func TestVectorLinearExpressionTranspose_Eq5(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_Eq16
-Description:
-
-	Tests whether or not an equality constraint between a ones vector and a standard vector variable works well.
-	Eq comparison between:
-	- Vector Linear Expression, and
-	- mat.VecDense
-*/
+// TestVectorLinearExpressionTranspose_Eq6 Tests whether or not an equality constraint between a ones vector and a standard vector variable works well.
+// Eq comparison between:
+// - Vector Linear Expression, and
+// - mat.VecDense
 func TestVectorLinearExpressionTranspose_Eq6(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Eq6")
@@ -720,13 +635,8 @@ func TestVectorLinearExpressionTranspose_Eq6(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_Len1
-Description:
-
-	This test will evaluate how well the Len() method for the vector of linear constraints works.
-	A constraint between two vectors of length 2
-*/
+// TestVectorLinearExpressionTranspose_Len1 This test will evaluate how well the Len() method for the vector of linear constraints works.
+// A constraint between two vectors of length 2
 func TestVectorLinearExpressionTranspose_Len1(t *testing.T) {
 	m := optim.NewModel("Len1")
 	x := m.AddBinaryVariable()
@@ -756,13 +666,8 @@ func TestVectorLinearExpressionTranspose_Len1(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_Len2
-Description:
-
-	This test will evaluate how well the Len() method for the vector of linear constraints works.
-	A constraint between two vectors of length 10
-*/
+// TestVectorLinearExpressionTranspose_Len2 This test will evaluate how well the Len() method for the vector of linear constraints works.
+// A constraint between two vectors of length 10
 func TestVectorLinearExpressionTranspose_Len2(t *testing.T) {
 	m := optim.NewModel("Len2")
 	x := m.AddBinaryVariable()
@@ -794,12 +699,7 @@ func TestVectorLinearExpressionTranspose_Len2(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_Plus1
-Description:
-
-	Add VectorLinearExpressionTranspose to a KVector of appropriate length.
-*/
+// TestVectorLinearExpressionTranspose_Plus1 Add VectorLinearExpressionTranspose to a KVector of appropriate length.
 func TestVectorLinearExpressionTranspose_Plus1(t *testing.T) {
 	// Constants
 	n := 5
@@ -862,12 +762,7 @@ func TestVectorLinearExpressionTranspose_Plus1(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_Plus2
-Description:
-
-	Add VectorLinearExpressionTranspose to a KVector of inappropriate length.
-*/
+// TestVectorLinearExpressionTranspose_Plus2 Add VectorLinearExpressionTranspose to a KVector of inappropriate length.
 func TestVectorLinearExpressionTranspose_Plus2(t *testing.T) {
 	// Constants
 	n := 5
@@ -901,13 +796,8 @@ func TestVectorLinearExpressionTranspose_Plus2(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_Plus3
-Description:
-
-	Add VectorLinearExpressionTranspose to a KVector of appropriate length.
-	Nonzero offset in VectorLinearExpressionTranspose.
-*/
+// TestVectorLinearExpressionTranspose_Plus3 Add VectorLinearExpressionTranspose to a KVector of appropriate length.
+// Nonzero offset in VectorLinearExpressionTranspose.
 func TestVectorLinearExpressionTranspose_Plus3(t *testing.T) {
 	// Constants
 	n := 5
@@ -970,12 +860,7 @@ func TestVectorLinearExpressionTranspose_Plus3(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_Plus4
-Description:
-
-	Add VectorLinearExpressionTranspose to a VarVector of appropriate length.
-*/
+// TestVectorLinearExpressionTranspose_Plus4 Add VectorLinearExpressionTranspose to a VarVector of appropriate length.
 func TestVectorLinearExpressionTranspose_Plus4(t *testing.T) {
 	// Constants
 	n := 5
@@ -1049,12 +934,7 @@ func TestVectorLinearExpressionTranspose_Plus4(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_Plus5
-Description:
-
-	Add VectorLinearExpressionTranspose to a VarVector of appropriate length.
-*/
+// TestVectorLinearExpressionTranspose_Plus5 Add VectorLinearExpressionTranspose to a VarVector of appropriate length.
 func TestVectorLinearExpressionTranspose_Plus5(t *testing.T) {
 	// Constants
 	n := 5
@@ -1125,12 +1005,7 @@ func TestVectorLinearExpressionTranspose_Plus5(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_Plus6
-Description:
-
-	Add VectorLinearExpressionTranspose to a VectorLinearExpressionTranspose of appropriate length. (But different variables)
-*/
+// TestVectorLinearExpressionTranspose_Plus6 Add VectorLinearExpressionTranspose to a VectorLinearExpressionTranspose of appropriate length. (But different variables)
 func TestVectorLinearExpressionTranspose_Plus6(t *testing.T) {
 	// Constants
 	n := 5
@@ -1209,12 +1084,7 @@ func TestVectorLinearExpressionTranspose_Plus6(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_Plus7
-Description:
-
-	Add VectorLinearExpressionTranspose to a KVector.
-*/
+// TestVectorLinearExpressionTranspose_Plus7 Add VectorLinearExpressionTranspose to a KVector.
 func TestVectorLinearExpressionTranspose_Plus7(t *testing.T) {
 	// Constants
 	n := 5
@@ -1248,12 +1118,7 @@ func TestVectorLinearExpressionTranspose_Plus7(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_Plus8
-Description:
-
-	Add VectorLinearExpressionTranspose to a VarVector.
-*/
+// TestVectorLinearExpressionTranspose_Plus8 Add VectorLinearExpressionTranspose to a VarVector.
 func TestVectorLinearExpressionTranspose_Plus8(t *testing.T) {
 	// Constants
 	n := 5
@@ -1284,12 +1149,7 @@ func TestVectorLinearExpressionTranspose_Plus8(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_Plus9
-Description:
-
-	Add VectorLinearExpressionTranspose to a VectorLinearExpression.
-*/
+// TestVectorLinearExpressionTranspose_Plus9 Add VectorLinearExpressionTranspose to a VectorLinearExpression.
 func TestVectorLinearExpressionTranspose_Plus9(t *testing.T) {
 	// Constants
 	n := 5
@@ -1319,12 +1179,7 @@ func TestVectorLinearExpressionTranspose_Plus9(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_Plus10
-Description:
-
-	Add VectorLinearExpressionTranspose to a VectorLinearExpression.
-*/
+// TestVectorLinearExpressionTranspose_Plus10 Add VectorLinearExpressionTranspose to a VectorLinearExpression.
 func TestVectorLinearExpressionTranspose_Plus10(t *testing.T) {
 	// Constants
 	n := 5
@@ -1355,13 +1210,8 @@ func TestVectorLinearExpressionTranspose_Plus10(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_Plus11
-Description:
-
-	Add VectorLinearExpressionTranspose to a VectorLinearExpressionTranspose
-	that is not of the right size.
-*/
+// TestVectorLinearExpressionTranspose_Plus11 Add VectorLinearExpressionTranspose to a VectorLinearExpressionTranspose
+// that is not of the right size.
 func TestVectorLinearExpressionTranspose_Plus11(t *testing.T) {
 	// Constants
 	n := 5
@@ -1398,12 +1248,7 @@ func TestVectorLinearExpressionTranspose_Plus11(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_Comparison1
-Description:
-
-	Compares a VectorLinearExpressionTranspose with a constant vector.
-*/
+// TestVectorLinearExpressionTranspose_Comparison1 Compares a VectorLinearExpressionTranspose with a constant vector.
 func TestVectorLinearExpressionTranspose_Comparison1(t *testing.T) {
 	// Constants
 	n := 5
@@ -1433,12 +1278,7 @@ func TestVectorLinearExpressionTranspose_Comparison1(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_Comparison2
-Description:
-
-	Compares a VectorLinearExpressionTranspose with a constant vector transpose.
-*/
+// TestVectorLinearExpressionTranspose_Comparison2 Compares a VectorLinearExpressionTranspose with a constant vector transpose.
 func TestVectorLinearExpressionTranspose_Comparison2(t *testing.T) {
 	// Constants
 	n := 5
@@ -1469,12 +1309,7 @@ func TestVectorLinearExpressionTranspose_Comparison2(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_Comparison3
-Description:
-
-	Compares a VectorLinearExpressionTranspose with a var vector.
-*/
+// TestVectorLinearExpressionTranspose_Comparison3 Compares a VectorLinearExpressionTranspose with a var vector.
 func TestVectorLinearExpressionTranspose_Comparison3(t *testing.T) {
 	// Constants
 	n := 5
@@ -1504,13 +1339,8 @@ func TestVectorLinearExpressionTranspose_Comparison3(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_Comparison4
-Description:
-
-	Compares a VectorLinearExpressionTranspose with a varVectorTranspose
-	of the wrong shape.
-*/
+// TestVectorLinearExpressionTranspose_Comparison4 Compares a VectorLinearExpressionTranspose with a varVectorTranspose
+// of the wrong shape.
 func TestVectorLinearExpressionTranspose_Comparison4(t *testing.T) {
 	// Constants
 	n := 5
@@ -1541,12 +1371,7 @@ func TestVectorLinearExpressionTranspose_Comparison4(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_Comparison5
-Description:
-
-	Compares a VectorLinearExpressionTranspose with a vector linear expression.
-*/
+// TestVectorLinearExpressionTranspose_Comparison5 Compares a VectorLinearExpressionTranspose with a vector linear expression.
 func TestVectorLinearExpressionTranspose_Comparison5(t *testing.T) {
 	// Constants
 	n := 5
@@ -1575,13 +1400,8 @@ func TestVectorLinearExpressionTranspose_Comparison5(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_Comparison6
-Description:
-
-	Compares a VectorLinearExpressionTranspose with a vector linear expression transpose of
-	the wrong shape.
-*/
+// TestVectorLinearExpressionTranspose_Comparison6 Compares a VectorLinearExpressionTranspose with a vector linear expression transpose of
+// the wrong shape.
 func TestVectorLinearExpressionTranspose_Comparison6(t *testing.T) {
 	// Constants
 	n := 5
@@ -1617,12 +1437,7 @@ func TestVectorLinearExpressionTranspose_Comparison6(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_AtVec1
-Description:
-
-	Tests to make sure that AtVec properly works.
-*/
+// TestVectorLinearExpressionTranspose_AtVec1 Tests to make sure that AtVec properly works.
 func TestVectorLinearExpressionTranspose_AtVec1(t *testing.T) {
 	// Constants
 	n := 5
@@ -1642,12 +1457,7 @@ func TestVectorLinearExpressionTranspose_AtVec1(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_Transpose1
-Description:
-
-	Tests to make sure that AtVec properly works.
-*/
+// TestVectorLinearExpressionTranspose_Transpose1 Tests to make sure that AtVec properly works.
 func TestVectorLinearExpressionTranspose_Transpose1(t *testing.T) {
 	// Constants
 	n := 5
@@ -1667,12 +1477,7 @@ func TestVectorLinearExpressionTranspose_Transpose1(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_Multiply1
-Description:
-
-	Tests what happens if the errors input contains a bad error choice.
-*/
+// TestVectorLinearExpressionTranspose_Multiply1 Tests what happens if the errors input contains a bad error choice.
 func TestVectorLinearExpressionTranspose_Multiply1(t *testing.T) {
 	// Constants
 	n := 5
@@ -1705,12 +1510,7 @@ func TestVectorLinearExpressionTranspose_Multiply1(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_Multiply2
-Description:
-
-	Tests what happens if the errors input contains a nil error choice.
-*/
+// TestVectorLinearExpressionTranspose_Multiply2 Tests what happens if the errors input contains a nil error choice.
 func TestVectorLinearExpressionTranspose_Multiply2(t *testing.T) {
 	// Constants
 	n := 5
@@ -1769,13 +1569,8 @@ func TestVectorLinearExpressionTranspose_Multiply2(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_Multiply3
-Description:
-
-	Tests what happens if the input to errors has a
-	float input but has large size.
-*/
+// TestVectorLinearExpressionTranspose_Multiply3 Tests what happens if the input to errors has a
+// float input but has large size.
 func TestVectorLinearExpressionTranspose_Multiply3(t *testing.T) {
 	// Constants
 	n := 5
@@ -1811,13 +1606,8 @@ func TestVectorLinearExpressionTranspose_Multiply3(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_Multiply4
-Description:
-
-	Tests what happens if the input to errors has a
-	float input. With VLE that happens to be of dimension 1.
-*/
+// TestVectorLinearExpressionTranspose_Multiply4 Tests what happens if the input to errors has a
+// float input. With VLE that happens to be of dimension 1.
 func TestVectorLinearExpressionTranspose_Multiply4(t *testing.T) {
 	// Constants
 	n := 1
@@ -1870,13 +1660,8 @@ func TestVectorLinearExpressionTranspose_Multiply4(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_ToScalarExpression1
-Description:
-
-	ToScalarExpression() should throw an error because the vlet1
-	was malformed.
-*/
+// TestVectorLinearExpressionTranspose_ToScalarExpression1 ToScalarExpression() should throw an error because the vlet1
+// was malformed.
 func TestVectorLinearExpressionTranspose_ToScalarExpression1(t *testing.T) {
 	// Constants
 	n := 5
@@ -1911,13 +1696,8 @@ func TestVectorLinearExpressionTranspose_ToScalarExpression1(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_ToScalarExpression2
-Description:
-
-	ToScalarExpression() should throw an error when the vlet1
-	has dimension larger than 1.
-*/
+// TestVectorLinearExpressionTranspose_ToScalarExpression2 ToScalarExpression() should throw an error when the vlet1
+// has dimension larger than 1.
 func TestVectorLinearExpressionTranspose_ToScalarExpression2(t *testing.T) {
 	// Constants
 	n := 5
@@ -1949,13 +1729,8 @@ func TestVectorLinearExpressionTranspose_ToScalarExpression2(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_ToScalarExpression3
-Description:
-
-	ToScalarExpression() should throw an error when the vlet1
-	has dimension 1.
-*/
+// TestVectorLinearExpressionTranspose_ToScalarExpression3 ToScalarExpression() should throw an error when the vlet1
+// has dimension 1.
 func TestVectorLinearExpressionTranspose_ToScalarExpression3(t *testing.T) {
 	// Constants
 	n := 1
@@ -1990,13 +1765,8 @@ func TestVectorLinearExpressionTranspose_ToScalarExpression3(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_ToScalarExpression4
-Description:
-
-	ToScalarExpression() should throw an error when the vlet1
-	has dimension 1 AND is a non square matrix.
-*/
+// TestVectorLinearExpressionTranspose_ToScalarExpression4 ToScalarExpression() should throw an error when the vlet1
+// has dimension 1 AND is a non square matrix.
 func TestVectorLinearExpressionTranspose_ToScalarExpression4(t *testing.T) {
 	// Constants
 	n := 5
@@ -2037,13 +1807,8 @@ func TestVectorLinearExpressionTranspose_ToScalarExpression4(t *testing.T) {
 
 }
 
-/*
-TestVectorLinearExpressionTranspose_ToSymbolic1
-Description:
-
-	ToSymbolic() should throw an error when the vlet1
-	is not well-defined.
-*/
+// TestVectorLinearExpressionTranspose_ToSymbolic1 ToSymbolic() should throw an error when the vlet1
+// is not well-defined.
 func TestVectorLinearExpressionTranspose_ToSymbolic1(t *testing.T) {
 	// Constants
 	n := 5
@@ -2077,13 +1842,8 @@ func TestVectorLinearExpressionTranspose_ToSymbolic1(t *testing.T) {
 	}
 }
 
-/*
-TestVectorLinearExpressionTranspose_ToSymbolic2
-Description:
-
-	ToSymbolic() should produce a VectorPolynomialExpression
-	when the vlet1 is well-defined.
-*/
+// TestVectorLinearExpressionTranspose_ToSymbolic2 ToSymbolic() should produce a VectorPolynomialExpression
+// when the vlet1 is well-defined.
 func TestVectorLinearExpressionTranspose_ToSymbolic2(t *testing.T) {
 	// Constants
 	n := 5

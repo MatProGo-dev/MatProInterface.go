@@ -9,18 +9,9 @@ import (
 	"testing"
 )
 
-/*
-vector_constant_transposed_test.go
-Description:
-	Tests the new type KVectorTranspose which represents a constant vector.
-*/
+// Tests the new type KVectorTranspose which represents a constant vector.
 
-/*
-TestKVectorTranspose_Check1
-Description:
-
-	Tests that the Check() method returns nil.
-*/
+// TestKVectorTranspose_Check1 Tests that the Check() method returns nil.
 func TestKVectorTranspose_Check1(t *testing.T) {
 	// Create a KVectorTranspose
 	desLength := 4
@@ -32,13 +23,8 @@ func TestKVectorTranspose_Check1(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_At1
-Description:
-
-	This test verifies whether or not a 1 is retrieved when we create a KVectorTranspose
-	using OnesVector().
-*/
+// TestKVectorTranspose_AtVec1 This test verifies whether or not a 1 is retrieved when we create a KVectorTranspose
+// using OnesVector().
 func TestKVectorTranspose_AtVec1(t *testing.T) {
 	// Create a KVectorTranspose
 	desLength := 4
@@ -50,13 +36,8 @@ func TestKVectorTranspose_AtVec1(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_At2
-Description:
-
-	This test verifies whether or not an arbitrary number is retrieved when we create a KVectorTranspose
-	using NewVecDense().
-*/
+// TestKVectorTranspose_AtVec2 This test verifies whether or not an arbitrary number is retrieved when we create a KVectorTranspose
+// using NewVecDense().
 func TestKVectorTranspose_AtVec2(t *testing.T) {
 	// Create a KVectorTranspose
 	vec1Elts := []float64{1.0, 3.0, 5.0, 7.0, 9.0}
@@ -68,13 +49,8 @@ func TestKVectorTranspose_AtVec2(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Len1
-Description:
-
-	This function tests that the Len() method works.
-	(Should be inherited from the base type mat.DenseVec)
-*/
+// TestKVectorTranspose_Len1 This function tests that the Len() method works.
+// (Should be inherited from the base type mat.DenseVec)
 func TestKVectorTranspose_Len1(t *testing.T) {
 	// Create a KVectorTranspose
 	desLength := 4
@@ -85,12 +61,7 @@ func TestKVectorTranspose_Len1(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Len2
-Description:
-
-	This function tests that the Len() method is properly inherited by KVectorTranspose.
-*/
+// TestKVectorTranspose_Len2 This function tests that the Len() method is properly inherited by KVectorTranspose.
 func TestKVectorTranspose_Len2(t *testing.T) {
 	// Create a KVectorTranspose
 	desLength := 10
@@ -101,12 +72,7 @@ func TestKVectorTranspose_Len2(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_NumVars1
-Description:
-
-	Verify that the number of variables associated with the constant vector is zero.
-*/
+// TestKVectorTranspose_NumVars1 Verify that the number of variables associated with the constant vector is zero.
 func TestKVectorTranspose_NumVars1(t *testing.T) {
 	// Constant
 	kv1 := optim.KVectorTranspose(optim.OnesVector(10))
@@ -121,12 +87,7 @@ func TestKVectorTranspose_NumVars1(t *testing.T) {
 
 }
 
-/*
-TestKVectorTranspose_IDs1()
-Description:
-
-	Verify that the number of variables associated with the constant vector is zero.
-*/
+// TestKVectorTranspose_IDs1 Verify that the number of variables associated with the constant vector is zero.
 func TestKVectorTranspose_IDs1(t *testing.T) {
 	// Constant
 	kv1 := optim.KVectorTranspose(optim.OnesVector(10))
@@ -141,12 +102,7 @@ func TestKVectorTranspose_IDs1(t *testing.T) {
 
 }
 
-/*
-TestKVectorTranspose_LinearCoeff1
-Description:
-
-	Verify that the number of variables associated with the constant vector is zero.
-*/
+// TestKVectorTranspose_LinearCoeff1 Verify that the number of variables associated with the constant vector is zero.
 func TestKVectorTranspose_LinearCoeff1(t *testing.T) {
 	// Constant
 	kv1 := optim.KVectorTranspose(optim.OnesVector(10))
@@ -176,12 +132,7 @@ func TestKVectorTranspose_LinearCoeff1(t *testing.T) {
 
 }
 
-/*
-TestKVectorTranspose_Constant1
-Description:
-
-	Tests that the constant function correctly retrieves a matrix.
-*/
+// TestKVectorTranspose_Constant1 Tests that the constant function correctly retrieves a matrix.
 func TestKVectorTranspose_Constant1(t *testing.T) {
 	// Constant
 	kv1 := optim.KVectorTranspose(optim.OnesVector(10))
@@ -207,12 +158,7 @@ func TestKVectorTranspose_Constant1(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Comparison1
-Description:
-
-	This function tests that the Comparison() method is properly working for KVectorTranspose inputs.
-*/
+// TestKVectorTranspose_Comparison1 This function tests that the Comparison() method is properly working for KVectorTranspose inputs.
 func TestKVectorTranspose_Comparison1(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -234,16 +180,11 @@ func TestKVectorTranspose_Comparison1(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Comparison2
-Description:
-
-	This function tests that the Comparison() method is properly working for KVectorTranspose inputs.
-	Uses SenseLessThanEqual.
-	Comparison of:
-	- KVectorTranspose
-	- VarVector
-*/
+// TestKVectorTranspose_Comparison2 This function tests that the Comparison() method is properly working for KVectorTranspose inputs.
+// Uses SenseLessThanEqual.
+// Comparison of:
+// - KVectorTranspose
+// - VarVector
 func TestKVectorTranspose_Comparison2(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -266,16 +207,11 @@ func TestKVectorTranspose_Comparison2(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Comparison3
-Description:
-
-	This function tests that the Comparison() method is properly working for KVectorTranspose inputs.
-	Uses SenseGreaterThanEqual.
-	Comparison of:
-	- KVectorTranspose
-	- VectorLinearExpression
-*/
+// TestKVectorTranspose_Comparison3 This function tests that the Comparison() method is properly working for KVectorTranspose inputs.
+// Uses SenseGreaterThanEqual.
+// Comparison of:
+// - KVectorTranspose
+// - VectorLinearExpression
 func TestKVectorTranspose_Comparison3(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -306,17 +242,12 @@ func TestKVectorTranspose_Comparison3(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Comparison4
-Description:
-
-	This function tests that the Comparison() method is properly working for KVectorTranspose inputs.
-	Input is bad (dimension of linear vector expression is different from constant vector) and error should be thrown.
-	Uses SenseGreaterThanEqual.
-	Comparison of:
-	- KVectorTranspose
-	- VectorLinearExpression
-*/
+// TestKVectorTranspose_Comparison4 This function tests that the Comparison() method is properly working for KVectorTranspose inputs.
+// Input is bad (dimension of linear vector expression is different from constant vector) and error should be thrown.
+// Uses SenseGreaterThanEqual.
+// Comparison of:
+// - KVectorTranspose
+// - VectorLinearExpression
 func TestKVectorTranspose_Comparison4(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -339,18 +270,13 @@ func TestKVectorTranspose_Comparison4(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Comparison5
-Description:
-
-	This function tests that the Comparison() method is properly working
-	for KVectorTranspose.
-	Uses SenseLessThanEqual.
-	Comparison of:
-	- KVectorTranspose
-	- VarVector
-	Should throw error
-*/
+// TestKVectorTranspose_Comparison5 This function tests that the Comparison() method is properly working
+// for KVectorTranspose.
+// Uses SenseLessThanEqual.
+// Comparison of:
+// - KVectorTranspose
+// - VarVector
+// Should throw error
 func TestKVectorTranspose_Comparison5(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -371,12 +297,7 @@ func TestKVectorTranspose_Comparison5(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_LessEq1
-Description:
-
-	This function tests that the LessEq() method is properly working for KVector inputs.
-*/
+// TestKVectorTranspose_LessEq1 This function tests that the LessEq() method is properly working for KVector inputs.
 func TestKVectorTranspose_LessEq1(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -396,13 +317,8 @@ func TestKVectorTranspose_LessEq1(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_GreaterEq1
-Description:
-
-	This function tests that the GreaterEq() method is properly working for
-	KVectorTranspose inputs of improper length.
-*/
+// TestKVectorTranspose_GreaterEq1 This function tests that the GreaterEq() method is properly working for
+// KVectorTranspose inputs of improper length.
 func TestKVectorTranspose_GreaterEq1(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -423,13 +339,8 @@ func TestKVectorTranspose_GreaterEq1(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Eq1
-Description:
-
-	This function tests that the Eq() method is properly working for
-	when given an unexpected type input.
-*/
+// TestKVectorTranspose_Eq1 This function tests that the Eq() method is properly working for
+// when given an unexpected type input.
 func TestKVectorTranspose_Eq1(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -451,12 +362,7 @@ func TestKVectorTranspose_Eq1(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Plus1
-Description:
-
-	Tests the addition of KVectorTranspose with another KVectorTranspose
-*/
+// TestKVectorTranspose_Plus1 Tests the addition of KVectorTranspose with another KVectorTranspose
 func TestKVectorTranspose_Plus1(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -487,12 +393,7 @@ func TestKVectorTranspose_Plus1(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Plus2
-Description:
-
-	Tests the addition of KVectorTranspose with a float64
-*/
+// TestKVectorTranspose_Plus2 Tests the addition of KVectorTranspose with a float64
 func TestKVectorTranspose_Plus2(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -523,12 +424,7 @@ func TestKVectorTranspose_Plus2(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Plus3
-Description:
-
-	Tests the addition of KVectorTranspose with a K
-*/
+// TestKVectorTranspose_Plus3 Tests the addition of KVectorTranspose with a K
 func TestKVectorTranspose_Plus3(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -559,12 +455,7 @@ func TestKVectorTranspose_Plus3(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Plus4
-Description:
-
-	Tests the addition of KVectorTranspose with a mat.VecDense vector
-*/
+// TestKVectorTranspose_Plus4 Tests the addition of KVectorTranspose with a mat.VecDense vector
 func TestKVectorTranspose_Plus4(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -595,12 +486,7 @@ func TestKVectorTranspose_Plus4(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Plus5
-Description:
-
-	Tests the addition of KVectorTranspose with a mat.VecDense of improper length
-*/
+// TestKVectorTranspose_Plus5 Tests the addition of KVectorTranspose with a mat.VecDense of improper length
 func TestKVectorTranspose_Plus5(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -622,12 +508,7 @@ func TestKVectorTranspose_Plus5(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Plus6
-Description:
-
-	Tests the addition of KVectorTranspose with another KVectorTranspose. Length mismatch.
-*/
+// TestKVectorTranspose_Plus6 Tests the addition of KVectorTranspose with another KVectorTranspose. Length mismatch.
 func TestKVectorTranspose_Plus6(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -650,12 +531,7 @@ func TestKVectorTranspose_Plus6(t *testing.T) {
 
 }
 
-/*
-TestKVectorTranspose_Plus7
-Description:
-
-	Tests the addition of KVectorTranspose with a VarVector
-*/
+// TestKVectorTranspose_Plus7 Tests the addition of KVectorTranspose with a VarVector
 func TestKVectorTranspose_Plus7(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -709,12 +585,7 @@ func TestKVectorTranspose_Plus7(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Plus8
-Description:
-
-	Tests the addition of KVectorTranspose with a VectorLinearExpr
-*/
+// TestKVectorTranspose_Plus8 Tests the addition of KVectorTranspose with a VectorLinearExpr
 func TestKVectorTranspose_Plus8(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -769,12 +640,7 @@ func TestKVectorTranspose_Plus8(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Plus9
-Description:
-
-	Tests the addition of KVectorTranspose with a bool
-*/
+// TestKVectorTranspose_Plus9 Tests the addition of KVectorTranspose with a bool
 func TestKVectorTranspose_Plus9(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -792,12 +658,7 @@ func TestKVectorTranspose_Plus9(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Plus10
-Description:
-
-	Tests the addition of KVectorTranspose with a bool
-*/
+// TestKVectorTranspose_Plus10 Tests the addition of KVectorTranspose with a bool
 func TestKVectorTranspose_Plus10(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -819,12 +680,7 @@ func TestKVectorTranspose_Plus10(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Plus11
-Description:
-
-	Tests the addition of KVectorTranspose with a bool
-*/
+// TestKVectorTranspose_Plus11 Tests the addition of KVectorTranspose with a bool
 func TestKVectorTranspose_Plus11(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -846,12 +702,7 @@ func TestKVectorTranspose_Plus11(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Plus12
-Description:
-
-	Tests the addition of KVectorTranspose with a varvector
-*/
+// TestKVectorTranspose_Plus12 Tests the addition of KVectorTranspose with a varvector
 func TestKVectorTranspose_Plus12(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -873,12 +724,7 @@ func TestKVectorTranspose_Plus12(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Plus13
-Description:
-
-	Tests the addition of KVectorTranspose with a vle
-*/
+// TestKVectorTranspose_Plus13 Tests the addition of KVectorTranspose with a vle
 func TestKVectorTranspose_Plus13(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -905,12 +751,7 @@ func TestKVectorTranspose_Plus13(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Plus14
-Description:
-
-	Tests the addition of KVectorTranspose with a vletranspose
-*/
+// TestKVectorTranspose_Plus14 Tests the addition of KVectorTranspose with a vletranspose
 func TestKVectorTranspose_Plus14(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -937,12 +778,7 @@ func TestKVectorTranspose_Plus14(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Mult1
-Description:
-
-	Tests that the scalar multiplication function works as expected.
-*/
+// TestKVectorTranspose_Mult1 Tests that the scalar multiplication function works as expected.
 func TestKVectorTranspose_Mult1(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -970,12 +806,7 @@ func TestKVectorTranspose_Mult1(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Multiply1
-Description:
-
-	Tests that the scalar multiplication function works as expected.
-*/
+// TestKVectorTranspose_Multiply1 Tests that the scalar multiplication function works as expected.
 func TestKVectorTranspose_Multiply1(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -1001,12 +832,7 @@ func TestKVectorTranspose_Multiply1(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Multiply2
-Description:
-
-	Tests that the multiplication function works as expected for K input.
-*/
+// TestKVectorTranspose_Multiply2 Tests that the multiplication function works as expected for K input.
 func TestKVectorTranspose_Multiply2(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -1032,12 +858,7 @@ func TestKVectorTranspose_Multiply2(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Multiply3
-Description:
-
-	Tests that the multiplication function works as expected for mat.VecDense input.
-*/
+// TestKVectorTranspose_Multiply3 Tests that the multiplication function works as expected for mat.VecDense input.
 func TestKVectorTranspose_Multiply3(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -1063,12 +884,7 @@ func TestKVectorTranspose_Multiply3(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Multiply4
-Description:
-
-	Tests that the multiplication function works as expected for KVector input.
-*/
+// TestKVectorTranspose_Multiply4 Tests that the multiplication function works as expected for KVector input.
 func TestKVectorTranspose_Multiply4(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -1094,12 +910,7 @@ func TestKVectorTranspose_Multiply4(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_Multiply5
-Description:
-
-	Tests that the multiplication function works as expected for KVectorTranspose input.
-*/
+// TestKVectorTranspose_Multiply5 Tests that the multiplication function works as expected for KVectorTranspose input.
 func TestKVectorTranspose_Multiply5(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -1121,12 +932,7 @@ func TestKVectorTranspose_Multiply5(t *testing.T) {
 
 }
 
-/*
-TestKVectorTranspose_Multiply6
-Description:
-
-	Tests that the multiplication function works as expected when a bad error is provided.
-*/
+// TestKVectorTranspose_Multiply6 Tests that the multiplication function works as expected when a bad error is provided.
 func TestKVectorTranspose_Multiply6(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -1149,12 +955,7 @@ func TestKVectorTranspose_Multiply6(t *testing.T) {
 
 }
 
-/*
-TestKVectorTranspose_Multiply7
-Description:
-
-	Tests that the multiplication function works as expected when a vector of the wrong length is provided.
-*/
+// TestKVectorTranspose_Multiply7 Tests that the multiplication function works as expected when a vector of the wrong length is provided.
 func TestKVectorTranspose_Multiply7(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -1180,12 +981,7 @@ func TestKVectorTranspose_Multiply7(t *testing.T) {
 
 }
 
-/*
-TestKVectorTranspose_Transpose1
-Description:
-
-	Tests that the transpose function works as expected.
-*/
+// TestKVectorTranspose_Transpose1 Tests that the transpose function works as expected.
 func TestKVectorTranspose_Transpose1(t *testing.T) {
 	// Constants
 	desLength := 10
@@ -1206,13 +1002,8 @@ func TestKVectorTranspose_Transpose1(t *testing.T) {
 	}
 }
 
-/*
-TestKVectorTranspose_ToSymbolic1
-Description:
-
-	Tests that the ToSymbolic function works as expected.
-	Expects for the error to be nil and for the result to be a symbolic.KMatrix
-*/
+// TestKVectorTranspose_ToSymbolic1 Tests that the ToSymbolic function works as expected.
+// Expects for the error to be nil and for the result to be a symbolic.KMatrix
 func TestKVectorTranspose_ToSymbolic1(t *testing.T) {
 	// Constants
 	desLength := 10

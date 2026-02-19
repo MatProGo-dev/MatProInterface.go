@@ -7,18 +7,9 @@ import (
 	"testing"
 )
 
-/*
-vars_test.go
-Description:
-	Testing functions relevant to the Var() object. (Scalar Variable)
-*/
+// Testing functions relevant to the Var() object. (Scalar Variable)
 
-/*
-TestVar_NumVars1
-Description:
-
-	Tests whether or not NumVars returns 1 for a single variable.
-*/
+// TestVar_NumVars1 Tests whether or not NumVars returns 1 for a single variable.
 func TestVar_NumVars1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("NumVars1")
@@ -35,12 +26,7 @@ func TestVar_NumVars1(t *testing.T) {
 
 }
 
-/*
-TestVar_Constant1
-Description:
-
-	Tests whether or not NumVars returns 0 as the constant included in the a single variable.
-*/
+// TestVar_Constant1 Tests whether or not NumVars returns 0 as the constant included in the a single variable.
 func TestVar_Constant1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Var-Constant1")
@@ -57,12 +43,7 @@ func TestVar_Constant1(t *testing.T) {
 
 }
 
-/*
-TestVar_Plus1
-Description:
-
-	Tests the approach of performing addition of a var with a constant.
-*/
+// TestVar_Plus1 Tests the approach of performing addition of a var with a constant.
 func TestVar_Plus1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Plus1")
@@ -98,12 +79,7 @@ func TestVar_Plus1(t *testing.T) {
 	}
 }
 
-/*
-TestVar_Plus2
-Description:
-
-	Tests the approach of performing addition of a var with a var.
-*/
+// TestVar_Plus2 Tests the approach of performing addition of a var with a var.
 func TestVar_Plus2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Plus2")
@@ -146,12 +122,7 @@ func TestVar_Plus2(t *testing.T) {
 	}
 }
 
-/*
-TestVar_Plus3
-Description:
-
-	Tests the approach of performing addition of a var with a scalar linear expression.
-*/
+// TestVar_Plus3 Tests the approach of performing addition of a var with a scalar linear expression.
 func TestVar_Plus3(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Plus3")
@@ -237,12 +208,7 @@ func TestVar_Plus3(t *testing.T) {
 	}
 }
 
-/*
-TestVar_Plus4
-Description:
-
-	Tests the approach of performing addition of a var with a scalar quadratic expression.
-*/
+// TestVar_Plus4 Tests the approach of performing addition of a var with a scalar quadratic expression.
 func TestVar_Plus4(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Plus4")
@@ -330,12 +296,7 @@ func TestVar_Plus4(t *testing.T) {
 	}
 }
 
-/*
-TestVar_Plus5
-Description:
-
-	Tests that the Plus method properly throws an error.
-*/
+// TestVar_Plus5 Tests that the Plus method properly throws an error.
 func TestVar_Plus5(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Plus1")
@@ -358,13 +319,8 @@ func TestVar_Plus5(t *testing.T) {
 	}
 }
 
-/*
-TestVar_Plus6
-Description:
-
-	Tests the approach of performing addition of a var with a var
-	when the var is the same.
-*/
+// TestVar_Plus6 Tests the approach of performing addition of a var with a var
+// when the var is the same.
 func TestVar_Plus6(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Plus2")
@@ -405,12 +361,7 @@ func TestVar_Plus6(t *testing.T) {
 	}
 }
 
-/*
-TestVariable_Multiply1
-Description:
-
-	Tests how well the Multiply() function works between a variable and a float.
-*/
+// TestVariable_Multiply1 Tests how well the Multiply() function works between a variable and a float.
 func TestVariable_Multiply1(t *testing.T) {
 	//Constants
 	m := optim.NewModel("Test-Variable-Multiply1")
@@ -454,12 +405,7 @@ func TestVariable_Multiply1(t *testing.T) {
 	}
 }
 
-/*
-TestVariable_Multiply2
-Description:
-
-	Tests how well the Multiply() function works between a variable and a K.
-*/
+// TestVariable_Multiply2 Tests how well the Multiply() function works between a variable and a K.
 func TestVariable_Multiply2(t *testing.T) {
 	//Constants
 	m := optim.NewModel("Test-Variable-Multiply2")
@@ -503,12 +449,7 @@ func TestVariable_Multiply2(t *testing.T) {
 	}
 }
 
-/*
-TestVariable_Multiply3
-Description:
-
-	Tests how well the Multiply() function works between a variable and a variable (different).
-*/
+// TestVariable_Multiply3 Tests how well the Multiply() function works between a variable and a variable (different).
 func TestVariable_Multiply3(t *testing.T) {
 	//Constants
 	m := optim.NewModel("Test-Variable-Multiply1")
@@ -563,12 +504,7 @@ func TestVariable_Multiply3(t *testing.T) {
 
 }
 
-/*
-TestVariable_Multiply4
-Description:
-
-	Tests how well the Multiply() function works between a variable and a variable (same as original).
-*/
+// TestVariable_Multiply4 Tests how well the Multiply() function works between a variable and a variable (same as original).
 func TestVariable_Multiply4(t *testing.T) {
 	//Constants
 	m := optim.NewModel("Test-Variable-Multiply1")
@@ -622,12 +558,7 @@ func TestVariable_Multiply4(t *testing.T) {
 
 }
 
-/*
-TestVariable_Multiply5
-Description:
-
-	Tests how well the Multiply() function works between a variable and a scalar linear expression.
-*/
+// TestVariable_Multiply5 Tests how well the Multiply() function works between a variable and a scalar linear expression.
 func TestVariable_Multiply5(t *testing.T) {
 	//Constants
 	m := optim.NewModel("Test-Variable-Multiply1")
@@ -681,12 +612,7 @@ func TestVariable_Multiply5(t *testing.T) {
 
 }
 
-/*
-TestVariable_Multiply6
-Description:
-
-	Tests how well the Multiply() function works between a variable and a scalar linear expression.
-*/
+// TestVariable_Multiply6 Tests how well the Multiply() function works between a variable and a scalar linear expression.
 func TestVariable_Multiply6(t *testing.T) {
 	//Constants
 	m := optim.NewModel("Test-Variable-Multiply1")
@@ -772,13 +698,8 @@ func TestVariable_Multiply6(t *testing.T) {
 
 }
 
-/*
-TestVariable_Multiply7
-Description:
-
-	Tests how well the Multiply() function works between a variable and
-	a scalar quadratic expression. Should produce an error
-*/
+// TestVariable_Multiply7 Tests how well the Multiply() function works between a variable and
+// a scalar quadratic expression. Should produce an error
 func TestVariable_Multiply7(t *testing.T) {
 	//Constants
 	m := optim.NewModel("Test-Variable-Multiply1")

@@ -8,18 +8,9 @@ import (
 	"testing"
 )
 
-/*
-scalar_quadratic_expression_test.go
-Description:
-	Tests some of the basic functions of the quadraticExpr class.
-*/
+// Tests some of the basic functions of the quadraticExpr class.
 
-/*
-TestQuadraticExpr_NewQuadraticExpr_q01
-Description:
-
-	Tests whether or not the function returns two variables for a simple expression.
-*/
+// TestQuadraticExpr_NewQuadraticExpr_qb01 Tests whether or not the function returns two variables for a simple expression.
 func TestQuadraticExpr_NewQuadraticExpr_qb01(t *testing.T) {
 	// Constants
 	Q1 := [][]float64{
@@ -45,12 +36,7 @@ func TestQuadraticExpr_NewQuadraticExpr_qb01(t *testing.T) {
 
 }
 
-/*
-TestQuadraticExpr_NewQuadraticExpr_q02
-Description:
-
-	Tests whether or not the NewQuadraticExpr_q0() function gracefully fails when given a badly sized Q matrix.
-*/
+// TestQuadraticExpr_NewQuadraticExpr_qb02 Tests whether or not the NewQuadraticExpr_q0() function gracefully fails when given a badly sized Q matrix.
 func TestQuadraticExpr_NewQuadraticExpr_qb02(t *testing.T) {
 	// Constants
 	Q2 := [][]float64{
@@ -79,13 +65,8 @@ func TestQuadraticExpr_NewQuadraticExpr_qb02(t *testing.T) {
 
 }
 
-/*
-TestQuadraticExpr_NewQuadraticExpr_q03
-Description:
-
-	Tests whether or not the NewQuadraticExpr_q0() function gracefully fails when given a badly sized Q matrix.
-	(Wrong number of columns)
-*/
+// TestQuadraticExpr_NewQuadraticExpr_qb03 Tests whether or not the NewQuadraticExpr_q0() function gracefully fails when given a badly sized Q matrix.
+// (Wrong number of columns)
 func TestQuadraticExpr_NewQuadraticExpr_qb03(t *testing.T) {
 	// Constants
 	Q3 := [][]float64{
@@ -115,12 +96,7 @@ func TestQuadraticExpr_NewQuadraticExpr_qb03(t *testing.T) {
 
 }
 
-/*
-TestQuadraticExpr_NumVars1
-Description:
-
-	Tests whether or not the function returns two variables for a simple expression.
-*/
+// TestQuadraticExpr_NumVars1 Tests whether or not the function returns two variables for a simple expression.
 func TestQuadraticExpr_NumVars1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("NumVars1")
@@ -149,12 +125,7 @@ func TestQuadraticExpr_NumVars1(t *testing.T) {
 	}
 }
 
-/*
-TestQuadraticExpr_NumVars2
-Description:
-
-	Tests whether or not the function returns three variables for a more complex expression.
-*/
+// TestQuadraticExpr_NumVars2 Tests whether or not the function returns three variables for a more complex expression.
 func TestQuadraticExpr_NumVars2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("NumVars2")
@@ -190,12 +161,7 @@ func TestQuadraticExpr_NumVars2(t *testing.T) {
 	}
 }
 
-/*
-TestQuadraticExpr_NumVars3
-Description:
-
-	Tests whether or not the function returns one variables for a more complex expression.
-*/
+// TestQuadraticExpr_NumVars3 Tests whether or not the function returns one variables for a more complex expression.
 func TestQuadraticExpr_NumVars3(t *testing.T) {
 	// Constants
 	m := optim.NewModel("NumVars3")
@@ -226,12 +192,7 @@ func TestQuadraticExpr_NumVars3(t *testing.T) {
 	}
 }
 
-/*
-TestQuadraticExpr_Vars1
-Description:
-
-	Tests whether or not the function returns two variables for a simple expression.
-*/
+// TestQuadraticExpr_Vars1 Tests whether or not the function returns two variables for a simple expression.
 func TestQuadraticExpr_Vars1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Vars1")
@@ -274,12 +235,7 @@ func TestQuadraticExpr_Vars1(t *testing.T) {
 
 }
 
-/*
-TestQuadraticExpr_Plus1
-Description:
-
-	Tests whether or not the function returns one variable index for a more complex expression.
-*/
+// TestQuadraticExpr_Plus1 Tests whether or not the function returns one variable index for a more complex expression.
 func TestQuadraticExpr_Plus1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Plus1")
@@ -351,13 +307,8 @@ func TestQuadraticExpr_Plus1(t *testing.T) {
 
 }
 
-/*
-TestQuadraticExpr_Plus2
-Description:
-
-	Tests whether or not the plus function works
-	for a sum of a quadratic expression and a linear expression (no id checking done).
-*/
+// TestQuadraticExpr_Plus2 Tests whether or not the plus function works
+// for a sum of a quadratic expression and a linear expression (no id checking done).
 func TestQuadraticExpr_Plus2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Plus2")
@@ -424,13 +375,8 @@ func TestQuadraticExpr_Plus2(t *testing.T) {
 
 }
 
-/*
-TestQuadraticExpr_Plus3
-Description:
-
-	Tests whether or not the Plus() function works for two quadratic expressions containing
-	slightly different variables.
-*/
+// TestQuadraticExpr_Plus3 Tests whether or not the Plus() function works for two quadratic expressions containing
+// slightly different variables.
 func TestQuadraticExpr_Plus3(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Plus3")
@@ -504,13 +450,8 @@ func TestQuadraticExpr_Plus3(t *testing.T) {
 
 }
 
-/*
-TestQuadraticExpr_Plus4
-Description:
-
-	Tests whether or not the Plus() function works for a quadratic expression and a linear one containing
-	slightly different variables.
-*/
+// TestQuadraticExpr_Plus4 Tests whether or not the Plus() function works for a quadratic expression and a linear one containing
+// slightly different variables.
 func TestQuadraticExpr_Plus4(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Plus4")
@@ -591,12 +532,7 @@ func TestQuadraticExpr_Plus4(t *testing.T) {
 
 }
 
-/*
-TestQuadraticExpr_Plus5
-Description:
-
-	Tests whether or not the Plus() function works for a quadratic expression and a constant one.
-*/
+// TestQuadraticExpr_Plus5 Tests whether or not the Plus() function works for a quadratic expression and a constant one.
 func TestQuadraticExpr_Plus5(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Plus5")
@@ -661,12 +597,7 @@ func TestQuadraticExpr_Plus5(t *testing.T) {
 
 }
 
-/*
-TestQuadraticExpr_Plus6
-Description:
-
-	Tests whether or not the Plus() function works for a quadratic expression and a variable.
-*/
+// TestQuadraticExpr_Plus6 Tests whether or not the Plus() function works for a quadratic expression and a variable.
 func TestQuadraticExpr_Plus6(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Plus6")
@@ -777,13 +708,8 @@ func TestQuadraticExpr_Plus6(t *testing.T) {
 
 }
 
-/*
-TestQuadraticExpr_Plus7
-Description:
-
-	Tests whether or not the function returns a proper error
-	when an error is provided.
-*/
+// TestQuadraticExpr_Plus7 Tests whether or not the function returns a proper error
+// when an error is provided.
 func TestQuadraticExpr_Plus7(t *testing.T) {
 	// Constants
 	m := optim.NewModel("SQE_Plus7")
@@ -812,13 +738,8 @@ func TestQuadraticExpr_Plus7(t *testing.T) {
 	}
 }
 
-/*
-TestQuadraticExpr_Plus8
-Description:
-
-	Tests whether or not the function returns a proper error when a bad input
-	is given.
-*/
+// TestQuadraticExpr_Plus8 Tests whether or not the function returns a proper error when a bad input
+// is given.
 func TestQuadraticExpr_Plus8(t *testing.T) {
 	// Constants
 	m := optim.NewModel("SQE_Plus8")
@@ -848,12 +769,7 @@ func TestQuadraticExpr_Plus8(t *testing.T) {
 	}
 }
 
-/*
-TestQuadraticExpr_Plus9
-Description:
-
-	Tests the Plus() function with a float.
-*/
+// TestQuadraticExpr_Plus9 Tests the Plus() function with a float.
 func TestQuadraticExpr_Plus9(t *testing.T) {
 	// Constants
 	m := optim.NewModel("SQE_Plus8")
@@ -890,12 +806,7 @@ func TestQuadraticExpr_Plus9(t *testing.T) {
 	}
 }
 
-/*
-TestQuadraticExpr_RewriteInTermsOfIndices1
-Description:
-
-	Tests whether or not the rewrite function returns a quadratic expression in three variables when asked.
-*/
+// TestQuadraticExpr_RewriteInTermsOfIndices1 Tests whether or not the rewrite function returns a quadratic expression in three variables when asked.
 func TestQuadraticExpr_RewriteInTermsOfIndices1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("RewriteInTermsOfIndices1")
@@ -950,13 +861,8 @@ func TestQuadraticExpr_RewriteInTermsOfIndices1(t *testing.T) {
 
 }
 
-/*
-TestQuadraticExpr_Multiply1
-Description:
-
-	Tests whether or not the Multiply() function works for a quadratic expression
-	and a constant one.
-*/
+// TestQuadraticExpr_Multiply1 Tests whether or not the Multiply() function works for a quadratic expression
+// and a constant one.
 func TestQuadraticExpr_Multiply1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Multiply1")
@@ -1031,13 +937,8 @@ func TestQuadraticExpr_Multiply1(t *testing.T) {
 
 }
 
-/*
-TestQuadraticExpr_Multiply2
-Description:
-
-	Tests whether or not the Multiply() function works for a quadratic expression
-	and a constant one (K).
-*/
+// TestQuadraticExpr_Multiply2 Tests whether or not the Multiply() function works for a quadratic expression
+// and a constant one (K).
 func TestQuadraticExpr_Multiply2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Multiply2")
@@ -1112,13 +1013,8 @@ func TestQuadraticExpr_Multiply2(t *testing.T) {
 
 }
 
-/*
-TestQuadraticExpr_Multiply3
-Description:
-
-	Tests whether or not the Multiply() function works for a quadratic expression
-	and a variable.
-*/
+// TestQuadraticExpr_Multiply3 Tests whether or not the Multiply() function works for a quadratic expression
+// and a variable.
 func TestQuadraticExpr_Multiply3(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Multiply3")
@@ -1157,13 +1053,8 @@ func TestQuadraticExpr_Multiply3(t *testing.T) {
 
 }
 
-/*
-TestQuadraticExpr_Multiply4
-Description:
-
-	Tests whether or not the Multiply() function works for a quadratic expression
-	and a variable.
-*/
+// TestQuadraticExpr_Multiply4 Tests whether or not the Multiply() function works for a quadratic expression
+// and a variable.
 func TestQuadraticExpr_Multiply4(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Multiply4")
@@ -1206,13 +1097,8 @@ func TestQuadraticExpr_Multiply4(t *testing.T) {
 
 }
 
-/*
-TestQuadraticExpr_Multiply5
-Description:
-
-	Tests whether or not the Multiply() function works for a quadratic expression
-	and a ScalarQuadraticExpression.
-*/
+// TestQuadraticExpr_Multiply5 Tests whether or not the Multiply() function works for a quadratic expression
+// and a ScalarQuadraticExpression.
 func TestQuadraticExpr_Multiply5(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Multiply4")
@@ -1250,13 +1136,8 @@ func TestQuadraticExpr_Multiply5(t *testing.T) {
 
 }
 
-/*
-TestQuadraticExpr_Multiply6
-Description:
-
-	Tests whether or not the Multiply() function works for a quadratic expression
-	and a ScalarQuadraticExpression AND an error is also passed.
-*/
+// TestQuadraticExpr_Multiply6 Tests whether or not the Multiply() function works for a quadratic expression
+// and a ScalarQuadraticExpression AND an error is also passed.
 func TestQuadraticExpr_Multiply6(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Multiply4")
@@ -1295,13 +1176,8 @@ func TestQuadraticExpr_Multiply6(t *testing.T) {
 
 }
 
-/*
-TestQuadraticExpr_Multiply7
-Description:
-
-	Tests whether or not the Multiply() function works for a quadratic expression
-	and a ScalarQuadraticExpression AND an error is also passed.
-*/
+// TestQuadraticExpr_Multiply7 Tests whether or not the Multiply() function works for a quadratic expression
+// and a ScalarQuadraticExpression AND an error is also passed.
 func TestQuadraticExpr_Multiply7(t *testing.T) {
 	// Constants
 	m := optim.NewModel("Multiply7")
@@ -1340,13 +1216,8 @@ func TestQuadraticExpr_Multiply7(t *testing.T) {
 
 }
 
-/*
-TestScalarQuadraticExpression_Coeffs1
-Description:
-
-	Tests whether or not the scalar quadratic expression's coefficients
-	function works.
-*/
+// TestScalarQuadraticExpression_Coeffs1 Tests whether or not the scalar quadratic expression's coefficients
+// function works.
 func TestScalarQuadraticExpression_Coeffs1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("testsqe_coeffs1")
@@ -1388,12 +1259,7 @@ func TestScalarQuadraticExpression_Coeffs1(t *testing.T) {
 	}
 }
 
-/*
-TestScalarQuadraticExpression_LessEq1
-Description:
-
-	Tests whether or not the LessEq function works properly
-*/
+// TestScalarQuadraticExpression_LessEq1 Tests whether or not the LessEq function works properly
 func TestScalarQuadraticExpression_LessEq1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("testsqe_LessEq1")
@@ -1421,12 +1287,7 @@ func TestScalarQuadraticExpression_LessEq1(t *testing.T) {
 	}
 }
 
-/*
-TestScalarQuadraticExpression_GreaterEq1
-Description:
-
-	Tests whether or not the GreaterEq function works properly
-*/
+// TestScalarQuadraticExpression_GreaterEq1 Tests whether or not the GreaterEq function works properly
 func TestScalarQuadraticExpression_GreaterEq1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("testsqe_GreaterEq1")
@@ -1460,12 +1321,7 @@ func TestScalarQuadraticExpression_GreaterEq1(t *testing.T) {
 	}
 }
 
-/*
-TestScalarQuadraticExpression_Eq1
-Description:
-
-	Tests whether or not the Eq function works properly
-*/
+// TestScalarQuadraticExpression_Eq1 Tests whether or not the Eq function works properly
 func TestScalarQuadraticExpression_Eq1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("testsqe_Eq1")
@@ -1493,12 +1349,7 @@ func TestScalarQuadraticExpression_Eq1(t *testing.T) {
 	}
 }
 
-/*
-TestScalarQuadraticExpression_Comparison1
-Description:
-
-	Tests whether or not the Comparison function works properly
-*/
+// TestScalarQuadraticExpression_Comparison1 Tests whether or not the Comparison function works properly
 func TestScalarQuadraticExpression_Comparison1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("testsqe_Comparison1")
@@ -1526,12 +1377,7 @@ func TestScalarQuadraticExpression_Comparison1(t *testing.T) {
 	}
 }
 
-/*
-TestScalarQuadraticExpression_Comparison2
-Description:
-
-	Tests whether or not the Comparison function works properly
-*/
+// TestScalarQuadraticExpression_Comparison2 Tests whether or not the Comparison function works properly
 func TestScalarQuadraticExpression_Comparison2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("testsqe_Comparison2")
@@ -1561,13 +1407,8 @@ func TestScalarQuadraticExpression_Comparison2(t *testing.T) {
 	}
 }
 
-/*
-TestScalarQuadraticExpression_Comparison3
-Description:
-
-	Tests whether or not the Comparison function returns error when
-	a bad input type was given.
-*/
+// TestScalarQuadraticExpression_Comparison3 Tests whether or not the Comparison function returns error when
+// a bad input type was given.
 func TestScalarQuadraticExpression_Comparison3(t *testing.T) {
 	// Constants
 	m := optim.NewModel("testsqe_Comparison3")
@@ -1602,13 +1443,8 @@ func TestScalarQuadraticExpression_Comparison3(t *testing.T) {
 	}
 }
 
-/*
-TestScalarQuadraticExpression_Check1
-Description:
-
-	Tests to see if Check() works when the Q matrix in ScalarQuadraticExpression
-	is not square and doesn't have the right number of columns.
-*/
+// TestScalarQuadraticExpression_Check1 Tests to see if Check() works when the Q matrix in ScalarQuadraticExpression
+// is not square and doesn't have the right number of columns.
 func TestScalarQuadraticExpression_Check1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("testsqe_Check1")
@@ -1642,12 +1478,7 @@ func TestScalarQuadraticExpression_Check1(t *testing.T) {
 	}
 }
 
-/*
-TestScalarQuadraticExpression_RewriteInTermsOf1
-Description:
-
-	Making sure RewriteInTermsOf properly catches error.
-*/
+// TestScalarQuadraticExpression_RewriteInTermsOf1 Making sure RewriteInTermsOf properly catches error.
 func TestScalarQuadraticExpression_RewriteInTermsOf1(t *testing.T) {
 	// Constants
 	m := optim.NewModel("testsqe_RewriteInTermsOf1")
@@ -1682,12 +1513,7 @@ func TestScalarQuadraticExpression_RewriteInTermsOf1(t *testing.T) {
 
 }
 
-/*
-TestScalarQuadraticExpression_RewriteInTermsOf2
-Description:
-
-	Making sure RewriteInTermsOf properly catches error.
-*/
+// TestScalarQuadraticExpression_RewriteInTermsOf2 Making sure RewriteInTermsOf properly catches error.
 func TestScalarQuadraticExpression_RewriteInTermsOf2(t *testing.T) {
 	// Constants
 	m := optim.NewModel("testsqe_RewriteInTermsOf2")
