@@ -5,13 +5,15 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-// Constants
-// =========
-
+// INFINITY represents a large constant value used for unbounded constraints.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 const INFINITY = 1e100
 
-// SumVars returns the sum of the given variables. It creates a new empty
-// expression and adds to it the given variables.
+// SumVars returns the sum of the given variables by creating a new empty
+// expression and adding the given variables to it.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func SumVars(vs ...Variable) ScalarExpression {
 	newExpr := NewScalarExpression(0)
 	for _, v := range vs {
@@ -23,6 +25,8 @@ func SumVars(vs ...Variable) ScalarExpression {
 
 // SumRow returns the sum of all the variables in a single specified row of
 // a variable matrix.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func SumRow(vs [][]Variable, row int) ScalarExpression {
 	newExpr := NewScalarExpression(0)
 	for col := 0; col < len(vs[0]); col++ {
@@ -34,6 +38,8 @@ func SumRow(vs [][]Variable, row int) ScalarExpression {
 
 // SumCol returns the sum of all variables in a single specified column of
 // a variable matrix.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func SumCol(vs [][]Variable, col int) ScalarExpression {
 	newExpr := NewScalarExpression(0)
 	for row := 0; row < len(vs); row++ {
@@ -43,14 +49,11 @@ func SumCol(vs [][]Variable, col int) ScalarExpression {
 	return newExpr
 }
 
-/*
-FindInSlice
-Description:
-
-	Identifies if the  input xIn is in the slice sliceIn.
-	If it is, then this function returns the index such that xIn = sliceIn[index] and no errors.
-	If it is not, then this function returns the index -1 and the boolean value false.
-*/
+// FindInSlice identifies if the input xIn is in the slice sliceIn.
+// If it is, then this function returns the index such that xIn = sliceIn[index] and no errors.
+// If it is not, then this function returns the index -1 and an error.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func FindInSlice(xIn interface{}, sliceIn interface{}) (int, error) {
 	// Constants
 	allowedTypes := []string{"string", "int", "uint64", "Variable"}
@@ -129,12 +132,9 @@ func FindInSlice(xIn interface{}, sliceIn interface{}) (int, error) {
 
 }
 
-/*
-Unique
-Description:
-
-	Returns the unique list of variables in a slice of uint64's.
-*/
+// Unique returns the unique list of uint64 values in the given slice.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func Unique(listIn []uint64) []uint64 {
 	// Create unique list
 	var uniqueList []uint64
@@ -158,13 +158,9 @@ func Unique(listIn []uint64) []uint64 {
 	return uniqueList
 }
 
-/*
-OnesVector
-Description:
-
-	Returns a vector of ones with length lengthIn.
-	Note: this function assumes lengthIn is a positive number.
-*/
+// OnesVector returns a vector of ones with the given length.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func OnesVector(lengthIn int) mat.VecDense {
 	// Create the empty slice.
 	elts := make([]float64, lengthIn)
@@ -175,13 +171,9 @@ func OnesVector(lengthIn int) mat.VecDense {
 	return *mat.NewVecDense(lengthIn, elts)
 }
 
-/*
-ZerosVector
-Description:
-
-	Returns a vector of zeros with length lengthIn.
-	Note: this function assumes lengthIn is a positive number.
-*/
+// ZerosVector returns a vector of zeros with the given length.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func ZerosVector(lengthIn int) mat.VecDense {
 	// Create the empty slice.
 	elts := make([]float64, lengthIn)
@@ -192,12 +184,10 @@ func ZerosVector(lengthIn int) mat.VecDense {
 	return *mat.NewVecDense(lengthIn, elts)
 }
 
-/*
-ZerosMatrix
-Description:
-
-	Returns a dense matrix of all zeros.
-*/
+// ZerosMatrix returns a dense matrix of all zeros with the given number of
+// rows and columns.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func ZerosMatrix(nR, nC int) mat.Dense {
 	// Create empty slice
 	elts := make([]float64, nR*nC)
@@ -210,13 +200,9 @@ func ZerosMatrix(nR, nC int) mat.Dense {
 	return *mat.NewDense(nR, nC, elts)
 }
 
-/*
-Identity
-Description:
-
-	Returns a symmetric matrix that is the identity matrix.
-	Note: this function assumes lengthIn is a positive number.
-*/
+// Identity returns a square identity matrix of the given dimension.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func Identity(dim int) mat.Dense {
 	// Create the empty matrix.
 	zeroBase := ZerosMatrix(dim, dim)
@@ -229,10 +215,10 @@ func Identity(dim int) mat.Dense {
 	return zeroBase
 }
 
-/*
-CheckExtras
-Description:
-*/
+// CheckExtras checks the extras slice for any errors. It returns an error if
+// one of the extras is an error, or if there are more than one extras.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func CheckExtras(extras []interface{}) error {
 	// Constants
 
@@ -265,10 +251,10 @@ func CheckExtras(extras []interface{}) error {
 	return nil
 }
 
-/*
-CheckErrors
-Description:
-*/
+// CheckErrors checks the extras slice of errors. It returns an error if one
+// of the extras is non-nil, or if there are more than one extras.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func CheckErrors(extras []error) error {
 	// Constants
 

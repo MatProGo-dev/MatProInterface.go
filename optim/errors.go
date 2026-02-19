@@ -10,12 +10,20 @@ dimension.go
 
 /* Type Definitions */
 
+// DimensionError represents an error that occurs when two expressions have
+// incompatible dimensions for a given operation.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 type DimensionError struct {
 	Arg1      Expression
 	Arg2      Expression
 	Operation string // Either multiply or Plus
 }
 
+// UnexpectedInputError represents an error that occurs when an unexpected
+// input type is provided to an operation.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 type UnexpectedInputError struct {
 	InputInQuestion interface{}
 	Operation       string
@@ -23,6 +31,9 @@ type UnexpectedInputError struct {
 
 /* Methods */
 
+// Error returns a string representation of the DimensionError.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (de DimensionError) Error() string {
 	dimStrings := de.ArgDimsAsStrings()
 	return fmt.Sprintf(
@@ -33,6 +44,9 @@ func (de DimensionError) Error() string {
 	)
 }
 
+// ArgDimsAsStrings returns the dimensions of both arguments as a slice of strings.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (de DimensionError) ArgDimsAsStrings() []string {
 	// Create string for arg 1
 	arg1DimsAsString := "("
@@ -58,6 +72,9 @@ func (de DimensionError) ArgDimsAsStrings() []string {
 
 }
 
+// Error returns a string representation of the UnexpectedInputError.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (uie UnexpectedInputError) Error() string {
 	return fmt.Sprintf(
 		"Unexpected input to \"%v\" operation: %T",

@@ -3,24 +3,32 @@ package optim
 import "github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 
 // ConstrSense represents if the constraint x <= y, x >= y, or x == y. For easy
-// integration with Gurobi, the senses have been encoding using a byte in
+// integration with Gurobi, the senses have been encoded using a byte in
 // the same way Gurobi encodes the constraint senses.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 type ConstrSense byte
 
 // Different constraint senses conforming to Gurobi's encoding.
 const (
-	SenseEqual            ConstrSense = '='
-	SenseLessThanEqual                = '<'
-	SenseGreaterThanEqual             = '>'
+	// SenseEqual represents the equality constraint sense (==).
+	//
+	// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
+	SenseEqual ConstrSense = '='
+	// SenseLessThanEqual represents the less-than-or-equal constraint sense (<=).
+	//
+	// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
+	SenseLessThanEqual = '<'
+	// SenseGreaterThanEqual represents the greater-than-or-equal constraint sense (>=).
+	//
+	// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
+	SenseGreaterThanEqual = '>'
 )
 
-/*
-ToSymbolic
-Description:
-
-	Converts a constraint sense to a the appropriate representation
-	in the symbolic math toolbox.
-*/
+// ToSymbolic converts a constraint sense to the appropriate representation
+// in the symbolic math toolbox.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (cs ConstrSense) ToSymbolic() symbolic.ConstrSense {
 	switch cs {
 	case SenseEqual:
@@ -33,12 +41,9 @@ func (cs ConstrSense) ToSymbolic() symbolic.ConstrSense {
 	return '1'
 }
 
-/*
-String
-Description:
-
-	Returns the string representation of the constraint sense.
-*/
+// String returns the string representation of the constraint sense.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (cs ConstrSense) String() string {
 	switch cs {
 	case SenseEqual:

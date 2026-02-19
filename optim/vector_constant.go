@@ -1,105 +1,71 @@
 package optim
 
 import (
+	"fmt"
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
 )
 
-/*
-vector_constant_test.go
-Description:
-	Creates a vector extension of the constant type K from the original goop.
-*/
-
-import (
-	"fmt"
-)
-
-/*
-KVector
-
-	A type which is built on top of the KVector()
-	a constant expression type for an MIP. K for short ¯\_(ツ)_/¯
-*/
+// KVector is a constant vector expression type for an MIP (Mixed Integer Program).
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 type KVector mat.VecDense // Inherit all methods from mat.VecDense
 
-/*
-Check
-Description:
-
-	This method checks for errors in the KVector type.
-	There should never be any.
-*/
+// Check verifies that the KVector expression is valid. For KVector, this always returns nil.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (kv KVector) Check() error {
 	return nil
 }
 
-/*
-Len
-
-	Computes the length of the KVector given.
-*/
+// Len computes the length of the KVector.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (kv KVector) Len() int {
 	kvAsVector := mat.VecDense(kv)
 	return kvAsVector.Len()
 }
 
-/*
-AtVec
-Description:
-
-	This function returns the value at the k index.
-*/
+// AtVec returns the scalar expression value at the given index k.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (kv KVector) AtVec(idx int) ScalarExpression {
 	kvAsVector := mat.VecDense(kv)
 	return K(kvAsVector.AtVec(idx))
 }
 
-/*
-NumVars
-Description:
-
-	This returns the number of variables in the expression. For constants, this is 0.
-*/
+// NumVars returns the number of variables in the expression. For KVector, this is always 0.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (kv KVector) NumVars() int {
 	return 0
 }
 
-/*
-Vars
-Description:
-
-	This function returns a slice of the Var ids in the expression. For constants, this is always nil.
-*/
+// IDs returns a slice of the Var ids in the expression. For KVector, this is always nil.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (kv KVector) IDs() []uint64 {
 	return nil
 }
 
-/*
-LinearCoeff
-Description:
-
-	This function returns a slice of the coefficients in the expression. For constants, this is always nil.
-*/
+// LinearCoeff returns the zero matrix of coefficients. For KVector, this is always a zero matrix.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (kv KVector) LinearCoeff() mat.Dense {
 	return ZerosMatrix(kv.Len(), kv.Len())
 }
 
-/*
-Constant
-
-	Returns the constant additive value in the expression. For constants, this is just the constants value
-*/
+// Constant returns the constant additive value in the expression, which is
+// the vector itself.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (kv KVector) Constant() mat.VecDense {
 	return mat.VecDense(kv)
 }
 
-/*
-Plus
-Description:
-
-	Adds the current expression to another and returns the resulting expression
-*/
+// Plus adds the current expression to another and returns the resulting expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (kv KVector) Plus(rightIn interface{}, errors ...error) (Expression, error) {
 	// Input Processing
 	err := CheckErrors(errors)
@@ -180,12 +146,10 @@ func (kv KVector) Plus(rightIn interface{}, errors ...error) (Expression, error)
 	}
 }
 
-/*
-Mult
-Description:
-
-	This method multiplies the current expression to another and returns the resulting expression.
-*/
+// Mult multiplies the current expression by a scalar float64 and returns
+// the resulting expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (kv KVector) Mult(val float64) (VectorExpression, error) {
 
 	// Use mat.Vector's multiplication method
@@ -196,36 +160,32 @@ func (kv KVector) Mult(val float64) (VectorExpression, error) {
 	return KVector(result), nil
 }
 
-/*
-LessEq
-Description:
-
-	Returns a less than or equal to (<=) constraint between the current expression and another
-*/
+// LessEq returns a less than or equal to (<=) constraint between the current
+// expression and another.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (kv KVector) LessEq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return kv.Comparison(rightIn, SenseLessThanEqual, errors...)
 }
 
-/*
-GreaterEq
-Description:
-
-	This method returns a greater than or equal to (>=) constraint between the current expression and another
-*/
+// GreaterEq returns a greater than or equal to (>=) constraint between the
+// current expression and another.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (kv KVector) GreaterEq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return kv.Comparison(rightIn, SenseGreaterThanEqual, errors...)
 }
 
-/*
-Eq
-Description:
-
-	This method returns an equality (==) constraint between the current expression and another
-*/
+// Eq returns an equality (==) constraint between the current expression and another.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (kv KVector) Eq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return kv.Comparison(rightIn, SenseEqual, errors...)
 }
 
+// Comparison compares the KVector with the given expression in the given sense.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (kv KVector) Comparison(rightIn interface{}, sense ConstrSense, errors ...error) (Constraint, error) {
 	switch rhsConverted := rightIn.(type) {
 	case KVector:
@@ -280,12 +240,9 @@ func (kv KVector) Comparison(rightIn interface{}, sense ConstrSense, errors ...e
 	}
 }
 
-/*
-Multiply
-Description:
-
-	This method is used to compute the multiplication of the input vector constant with another term.
-*/
+// Multiply computes the multiplication of the input vector constant with another term.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (kv KVector) Multiply(rightIn interface{}, errors ...error) (Expression, error) {
 	// Input Processing
 	err := CheckErrors(errors)
@@ -408,32 +365,23 @@ func (kv KVector) Multiply(rightIn interface{}, errors ...error) (Expression, er
 	}
 }
 
-/*
-Transpose
-Description:
-
-	This method creates the transpose of the current vector and returns it.
-*/
+// Transpose creates the transpose of the current vector and returns it.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (kv KVector) Transpose() Expression {
 	return KVectorTranspose(kv)
 }
 
-/*
-Dims
-Description:
-
-	Returns the dimension of the constant vector.
-*/
+// Dims returns the dimension of the constant vector.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (kv KVector) Dims() []int {
 	return []int{kv.Len(), 1}
 }
 
-/*
-ToSymbolic
-Description:
-
-	This method returns the symbolic version of the constant vector.
-*/
+// ToSymbolic returns the symbolic version of the constant vector.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (kv KVector) ToSymbolic() (symbolic.Expression, error) {
 	// Constants
 	kvAsVec := mat.VecDense(kv)

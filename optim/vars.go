@@ -6,8 +6,10 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-// Var represnts a variable in a optimization problem. The variable is
-// identified with an uint64.
+// Variable represents a variable in an optimization problem. The variable is
+// identified with a uint64.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 type Variable struct {
 	ID    uint64
 	Lower float64
@@ -15,42 +17,49 @@ type Variable struct {
 	Vtype VarType
 }
 
-/*
-Variables
-Description:
-
-	This function returns a slice containing all unique variables in the variable expression v.
-*/
+// Variables returns a slice containing all unique variables in the variable expression v.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (v Variable) Variables() []Variable {
 	return []Variable{v}
 }
 
 // NumVars returns the number of variables in the expression. For a variable, it
 // always returns one.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (v Variable) NumVars() int {
 	return 1
 }
 
-// IDs Vars returns a slice of the Var ids in the expression. For a variable, it
+// IDs returns a slice of the Var ids in the expression. For a variable, it
 // always returns a singleton slice with the given variable ID.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (v Variable) IDs() []uint64 {
 	return []uint64{v.ID}
 }
 
 // Coeffs returns a slice of the coefficients in the expression. For a variable,
 // it always returns a singleton slice containing the value one.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (v Variable) Coeffs() []float64 {
 	return []float64{1}
 }
 
 // Constant returns the constant additive value in the expression. For a
 // variable, it always returns zero.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (v Variable) Constant() float64 {
 	return 0
 }
 
 // Plus adds the current expression to another and returns the resulting
 // expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (v Variable) Plus(e interface{}, errors ...error) (Expression, error) {
 	// Input Processing
 	err := v.Check()
@@ -159,33 +168,32 @@ func (v Variable) Plus(e interface{}, errors ...error) (Expression, error) {
 //}
 
 // LessEq returns a less than or equal to (<=) constraint between the
-// current expression and another
+// current expression and another.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (v Variable) LessEq(rhsIn interface{}, errors ...error) (Constraint, error) {
 	return v.Comparison(rhsIn, SenseLessThanEqual, errors...)
 }
 
 // GreaterEq returns a greater than or equal to (>=) constraint between the
-// current expression and another
+// current expression and another.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (v Variable) GreaterEq(rhsIn interface{}, errors ...error) (Constraint, error) {
 	return v.Comparison(rhsIn, SenseGreaterThanEqual, errors...)
 }
 
 // Eq returns an equality (==) constraint between the current expression
-// and another
+// and another.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (v Variable) Eq(rhsIn interface{}, errors ...error) (Constraint, error) {
 	return v.Comparison(rhsIn, SenseEqual, errors...)
 }
 
-/*
-Comparison
-Description:
-
-	This method compares the receiver with expression rhs in the sense provided by sense.
-
-Usage:
-
-	constr, err := v.Comparison(expr1,SenseGreaterThanEqual)
-*/
+// Comparison compares the receiver with expression rhs in the sense provided by sense.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (v Variable) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (Constraint, error) {
 	// Input Processing
 	err := CheckErrors(errors)
@@ -227,23 +235,30 @@ func (v *Variable) Type() VarType {
 
 // VarType represents the type of the variable (continuous, binary,
 // integer, etc) and uses Gurobi's encoding.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 type VarType byte
 
 // Multiple common variable types have been included as constants that conform
 // to Gurobi's encoding.
 const (
+	// Continuous represents a continuous variable type.
+	//
+	// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 	Continuous VarType = 'C'
-	Binary             = 'B'
-	Integer            = 'I'
+	// Binary represents a binary variable type.
+	//
+	// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
+	Binary = 'B'
+	// Integer represents an integer variable type.
+	//
+	// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
+	Integer = 'I'
 )
 
-/*
-UniqueVars
-Description:
-
-	This function creates a slice of unique variables from the slice given in
-	varsIn
-*/
+// UniqueVars creates a slice of unique variables from the slice given in varsIn.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func UniqueVars(varsIn []Variable) []Variable {
 	// Constants
 
@@ -259,12 +274,9 @@ func UniqueVars(varsIn []Variable) []Variable {
 
 }
 
-/*
-Multiply
-Description:
-
-	multiplies the current expression to another and returns the resulting expression
-*/
+// Multiply multiplies the current expression to another and returns the resulting expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (v Variable) Multiply(val interface{}, errors ...error) (Expression, error) {
 	// Input Processing
 	err := v.Check()
@@ -359,12 +371,9 @@ func (v Variable) Multiply(val interface{}, errors ...error) (Expression, error)
 	}
 }
 
-/*
-ToScalarLinearExpression
-Description:
-
-	Converting the variable into a scalar linear Expression.
-*/
+// ToScalarLinearExpression converts the variable into a scalar linear expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (v Variable) ToScalarLinearExpression() ScalarLinearExpr {
 	// Constants
 
@@ -380,22 +389,17 @@ func (v Variable) ToScalarLinearExpression() ScalarLinearExpr {
 	}
 }
 
-/*
-Dims
-Description:
-
-	Returns the dimension of the Variable object (should be scalar).
-*/
+// Dims returns the dimension of the Variable object, which is always [1, 1] for a scalar.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (v Variable) Dims() []int {
 	return []int{1, 1}
 }
 
-/*
-Check
-Description:
-
-	Checks whether or not the Variable has a sensible initialization.
-*/
+// Check checks whether or not the Variable has a sensible initialization,
+// returning an error if the lower bound is greater than the upper bound.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (v Variable) Check() error {
 	// Check that the lower bound is below is the upper bound
 	if v.Lower > v.Upper {
@@ -409,17 +413,17 @@ func (v Variable) Check() error {
 	return nil
 }
 
+// Transpose returns the transpose of the variable, which is the variable itself.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (v Variable) Transpose() Expression {
 	return v
 }
 
-/*
-ToSymbolic
-Description:
-
-	Converts the variable into a symbolic variable
-	(from the symbolic math toolbox).
-*/
+// ToSymbolic converts the variable into a symbolic variable
+// (from the symbolic math toolbox).
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (v Variable) ToSymbolic() (symbolic.Expression, error) {
 	// Input Checking
 	err := v.Check()

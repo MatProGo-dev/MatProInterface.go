@@ -2,24 +2,18 @@ package optim
 
 import "fmt"
 
-/*
-vector_constraint.go
-Description:
-
-*/
-
+// VectorConstraint represents a vector constraint relating two vector expressions.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 type VectorConstraint struct {
 	LeftHandSide  VectorExpression
 	RightHandSide VectorExpression
 	Sense         ConstrSense
 }
 
-/*
-AtVec
-Description:
-
-	Retrieves the constraint formed by one element of the "vector" constraint.
-*/
+// AtVec retrieves the scalar constraint formed by one element of the vector constraint.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vc VectorConstraint) AtVec(i int) (ScalarConstraint, error) {
 	// Input Processing
 	if vc.Check() != nil {
@@ -42,12 +36,10 @@ func (vc VectorConstraint) AtVec(i int) (ScalarConstraint, error) {
 	return ScalarConstraint{lhsAtI, rhsAtI, vc.Sense}, nil
 }
 
-/*
-Check
-Description:
-
-	Checks that the VectorConstraint is valid.
-*/
+// Check checks that the VectorConstraint is valid, ensuring dimensions of both
+// sides match and each side is well-defined.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vc VectorConstraint) Check() error {
 	// Constants
 
@@ -75,20 +67,23 @@ func (vc VectorConstraint) Check() error {
 	return nil
 }
 
+// Left returns the left hand side expression of the vector constraint.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vc VectorConstraint) Left() Expression {
 	return vc.LeftHandSide
 }
 
+// Right returns the right hand side expression of the vector constraint.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vc VectorConstraint) Right() Expression {
 	return vc.RightHandSide
 }
 
-/*
-ConstrSense
-Description:
-
-	Returns the sense of the constraint.
-*/
+// ConstrSense returns the sense of the vector constraint.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vc VectorConstraint) ConstrSense() ConstrSense {
 	return vc.Sense
 }

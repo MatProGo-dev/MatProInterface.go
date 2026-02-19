@@ -2,34 +2,42 @@ package optim
 
 import "fmt"
 
-// ScalarConstraint represnts a linear constraint of the form x <= y, x >= y, or
-// x == y. ScalarConstraint uses a left and right hand side expressions along with a
-// constraint sense (<=, >=, ==) to represent a generalized linear constraint
+// ScalarConstraint represents a linear constraint of the form x <= y, x >= y, or
+// x == y. ScalarConstraint uses a left and right hand side expression along with a
+// constraint sense (<=, >=, ==) to represent a generalized linear constraint.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 type ScalarConstraint struct {
 	LeftHandSide  ScalarExpression
 	RightHandSide ScalarExpression
 	Sense         ConstrSense
 }
 
+// Left returns the left hand side expression of the scalar constraint.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sc ScalarConstraint) Left() Expression {
 	return sc.LeftHandSide
 }
 
+// Right returns the right hand side expression of the scalar constraint.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sc ScalarConstraint) Right() Expression {
 	return sc.RightHandSide
 }
 
+// ConstrSense returns the sense of the scalar constraint.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sc ScalarConstraint) ConstrSense() ConstrSense {
 	return sc.Sense
 }
 
-/*
-IsLinear
-Description:
-
-	Describes whether or not a given linear constraint is
-	linear or not.
-*/
+// IsLinear returns true if the scalar constraint is linear (i.e., neither side
+// is a ScalarQuadraticExpression).
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sc ScalarConstraint) IsLinear() (bool, error) {
 	// Check left and right side.
 	if _, tf := sc.LeftHandSide.(ScalarQuadraticExpression); tf {
@@ -46,13 +54,10 @@ func (sc ScalarConstraint) IsLinear() (bool, error) {
 	return true, nil
 }
 
-/*
-Simplify
-Description:
-
-	Moves all of the variables of the ScalarConstraint to its
-	left hand side.
-*/
+// Simplify moves all of the variables of the ScalarConstraint to its
+// left hand side.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sc ScalarConstraint) Simplify() (ScalarConstraint, error) {
 	// Create LHS
 	newLHS := sc.LeftHandSide
@@ -110,13 +115,10 @@ func (sc ScalarConstraint) Simplify() (ScalarConstraint, error) {
 
 }
 
-/*
-Check
-Description:
-
-	Checks the validity of the ScalarConstraint, this makes sure that:
-	- The Sense if either SenseEqual, SenseLessThanEqual, or SenseGreaterThanEqual
-*/
+// Check checks the validity of the ScalarConstraint, ensuring the sense is
+// recognized and both hand sides are valid.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sc ScalarConstraint) Check() error {
 	// Check sense
 	switch sc.Sense {

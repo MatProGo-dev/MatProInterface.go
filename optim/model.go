@@ -5,9 +5,11 @@ import (
 )
 
 // Model represents the overall constrained linear optimization model to be
-// solved. Model contains all the variables associated with the optimization
+// solved. It contains all variables associated with the optimization
 // problem, constraints, objective, and parameters. New variables can only be
 // created using an instantiated Model.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 type Model struct {
 	Name        string
 	Variables   []Variable
@@ -15,34 +17,31 @@ type Model struct {
 	Obj         *Objective
 }
 
-// NewModel returns a new model with some default arguments such as not to show
-// the log.
+// NewModel returns a new model with the given name.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func NewModel(name string) *Model {
 	return &Model{Name: name}
 }
 
-/*
-AddVariable
-Description:
-
-	This method adds an "unbounded" continuous variable to the model.
-*/
+// AddVariable adds an "unbounded" continuous variable to the model.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (m *Model) AddVariable() Variable {
 	return m.AddRealVariable()
 }
 
-/*
-AddRealVariable
-Description:
-
-	Adds a Real variable to the model and returns said variable.
-*/
+// AddRealVariable adds a real-valued variable to the model and returns said variable.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (m *Model) AddRealVariable() Variable {
 	return m.AddVariableClassic(-INFINITY, INFINITY, Continuous)
 }
 
-// AddVariableClassic AddVariable adds a variable of a given variable type to the model given the lower
+// AddVariableClassic adds a variable of a given variable type to the model given the lower
 // and upper value limits. This variable is returned.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (m *Model) AddVariableClassic(lower, upper float64, vtype VarType) Variable {
 	id := uint64(len(m.Variables))
 	newVar := Variable{id, lower, upper, vtype}
@@ -50,18 +49,17 @@ func (m *Model) AddVariableClassic(lower, upper float64, vtype VarType) Variable
 	return newVar
 }
 
-// AddBinaryVariable AddBinaryVar adds a binary variable to the model and returns said variable.
+// AddBinaryVariable adds a binary variable to the model and returns said variable.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (m *Model) AddBinaryVariable() Variable {
 	return m.AddVariableClassic(0, 1, Binary)
 }
 
-/*
-AddVariableVector
-Description:
-
-	Creates a VarVector object using a constructor that assumes you want an "unbounded" vector of real optimization
-	variables.
-*/
+// AddVariableVector creates a VarVector of the given dimension containing
+// unbounded real optimization variables.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (m *Model) AddVariableVector(dim int) VarVector {
 	// Constants
 
@@ -73,12 +71,10 @@ func (m *Model) AddVariableVector(dim int) VarVector {
 	return VarVector{varSlice}
 }
 
-/*
-AddVariableVectorClassic
-Description:
-
-	The classic version of AddVariableVector defined in the original goop.
-*/
+// AddVariableVectorClassic adds a vector of num variables with the given lower
+// bound, upper bound, and variable type to the model.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (m *Model) AddVariableVectorClassic(
 	num int, lower, upper float64, vtype VarType,
 ) VarVector {
@@ -94,12 +90,16 @@ func (m *Model) AddVariableVectorClassic(
 
 // AddBinaryVariableVector adds a vector of binary variables to the model and
 // returns the slice.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (m *Model) AddBinaryVariableVector(num int) VarVector {
 	return m.AddVariableVectorClassic(num, 0, 1, Binary)
 }
 
 // AddVariableMatrix adds a matrix of variables of a given type to the model with
 // lower and upper value limits and returns the resulting slice.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (m *Model) AddVariableMatrix(
 	rows, cols int, lower, upper float64, vtype VarType,
 ) [][]Variable {
@@ -114,11 +114,15 @@ func (m *Model) AddVariableMatrix(
 
 // AddBinaryVariableMatrix adds a matrix of binary variables to the model and returns
 // the resulting slice.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (m *Model) AddBinaryVariableMatrix(rows, cols int) [][]Variable {
 	return m.AddVariableMatrix(rows, cols, 0, 1, Binary)
 }
 
-// AddConstraint AddConstr adds the given constraint to the model.
+// AddConstraint adds the given constraint to the model.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (m *Model) AddConstraint(constr Constraint, errors ...error) error {
 	// Constants
 
@@ -133,16 +137,10 @@ func (m *Model) AddConstraint(constr Constraint, errors ...error) error {
 	return nil
 }
 
-/*
-SetObjective
-Description:
-	sets the objective of the model given an expression and
-	objective sense.
-Notes:
-	To make this function easier to parse, we will assume an expression
-	is given, even though objectives are normally scalars.
-*/
-
+// SetObjective sets the objective of the model given an expression and
+// objective sense.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (m *Model) SetObjective(e Expression, sense ObjSense) error {
 	// Input Processing
 	se, err := ToScalarExpression(e)
@@ -155,12 +153,9 @@ func (m *Model) SetObjective(e Expression, sense ObjSense) error {
 	return nil
 }
 
-/*
-Check
-Description:
-
-	Checks the model for errors.
-*/
+// Check checks the model for errors, ensuring that at least one variable exists.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (m *Model) Check() error {
 	// Constants
 

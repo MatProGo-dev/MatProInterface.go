@@ -1,35 +1,29 @@
 package optim
 
-/*
-vector_linear_expression_transpose.go
-Description:
-
-*/
-
 import (
 	"fmt"
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
 )
 
-// VectorLinearExpressionTranspose represents a linear general expression of the form
+// VectorLinearExpressionTranspose represents a transposed linear general
+// expression of the form
 //
 //	x^T * L^T + C^T
 //
-// where L is an n x m matrix of coefficients that matches the dimension of x, the vector of variables
-// and C is a constant vector
+// where L is an n x m matrix of coefficients that matches the dimension of x,
+// the vector of variables, and C is a constant vector.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 type VectorLinearExpressionTranspose struct {
 	X VarVector
 	L mat.Dense // Matrix of coefficients. Should match the dimensions of XIndices
 	C mat.VecDense
 }
 
-/*
-Check
-Description:
-
-	Checks to see if the VectorLinearExpressionTransposeession is well-defined.
-*/
+// Check checks to see if the VectorLinearExpressionTranspose is well-defined.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vlet VectorLinearExpressionTranspose) Check() error {
 	// Extract the dimension of the vector x
 	m := vlet.X.Length()
@@ -50,84 +44,63 @@ func (vlet VectorLinearExpressionTranspose) Check() error {
 	return nil
 }
 
-/*
-IDs
-Description:
-
-	Returns the MatProInterface ID of each variable in the current vector linear expression.
-*/
+// IDs returns the MatProInterface ID of each variable in the current vector linear expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vlet VectorLinearExpressionTranspose) IDs() []uint64 {
 	return vlet.X.IDs()
 }
 
-/*
-NumVars
-Description:
-
-	Returns the goop2 ID of each variable in the current vector linear expression.
-*/
+// NumVars returns the number of unique variables in the current vector linear expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vlet VectorLinearExpressionTranspose) NumVars() int {
 	return len(vlet.IDs())
 }
 
-/*
-LinearCoeff
-Description:
-
-	Returns the matrix which is applied as a coefficient to the vector X in our expression.
-*/
+// LinearCoeff returns the matrix which is applied as a coefficient to the vector X in the expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vlet VectorLinearExpressionTranspose) LinearCoeff() mat.Dense {
 	return vlet.L
 }
 
-/*
-Constant
-Description:
-
-	Returns the vector which is given as an offset vector in the linear expression represented by v
-	(the c in the above expression).
-*/
+// Constant returns the vector which is given as an offset vector in the linear
+// expression (the C in x^T * L^T + C^T).
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vlet VectorLinearExpressionTranspose) Constant() mat.VecDense {
 
 	return vlet.C
 }
 
-/*
-GreaterEq
-Description:
-
-	Creates a VectorConstraint that declares vle is greater than or equal to the value to the right hand side rhs.
-*/
+// GreaterEq creates a VectorConstraint that declares vlet is greater than or
+// equal to the value to the right hand side rhs.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vlet VectorLinearExpressionTranspose) GreaterEq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return vlet.Comparison(rightIn, SenseGreaterThanEqual, errors...)
 }
 
-/*
-LessEq
-Description:
-
-	Creates a VectorConstraint that declares vle is less than or equal to the value to the right hand side rhs.
-*/
+// LessEq creates a VectorConstraint that declares vlet is less than or equal
+// to the value to the right hand side rhs.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vlet VectorLinearExpressionTranspose) LessEq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return vlet.Comparison(rightIn, SenseLessThanEqual, errors...)
 }
 
-/*
-Mult
-Description:
-
-	Returns an expression which scales every dimension of the vector linear expression by the input.
-*/
+// Mult returns an expression which scales every dimension of the vector linear
+// expression by the input. This method is not yet implemented.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vlet VectorLinearExpressionTranspose) Mult(c float64) (VectorExpression, error) {
 	return vlet, fmt.Errorf("The multiplication method has not yet been implemented!")
 }
 
-/*
-Multiply
-Description:
-
-	Multiplication of a VarVector with another expression.
-*/
+// Multiply performs multiplication of a VectorLinearExpressionTranspose with another expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vlet VectorLinearExpressionTranspose) Multiply(rightIn interface{}, errors ...error) (Expression, error) {
 	// Input Processing
 	err := vlet.Check()
@@ -213,12 +186,10 @@ func (vlet VectorLinearExpressionTranspose) Multiply(rightIn interface{}, errors
 	}
 }
 
-/*
-Plus
-Description:
-
-	Returns an expression which adds the expression e to the vector linear expression at hand.
-*/
+// Plus returns an expression which adds the expression e to the vector linear
+// expression at hand.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vlet VectorLinearExpressionTranspose) Plus(rightIn interface{}, errors ...error) (Expression, error) {
 	// Input Processing
 	err := vlet.Check()
@@ -347,23 +318,17 @@ Description:
 //	return nil, fmt.Errorf("Unexpected type of right hand side %v: %T", rhsIn, rhsIn)
 //}
 
-/*
-Eq
-Description:
-
-	Creates a constraint between the current vector linear expression v and the
-	rhs given by rhs.
-*/
+// Eq creates a constraint between the current vector linear expression and
+// the rhs given by rhs.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vlet VectorLinearExpressionTranspose) Eq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return vlet.Comparison(rightIn, SenseEqual, errors...)
 }
 
-/*
-Len
-Description:
-
-	The size of the constraint.
-*/
+// Len returns the number of elements in the transposed vector linear expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vlet VectorLinearExpressionTranspose) Len() int {
 	// Constants
 
@@ -371,13 +336,10 @@ func (vlet VectorLinearExpressionTranspose) Len() int {
 	return vlet.C.Len()
 }
 
-/*
-Comparison
-Description:
-
-	Compares the input vector linear expression with respect to the expression rhsIn and the sense
-	senseIn.
-*/
+// Comparison compares the input vector linear expression transpose with respect
+// to the expression rightIn and the sense senseIn.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vlet VectorLinearExpressionTranspose) Comparison(rightIn interface{}, sense ConstrSense, errors ...error) (Constraint, error) {
 	// Constants
 
@@ -464,17 +426,11 @@ func (vlet VectorLinearExpressionTranspose) Comparison(rightIn interface{}, sens
 	}
 }
 
-/*
-RewriteInTermsOf
-Description:
-
-	Rewrites the VectorLinearExpressionTransposeession in terms of a new set of variables vv
-
-Assumes:
-
-	vv contains all unique variables.
-	All elements of vle.X are in vv.
-*/
+// RewriteInTermsOf rewrites the VectorLinearExpressionTranspose in terms of a
+// new set of variables vv. It assumes vv contains all unique variables and all
+// elements of vlet.X are in vv.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vlet VectorLinearExpressionTranspose) RewriteInTermsOf(vv VarVector) VectorLinearExpressionTranspose {
 	// Constants
 
@@ -505,10 +461,9 @@ func (vlet VectorLinearExpressionTranspose) RewriteInTermsOf(vv VarVector) Vecto
 
 }
 
-/*
-AtVec
-Description:
-*/
+// AtVec returns the scalar expression at the given index idx.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vlet VectorLinearExpressionTranspose) AtVec(idx int) ScalarExpression {
 	// Constants
 	Li := vlet.L.RowView(idx)
@@ -525,12 +480,9 @@ func (vlet VectorLinearExpressionTranspose) AtVec(idx int) ScalarExpression {
 
 }
 
-/*
-Transpose
-Description:
-
-	This method creates the transpose of the current vector and returns it.
-*/
+// Transpose creates the transpose of the current expression and returns it.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vlet VectorLinearExpressionTranspose) Transpose() Expression {
 	return VectorLinearExpr{
 		L: vlet.L,
@@ -539,17 +491,17 @@ func (vlet VectorLinearExpressionTranspose) Transpose() Expression {
 	}
 }
 
-/*
-Dims
-Description:
-
-	Returns the dimensions of the VectorLinearExpressionTranspose
-	object.
-*/
+// Dims returns the dimensions of the VectorLinearExpressionTranspose object.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vlet VectorLinearExpressionTranspose) Dims() []int {
 	return []int{1, vlet.Len()}
 }
 
+// ToScalarLinearExpression converts the VectorLinearExpressionTranspose to a
+// ScalarLinearExpr. This only works when the dimension is 1.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vlet VectorLinearExpressionTranspose) ToScalarLinearExpression() (ScalarLinearExpr, error) {
 	// Check Errors
 	err := vlet.Check()
@@ -573,13 +525,10 @@ func (vlet VectorLinearExpressionTranspose) ToScalarLinearExpression() (ScalarLi
 	return ScalarLinearExpr{L: L, X: vlet.X.Copy(), C: C}, nil
 }
 
-/*
-ToSymbolic
-Description:
-
-	Returns the symbolic version of the vector linear expression
-	transpose.
-*/
+// ToSymbolic returns the symbolic version of the vector linear expression
+// transpose.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vlet VectorLinearExpressionTranspose) ToSymbolic() (symbolic.Expression, error) {
 	// Check
 	err := vlet.Check()

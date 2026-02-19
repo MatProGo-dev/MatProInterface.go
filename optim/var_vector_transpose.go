@@ -6,53 +6,31 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-/*
-var_vector_transpose.go
-Description:
-	The VarVectorTranspose type will represent a transposed vector of all
-	variables.
-*/
-
-/*
-VarVectorTranspose
-Description:
-
-	Represnts a variable in a optimization problem. The variable is
-*/
+// VarVectorTranspose represents a transposed vector of all optimization variables.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 type VarVectorTranspose struct {
 	Elements []Variable
 }
-
-// =========
-// Functions
-// =========
-
-/*
-Length
-Description:
-
-	Returns the length of the vector of optimization variables.
-*/
+// Length returns the length of the vector of optimization variables.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vvt VarVectorTranspose) Length() int {
 	return len(vvt.Elements)
 }
 
-/*
-Len
-Description:
-
-	This function is created to mirror the GoNum Vector API. Does the same thing as Length.
-*/
+// Len returns the length of the vector of optimization variables.
+// This mirrors the GoNum Vector API and does the same thing as Length.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vvt VarVectorTranspose) Len() int {
 	return vvt.Length()
 }
 
-/*
-At
-Description:
-
-	Mirrors the gonum api for vectors. This extracts the element of the variable vector at the index x.
-*/
+// AtVec mirrors the gonum API for vectors and extracts the element of the
+// variable vector at the given index.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vvt VarVectorTranspose) AtVec(idx int) ScalarExpression {
 	// Constants
 
@@ -60,12 +38,9 @@ func (vvt VarVectorTranspose) AtVec(idx int) ScalarExpression {
 	return vvt.Elements[idx]
 }
 
-/*
-IDs
-Description:
-
-	Returns the unique indices
-*/
+// IDs returns the unique variable IDs in the transposed variable vector.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vvt VarVectorTranspose) IDs() []uint64 {
 	// Algorithm
 	var IDSlice []uint64
@@ -78,45 +53,33 @@ func (vvt VarVectorTranspose) IDs() []uint64 {
 
 }
 
-/*
-NumVars
-Description:
-
-	The number of unique variables inside the variable vector.
-*/
+// NumVars returns the number of unique variables inside the transposed variable vector.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vvt VarVectorTranspose) NumVars() int {
 	return len(vvt.IDs())
 }
 
-/*
-Constant
-Description:
-
-	Returns an all zeros vector as output from the method.
-*/
+// Constant returns an all-zeros vector as the constant component of the expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vvt VarVectorTranspose) Constant() mat.VecDense {
 	zerosOut := ZerosVector(vvt.Len())
 	return zerosOut
 }
 
-/*
-LinearCoeff
-Description:
-
-	Returns the matrix which is multiplied by Variables to get the current "expression".
-	For a single vector, this is an identity matrix.
-*/
+// LinearCoeff returns the matrix which is multiplied by Variables to get the
+// current expression. For a single vector, this is an identity matrix.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vvt VarVectorTranspose) LinearCoeff() mat.Dense {
 	return Identity(vvt.Len())
 }
 
-/*
-Plus
-Description:
-
-	This member function computes the addition of the receiver vector var with the
-	incoming vector expression ve.
-*/
+// Plus computes the addition of the receiver VarVectorTranspose with the
+// incoming vector expression eIn.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vvt VarVectorTranspose) Plus(eIn interface{}, errors ...error) (Expression, error) {
 	// Constants
 	vvLen := vvt.Len()
@@ -184,12 +147,9 @@ func (vvt VarVectorTranspose) Plus(eIn interface{}, errors ...error) (Expression
 	}
 }
 
-/*
-Multiply
-Description:
-
-	Multiplication of a VarVectorTranspose with another expression.
-*/
+// Multiply performs multiplication of a VarVectorTranspose with another expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vvt VarVectorTranspose) Multiply(e interface{}, errors ...error) (Expression, error) {
 	// Input Processing
 	err := CheckErrors(errors)
@@ -325,47 +285,35 @@ func (vvt VarVectorTranspose) Multiply(e interface{}, errors ...error) (Expressi
 	}
 }
 
-/*
-LessEq
-Description:
-
-	This method creates a less than or equal to vector constraint using the receiver as the left hand side and the
-	input rhs as the right hand side if it is valid.
-*/
+// LessEq creates a less than or equal to vector constraint using the receiver
+// as the left hand side and the input rhs as the right hand side.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vvt VarVectorTranspose) LessEq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return vvt.Comparison(rightIn, SenseLessThanEqual, errors...)
 }
 
-/*
-GreaterEq
-Description:
-
-	This method creates a greater than or equal to vector constraint using the receiver as the left hand side and the
-	input rhs as the right hand side if it is valid.
-*/
+// GreaterEq creates a greater than or equal to vector constraint using the
+// receiver as the left hand side and the input rhs as the right hand side.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vvt VarVectorTranspose) GreaterEq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return vvt.Comparison(rightIn, SenseGreaterThanEqual, errors...)
 }
 
-/*
-Eq
-Description:
-
-	This method creates an equal to vector constraint using the receiver as the left hand side and the
-	input rhs as the right hand side if it is valid.
-*/
+// Eq creates an equal to vector constraint using the receiver as the left hand
+// side and the input rhs as the right hand side.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vvt VarVectorTranspose) Eq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return vvt.Comparison(rightIn, SenseEqual, errors...)
 
 }
 
-/*
-Comparison
-Description:
-
-	This method creates a constraint of type sense between
-	the receiver (as left hand side) and rhs (as right hand side) if both are valid.
-*/
+// Comparison creates a constraint of type sense between the receiver (as left
+// hand side) and rhs (as right hand side).
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vvt VarVectorTranspose) Comparison(rightIn interface{}, sense ConstrSense, errors ...error) (Constraint, error) {
 	// Input Processing
 	err := CheckErrors(errors)
@@ -434,6 +382,9 @@ func (vvt VarVectorTranspose) Comparison(rightIn interface{}, sense ConstrSense,
 	}
 }
 
+// Copy creates a copy of the VarVectorTranspose.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vvt VarVectorTranspose) Copy() VarVectorTranspose {
 	// Constants
 
@@ -448,33 +399,25 @@ func (vvt VarVectorTranspose) Copy() VarVectorTranspose {
 
 }
 
-/*
-Transpose
-Description:
-
-	This method creates the transpose of the current vector and returns it.
-*/
+// Transpose creates the transpose of the current vector and returns it.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vvt VarVectorTranspose) Transpose() Expression {
 	vvtCopy := vvt.Copy()
 	return VarVector{vvtCopy.Elements}
 }
 
-/*
-Dims
-Description:
-
-	This method returns the dimension of the VarVectorTranspose object.
-*/
+// Dims returns the dimension of the VarVectorTranspose object.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vvt VarVectorTranspose) Dims() []int {
 	return []int{1, vvt.Len()}
 }
 
-/*
-Check
-Description:
-
-	Checks whether or not the VarVector has a sensible initialization.
-*/
+// Check checks whether or not the VarVectorTranspose has a sensible
+// initialization, returning an error if any element is not properly defined.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vvt VarVectorTranspose) Check() error {
 	// Check that each variable is properly defined
 	for ii, element := range vvt.Elements {
@@ -491,13 +434,10 @@ func (vvt VarVectorTranspose) Check() error {
 	return nil
 }
 
-/*
-ToSymbolic
-Description:
-
-	This method converts the VarVectorTranspose to a symbolic expression
-	(i.e., an expression made using SymbolicMath.go).
-*/
+// ToSymbolic converts the VarVectorTranspose to a symbolic expression
+// (i.e., an expression made using SymbolicMath.go).
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vvt VarVectorTranspose) ToSymbolic() (symbolic.Expression, error) {
 	// Input Processing
 	err := vvt.Check()
