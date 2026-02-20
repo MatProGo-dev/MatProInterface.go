@@ -4,43 +4,31 @@ import (
 	"fmt"
 	"gonum.org/v1/gonum/mat"
 )
-
-/*
-operators.go
-Description:
-	Defines the operators that transform variables and expressions into expressions or constraints.
-*/
-
-/*
-Eq
-Description:
-
-	Returns a constraint representing lhs == rhs
-*/
+// Eq returns a constraint representing lhs == rhs.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func Eq(lhs, rhs interface{}) (Constraint, error) {
 	return Comparison(lhs, rhs, SenseEqual)
 }
 
-// LessEq returns a constraint representing lhs <= rhs
+// LessEq returns a constraint representing lhs <= rhs.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func LessEq(lhs, rhs interface{}) (Constraint, error) {
 	return Comparison(lhs, rhs, SenseLessThanEqual)
 }
 
-// GreaterEq returns a constraint representing lhs >= rhs
+// GreaterEq returns a constraint representing lhs >= rhs.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func GreaterEq(lhs, rhs interface{}) (Constraint, error) {
 	return Comparison(lhs, rhs, SenseGreaterThanEqual)
 }
 
-/*
-Comparison
-Description:
-
-	Compares the two inputs lhs (Left Hand Side) and rhs (Right Hand Side) in the sense provided in sense.
-
-Usage:
-
-	constr, err := Comparison(expr1, expr2, SenseGreaterThanEqual)
-*/
+// Comparison compares the two inputs lhs (Left Hand Side) and rhs (Right Hand Side)
+// in the sense provided in sense.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func Comparison(lhs, rhs interface{}, sense ConstrSense) (Constraint, error) {
 	// Input Processing
 	var err error
@@ -66,12 +54,10 @@ func Comparison(lhs, rhs interface{}, sense ConstrSense) (Constraint, error) {
 
 }
 
-/*
-Multiply
-Description:
-
-	Defines the multiplication between two objects.
-*/
+// Multiply defines the multiplication between two objects, returning the
+// resulting expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func Multiply(term1, term2 interface{}) (Expression, error) {
 	// Constants
 
@@ -121,6 +107,8 @@ func Multiply(term1, term2 interface{}) (Expression, error) {
 
 // Sum returns the sum of the given expressions. It creates a new empty
 // expression and adds to it the given expressions.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func Sum(exprs ...interface{}) (Expression, error) {
 	// Constants
 

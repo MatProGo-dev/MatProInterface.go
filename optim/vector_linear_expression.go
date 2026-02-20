@@ -1,11 +1,5 @@
 package optim
 
-/*
-vector_linear_expression.go
-Description:
-
-*/
-
 import (
 	"fmt"
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
@@ -14,22 +8,21 @@ import (
 
 // VectorLinearExpr represents a linear general expression of the form
 //
-//	L' * x + C
+//	L * x + C
 //
-// where L is an n x m matrix of coefficients that matches the dimension of x, the vector of variables
-// and C is a constant vector
+// where L is an n x m matrix of coefficients that matches the dimension of x, the vector of variables,
+// and C is a constant vector.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 type VectorLinearExpr struct {
 	X VarVector
 	L mat.Dense // Matrix of coefficients. Should match the dimensions of XIndices
 	C mat.VecDense
 }
 
-/*
-Check
-Description:
-
-	Checks to see if the VectorLinearExpression is well-defined.
-*/
+// Check checks to see if the VectorLinearExpr is well-defined.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vle VectorLinearExpr) Check() error {
 	// Extract the dimension of the vector x
 	m := vle.X.Length()
@@ -50,75 +43,56 @@ func (vle VectorLinearExpr) Check() error {
 	return nil
 }
 
-/*
-IDs
-Description:
-
-	Returns the MatProInterface ID of each variable in the current vector linear expression.
-*/
+// IDs returns the MatProInterface ID of each variable in the current vector linear expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vle VectorLinearExpr) IDs() []uint64 {
 	return vle.X.IDs()
 }
 
-/*
-NumVars
-Description:
-
-	Returns the goop2 ID of each variable in the current vector linear expression.
-*/
+// NumVars returns the number of unique variables in the current vector linear expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vle VectorLinearExpr) NumVars() int {
 	return len(vle.IDs())
 }
 
-/*
-LinearCoeff
-Description:
-
-	Returns the matrix which is applied as a coefficient to the vector X in our expression.
-*/
+// LinearCoeff returns the matrix which is applied as a coefficient to the vector X in the expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vle VectorLinearExpr) LinearCoeff() mat.Dense {
 
 	return vle.L
 }
 
-/*
-Constant
-Description:
-
-	Returns the vector which is given as an offset vector in the linear expression represented by v
-	(the c in the above expression).
-*/
+// Constant returns the vector which is given as an offset vector in the linear
+// expression (the C in L*x + C).
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vle VectorLinearExpr) Constant() mat.VecDense {
 
 	return vle.C
 }
 
-/*
-GreaterEq
-Description:
-
-	Creates a VectorConstraint that declares vle is greater than or equal to the value to the right hand side rhs.
-*/
+// GreaterEq creates a VectorConstraint that declares vle is greater than or
+// equal to the value to the right hand side rhs.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vle VectorLinearExpr) GreaterEq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return vle.Comparison(rightIn, SenseGreaterThanEqual, errors...)
 }
 
-/*
-LessEq
-Description:
-
-	Creates a VectorConstraint that declares vle is less than or equal to the value to the right hand side rhs.
-*/
+// LessEq creates a VectorConstraint that declares vle is less than or equal to
+// the value to the right hand side rhs.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vle VectorLinearExpr) LessEq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return vle.Comparison(rightIn, SenseLessThanEqual, errors...)
 }
 
-/*
-Multiply
-Description:
-
-	Multiplication of a VarVector with another expression.
-*/
+// Multiply performs multiplication of a VectorLinearExpr with another expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vle VectorLinearExpr) Multiply(rightIn interface{}, errors ...error) (Expression, error) {
 	// Input Processing
 	err := CheckErrors(errors)
@@ -186,12 +160,9 @@ func (vle VectorLinearExpr) Multiply(rightIn interface{}, errors ...error) (Expr
 	}
 }
 
-/*
-Plus
-Description:
-
-	Returns an expression which adds the expression e to the vector linear expression at hand.
-*/
+// Plus returns an expression which adds the expression e to the vector linear expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vle VectorLinearExpr) Plus(rightIn interface{}, errors ...error) (Expression, error) {
 	// Constants
 	vleLen := vle.Len()
@@ -348,23 +319,17 @@ Description:
 //	return nil, fmt.Errorf("Unexpected type of right hand side %v: %T", rhsIn, rhsIn)
 //}
 
-/*
-Eq
-Description:
-
-	Creates a constraint between the current vector linear expression v and the
-	rhs given by rhs.
-*/
+// Eq creates a constraint between the current vector linear expression and
+// the rhs given by rhs.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vle VectorLinearExpr) Eq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return vle.Comparison(rightIn, SenseEqual, errors...)
 }
 
-/*
-Len
-Description:
-
-	The size of the constraint.
-*/
+// Len returns the number of rows in the vector linear expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vle VectorLinearExpr) Len() int {
 	// Constants
 
@@ -372,13 +337,10 @@ func (vle VectorLinearExpr) Len() int {
 	return vle.C.Len()
 }
 
-/*
-Comparison
-Description:
-
-	Compares the input vector linear expression with respect to the expression rhsIn and the sense
-	senseIn.
-*/
+// Comparison compares the input vector linear expression with respect to the
+// expression rhsIn and the sense senseIn.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vle VectorLinearExpr) Comparison(rightIn interface{}, sense ConstrSense, errors ...error) (Constraint, error) {
 	// Constants
 
@@ -461,17 +423,11 @@ func (vle VectorLinearExpr) Comparison(rightIn interface{}, sense ConstrSense, e
 	}
 }
 
-/*
-RewriteInTermsOf
-Description:
-
-	Rewrites the VectorLinearExpression in terms of a new set of variables vv
-
-Assumes:
-
-	vv contains all unique variables.
-	All elements of vle.X are in vv.
-*/
+// RewriteInTermsOf rewrites the VectorLinearExpr in terms of a new set of
+// variables vv. It assumes vv contains all unique variables and all elements
+// of vle.X are in vv.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vle VectorLinearExpr) RewriteInTermsOf(vv VarVector) VectorLinearExpr {
 	// Constants
 
@@ -502,10 +458,9 @@ func (vle VectorLinearExpr) RewriteInTermsOf(vv VarVector) VectorLinearExpr {
 
 }
 
-/*
-AtVec
-Description:
-*/
+// AtVec returns the scalar expression at the given index idx.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vle VectorLinearExpr) AtVec(idx int) ScalarExpression {
 	// Constants
 	Li := vle.L.RowView(idx)
@@ -522,12 +477,9 @@ func (vle VectorLinearExpr) AtVec(idx int) ScalarExpression {
 
 }
 
-/*
-Transpose
-Description:
-
-	This method creates the transpose of the current vector and returns it.
-*/
+// Transpose creates the transpose of the current vector and returns it.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vle VectorLinearExpr) Transpose() Expression {
 	return VectorLinearExpressionTranspose{
 		L: vle.L,
@@ -536,12 +488,9 @@ func (vle VectorLinearExpr) Transpose() Expression {
 	}
 }
 
-/*
-Copy
-Description:
-
-	This method copies the contents of a Vector Linear Expression.
-*/
+// Copy returns a copy of the VectorLinearExpr.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vle VectorLinearExpr) Copy() VectorLinearExpr {
 	// Constants
 	nRows := vle.Len()
@@ -558,22 +507,16 @@ func (vle VectorLinearExpr) Copy() VectorLinearExpr {
 	return out
 }
 
-/*
-Dims
-Description:
-
-	This method returns the dimensions of the KVectorTranspose object.
-*/
+// Dims returns the dimensions of the VectorLinearExpr.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vle VectorLinearExpr) Dims() []int {
 	return []int{vle.Len(), 1}
 }
 
-/*
-ToSymbolic
-Description:
-
-	This method returns the symbolic version of the KVectorTranspose expression.
-*/
+// ToSymbolic returns the symbolic version of the VectorLinearExpr expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vle VectorLinearExpr) ToSymbolic() (symbolic.Expression, error) {
 	// Input Processing
 	err := vle.Check()

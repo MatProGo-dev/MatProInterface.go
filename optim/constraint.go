@@ -1,12 +1,9 @@
 package optim
 
-/*
-constraint.go
-Description:
-	Defines an interface that we are meant to use with the ScalarContraint and VectorConstraint
-	objects.
-*/
-
+// Constraint is an interface for use with the ScalarConstraint and
+// VectorConstraint objects.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 type Constraint interface {
 	Left() Expression
 	Right() Expression
@@ -14,6 +11,10 @@ type Constraint interface {
 	Check() error
 }
 
+// IsConstraint returns true if the input is a valid Constraint type
+// (ScalarConstraint or VectorConstraint).
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func IsConstraint(c interface{}) bool {
 	switch c.(type) {
 	case ScalarConstraint:

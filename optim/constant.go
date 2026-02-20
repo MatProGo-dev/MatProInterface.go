@@ -8,45 +8,63 @@ import (
 
 const (
 	// Zero is a constant expression representing the value 0.
+	//
+	// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 	Zero = K(0)
 	// One is a constant expression representing the value 1.
+	//
+	// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 	One = K(1)
 )
 
 // K is a constant expression type for an MIP (Mixed Integer Program).
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 type K float64
 
 // Variables returns all variables included in the expression.
 // For constant K, there are no variables, so it returns an empty slice.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (c K) Variables() []Variable {
 	return []Variable{}
 }
 
 // NumVars returns the number of variables in the expression.
 // For constant K, this is always 0.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (c K) NumVars() int {
 	return 0
 }
 
 // IDs returns a slice of the variable IDs in the expression.
 // For constant K, this is always nil.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (c K) IDs() []uint64 {
 	return nil
 }
 
 // Coeffs returns a slice of the coefficients in the expression.
 // For constant K, this is always nil.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (c K) Coeffs() []float64 {
 	return nil
 }
 
 // Constant returns the constant additive value in the expression.
 // For constant K, this is just the constant's value.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (c K) Constant() float64 {
 	return float64(c)
 }
 
 // Plus adds the current expression to another and returns the resulting expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (c K) Plus(rightIn interface{}, errors ...error) (Expression, error) {
 	// Input Processing
 	err := CheckErrors(errors)
@@ -78,21 +96,29 @@ func (c K) Plus(rightIn interface{}, errors ...error) (Expression, error) {
 }
 
 // LessEq returns a less than or equal to (<=) constraint between the current expression and another.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (c K) LessEq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return c.Comparison(rightIn, SenseLessThanEqual, errors...)
 }
 
 // GreaterEq returns a greater than or equal to (>=) constraint between the current expression and another.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (c K) GreaterEq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return c.Comparison(rightIn, SenseGreaterThanEqual, errors...)
 }
 
 // Eq returns an equality (==) constraint between the current expression and another.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (c K) Eq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return c.Comparison(rightIn, SenseEqual, errors...)
 }
 
 // Comparison compares the receiver with expression rhs in the sense provided by sense.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (c K) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (Constraint, error) {
 	// InputProcessing
 	err := CheckErrors(errors)
@@ -112,6 +138,8 @@ func (c K) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (Co
 }
 
 // Multiply multiplies the input constant by another expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (c K) Multiply(term1 interface{}, errors ...error) (Expression, error) {
 	// Constants
 
@@ -217,19 +245,30 @@ func (c K) Multiply(term1 interface{}, errors ...error) (Expression, error) {
 	}
 }
 
+// Dims returns the dimensions of the constant K expression, which is always [1, 1] for a scalar.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (c K) Dims() []int {
 	return []int{1, 1} // Signifies scalar
 }
 
+// Check verifies that the constant K expression is valid. For K, this always returns nil.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (c K) Check() error {
 	return nil
 }
 
+// Transpose returns the transpose of the constant K expression, which is the constant itself.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (c K) Transpose() Expression {
 	return c
 }
 
 // ToSymbolic converts the constant to a symbolic expression (i.e., one that uses the symbolic math toolbox).
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (c K) ToSymbolic() (symbolic.Expression, error) {
 	return symbolic.K(c), nil
 }

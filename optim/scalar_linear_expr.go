@@ -10,8 +10,10 @@ import (
 //
 //	L' * x + C
 //
-// where L is a vector of coefficients that matches the dimension of x, the vector of variables
-// variables and C is a constant
+// where L is a vector of coefficients that matches the dimension of x, the vector of variables,
+// and C is a constant.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 type ScalarLinearExpr struct {
 	X VarVector
 	L mat.VecDense // Vector of coefficients. Should match the dimensions of XIndices
@@ -20,31 +22,36 @@ type ScalarLinearExpr struct {
 
 // NewLinearExpr returns a new expression with a single additive constant
 // value, c, and no variables.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func NewLinearExpr(c float64) ScalarExpression {
 	return ScalarLinearExpr{C: c}
 }
 
-/*
-Variables
-Description:
-
-	This function returns a slice containing all unique variables in the linear expression le.
-*/
+// Variables returns a slice containing all unique variables in the linear expression sle.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sle ScalarLinearExpr) Variables() []Variable {
 	return UniqueVars(sle.X.Elements)
 }
 
-// NumVars returns the number of variables in the expression
+// NumVars returns the number of variables in the expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sle ScalarLinearExpr) NumVars() int {
 	return sle.X.Len()
 }
 
-// IDs Vars returns a slice of the Var ids in the expression
+// IDs returns a slice of the Var ids in the expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sle ScalarLinearExpr) IDs() []uint64 {
 	return sle.X.IDs()
 }
 
-// Coeffs returns a slice of the coefficients in the expression
+// Coeffs returns a slice of the coefficients in the expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sle ScalarLinearExpr) Coeffs() []float64 {
 	var coeffsOut []float64
 	for i := 0; i < sle.L.Len(); i++ {
@@ -53,15 +60,17 @@ func (sle ScalarLinearExpr) Coeffs() []float64 {
 	return coeffsOut
 }
 
-// Constant returns the constant additive value in the expression
+// Constant returns the constant additive value in the expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sle ScalarLinearExpr) Constant() float64 {
 	return sle.C
 }
 
-/*
-Check
-Description:
-*/
+// Check verifies that the ScalarLinearExpr is well-formed, ensuring the
+// length of L matches the length of X.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sle ScalarLinearExpr) Check() error {
 	// Compare lengths of X and L
 	if sle.L.Len() != sle.X.Len() {
@@ -77,7 +86,9 @@ func (sle ScalarLinearExpr) Check() error {
 }
 
 // Plus adds the current expression to another and returns the resulting
-// expression
+// expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sle ScalarLinearExpr) Plus(e interface{}, errors ...error) (Expression, error) {
 	// Input Processing
 	err := sle.Check()
@@ -150,33 +161,32 @@ func (sle ScalarLinearExpr) Plus(e interface{}, errors ...error) (Expression, er
 }
 
 // LessEq returns a less than or equal to (<=) constraint between the
-// current expression and another
+// current expression and another.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sle ScalarLinearExpr) LessEq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return sle.Comparison(rightIn, SenseLessThanEqual, errors...)
 }
 
 // GreaterEq returns a greater than or equal to (>=) constraint between the
-// current expression and another
+// current expression and another.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sle ScalarLinearExpr) GreaterEq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return sle.Comparison(rightIn, SenseGreaterThanEqual, errors...)
 }
 
 // Eq returns an equality (==) constraint between the current expression
-// and another
+// and another.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sle ScalarLinearExpr) Eq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return sle.Comparison(rightIn, SenseEqual, errors...)
 }
 
-/*
-Comparison
-Description:
-
-	This method compares the receiver with expression rhs in the sense provided by sense.
-
-Usage:
-
-	constr, err := e.Comparison(expr1,SenseGreaterThanEqual)
-*/
+// Comparison compares the receiver with expression rhs in the sense provided by sense.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sle ScalarLinearExpr) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (Constraint, error) {
 	// Input Processing
 	err := sle.Check()
@@ -197,16 +207,10 @@ func (sle ScalarLinearExpr) Comparison(rhsIn interface{}, sense ConstrSense, err
 	return ScalarConstraint{sle, rhs, sense}, nil
 }
 
-/*
-RewriteInTermsOf
-Description:
-
-	Rewrites the current linear expression in terms of the new variables.
-
-Usage:
-
-	rewrittenLE, err := orignalLE.RewriteInTermsOfIndices(newXIndices1)
-*/
+// RewriteInTermsOf rewrites the current linear expression in terms of the new
+// variables newX.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sle ScalarLinearExpr) RewriteInTermsOf(newX VarVector) (ScalarLinearExpr, error) {
 	// Create new Linear Express
 	var newLE ScalarLinearExpr = ScalarLinearExpr{
@@ -250,12 +254,9 @@ func (sle ScalarLinearExpr) RewriteInTermsOf(newX VarVector) (ScalarLinearExpr, 
 
 }
 
-/*
-Multiply
-Description:
-
-	multiplies the current expression to another and returns the resulting expression
-*/
+// Multiply multiplies the current expression to another and returns the resulting expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sle ScalarLinearExpr) Multiply(rightInput interface{}, errors ...error) (Expression, error) {
 	// Input Processing
 	err := sle.Check()
@@ -386,10 +387,9 @@ func (sle ScalarLinearExpr) Multiply(rightInput interface{}, errors ...error) (E
 	}
 }
 
-/*
-Copy
-Description:
-*/
+// Copy returns a copy of the ScalarLinearExpr.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sle ScalarLinearExpr) Copy() ScalarLinearExpr {
 	// Constants
 
@@ -405,31 +405,24 @@ func (sle ScalarLinearExpr) Copy() ScalarLinearExpr {
 	return sleOut
 }
 
-/*
-Dims
-Description:
-
-	Dimensions of a
-*/
+// Dims returns the dimensions of the ScalarLinearExpr, which is always [1, 1].
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sle ScalarLinearExpr) Dims() []int {
 	return []int{1, 1} // Represents scalar
 }
 
-/*
-Transpose
-Description:
-*/
+// Transpose returns the transpose of the ScalarLinearExpr, which is the expression itself.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sle ScalarLinearExpr) Transpose() Expression {
 	return sle
 }
 
-/*
-ToSymbolic
-Description:
-
-	Converts the constant to a symbolic expression (i.e., one that uses the
-	symbolic math toolbox).
-*/
+// ToSymbolic converts the scalar linear expression to a symbolic expression
+// (i.e., one that uses the symbolic math toolbox).
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (sle ScalarLinearExpr) ToSymbolic() (symbolic.Expression, error) {
 	// Check for errors
 	err := sle.Check()

@@ -6,52 +6,32 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-/*
-var_vector.go
-Description:
-	The VarVector type will represent a
-*/
-
-/*
-VarVector
-Description:
-
-	Represnts a variable in a optimization problem. The variable is
-*/
+// VarVector represents a vector of optimization variables.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 type VarVector struct {
 	Elements []Variable
 }
 
-// =========
-// Functions
-// =========
-
-/*
-Length
-Description:
-
-	Returns the length of the vector of optimization variables.
-*/
+// Length returns the length of the vector of optimization variables.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vv VarVector) Length() int {
 	return len(vv.Elements)
 }
 
-/*
-Len
-Description:
-
-	This function is created to mirror the GoNum Vector API. Does the same thing as Length.
-*/
+// Len returns the length of the vector of optimization variables.
+// This mirrors the GoNum Vector API and does the same thing as Length.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vv VarVector) Len() int {
 	return vv.Length()
 }
 
-/*
-At
-Description:
-
-	Mirrors the gonum api for vectors. This extracts the element of the variable vector at the index x.
-*/
+// AtVec mirrors the gonum API for vectors and extracts the element of the
+// variable vector at the given index.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vv VarVector) AtVec(idx int) ScalarExpression {
 	// Constants
 
@@ -59,12 +39,9 @@ func (vv VarVector) AtVec(idx int) ScalarExpression {
 	return vv.Elements[idx]
 }
 
-/*
-IDs
-Description:
-
-	Returns the unique indices
-*/
+// IDs returns the unique variable IDs in the variable vector.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vv VarVector) IDs() []uint64 {
 	// Algorithm
 	var IDSlice []uint64
@@ -77,45 +54,33 @@ func (vv VarVector) IDs() []uint64 {
 
 }
 
-/*
-NumVars
-Description:
-
-	The number of unique variables inside the variable vector.
-*/
+// NumVars returns the number of unique variables inside the variable vector.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vv VarVector) NumVars() int {
 	return len(vv.IDs())
 }
 
-/*
-Constant
-Description:
-
-	Returns an all zeros vector as output from the method.
-*/
+// Constant returns an all-zeros vector as the constant component of the expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vv VarVector) Constant() mat.VecDense {
 	zerosOut := ZerosVector(vv.Len())
 	return zerosOut
 }
 
-/*
-LinearCoeff
-Description:
-
-	Returns the matrix which is multiplied by Variables to get the current "expression".
-	For a single vector, this is an identity matrix.
-*/
+// LinearCoeff returns the matrix which is multiplied by Variables to get the
+// current expression. For a single vector, this is an identity matrix.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vv VarVector) LinearCoeff() mat.Dense {
 	return Identity(vv.Len())
 }
 
-/*
-Plus
-Description:
-
-	This member function computes the addition of the receiver vector var with the
-	incoming vector expression ve.
-*/
+// Plus computes the addition of the receiver VarVector with the incoming
+// vector expression e.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vv VarVector) Plus(e interface{}, errors ...error) (Expression, error) {
 	// Constants
 	vvLen := vv.Len()
@@ -185,23 +150,17 @@ func (vv VarVector) Plus(e interface{}, errors ...error) (Expression, error) {
 	}
 }
 
-/*
-Mult
-Description:
-
-	This member function computest the multiplication of the receiver vector var with some
-	incoming vector expression (may result in quadratic?).
-*/
+// Mult computes the multiplication of the receiver VarVector with a scalar
+// float64 value. This method is not yet implemented.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vv VarVector) Mult(c float64) (VectorExpression, error) {
 	return vv, fmt.Errorf("The Mult() method for VarVector is not implemented yet!")
 }
 
-/*
-Multiply
-Description:
-
-	Multiplication of a VarVector with another expression.
-*/
+// Multiply performs multiplication of a VarVector with another expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vv VarVector) Multiply(rightIn interface{}, errors ...error) (Expression, error) {
 	//Input Processing
 	err := vv.Check()
@@ -264,47 +223,35 @@ func (vv VarVector) Multiply(rightIn interface{}, errors ...error) (Expression, 
 	}
 }
 
-/*
-LessEq
-Description:
-
-	This method creates a less than or equal to vector constraint using the receiver as the left hand side and the
-	input rhs as the right hand side if it is valid.
-*/
+// LessEq creates a less than or equal to vector constraint using the receiver
+// as the left hand side and the input rhs as the right hand side.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vv VarVector) LessEq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return vv.Comparison(rightIn, SenseLessThanEqual, errors...)
 }
 
-/*
-GreaterEq
-Description:
-
-	This method creates a greater than or equal to vector constraint using the receiver as the left hand side and the
-	input rhs as the right hand side if it is valid.
-*/
+// GreaterEq creates a greater than or equal to vector constraint using the
+// receiver as the left hand side and the input rhs as the right hand side.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vv VarVector) GreaterEq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return vv.Comparison(rightIn, SenseGreaterThanEqual, errors...)
 }
 
-/*
-Eq
-Description:
-
-	This method creates an equal to vector constraint using the receiver as the left hand side and the
-	input rhs as the right hand side if it is valid.
-*/
+// Eq creates an equal to vector constraint using the receiver as the left hand
+// side and the input rhs as the right hand side.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vv VarVector) Eq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return vv.Comparison(rightIn, SenseEqual, errors...)
 
 }
 
-/*
-Comparison
-Description:
-
-	This method creates a constraint of type sense between
-	the receiver (as left hand side) and rhs (as right hand side) if both are valid.
-*/
+// Comparison creates a constraint of type sense between the receiver (as left
+// hand side) and rhs (as right hand side).
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vv VarVector) Comparison(rhs interface{}, sense ConstrSense, errors ...error) (Constraint, error) {
 	// Constants
 
@@ -378,6 +325,9 @@ func (vv VarVector) Comparison(rhs interface{}, sense ConstrSense, errors ...err
 	}
 }
 
+// Copy creates a copy of the VarVector.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vv VarVector) Copy() VarVector {
 	// Constants
 
@@ -392,33 +342,25 @@ func (vv VarVector) Copy() VarVector {
 
 }
 
-/*
-Transpose
-Description:
-
-	This method creates the transpose of the current vector and returns it.
-*/
+// Transpose creates the transpose of the current vector and returns it.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vv VarVector) Transpose() Expression {
 	vvCopy := vv.Copy()
 	return VarVectorTranspose(vvCopy)
 }
 
-/*
-Dims
-Description:
-
-	Dimensions of the variable vector.
-*/
+// Dims returns the dimensions of the variable vector.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vv VarVector) Dims() []int {
 	return []int{vv.Len(), 1}
 }
 
-/*
-Check
-Description:
-
-	Checks whether or not the VarVector has a sensible initialization.
-*/
+// Check checks whether or not the VarVector has a sensible initialization,
+// returning an error if any element is not properly defined.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vv VarVector) Check() error {
 	// Check that each variable is properly defined
 	for ii, element := range vv.Elements {
@@ -435,13 +377,10 @@ func (vv VarVector) Check() error {
 	return nil
 }
 
-/*
-ToSymbolic
-Description:
-
-	Converts the variable vector to a symbolic expression.
-	(i.e., one that uses the symbolic math toolbox).
-*/
+// ToSymbolic converts the variable vector to a symbolic expression
+// (i.e., one that uses the symbolic math toolbox).
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (vv VarVector) ToSymbolic() (symbolic.Expression, error) {
 	// Input Checking
 	err := vv.Check()

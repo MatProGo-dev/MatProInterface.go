@@ -9,6 +9,8 @@ import (
 // c0 * x0 + c1 * x1 + ... + cn * xn + k where ci are coefficients and xi are
 // variables and k is a constant. This is a base interface that is implemented
 // by single variables, constants, and general linear expressions.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 type ScalarExpression interface {
 	// Variables returns the variables included in the scalar expression
 	Variables() []Variable
@@ -68,21 +70,19 @@ type ScalarExpression interface {
 	Check() error
 }
 
-// NewScalarExpression NewExpr returns a new expression with a single additive constant value, c,
-// and no variables. Creating an expression like sum := NewExpr(0) is useful
-// for creating new empty expressions that you can perform operatotions on
-// later
+// NewScalarExpression returns a new expression with a single additive constant value, c,
+// and no variables. Creating an expression like sum := NewScalarExpression(0) is useful
+// for creating new empty expressions that you can perform operations on later.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func NewScalarExpression(c float64) ScalarExpression {
 	return ScalarLinearExpr{C: c}
 }
 
-/*
-IsScalarExpression
-Description:
-
-	Determines whether or not an input object is a
-	valid "ScalarExpression" according to MatProInterface.
-*/
+// IsScalarExpression determines whether or not an input object is a
+// valid ScalarExpression according to MatProInterface.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func IsScalarExpression(e interface{}) bool {
 	// Check each type
 	switch e.(type) {
@@ -102,13 +102,10 @@ func IsScalarExpression(e interface{}) bool {
 	}
 }
 
-/*
-ToScalarExpression
-Description:
-
-	Converts the input expression to a valid type that
-	implements "ScalarExpression".
-*/
+// ToScalarExpression converts the input expression to a valid type that
+// implements ScalarExpression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func ToScalarExpression(e interface{}) (ScalarExpression, error) {
 	// Input Processing
 	if !IsScalarExpression(e) {

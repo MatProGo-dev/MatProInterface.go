@@ -1,27 +1,20 @@
 package optim
 
-/*
-vector_expression.go
-Description:
-	An improvement/successor to the scalar expr interface.
-*/
-
 import (
 	"fmt"
 	"github.com/MatProGo-dev/SymbolicMath.go/symbolic"
 	"gonum.org/v1/gonum/mat"
 )
 
-/*
-VectorExpression
-Description:
-
-	This interface represents any expression written in terms of a
-	vector of represents a linear general expression of the form
-		c0 * x0 + c1 * x1 + ... + cn * xn + k where ci are coefficients and xi are
-	variables and k is a constant. This is a base interface that is implemented
-	by single variables, constants, and general linear expressions.
-*/
+// VectorExpression represents a vector expression of the form
+//
+//	L * x + C
+//
+// where L is a matrix of coefficients, x is a vector of variables, and C is a
+// constant vector. This is a base interface implemented by variable vectors,
+// constant vectors, and general vector linear expressions.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 type VectorExpression interface {
 	// NumVars returns the number of variables in the expression
 	NumVars() int
@@ -81,14 +74,10 @@ type VectorExpression interface {
 	Check() error
 }
 
-/*
-NewVectorExpression
-Description:
-
-	NewExpr returns a new expression with a single additive constant value, c,
-	and no variables. Creating an expression like sum := NewVectorExpr(0) is useful
-	for creating new empty expressions that you can perform operatotions on later
-*/
+// NewVectorExpression returns a new vector expression with a constant vector c
+// and no variables.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func NewVectorExpression(c mat.VecDense) VectorLinearExpr {
 	return VectorLinearExpr{C: c}
 }
@@ -110,12 +99,10 @@ func NewVectorExpression(c mat.VecDense) VectorLinearExpr {
 //	return nil
 //}
 
-/*
-IsVectorExpression
-Description:
-
-	Determines whether or not an input object is a valid "VectorExpression" according to MatProInterface.
-*/
+// IsVectorExpression determines whether or not an input object is a valid
+// VectorExpression according to MatProInterface.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func IsVectorExpression(e interface{}) bool {
 	// Check each type
 	switch e.(type) {
@@ -139,12 +126,10 @@ func IsVectorExpression(e interface{}) bool {
 	}
 }
 
-/*
-ToVectorExpression
-Description:
-
-	Converts the input expression to a valid type that implements "VectorExpression".
-*/
+// ToVectorExpression converts the input expression to a valid type that
+// implements VectorExpression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func ToVectorExpression(e interface{}) (VectorExpression, error) {
 	// Input Processing
 	if !IsVectorExpression(e) {

@@ -16,14 +16,15 @@ Description:
 // Type Definitions
 // ================
 
-/*
-QuadraticExpr
-Description:
-
-	A quadratic expression of optimization variables (given by their indices).
-	The quadratic expression object defines a quadratic written as follows:
-		x' * Q * x + L * x + C
-*/
+// ScalarQuadraticExpression represents a quadratic expression of optimization
+// variables written as:
+//
+//	x' * Q * x + L * x + C
+//
+// where Q is the quadratic term matrix, L is the linear term vector, and C is
+// the constant term.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 type ScalarQuadraticExpression struct {
 	Q mat.Dense    // Quadratic Term
 	L mat.VecDense // Linear Term
@@ -34,13 +35,10 @@ type ScalarQuadraticExpression struct {
 // Member Functions
 // ================
 
-/*
-NewQuadraticExpr_qb0
-Description:
-
-	NewQuadraticExpr_q0 returns a basic Quadratic expression with only the matrix Q being defined,
-	all other values are assumed to be zero.
-*/
+// NewQuadraticExpr_qb0 returns a basic ScalarQuadraticExpression with only
+// the matrix Q being defined; all other values are assumed to be zero.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func NewQuadraticExpr_qb0(QIn mat.Dense, xIn VarVector) (ScalarQuadraticExpression, error) {
 	// Constants
 	numXIndices := xIn.Len()
@@ -57,12 +55,10 @@ func NewQuadraticExpr_qb0(QIn mat.Dense, xIn VarVector) (ScalarQuadraticExpressi
 	return NewQuadraticExpr(QIn, *q, 0.0, xIn)
 }
 
-/*
-NewQuadraticExpr
-Description:
-
-	NewQuadraticExpr returns a basic Quadratic expression whuch is defined by QIn, qIn and bIn.
-*/
+// NewQuadraticExpr returns a ScalarQuadraticExpression defined by QIn, qIn, bIn,
+// and xIn.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func NewQuadraticExpr(QIn mat.Dense, qIn mat.VecDense, bIn float64, xIn VarVector) (ScalarQuadraticExpression, error) {
 	// Constants
 
@@ -83,13 +79,10 @@ func NewQuadraticExpr(QIn mat.Dense, qIn mat.VecDense, bIn float64, xIn VarVecto
 	return tempExpr, nil
 }
 
-/*
-Check
-Description:
-
-	This function checks the dimensions of all of the members of the quadratic expression which are slices.
-	They should have compatible dimensions.
-*/
+// Check verifies the dimensions of all members of the quadratic expression,
+// ensuring they have compatible dimensions.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (qe ScalarQuadraticExpression) Check() error {
 	// Make the number of elements in q be the dimension of the x in the expression.
 	xLen := qe.X.Len()
@@ -108,53 +101,32 @@ func (qe ScalarQuadraticExpression) Check() error {
 	return nil
 }
 
-/*
-Variables
-Description:
-
-	This function returns a slice containing all unique variables in the expression qe.
-*/
+// Variables returns a slice containing all unique variables in the expression qe.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (qe ScalarQuadraticExpression) Variables() []Variable {
 	return UniqueVars(qe.X.Elements)
 }
 
-/*
-NumVars
-Description:
-
-	Returns the number of variables in the expression.
-	To make this actually meaningful, we only count the unique vars.
-*/
+// NumVars returns the number of unique variables in the expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (qe ScalarQuadraticExpression) NumVars() int {
 
 	return len(qe.IDs())
 }
 
-/*
-Vars
-Description:
-
-	Returns the ids of all of the variables in the quadratic expression.
-*/
+// IDs returns the ids of all of the variables in the quadratic expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (qe ScalarQuadraticExpression) IDs() []uint64 {
 	return qe.X.IDs()
 }
 
-/*
-Coeffs
-Description:
-
-	Returns the slice of all coefficient values for each pair of variable tuples.
-	The coefficients of the quadratic expression are created in an ordering that comes from the following vector.
-
-	Consider xI (the indices of the input expression e). The output coefficients will be c.
-	The coefficients of the expression
-		e = x' Q x + q' * x + b
-	will be
-		e = c' mx + b
-	where
-		mx = [ x[0]*x[0], x[0]*x[1], ... , x[0]*x[N-1], x[1]*x[1] , x[1]*x[2], ... , x[1]*x[N-1], x[2]*x[2], ... , x[N-1]*x[N-1], x[0], x[1], ... , x[N-1] ]
-*/
+// Coeffs returns the slice of all coefficient values for each pair of variable
+// tuples in the quadratic expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (qe ScalarQuadraticExpression) Coeffs() []float64 {
 	// Create container for all coefficients
 	var coefficientList []float64
@@ -181,25 +153,16 @@ func (qe ScalarQuadraticExpression) Coeffs() []float64 {
 	return coefficientList
 }
 
-/*
-Constant
-Description:
-
-	Returns the constant value associated with a quadratic expression.
-*/
+// Constant returns the constant value associated with the quadratic expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (qe ScalarQuadraticExpression) Constant() float64 {
 	return qe.C
 }
 
-/*
-Plus
-Description:
-
-	Adds a quadratic expression to either:
-	- A Quadratic Expression,
-	- A Linear Expression, or
-	- A Constant
-*/
+// Plus adds the quadratic expression to another expression and returns the result.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (qe ScalarQuadraticExpression) Plus(e interface{}, errors ...error) (Expression, error) {
 	// Constants
 
@@ -268,50 +231,33 @@ func (qe ScalarQuadraticExpression) Plus(e interface{}, errors ...error) (Expres
 
 }
 
-/*
-LessEq
-Description:
-
-	LessEq returns a less than or equal to (<=) constraint between the
-	current expression and another
-*/
+// LessEq returns a less than or equal to (<=) constraint between the
+// current expression and another.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (qe ScalarQuadraticExpression) LessEq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return qe.Comparison(rightIn, SenseLessThanEqual, errors...)
 }
 
-/*
-GreaterEq
-Description:
-
-	GreaterEq returns a greater than or equal to (>=) constraint between the
-	current expression and another
-*/
+// GreaterEq returns a greater than or equal to (>=) constraint between the
+// current expression and another.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (qe ScalarQuadraticExpression) GreaterEq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return qe.Comparison(rightIn, SenseGreaterThanEqual, errors...)
 }
 
-/*
-Eq
-Description:
-
-	Form an equality constraint with this equality constraint and another
-	Eq returns an equality (==) constraint between the current expression
-	and another
-*/
+// Eq returns an equality (==) constraint between the current expression
+// and another.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (qe ScalarQuadraticExpression) Eq(rightIn interface{}, errors ...error) (Constraint, error) {
 	return qe.Comparison(rightIn, SenseEqual, errors...)
 }
 
-/*
-Comparison
-Description:
-
-	This method compares the receiver with expression rhs in the sense provided by sense.
-
-Usage:
-
-	constr, err := qe.Comparison(expr1,SenseGreaterThanEqual)
-*/
+// Comparison compares the receiver with expression rhs in the sense provided by sense.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (qe ScalarQuadraticExpression) Comparison(rhsIn interface{}, sense ConstrSense, errors ...error) (Constraint, error) {
 	// Input Processing
 	rhs, err := ToScalarExpression(rhsIn)
@@ -327,16 +273,10 @@ func (qe ScalarQuadraticExpression) Comparison(rhsIn interface{}, sense ConstrSe
 	return ScalarConstraint{qe, rhs, sense}, nil
 }
 
-/*
-RewriteInTermsOfIndices
-Description:
-
-	Rewrites the current quadratic expression in terms of the new variables.
-
-Usage:
-
-	rewrittenQE, err := orignalQE.RewriteInTermsOfIndices(newXIndices1)
-*/
+// RewriteInTermsOf rewrites the current quadratic expression in terms of the
+// new variables newX.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (qe ScalarQuadraticExpression) RewriteInTermsOf(newX VarVector) (ScalarQuadraticExpression, error) {
 	// Create new Quadratic Expression
 	// ===============================
@@ -402,13 +342,10 @@ func (qe ScalarQuadraticExpression) RewriteInTermsOf(newX VarVector) (ScalarQuad
 
 }
 
-/*
-Multiply
-Description:
-
-	Multiply() multiplies the current expression to another and returns the
-	resulting expression
-*/
+// Multiply multiplies the current expression to another and returns the
+// resulting expression.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (qe ScalarQuadraticExpression) Multiply(val interface{}, errors ...error) (Expression, error) {
 	// Input Processing
 	if len(errors) > 0 {
@@ -458,27 +395,25 @@ func (qe ScalarQuadraticExpression) Multiply(val interface{}, errors ...error) (
 	}
 }
 
+// Dims returns the dimensions of the ScalarQuadraticExpression, which is always [1, 1].
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (qe ScalarQuadraticExpression) Dims() []int {
 	return []int{1, 1}
 }
 
-/*
-Transpose
-Description:
-
-	TBD
-*/
+// Transpose returns the transpose of the ScalarQuadraticExpression, which is
+// the expression itself.
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (qe ScalarQuadraticExpression) Transpose() Expression {
 	return qe
 }
 
-/*
-ToSymbolic
-Description:
-
-	This function converts the quadratic expression into a symbolic expression.
-	(i.e., one that uses the symbolic math toolbox).
-*/
+// ToSymbolic converts the quadratic expression into a symbolic expression
+// (i.e., one that uses the symbolic math toolbox).
+//
+// Deprecated: This package is deprecated. Please use github.com/MatProGo-dev/SymbolicMath.go instead.
 func (qe ScalarQuadraticExpression) ToSymbolic() (symbolic.Expression, error) {
 	// Input Checking
 	err := qe.Check()
